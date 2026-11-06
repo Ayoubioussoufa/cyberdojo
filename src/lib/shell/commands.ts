@@ -3,13 +3,15 @@
  * bash; scripts/check-shell.ts compares them against the real tools. Where a
  * tool is only partly implemented, it says so instead of inventing a result.
  */
+import { sha256 } from "./hash";
+import { jq, JqError } from "./jq";
 import { MAN } from "./man";
 import {
   EACCES, EEXIST, EISDIR, ENOENT, ENOTDIR, ENOTEMPTY, EPERM, FsError, NOW,
   basename, dirname, modeString, normalize, type Creds, type FsNode,
 } from "./fs";
 import { globToRegExp, posixToJs } from "./parse";
-import type { Shell } from "./shell";
+import type { Proc, Shell } from "./shell";
 
 export interface Result {
   stdout: string;
@@ -485,38 +487,61 @@ const sed: Cmd = (ctx) => {
   const { flags, rest } = opts(ctx.args);
   const script = rest.shift() ?? "";
   const extended = flags.has("E") || flags.has("r");
-  const inp = inputs(ctx, rest);
-  const ls2 = inp.flatMap((f) => lines(f.text));
   const quiet = flags.has("n");
-  let m = /^s(.)((?:\\.|(?!\1).)*)\1((?:\\.|(?!\1).)*)\1([gip]*)$/.exec(script);
-  const out: string[] = [];
-  if (m) {
-    const re = new RegExp(posixToJs(m[2] as string, extended), (m[4]?.includes("g") ? "g" : "") + (m[4]?.includes("i") ? "i" : ""));
-    const replacement = (m[3] as string).replace(/\$/g, "$$$$").replace(/\\(\d)/g, "$$$1").replace(/(?<!\\)&/g, "$$&").replace(/\\&/g, "&");
-    for (const l of ls2) {
-      const n = l.replace(re, replacement);
-      if (!quiet) out.push(n);
-      else if (m[4]?.includes("p") && re.test(l)) out.push(n);
-    }
-    return { stdout: join(out), stderr: inp.errors, code: 0 };
-  }
-  m = /^(?:(\d+)(?:,(\d+|\$))?|\/(.*)\/)([dp])$/.exec(script);
-  if (m) {
-    const from = Number(m[1]);
-    const to = m[2] === "$" ? Infinity : m[2] ? Number(m[2]) : from;
-    const re = m[3] !== undefined ? new RegExp(posixToJs(m[3], extended)) : null;
-    ls2.forEach((l, i) => {
-      const hit = re ? re.test(l) : i + 1 >= from && i + 1 <= to;
-      if (m?.[4] === "d") {
-        if (!hit && !quiet) out.push(l);
-      } else {
-        if (hit) out.push(l);
-        if (!quiet) out.push(l);
+  const apply = (ls2: string[]): string[] | null => {
+    let m = /^s(.)((?:\\.|(?!\1).)*)\1((?:\\.|(?!\1).)*)\1([gip]*)$/.exec(script);
+    const out: string[] = [];
+    if (m) {
+      const re = new RegExp(posixToJs(m[2] as string, extended), (m[4]?.includes("g") ? "g" : "") + (m[4]?.includes("i") ? "i" : ""));
+      const replacement = (m[3] as string).replace(/\$/g, "$$$$").replace(/\\(\d)/g, "$$$1").replace(/(?<!\\)&/g, "$$&").replace(/\\&/g, "&");
+      for (const l of ls2) {
+        const n = l.replace(re, replacement);
+        if (!quiet) out.push(n);
+        else if (m[4]?.includes("p") && re.test(l)) out.push(n);
       }
-    });
-    return { stdout: join(out), stderr: inp.errors, code: 0 };
+      return out;
+    }
+    m = /^(?:(\d+)(?:,(\d+|\$))?|\/(.*)\/)([dp])$/.exec(script);
+    if (m) {
+      const from = Number(m[1]);
+      const to = m[2] === "$" ? Infinity : m[2] ? Number(m[2]) : from;
+      const re = m[3] !== undefined ? new RegExp(posixToJs(m[3], extended)) : null;
+      ls2.forEach((l, i) => {
+        const hit = re ? re.test(l) : i + 1 >= from && i + 1 <= to;
+        if (m?.[4] === "d") {
+          if (!hit && !quiet) out.push(l);
+        } else {
+          if (hit) out.push(l);
+          if (!quiet) out.push(l);
+        }
+      });
+      return out;
+    }
+    return null;
+  };
+  const refused = `sed: this simulator handles s/old/new/, Nd, Np and /re/d. Try real sed in your VM for: ${script}\n`;
+  if (flags.has("i")) {
+    const { shell, creds } = ctx;
+    let stderr = "";
+    for (const f of rest) {
+      try {
+        const node = shell.fs.lookup(f, shell.cwd, creds);
+        if (!shell.fs.can(node, creds, 4)) throw new FsError(EACCES);
+        const res = apply(lines(node.content));
+        if (!res) return err(refused);
+        if (!shell.fs.can(node, creds, 2)) throw new FsError(EACCES);
+        node.content = join(res);
+        node.mtime = NOW;
+      } catch (e) {
+        if (e instanceof FsError) stderr += `sed: can't read ${f}: ${e.reason}\n`;
+        else throw e;
+      }
+    }
+    return { stdout: "", stderr, code: stderr ? 2 : 0 };
   }
-  return err(`sed: this simulator handles s/old/new/, Nd, Np and /re/d. Try real sed in your VM for: ${script}\n`);
+  const inp = inputs(ctx, rest);
+  const res = apply(inp.flatMap((f) => lines(f.text)));
+  return res ? { stdout: join(res), stderr: inp.errors, code: 0 } : err(refused);
 };
 
 const awk: Cmd = (ctx) => {
@@ -524,34 +549,53 @@ const awk: Cmd = (ctx) => {
   const prog = (rest.shift() ?? "").trim();
   const inp = inputs(ctx, rest);
   const sep = flags.get("F");
-  const m = /^(?:\/(.*)\/|NR\s*==\s*(\d+)|\$(\d+)\s*(==|!=|>=|<=|>|<|~)\s*("[^"]*"|\/.*\/|-?\d+))?\s*(?:\{\s*print(?:\s+(.*?))?\s*\})?$/.exec(prog);
-  if (!m || !prog) {
-    return err("awk: this simulator handles a filter plus {print ...}, like awk -F: '$3 == 0 {print $1}'. Try real awk in your VM for anything longer.\n");
+  const help = "awk: this simulator handles filters joined by &&, {print ...}, and {s+=$3} END {print s}, like awk -F: '$3 == 0 {print $1}'. Try real awk in your VM for anything longer.\n";
+  const sum = /^(.*?)\s*\{\s*([A-Za-z_]\w*)\s*\+=\s*\$(\d+)\s*;?\s*\}\s*END\s*\{\s*print\s+\2\s*;?\s*\}$/.exec(prog);
+  const whole = sum ? null : /^(.*?)\s*(?:\{\s*print(?:\s+(.*?))?\s*;?\s*\})?$/.exec(prog);
+  if (!prog || (!sum && !whole)) return err(help);
+  const filterSrc = (sum ? sum[1] : whole?.[1]) ?? "";
+  const printExpr = whole?.[2];
+  type Line = { line: string; fields: string[]; idx: number; get: (n: number) => string };
+  const tests: ((l: Line) => boolean)[] = [];
+  for (const part of filterSrc.trim() ? filterSrc.split(/\s*&&\s*/) : []) {
+    const m = /^(?:\/(.*)\/|NR\s*(==|!=|>=|<=|>|<)\s*(\d+)|\$(\d+)\s*(==|!=|>=|<=|>|<|~)\s*("[^"]*"|\/.*\/|-?\d+))$/.exec(part.trim());
+    if (!m) return err(help);
+    const [, reSrc, nrOp, nrN, fieldN, op, val] = m;
+    if (reSrc !== undefined) {
+      const re = new RegExp(posixToJs(reSrc, true));
+      tests.push((l) => re.test(l.line));
+    } else if (nrOp) {
+      const n = Number(nrN);
+      tests.push((l) => {
+        const c = l.idx + 1;
+        return nrOp === "==" ? c === n : nrOp === "!=" ? c !== n : nrOp === ">" ? c > n : nrOp === "<" ? c < n : nrOp === ">=" ? c >= n : c <= n;
+      });
+    } else {
+      tests.push((l) => {
+        const left = l.get(Number(fieldN));
+        const v = val as string;
+        if (op === "~") return new RegExp(posixToJs(v.slice(1, -1), true)).test(left);
+        const isStr = v.startsWith('"');
+        const r = isStr ? v.slice(1, -1) : Number(v);
+        const lv = isStr || left === "" || Number.isNaN(Number(left)) ? left : Number(left);
+        const rc = typeof r === "number" && typeof lv === "string" ? String(r) : r;
+        return op === "==" ? lv === rc : op === "!=" ? lv !== rc : op === ">" ? lv > rc : op === "<" ? lv < rc : op === ">=" ? lv >= rc : lv <= rc;
+      });
+    }
   }
-  const [, reSrc, nrEq, fieldN, op, val, printExpr] = m;
   const out: string[] = [];
   let unsupported = "";
+  let total = 0;
+  const num = (v: number) => (Number.isInteger(v) ? String(v) : String(Number(v.toPrecision(6))));
   const split = (l: string) => (sep ? l.split(sep === "\\t" ? "\t" : sep) : l.split(/[ \t]+/).filter(Boolean));
   inp.flatMap((f) => lines(f.text)).forEach((line, idx) => {
     const fields = split(line);
     const get = (n: number) => (n === 0 ? line : (fields[n - 1] ?? ""));
-    let pass = true;
-    if (reSrc !== undefined) pass = new RegExp(posixToJs(reSrc, true)).test(line);
-    if (nrEq) pass = idx + 1 === Number(nrEq);
-    if (fieldN) {
-      const left = get(Number(fieldN));
-      const v = val as string;
-      if (op === "~") pass = new RegExp(posixToJs(v.slice(1, -1), true)).test(left);
-      else {
-        const isStr = v.startsWith('"');
-        const r = isStr ? v.slice(1, -1) : Number(v);
-        const l = isStr || left === "" || Number.isNaN(Number(left)) ? left : Number(left);
-        const lc = typeof r === "number" && typeof l === "string" ? l : l;
-        const rc = typeof r === "number" && typeof l === "string" ? String(r) : r;
-        pass = op === "==" ? lc === rc : op === "!=" ? lc !== rc : op === ">" ? lc > rc : op === "<" ? lc < rc : op === ">=" ? lc >= rc : lc <= rc;
-      }
+    if (!tests.every((t) => t({ line, fields, idx, get }))) return;
+    if (sum) {
+      total += parseFloat(get(Number(sum[3]))) || 0;
+      return;
     }
-    if (!pass) return;
     if (!printExpr) {
       out.push(line);
       return;
@@ -564,6 +608,12 @@ const awk: Cmd = (ctx) => {
       if (back) return get(fields.length - Number(back[1]));
       const f = /^\$(\d+)$/.exec(p);
       if (f) return get(Number(f[1]));
+      const calc = /^\$(\d+)\s*([*+\-/])\s*(\$?)(\d+)$/.exec(p);
+      if (calc) {
+        const x = parseFloat(get(Number(calc[1]))) || 0;
+        const y = calc[3] ? parseFloat(get(Number(calc[4]))) || 0 : Number(calc[4]);
+        return num(calc[2] === "*" ? x * y : calc[2] === "+" ? x + y : calc[2] === "-" ? x - y : x / y);
+      }
       const s = /^"(.*)"$/.exec(p);
       if (s) return s[1] as string;
       unsupported = p;
@@ -572,6 +622,7 @@ const awk: Cmd = (ctx) => {
     out.push(parts.join(" "));
   });
   if (unsupported) return err(`awk: this simulator can't print ${unsupported}. Try real awk in your VM.\n`, 2);
+  if (sum) out.push(num(total));
   return { stdout: join(out), stderr: inp.errors, code: inp.errors ? 2 : 0 };
 };
 
@@ -648,6 +699,15 @@ const find: Cmd = (ctx) => {
     } else if (a === "-group") {
       const v = take();
       add((_, n) => fs.groupName(n.gid) === v || String(n.gid) === v);
+    } else if (a === "-newer") {
+      const ref = take();
+      let t: number;
+      try {
+        t = fs.lookup(ref, ctx.shell.cwd, creds).mtime;
+      } catch {
+        return err(`find: '${ref}': No such file or directory\n`);
+      }
+      add((_, n) => n.mtime > t);
     } else if (a === "-empty") add((_, n) => (n.kind === "dir" ? n.children.size === 0 : size(n) === 0));
     else if (a === "-size") {
       const m = /^([+-]?)(\d+)([cbkMG]?)$/.exec(take());
@@ -848,11 +908,12 @@ const ps: Cmd = (ctx) => {
   const full = /aux|-ef|-e\b|ax/.test(a);
   const me = shell.fs.userName(ctx.creds.uid);
   const rows = shell.procs.filter((p) => full || (p.user === me && p.tty !== "?"));
-  const psSelf = { pid: shell.nextPid + 40, ppid: 4021, user: me, tty: "pts/0", cmd: `ps ${a}`.trim() };
+  const psSelf: Proc = { pid: shell.nextPid + 40, ppid: 4021, user: me, tty: "pts/0", cmd: `ps ${a}`.trim() };
   const all = [...rows, psSelf];
   if (/aux/.test(a)) {
     const head = "USER         PID %CPU %MEM COMMAND\n";
-    return ok(head + join(all.map((p) => `${p.user.padEnd(10)} ${String(p.pid).padStart(5)}  0.0  0.1 ${p.cmd}`)));
+    const pct = (n?: number) => (n ?? 0).toFixed(1).padStart(4);
+    return ok(head + join(all.map((p) => `${p.user.padEnd(10)} ${String(p.pid).padStart(5)} ${pct(p.cpu)} ${pct(p.mem ?? 0.1)} ${p.cmd}`)));
   }
   if (/-ef/.test(a)) {
     const head = "UID          PID    PPID TTY      CMD\n";
@@ -991,13 +1052,15 @@ export const COMMANDS: Record<string, Cmd> = {
     return ok(`${ctx.args[0] ? `${ctx.args[0]} : ` : ""}${ids.map((x) => fs.groupName(x)).join(" ")}\n`);
   },
   touch: (ctx) => {
+    const { flags, rest } = opts(ctx.args, "d");
+    const when = flags.has("d") ? Date.parse(`${flags.get("d")}Z`) / 1000 : NOW;
     let stderr = "";
-    for (const f of ctx.args.filter((a) => !a.startsWith("-"))) {
+    for (const f of rest) {
       try {
-        ctx.shell.fs.lookup(f, ctx.shell.cwd, ctx.creds).mtime = NOW;
+        ctx.shell.fs.lookup(f, ctx.shell.cwd, ctx.creds).mtime = when;
       } catch {
         try {
-          ctx.shell.fs.create(f, ctx.shell.cwd, ctx.creds, "file", 0o666 & ~ctx.shell.umask);
+          ctx.shell.fs.create(f, ctx.shell.cwd, ctx.creds, "file", 0o666 & ~ctx.shell.umask).mtime = when;
         } catch (e) {
           if (!(e instanceof FsError)) throw e;
           stderr += `touch: cannot touch '${f}': ${e.reason}\n`;
@@ -1220,30 +1283,78 @@ export const COMMANDS: Record<string, Cmd> = {
   sudo: (ctx) => {
     const { shell, creds } = ctx;
     const me = shell.fs.userName(creds.uid);
+    const rules = shell.sudoRules[me];
     if (ctx.args[0] === "-l") {
+      if (rules) return ok(`User ${me} may run the following commands on ${shell.host}:\n${rules.map((r) => `    (root) NOPASSWD: ${r}\n`).join("")}`);
       return shell.sudoers[me]
         ? ok(`User ${me} may run the following commands on ${shell.host}:\n    (ALL : ALL) ALL\n`)
         : ok(`User ${me} is not allowed to run sudo on ${shell.host}.\n`);
     }
     if (ctx.args.length === 0) return err("usage: sudo command\n");
-    if (!shell.sudoers[me] && creds.uid !== 0) return err(`${me} is not in the sudoers file.\n`);
+    if (rules && !shell.sudoers[me] && creds.uid !== 0) {
+      const name = ctx.args[0] as string;
+      const full = name.includes("/") ? name : `/usr/bin/${name}`;
+      if (!rules.some((r) => r === full || r === name)) return err(`Sorry, user ${me} is not allowed to execute '${[full, ...ctx.args.slice(1)].join(" ")}' as root on ${shell.host}.\n`);
+    } else if (!shell.sudoers[me] && creds.uid !== 0) return err(`${me} is not in the sudoers file.\n`);
     const root: Creds = { uid: 0, euid: 0, egid: 0, gids: [0] };
     return shell.invoke(ctx.args, ctx.stdin, root, ctx.piped);
   },
   passwd: () => ok("(Passwords don't change in this simulator.)\n"),
+  sha256sum: (ctx) => {
+    const { flags, rest } = opts(ctx.args);
+    const inp = inputs(ctx, rest);
+    if (flags.has("c")) {
+      let out = "";
+      let bad = 0;
+      for (const f of inp) {
+        for (const l of lines(f.text)) {
+          const m = /^([0-9a-f]{64})\s+\*?(.+)$/.exec(l);
+          if (!m) continue;
+          try {
+            const same = sha256(ctx.shell.fs.lookup(m[2] as string, ctx.shell.cwd, ctx.creds).content) === m[1];
+            out += `${m[2]}: ${same ? "OK" : "FAILED"}\n`;
+            if (!same) bad++;
+          } catch (e) {
+            if (!(e instanceof FsError)) throw e;
+            bad++;
+            out += `${m[2]}: FAILED open or read\n`;
+          }
+        }
+      }
+      return { stdout: out, stderr: bad ? `sha256sum: WARNING: ${bad} computed checksum${bad > 1 ? "s" : ""} did NOT match\n` : "", code: bad ? 1 : 0 };
+    }
+    const named = rest.length > 0;
+    const out = inp.map((f) => `${sha256(f.text)}  ${named ? f.name : "-"}\n`).join("");
+    return { stdout: out, stderr: inp.errors, code: inp.errors ? 1 : 0 };
+  },
+  jq: (ctx) => {
+    const { flags, rest } = opts(ctx.args);
+    const filter = rest[0];
+    if (filter === undefined) return err("usage: jq [-r] [-c] <filter> [file]\n", 2);
+    const inp = inputs(ctx, rest.slice(1));
+    try {
+      const stderr = inp.errors.replace(/^jq: (.*): (No such.*|Permission.*)$/gm, "jq: error: Could not open file $1: $2");
+      return { stdout: jq(filter, inp.map((f) => f.text).join(""), flags.has("r"), flags.has("c")), stderr, code: stderr ? 2 : 0 };
+    } catch (e) {
+      if (e instanceof SyntaxError) return err("jq: error: input is not valid JSON\n", 2);
+      if (e instanceof JqError) return err(e.message.startsWith("jq:") ? e.message : `jq: this simulator doesn't handle "${e.message}". It knows paths, [], |, select, ==, and, or, test, length and keys. Try real jq in your VM.\n`, 5);
+      throw e;
+    }
+  },
   man: (ctx) => {
     const page = MAN[ctx.args[0] ?? ""];
     if (!ctx.args[0]) return err("What manual page do you want?\n");
     return page ? ok(`${page.trim()}\n`) : err(`No manual entry for ${ctx.args[0]}\n`, 16);
   },
-  help: () =>
+  help: (ctx) =>
     ok(
       "This is a simulated Linux shell: real commands, a practice filesystem, nothing to break.\n" +
         "Move:   pwd  ls  cd\nRead:   cat  head  tail  wc  file  strings  base64\nSearch: grep  find\n" +
         "Shape:  sort  uniq  cut  tr  sed  awk  tee\nChange: touch  mkdir  cp  mv  rm  chmod  chown\n" +
-        "People: whoami  id  groups  sudo\nRunning: ps  kill\nLearn:  man <command>\n" +
+        "Data:   jq  sha256sum\nPeople: whoami  id  groups  sudo\nRunning: ps  kill\nLearn:  man <command>\n" +
         "Pipes and redirection work:  |  >  >>  <  2>/dev/null\n" +
-        "Finish a flag mission with:  submit <flag>\n",
+        "Finish a flag mission with:  submit <flag>\n" +
+        (ctx.shell.helpExtra ? `${ctx.shell.helpExtra}\n` : ""),
     ),
   submit: (ctx) => {
     const v = ctx.args.join(" ").trim();

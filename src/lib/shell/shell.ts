@@ -15,6 +15,9 @@ export interface Proc {
   cmd: string;
   /** Catches SIGTERM: only SIGKILL stops it. */
   ignoresTerm?: boolean;
+  /** Shown by `ps aux`. */
+  cpu?: number;
+  mem?: number;
 }
 
 export type Program = (ctx: Ctx) => Result;
@@ -31,6 +34,10 @@ export class Shell {
   umask = 0o022;
   host = "lab";
   sudoers: Record<string, boolean> = {};
+  /** Narrow sudo: a user may run only these programs as root. */
+  sudoRules: Record<string, string[]> = {};
+  /** One more line for `help`, listing the tools a machine adds. */
+  helpExtra = "";
   /** Programs a world adds, by the name a file's `program` field gives. */
   programs: Record<string, Program> = {};
   /** What `submit` received, for flag missions. */

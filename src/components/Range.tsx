@@ -72,7 +72,7 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
     const dirPart = slash >= 0 ? word.slice(0, slash + 1) : "";
     const stem = word.slice(slash + 1);
     let names: string[] = [];
-    if (isFirst && !word.includes("/")) names = Object.keys(COMMANDS).filter((c) => c.startsWith(stem));
+    if (isFirst && !word.includes("/")) names = [...new Set([...Object.keys(COMMANDS), ...Object.keys(w.shell.programs)])].filter((c) => c.startsWith(stem));
     else {
       try {
         const dir = w.shell.fs.lookup(dirPart || ".", w.shell.cwd, w.shell.creds);

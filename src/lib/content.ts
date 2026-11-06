@@ -13,6 +13,10 @@
  *   @flow A > B > C             a small flow diagram
  *   @term name (alias) = text   a glossary entry, shown on hover everywhere
  *   ::: key|tip|trap|try|why|law Title … :::   a callout
+ *
+ * Lessons sort by file name, and the number in that name is the lesson number.
+ * Machines (content/machines) are lessons built around one simulated box;
+ * sheets (content/reference) are printable reference pages.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -235,7 +239,10 @@ function parseBody(slug: string, title: string, body: string) {
   return { segments, questions, written, terms, toc, text };
 }
 
-function readDir(kind: "lessons" | "guides"): string[] {
+type DocDir = "lessons" | "guides" | "machines" | "reference";
+const KIND = { lessons: "lesson", guides: "guide", machines: "machine", reference: "sheet" } as const;
+
+function readDir(kind: DocDir): string[] {
   const dir = path.join(ROOT, kind);
   try {
     return fs.readdirSync(dir).filter((f) => f.endsWith(".md")).sort();
@@ -244,11 +251,11 @@ function readDir(kind: "lessons" | "guides"): string[] {
   }
 }
 
-function load(kindDir: "lessons" | "guides", file: string): Doc {
+function load(kindDir: DocDir, file: string): Doc {
   const raw = fs.readFileSync(path.join(ROOT, kindDir, file), "utf8");
   const slug = file.replace(/\.md$/, "");
   const { front, body } = splitFront(raw, file);
-  const kind = kindDir === "lessons" ? "lesson" : "guide";
+  const kind = KIND[kindDir];
   const title = front.title ?? slug;
   const parsed = parseBody(slug, title, body);
   const src = front.source?.split("|").map((s) => s.trim());
@@ -265,30 +272,37 @@ function load(kindDir: "lessons" | "guides", file: string): Doc {
   };
   if (front.builds) meta.builds = front.builds;
   if (front.group) meta.group = front.group;
+  if (front.level) meta.level = front.level;
   if (src && src.length === 2) meta.source = { label: src[0] as string, url: src[1] as string };
   return { meta, ...parsed };
 }
 
-let cache: { lessons: Doc[]; guides: Doc[] } | null = null;
+let cache: { lessons: Doc[]; guides: Doc[]; machines: Doc[]; sheets: Doc[] } | null = null;
 
 function all() {
   if (cache && process.env.NODE_ENV === "production") return cache;
   cache = {
     lessons: readDir("lessons").map((f) => load("lessons", f)),
     guides: readDir("guides").map((f) => load("guides", f)),
+    machines: readDir("machines").map((f) => load("machines", f)),
+    sheets: readDir("reference").map((f) => load("reference", f)),
   };
   return cache;
 }
 
 export const lessons = () => all().lessons;
 export const guides = () => all().guides;
+export const machines = () => all().machines;
+export const sheets = () => all().sheets;
+export const getMachine = (slug: string) => machines().find((d) => d.meta.slug === slug);
+export const getSheet = (slug: string) => sheets().find((d) => d.meta.slug === slug);
 export const lessonMetas = (): DocMeta[] => lessons().map((d) => d.meta);
 export const guideMetas = (): DocMeta[] => guides().map((d) => d.meta);
 export const getLesson = (slug: string) => lessons().find((d) => d.meta.slug === slug);
 export const getGuide = (slug: string) => guides().find((d) => d.meta.slug === slug);
 
 export function glossary(): Term[] {
-  const out = [...lessons(), ...guides()].flatMap((d) => d.terms);
+  const out = [...lessons(), ...guides(), ...machines(), ...sheets()].flatMap((d) => d.terms);
   return out.sort((a, b) => a.term.toLowerCase().localeCompare(b.term.toLowerCase()));
 }
 
@@ -302,6 +316,7 @@ export function allQuestions(): { q: Question; title: string; href: string }[] {
   return [
     ...lessons().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/courses/${d.meta.slug}/` }))),
     ...guides().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/guides/${d.meta.slug}/` }))),
+    ...machines().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/machines/${d.meta.slug}/` }))),
   ];
 }
 

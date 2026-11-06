@@ -44,4 +44,4 @@ Don't map generously to look thorough. Map only what the evidence shows, and cit
 
 @drill tactic
 
-?! Take the triage mission from lesson 46. List its indicators, and put each on the pyramid.
+?! Take the triage mission from lesson 51. List its indicators, and put each on the pyramid.

@@ -1,7 +1,7 @@
 /** A fresh machine: the skeleton every mission's world starts from. */
 import { COMMANDS } from "./commands";
 import { Vfs, type User } from "./fs";
-import { Shell } from "./shell";
+import { Shell, type Program } from "./shell";
 
 const ROOT: User = { name: "root", uid: 0, gid: 0, groups: [], home: "/root", shell: "/bin/bash" };
 
@@ -13,6 +13,12 @@ export interface MachineUser {
 
 /** Files the real tools keep on disk as programs; shell builtins are left out. */
 const NOT_FILES = new Set(["cd", "pwd", "history", "export", "unset", "umask", "clear", "exit", "help", "submit", "type"]);
+
+/** Installs a program a world provides, such as a simulated nmap, on the PATH. */
+export function tool(sh: Shell, name: string, fn: Program, mode = 0o755) {
+  sh.fs.put(`/usr/bin/${name}`, "\x7fELF\0", { mode, program: name });
+  sh.programs[name] = fn;
+}
 
 /** Builds a machine with users, standard directories and logged-in `login`. */
 export function machine(login: string, users: MachineUser[], groups: string[] = []): Shell {

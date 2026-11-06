@@ -7,6 +7,16 @@ const page = (name: string, what: string, synopsis: string, options: string) =>
     .join("\n")}`;
 
 export const MAN: Record<string, string> = {
+  sha256sum: page("sha256sum", "compute or check SHA-256 hashes", "sha256sum [-c] [FILE]...", `
+    no flag   print each file's hash, then its name
+    -c        read a list of hashes from FILE and check each one`),
+  jq: page("jq", "filter JSON (this simulator handles the common part)", "jq [-r] [-c] FILTER [FILE]", `
+    .a.b               the value at that path
+    .items[]           each element, one at a time
+    A | B              feed A's output into B
+    select(.a == "x")  keep a value only if the test is true
+    -r                 print strings without their quotes
+    -c                 one line per value`),
   ls: page("ls", "list directory contents", "ls [OPTION]... [FILE]...", `
     -a   show all entries, including names starting with .
     -l   long format: type, permissions, owner, group, size, date

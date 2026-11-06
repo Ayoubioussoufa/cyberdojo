@@ -39,9 +39,11 @@ export interface Term {
   docTitle: string;
 }
 
+export type DocKind = "lesson" | "guide" | "machine" | "sheet";
+
 export interface DocMeta {
   slug: string;
-  kind: "lesson" | "guide";
+  kind: DocKind;
   number: number;
   title: string;
   summary: string;
@@ -52,6 +54,8 @@ export interface DocMeta {
   source?: { label: string; url: string };
   words: string[];
   group?: string;
+  /** Machines: how hard it is. */
+  level?: string;
   questions: number;
 }
 
@@ -69,7 +73,7 @@ export interface Doc {
 /** What the copy buttons need, without the whole document. */
 export interface DocBrief {
   slug: string;
-  kind: "lesson" | "guide";
+  kind: DocKind;
   title: string;
   summary: string;
   number: number;

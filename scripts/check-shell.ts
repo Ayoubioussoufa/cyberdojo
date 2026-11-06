@@ -27,6 +27,13 @@ const FILES: Record<string, string> = {
   "docs/old.bak": "",
   "script.sh": "echo running\n",
   "locked.txt": "nope\n",
+  "policy.json": JSON.stringify({ Version: "2012-10-17", Statement: [{ Effect: "Allow", Action: "s3:GetObject", Resource: "*" }, { Effect: "Deny", Action: "iam:*", Resource: "*" }] }, null, 2) + "\n",
+  "trail.json": [
+    { eventTime: "2026-10-27T09:01:00Z", eventName: "ConsoleLogin", sourceIPAddress: "10.0.0.5", userIdentity: { userName: "ana" }, errorCode: null },
+    { eventTime: "2026-10-27T09:02:00Z", eventName: "AssumeRole", sourceIPAddress: "203.0.113.7", userIdentity: { userName: "ci-bot" }, errorCode: null },
+    { eventTime: "2026-10-27T09:03:00Z", eventName: "CreateAccessKey", sourceIPAddress: "203.0.113.7", userIdentity: { userName: "ci-bot" }, errorCode: "AccessDenied" },
+    { eventTime: "2026-10-27T09:04:00Z", eventName: "StopLogging", sourceIPAddress: "203.0.113.7", userIdentity: { userName: "ana" }, errorCode: null },
+  ].map((e) => JSON.stringify(e)).join("\n") + "\n",
 };
 const MODES: Record<string, number> = { "script.sh": 0o755, "locked.txt": 0o000, "docs/old.bak": 0o600 };
 
@@ -248,6 +255,55 @@ file notes.txt | cut -d: -f1
 printf 'x %s\\n' y
 | ls
 ls |
+awk -F, '$3 > 1001 && $2 == "sec" {print $1}' users.csv
+awk -F, 'NR > 1 {print $1, $3}' users.csv
+awk -F, 'NR > 1 && $2 == "ops"' users.csv
+awk -F, 'NR != 1 {print $3}' users.csv
+awk -F, 'NR > 1 {print $3 + $3}' users.csv
+awk -F, 'NR > 1 {print $3 * 2}' users.csv
+awk -F, 'NR > 1 {print $3 / $3}' users.csv
+awk -F, '$2 == "sec" {s+=$3} END {print s}' users.csv
+awk '{s+=$1} END {print s}' nums.txt
+awk '{ total += $1 } END { print total }' nums.txt
+awk -F, 'NR > 1 {print $3 / 7}' users.csv
+sed -i 's/alpha/ALPHA/' notes.txt; cat notes.txt
+sed -i 's/alpha/ALPHA/g' notes.txt nums.txt; cat notes.txt nums.txt
+sed -i '/charlie/d' notes.txt; cat notes.txt
+sed -i 's/x/y/' nothere
+sed -i 's/x/y/' locked.txt
+touch -d '2020-01-01' old.txt; touch fresh.txt; find . -name '*.txt' -newer old.txt | sort | grep -c old.txt
+touch -d '2020-01-01' old.txt; touch fresh.txt; find . -newer old.txt -name fresh.txt
+find . -newer nothere
+sha256sum notes.txt
+sha256sum notes.txt nums.txt
+echo -n hello | sha256sum
+cat auth.log | sha256sum
+sha256sum notes.txt > s.txt; sha256sum -c s.txt
+sha256sum notes.txt > s.txt; echo changed >> notes.txt; sha256sum -c s.txt
+sha256sum notes.txt nums.txt | sort | cut -c1-8
+jq . policy.json
+jq -r .Version policy.json
+jq -r '.Statement[0].Effect' policy.json
+jq -r '.Statement[-1].Effect' policy.json
+jq -r '.Statement[].Action' policy.json
+jq -c '.Statement[]' policy.json
+jq '.Statement | length' policy.json
+jq -c keys policy.json
+jq -r .nope policy.json
+jq -r .eventName trail.json
+jq . trail.json | head -3
+jq -r 'select(.eventName == "StopLogging") | .userIdentity.userName' trail.json
+jq -r 'select(.errorCode != null) | .eventName' trail.json
+jq -r 'select(.userIdentity.userName == "ci-bot" and .eventName == "AssumeRole") | .sourceIPAddress' trail.json
+jq -r 'select(.eventName == "StopLogging" or .eventName == "ConsoleLogin") | .eventTime' trail.json
+jq -c '[.eventName, .sourceIPAddress]' trail.json
+jq -r '[.eventName, .sourceIPAddress] | @tsv' trail.json
+jq -r 'select(.eventName | test("Key")) | .eventName' trail.json
+jq -r 'select(.eventName == "Nope")' trail.json
+jq -r 'select(.eventTime >= "2026-10-27T09:03:00Z") | .eventName' trail.json
+cat trail.json | jq -r .sourceIPAddress | sort | uniq -c | sort -rn
+jq -r .eventName trail.json | wc -l
+jq .x nothere.json
 `.trim().split("\n");
 
 function setup(dir: string) {
