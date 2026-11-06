@@ -5,7 +5,7 @@ A cybersecurity course from absolute zero, built from the 24-month roadmap PDF.
 ```
 pnpm install
 pnpm dev        # http://localhost:3100
-pnpm test       # shell vs real tools, missions, content rules
+pnpm test       # shell vs real tools, missions, drills, content rules, then the build
 pnpm build      # static site in out/
 ```
 
