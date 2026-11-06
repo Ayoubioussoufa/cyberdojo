@@ -5,12 +5,12 @@ import { BeltChip } from "./Progress";
 import { KIND_LABEL, currentBelt, isDone, nextStep, streak, weekPlan, type PathStep } from "@/lib/pathState";
 import { today, useStore } from "@/lib/progress";
 
-export function Home({ path, questionIds }: { path: PathStep[]; questionIds: string[] }) {
+export function Home({ path }: { path: PathStep[] }) {
   const store = useStore();
   const now = today();
   const next = nextStep(path, store);
   const doneSteps = path.filter((s) => isDone(s, store)).length;
-  const due = questionIds.filter((id) => store.srs[id] && (store.srs[id]?.due ?? "") <= now).length;
+  const due = Object.values(store.srs).filter((c) => c.due <= now).length;
   const mistakes = store.mistakes.length;
   const started = doneSteps > 0 || !!store.plan;
   const week = store.plan ? weekPlan(path, store, store.plan.hours) : [];

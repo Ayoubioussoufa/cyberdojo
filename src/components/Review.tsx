@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CopyButton } from "./Copy";
 import { INTERVALS, reviewed, today, useStore } from "@/lib/progress";
 import { freshSeed, Rng } from "@/lib/rng";
@@ -13,8 +13,22 @@ interface Item {
   href: string;
 }
 
-export function Review({ items }: { items: Item[] }) {
+export function Review() {
   const store = useStore();
+  const [items, setItems] = useState<Item[]>([]);
+  const tracked = Object.keys(store.srs).length;
+  // 400 KB of questions, so they load only for someone who has answered one.
+  useEffect(() => {
+    if (tracked === 0 || items.length) return;
+    let live = true;
+    void fetch("/data/questions.json").then((r) => r.json() as Promise<Item[]>).then((all) => {
+      if (live) setItems(all);
+    });
+    return () => {
+      live = false;
+    };
+  }, [tracked, items.length]);
+
   const [session] = useState(today);
   const [pos, setPos] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
@@ -22,7 +36,6 @@ export function Review({ items }: { items: Item[] }) {
   const [queue, setQueue] = useState<Item[] | null>(null);
 
   const dueNow = useMemo(() => items.filter((i) => (store.srs[i.q.id]?.due ?? "9999") <= session), [items, store.srs, session]);
-  const tracked = items.filter((i) => store.srs[i.q.id]).length;
 
   const start = () => {
     setQueue(new Rng(freshSeed()).shuffle(dueNow).slice(0, 20));

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Drill } from "@/components/Drill";
-import { Range } from "@/components/Range";
+import { LazyDrill, LazyRange } from "@/components/Lazy";
 import { DRILLS, DRILL_LIST } from "@/lib/drills";
 import { RANGES } from "@/lib/missions";
 
@@ -22,7 +21,7 @@ export default async function Page({ params }: Props) {
   return (
     <div className="page narrow">
       <p className="back"><Link href="/practice/">← All practice</Link></p>
-      {DRILLS[drill] ? <Drill id={drill} roundSize={12} /> : <Range id={drill} />}
+      {DRILLS[drill] ? <LazyDrill id={drill} roundSize={12} /> : <LazyRange id={drill} />}
     </div>
   );
 }

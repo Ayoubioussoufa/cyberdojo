@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { CopyButton } from "./Copy";
-import { answer, useStore } from "@/lib/progress";
+import { answer, getStore, useSlice } from "@/lib/progress";
 import { questionMessage } from "@/lib/tutor";
 import type { DocBrief, Question as Q } from "@/lib/types";
 
 /** Inline check: pick, get told why at once, or send it to the AI tutor. */
 export function QuestionCard({ q, doc, n }: { q: Q; doc: DocBrief; n: number }) {
-  const store = useStore();
-  const saved = store.picks[q.id];
+  const saved = useSlice((s) => s.picks[q.id]);
   const [fresh, setFresh] = useState<number | null>(null);
   const [retry, setRetry] = useState(false);
   const picked = retry ? fresh : (fresh ?? saved ?? null);
@@ -25,7 +24,7 @@ export function QuestionCard({ q, doc, n }: { q: Q; doc: DocBrief; n: number }) 
     <section className="qcard" aria-label={`Check question ${n}`}>
       <header className="qcard-head">
         <span className="qcard-tag">Check {n}</span>
-        <CopyButton className="link-btn" label="Ask my AI about this" done="Copied" build={() => questionMessage(doc, q, store)} />
+        <CopyButton className="link-btn" label="Ask my AI about this" done="Copied" build={() => questionMessage(doc, q, getStore())} />
       </header>
       <p className="qcard-prompt noterms" dangerouslySetInnerHTML={{ __html: q.promptHtml }} />
       <div className="opts">

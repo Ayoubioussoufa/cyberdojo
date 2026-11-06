@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAccount } from "@/lib/account";
 
 const LINKS = [
   { href: "/", label: "Today", also: [] as string[] },
@@ -18,6 +19,7 @@ export function Nav() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
+  const { ready, user } = useAccount();
 
   useEffect(() => {
     setDark(document.documentElement.dataset.theme === "dark");
@@ -57,6 +59,9 @@ export function Nav() {
           ))}
         </nav>
         <div className="nav-tools">
+          {ready && (user
+            ? <Link href="/account/" className="nav-user" title="Your account">{user.username}</Link>
+            : <Link href="/signin/" className="nav-signin">Sign in</Link>)}
           <button type="button" className="icon-btn" onClick={toggle} aria-label={dark ? "Use light theme" : "Use dark theme"}>
             {dark ? "☀" : "☾"}
           </button>

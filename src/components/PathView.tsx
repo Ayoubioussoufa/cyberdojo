@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HoverLink } from "./HoverLink";
 import { MONTHS, PHASES, phaseOf } from "@/lib/data";
 import { KIND_LABEL, finishDate, isDone, nextStep, partDone, type PathStep } from "@/lib/pathState";
 import { useStore } from "@/lib/progress";
@@ -17,12 +18,12 @@ function Row({ s, on, done, part }: { s: PathStep; on: boolean; done: boolean; p
   return (
     <li className={`step${done ? " done" : ""}${on ? " on" : ""}`}>
       <span className="step-mark" aria-hidden="true">{done ? "✓" : on ? "▶" : ""}</span>
-      <Link href={s.href} className="step-body">
+      <HoverLink href={s.href} className="step-body">
         <span className="step-kind">{KIND_LABEL[s.kind]}</span>
         <span className="step-title">{s.title}</span>
         {on && <span className="step-note">{s.note}</span>}
         {part > 0 && part < 1 && <span className="meter small" aria-label={`${Math.round(part * 100)}% done`}><i style={{ width: `${part * 100}%` }} /></span>}
-      </Link>
+      </HoverLink>
       <span className="step-time">{s.minutes >= 120 ? `${Math.round(s.minutes / 60)} h` : `${s.minutes} min`}</span>
     </li>
   );

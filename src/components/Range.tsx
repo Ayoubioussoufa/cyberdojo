@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CopyButton } from "./Copy";
-import { RANGES, type Built, type Mission } from "@/lib/missions";
+import type { Built, Mission, RangeSet } from "@/lib/missions/kit";
+import { loadRange } from "@/lib/missions/lazy";
 import { setMission, useStore } from "@/lib/progress";
 import { freshSeed, Rng } from "@/lib/rng";
 import { COMMANDS } from "@/lib/shell/commands";
@@ -158,16 +159,33 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
 
 /** A ladder of missions in one terminal. */
 export function Range({ id }: { id: string }) {
-  const range = RANGES[id];
+  const [loaded, setLoaded] = useState<{ id: string; range: RangeSet | null } | null>(null);
+  useEffect(() => {
+    let live = true;
+    void loadRange(id).then((range) => {
+      if (live) setLoaded({ id, range });
+    });
+    return () => {
+      live = false;
+    };
+  }, [id]);
+  if (!loaded || loaded.id !== id) return <RangeSkeleton />;
+  if (!loaded.range) return <p className="muted">Mission set {id} is missing.</p>;
+  return <RangeView range={loaded.range} />;
+}
+
+export const RangeSkeleton = () => <section className="range range-wait" aria-busy="true" aria-label="Loading the terminal" />;
+
+function RangeView({ range }: { range: RangeSet }) {
   const store = useStore();
-  const missions = useMemo(() => range?.missions ?? [], [range]);
+  const missions = range.missions;
   const firstOpen = missions.findIndex((m) => !store.missions[m.id]);
   const [choice, setChoice] = useState<number | null>(null);
   const [hints, setHints] = useState(0);
   const at = choice ?? (firstOpen < 0 ? 0 : firstOpen);
   const mission = missions[at];
 
-  if (!range || !mission) return <p className="muted">Mission set {id} is missing.</p>;
+  if (!mission) return <p className="muted">This mission set is empty.</p>;
   const passed = !!store.missions[mission.id];
   const go = (i: number) => {
     setChoice(i);

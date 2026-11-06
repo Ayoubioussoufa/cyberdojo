@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DrillGroups, PracticeTop } from "@/components/PracticeHub";
-import { Range } from "@/components/Range";
+import { LazyRange } from "@/components/Lazy";
 import { Subnav } from "@/components/Subnav";
 import { CASES } from "@/lib/cases";
 import { DRILL_LIST } from "@/lib/drills";
@@ -60,7 +60,7 @@ export default function Page() {
       </details>
 
       <h2 className="section-title">Free terminal</h2>
-      <Range id="sandbox" />
+      <LazyRange id="sandbox" />
     </div>
   );
 }

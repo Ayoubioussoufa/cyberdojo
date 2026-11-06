@@ -1,99 +1,105 @@
 /**
- * Everything the learner does, kept in this browser's localStorage. Nothing
- * leaves the machine; /you can export it to a file and bring it back.
+ * Everything the learner does. It lives in this browser's localStorage, and
+ * account.ts copies it to the server for anyone signed in.
  */
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { EMPTY_STORE as EMPTY } from "./merge";
+import type { Card, Mistake, Store } from "./progress-types";
 
 const KEY = "cyberdojo-v1";
-const EVENT = "cyberdojo-changed";
 
-export interface Card {
-  box: number;
-  /** yyyy-mm-dd. */
-  due: string;
-}
+export type { Card, Mistake, Store } from "./progress-types";
 
-export interface Store {
-  picks: Record<string, number>;
-  /** Question id → the first answer was right. */
-  first: Record<string, boolean>;
-  written: Record<string, string>;
-  words: Record<string, string>;
-  done: Record<string, string>;
-  srs: Record<string, Card>;
-  missions: Record<string, string>;
-  gates: Record<string, boolean>;
-  skills: Record<string, number>;
-  /** Drill id → best share right, rounds played. */
-  drills: Record<string, { best: number; plays: number }>;
-  /** Drill id → rows already dealt, so each round shows new ones first. */
-  seen: Record<string, number[]>;
-  /** Wrong answers, saved to retry. Newest first. */
-  mistakes: Mistake[];
-  /** yyyy-mm-dd → things done that day, for the streak and the calendar. */
-  days: Record<string, number>;
-  /** Project checkpoint → the day it was ticked. */
-  checks: Record<string, string>;
-  /** Hours a week, and the day she started. */
-  plan: { hours: number; start: string } | null;
-}
 
-export interface Mistake {
-  key: string;
-  source: string;
-  prompt: string;
-  right: string;
-  given: string;
-  why: string;
-  /** The options, when it was multiple choice. */
-  options?: string[];
-  date: string;
-}
+/** The live copy. localStorage is written a moment later, so typing stays instant. */
+let state: Store | null = null;
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+const FLUSH_MS = 250;
 
-const EMPTY: Store = { picks: {}, first: {}, written: {}, words: {}, done: {}, srs: {}, missions: {}, gates: {}, skills: {}, drills: {}, seen: {}, mistakes: [], days: {}, checks: {}, plan: null };
-
-let cacheRaw: string | null = null;
-let cacheValue: Store = EMPTY;
-
-function read(): Store {
-  let raw: string | null = null;
+function parse(raw: string | null): Store {
+  if (raw === null) return EMPTY;
   try {
-    raw = localStorage.getItem(KEY);
+    return { ...EMPTY, ...(JSON.parse(raw) as Partial<Store>) };
   } catch {
     return EMPTY;
   }
-  if (raw !== cacheRaw) {
-    cacheRaw = raw;
-    try {
-      cacheValue = raw === null ? EMPTY : { ...EMPTY, ...(JSON.parse(raw) as Partial<Store>) };
-    } catch {
-      cacheValue = EMPTY;
-    }
-  }
-  return cacheValue;
 }
 
-function write(next: Store) {
+function read(): Store {
+  if (state) return state;
   try {
-    localStorage.setItem(KEY, JSON.stringify(next));
+    state = parse(localStorage.getItem(KEY));
+  } catch {
+    state = EMPTY;
+  }
+  return state;
+}
+
+function flush() {
+  if (flushTimer !== null) clearTimeout(flushTimer);
+  flushTimer = null;
+  if (!state) return;
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
   } catch {
     // Storage blocked: the page still works, it just won't remember.
   }
-  window.dispatchEvent(new Event(EVENT));
+}
+
+const listeners = new Set<() => void>();
+const notify = () => listeners.forEach((fn) => fn());
+
+const editListeners = new Set<() => void>();
+
+function write(next: Store) {
+  state = next;
+  if (flushTimer === null) flushTimer = setTimeout(flush, FLUSH_MS);
+  notify();
+  editListeners.forEach((fn) => fn());
+}
+
+/** Called after the learner changes something, not when a saved copy is loaded in. */
+export function onEdit(fn: () => void) {
+  editListeners.add(fn);
+  return () => {
+    editListeners.delete(fn);
+  };
+}
+
+/** Swaps in a copy from the server, or an empty store after signing out. */
+export function replaceStore(next: Store) {
+  state = next;
+  flush();
+  notify();
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", flush);
+  // Another tab saved: take its copy.
+  window.addEventListener("storage", (e) => {
+    if (e.key !== KEY) return;
+    state = parse(e.newValue);
+    notify();
+  });
 }
 
 function subscribe(fn: () => void) {
-  window.addEventListener(EVENT, fn);
-  window.addEventListener("storage", fn);
+  listeners.add(fn);
   return () => {
-    window.removeEventListener(EVENT, fn);
-    window.removeEventListener("storage", fn);
+    listeners.delete(fn);
   };
 }
 
 export const useStore = (): Store => useSyncExternalStore(subscribe, read, () => EMPTY);
+
+/** Re-renders only when the picked value changes. Pick a primitive or a stored object. */
+export const useSlice = <T,>(pick: (s: Store) => T): T =>
+  useSyncExternalStore(subscribe, () => pick(read()), () => pick(EMPTY));
+
+/** The store right now, for click handlers that shouldn't subscribe. */
+export const getStore = read;
 
 export const today = () => {
   const d = new Date();

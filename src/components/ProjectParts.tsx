@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { TOOLS } from "@/data/tools";
-import { setCheck, useStore } from "@/lib/progress";
+import { setCheck, useSlice, useStore } from "@/lib/progress";
 import { HELP_TEXT } from "@/data/help";
 import type { HelpLevel } from "@/lib/types";
 
@@ -19,10 +19,10 @@ export function HelpBadge({ tool, level }: { tool: string; level: HelpLevel }) {
 }
 
 export function CheckBox({ id, html }: { id: string; html: string }) {
-  const store = useStore();
+  const checked = useSlice((s) => !!s.checks[id]);
   return (
     <label className="project-check">
-      <input type="checkbox" checked={!!store.checks[id]} onChange={(e) => setCheck(id, e.target.checked)} />
+      <input type="checkbox" checked={checked} onChange={(e) => setCheck(id, e.target.checked)} />
       <span dangerouslySetInnerHTML={{ __html: html }} />
     </label>
   );

@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "next dev -p 3100",
     "build": "next build",
-    "start": "npx --yes serve@14.2.4 out -l 3100",
+    "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
     "test:shell": "tsx scripts/check-shell.ts",
     "test:missions": "tsx scripts/check-missions.ts",
     "test:content": "tsx scripts/check-content.ts",
     "test:drills": "tsx scripts/check-drills.ts",
-    "test": "pnpm test:shell && pnpm test:missions && pnpm test:drills && pnpm test:content && pnpm build"
+    "test": "pnpm test:shell && pnpm test:missions && pnpm test:drills && pnpm test:content && pnpm build && pnpm test:auth",
+    "user:reset": "tsx scripts/reset-password.ts",
+    "test:auth": "tsx scripts/check-auth.ts"
   },
   "dependencies": {
     "marked": "15.0.12",
@@ -20,10 +22,13 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tsx": "^4.19.2",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=22.13"
   }
 }

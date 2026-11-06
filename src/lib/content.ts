@@ -348,18 +348,67 @@ function load(kindDir: DocDir, file: string): Doc {
   return { meta, ...parsed };
 }
 
-let cache: { lessons: Doc[]; guides: Doc[]; machines: Doc[]; sheets: Doc[]; projects: Doc[] } | null = null;
+interface Library {
+  lessons: Doc[];
+  guides: Doc[];
+  machines: Doc[];
+  sheets: Doc[];
+  projects: Doc[];
+}
 
-function all() {
-  if (cache && process.env.NODE_ENV === "production") return cache;
-  cache = {
-    lessons: readDir("lessons").map((f) => load("lessons", f)),
-    guides: readDir("guides").map((f) => load("guides", f)),
-    machines: readDir("machines").map((f) => load("machines", f)),
-    sheets: readDir("reference").map((f) => load("reference", f)),
-    projects: readDir("projects").map((f) => load("projects", f)),
+/**
+ * Parsing every document takes seconds, so it happens once. In development each
+ * file is re-parsed only when it changes on disk, so an edited lesson still shows
+ * up at once. The state sits on globalThis because `next dev` loads this module
+ * once per route. After editing the parser itself, restart the dev server.
+ */
+interface ContentCache {
+  files: Map<string, { stamp: string; doc: Doc }>;
+  library: Library | null;
+  checked: number;
+  glossary: Term[] | null;
+  terms: WeakMap<Doc, Term[]>;
+}
+const memo = ((globalThis as { __cyberdojoContent?: ContentCache }).__cyberdojoContent ??= {
+  files: new Map(),
+  library: null,
+  checked: 0,
+  glossary: null,
+  terms: new WeakMap(),
+});
+
+function cached(kindDir: DocDir, file: string): Doc {
+  const at = path.join(ROOT, kindDir, file);
+  const { mtimeMs, size } = fs.statSync(at);
+  const stamp = `${mtimeMs}:${size}`;
+  const hit = memo.files.get(at);
+  if (hit?.stamp === stamp) return hit.doc;
+  const doc = load(kindDir, file);
+  memo.files.set(at, { stamp, doc });
+  return doc;
+}
+
+/** One page asks for documents many times, so disk is checked at most this often. */
+const RECHECK_MS = 300;
+
+function all(): Library {
+  const now = Date.now();
+  if (memo.library && (process.env.NODE_ENV === "production" || now - memo.checked < RECHECK_MS)) return memo.library;
+  memo.checked = now;
+  const before = memo.library;
+  const next: Library = {
+    lessons: readDir("lessons").map((f) => cached("lessons", f)),
+    guides: readDir("guides").map((f) => cached("guides", f)),
+    machines: readDir("machines").map((f) => cached("machines", f)),
+    sheets: readDir("reference").map((f) => cached("reference", f)),
+    projects: readDir("projects").map((f) => cached("projects", f)),
   };
-  return cache;
+  const same = before && (Object.keys(next) as (keyof Library)[]).every((k) => next[k].length === before[k].length && next[k].every((d, i) => d === before[k][i]));
+  if (same) return before;
+  memo.library = next;
+  memo.glossary = null;
+  memo.terms = new WeakMap();
+  return next;
 }
 
 export const lessons = () => all().lessons;
@@ -376,8 +425,11 @@ export const getLesson = (slug: string) => lessons().find((d) => d.meta.slug ===
 export const getGuide = (slug: string) => guides().find((d) => d.meta.slug === slug);
 
 export function glossary(): Term[] {
-  const out = [...lessons(), ...guides(), ...machines(), ...sheets(), ...projects()].flatMap((d) => d.terms);
-  return out.sort((a, b) => a.term.toLowerCase().localeCompare(b.term.toLowerCase()));
+  const lib = all();
+  if (memo.glossary) return memo.glossary;
+  const out = [...lib.lessons, ...lib.guides, ...lib.machines, ...lib.sheets, ...lib.projects].flatMap((d) => d.terms);
+  memo.glossary = out.sort((a, b) => a.term.toLowerCase().localeCompare(b.term.toLowerCase()));
+  return memo.glossary;
 }
 
 export function brief(doc: Doc): DocBrief {
@@ -396,6 +448,11 @@ export function allQuestions(): { q: Question; title: string; href: string }[] {
 
 /** Glossary entries whose name appears in this document, for hover definitions. */
 export function termsFor(doc: Doc): Term[] {
+  const every = glossary();
+  const hit = memo.terms.get(doc);
+  if (hit) return hit;
   const hay = doc.text.toLowerCase();
-  return glossary().filter((t) => [t.term, ...t.aliases].some((n) => hay.includes(n.toLowerCase())));
+  const found = every.filter((t) => [t.term, ...t.aliases].some((n) => hay.includes(n.toLowerCase())));
+  memo.terms.set(doc, found);
+  return found;
 }

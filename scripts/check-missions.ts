@@ -1,5 +1,6 @@
 /** Every mission: unsolved at the start, solved by its reference solution, across many seeds. */
 import { RANGES } from "../src/lib/missions";
+import { RANGE_FAMILY } from "../src/lib/missions/lazy";
 import { Rng } from "../src/lib/rng";
 
 /** Flags the learner works out from the output, such as a percentage. */
@@ -7,6 +8,12 @@ const COMPUTED = new Set(["detect-3", "eval-1", "eval-2", "trail-3"]);
 
 let bad = 0;
 let runs = 0;
+
+// Lessons load ladders through this map, so a ladder missing here shows as "missing" in the browser.
+const mapped = new Set(Object.keys(RANGE_FAMILY));
+for (const id of Object.keys(RANGES)) if (!mapped.has(id)) { bad++; console.log(`✗ ${id}: add it to RANGE_FAMILY in lazy.ts`); }
+for (const id of mapped) if (!RANGES[id]) { bad++; console.log(`✗ ${id}: in RANGE_FAMILY but not in RANGES`); }
+
 for (const [rid, range] of Object.entries(RANGES)) {
   for (const m of range.missions) {
     if (m.id === "free") continue;

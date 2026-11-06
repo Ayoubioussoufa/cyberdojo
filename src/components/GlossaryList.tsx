@@ -1,11 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Term } from "@/lib/types";
 
-export function GlossaryList({ terms }: { terms: Term[] }) {
+export function GlossaryList() {
+  const [terms, setTerms] = useState<Term[] | null>(null);
   const [q, setQ] = useState("");
+  useEffect(() => {
+    let live = true;
+    void fetch("/data/terms.json").then((r) => r.json() as Promise<Term[]>).then((all) => {
+      if (live) setTerms(all);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (!terms) return <p className="muted" aria-busy="true">Loading the glossary…</p>;
   const needle = q.trim().toLowerCase();
   const shown = needle ? terms.filter((t) => `${t.term} ${t.aliases.join(" ")} ${t.definition}`.toLowerCase().includes(needle)) : terms;
   return (

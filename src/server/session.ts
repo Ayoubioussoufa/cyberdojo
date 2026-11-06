@@ -1,0 +1,63 @@
+/**
+ * Sessions: a random token in an HttpOnly cookie, stored only as its SHA-256.
+ * Reading the database therefore gives nobody a usable session.
+ */
+import { createHash, randomBytes } from "node:crypto";
+import { cookies } from "next/headers";
+import { db } from "./db";
+
+const DAY = 86_400_000;
+const LIFETIME = 30 * DAY;
+
+const secure = () => process.env.NODE_ENV === "production" && process.env.INSECURE_COOKIES !== "1";
+/** __Host- makes the browser refuse the cookie unless it is Secure and bound to this exact host. */
+const cookieName = () => (secure() ? "__Host-cyberdojo" : "cyberdojo");
+
+const digest = (token: string) => createHash("sha256").update(token).digest("hex");
+
+export interface User {
+  id: string;
+  username: string;
+  createdAt: number;
+}
+
+async function setCookie(token: string, expires: number) {
+  (await cookies()).set(cookieName(), token, { httpOnly: true, secure: secure(), sameSite: "lax", path: "/", expires: new Date(expires) });
+}
+
+export async function startSession(userId: string) {
+  const token = randomBytes(32).toString("base64url");
+  const now = Date.now();
+  const conn = db();
+  conn.prepare("DELETE FROM sessions WHERE expires_at < ?").run(now);
+  conn.prepare("INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)").run(digest(token), userId, now, now + LIFETIME);
+  await setCookie(token, now + LIFETIME);
+}
+
+export async function currentUser(): Promise<User | null> {
+  const token = (await cookies()).get(cookieName())?.value;
+  if (!token) return null;
+  const now = Date.now();
+  const row = db()
+    .prepare("SELECT u.id, u.username, u.created_at AS createdAt, s.expires_at AS expiresAt FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ?")
+    .get(digest(token), now) as (User & { expiresAt: number }) | undefined;
+  if (!row) return null;
+  // Someone using the site stays signed in. Renewing once a day avoids a write per request.
+  if (row.expiresAt - now < LIFETIME - DAY) {
+    db().prepare("UPDATE sessions SET expires_at = ? WHERE token_hash = ?").run(now + LIFETIME, digest(token));
+    await setCookie(token, now + LIFETIME);
+  }
+  return { id: row.id, username: row.username, createdAt: row.createdAt };
+}
+
+export async function endSession() {
+  const jar = await cookies();
+  const token = jar.get(cookieName())?.value;
+  if (token) db().prepare("DELETE FROM sessions WHERE token_hash = ?").run(digest(token));
+  jar.delete(cookieName());
+}
+
+/** After a password change: every session goes, including any on a stolen device. */
+export function endAllSessions(userId: string) {
+  db().prepare("DELETE FROM sessions WHERE user_id = ?").run(userId);
+}

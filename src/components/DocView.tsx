@@ -1,20 +1,98 @@
 "use client";
 
 import Link from "next/link";
+import { memo } from "react";
 import { CopyButton } from "./Copy";
-import { Drill } from "./Drill";
+import { LazyDrill, LazyRange } from "./Lazy";
 import { CheckBox, HelpBadge } from "./ProjectParts";
 import { Html } from "./Html";
 import { QuestionCard } from "./Question";
-import { Range } from "./Range";
 import { Terms } from "./Terms";
 import { WrittenCard } from "./Written";
-import { setDone, setWord, useStore } from "@/lib/progress";
+import { getStore, setDone, setWord, useSlice } from "@/lib/progress";
 import { KIND_LABEL, type PathStep } from "@/lib/pathState";
 import { fullMessage } from "@/lib/tutor";
 import type { DocBrief, DocMeta, Segment, Term, TocEntry } from "@/lib/types";
 
 type Near = Pick<DocMeta, "slug" | "title"> | null;
+
+/** The body never watches the store, so answering or typing can't re-render a whole lesson. */
+const Segments = memo(function Segments({ segments, brief }: { segments: Segment[]; brief: DocBrief }) {
+  let n = 0;
+  return (
+    <>
+      {segments.map((s, i) => {
+        if (s.kind === "html") return <Html key={i} html={s.html} />;
+        if (s.kind === "question") return <QuestionCard key={s.question.id} q={s.question} doc={brief} n={++n} />;
+        if (s.kind === "written") return <WrittenCard key={s.written.id} w={s.written} />;
+        if (s.kind === "drill") return <LazyDrill key={i} id={s.id} />;
+        if (s.kind === "range") return <LazyRange key={i} id={s.id} />;
+        if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
+        return <HelpBadge key={i} tool={s.tool} level={s.level} />;
+      })}
+    </>
+  );
+});
+
+function useTally(brief: DocBrief) {
+  const answered = useSlice((s) => brief.questions.filter((q) => s.picks[q.id] !== undefined).length);
+  const right = useSlice((s) => brief.questions.filter((q) => s.picks[q.id] === q.correct).length);
+  return { answered, right };
+}
+
+function WordField({ slug, word }: { slug: string; word: string }) {
+  const key = `${slug}:${word}`;
+  const value = useSlice((s) => s.words[key] ?? "");
+  return (
+    <label className="word">
+      <span>{word}</span>
+      <input value={value} onChange={(e) => setWord(key, e.target.value)} placeholder="One sentence, no looking" />
+    </label>
+  );
+}
+
+function Score({ brief }: { brief: DocBrief }) {
+  const { answered, right } = useTally(brief);
+  return (
+    <p className="score">
+      {brief.questions.length ? `${answered} of ${brief.questions.length} answered · ${right} right` : "No multiple-choice questions on this page"}
+    </p>
+  );
+}
+
+function RailScore({ brief }: { brief: DocBrief }) {
+  const { answered } = useTally(brief);
+  return <p className="rail-score">{brief.questions.length ? `${answered}/${brief.questions.length} answered` : ""}</p>;
+}
+
+function Finish({ meta, brief, after, copy }: { meta: DocMeta; brief: DocBrief; after?: PathStep | null; copy: () => string }) {
+  const isDone = useSlice((s) => !!s.done[meta.slug]);
+  return (
+    <>
+      <div className="finish-actions">
+        <CopyButton className="btn primary lg" label="Copy everything for my AI tutor" build={copy} />
+        {meta.kind !== "project" && (
+          <button type="button" className={`btn lg${isDone ? " is-ok" : ""}`} onClick={() => setDone(meta.slug, !isDone)}>
+            {isDone ? "✓ Marked as done" : "Mark as done"}
+          </button>
+        )}
+      </div>
+      <p className="followup">Anything unclear? Ask your AI tutor. There's no such thing as a question too basic for this course.</p>
+      {isDone && meta.builds && (
+        <div className="why ok cando">
+          <p><strong>New skill.</strong> You can now {meta.builds}. It's been added to your <Link href="/skills/">progress</Link>.</p>
+        </div>
+      )}
+      {after && (
+        <Link href={after.href} className="card link-card next-step">
+          <span className="band">Next on your roadmap · {KIND_LABEL[after.kind]}</span>
+          <span className="next-title">{after.title}</span>
+          <span className="muted">{after.note}</span>
+        </Link>
+      )}
+    </>
+  );
+}
 
 export function DocView({
   meta, brief, segments, toc, terms, kicker, prev, next, base, after, intro, outro,
@@ -35,12 +113,7 @@ export function DocView({
   /** Sits after the content, before "Get corrected". */
   outro?: React.ReactNode;
 }) {
-  const store = useStore();
-  const answered = brief.questions.filter((q) => store.picks[q.id] !== undefined).length;
-  const right = brief.questions.filter((q) => store.picks[q.id] === q.correct).length;
-  const isDone = !!store.done[meta.slug];
-  let n = 0;
-  const copy = () => fullMessage(brief, store);
+  const copy = () => fullMessage(brief, getStore());
 
   return (
     <div className="doc-grid">
@@ -62,15 +135,7 @@ export function DocView({
 
         {intro}
 
-        {segments.map((s, i) => {
-          if (s.kind === "html") return <Html key={i} html={s.html} />;
-          if (s.kind === "question") return <QuestionCard key={s.question.id} q={s.question} doc={brief} n={++n} />;
-          if (s.kind === "written") return <WrittenCard key={s.written.id} w={s.written} />;
-          if (s.kind === "drill") return <Drill key={i} id={s.id} />;
-          if (s.kind === "range") return <Range key={i} id={s.id} />;
-          if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
-          return <HelpBadge key={i} tool={s.tool} level={s.level} />;
-        })}
+        <Segments segments={segments} brief={brief} />
 
         {outro}
 
@@ -83,38 +148,11 @@ export function DocView({
           {meta.words.length > 0 && (
             <div className="words">
               <p className="words-title">Define these in your own words</p>
-              {meta.words.map((w) => (
-                <label key={w} className="word">
-                  <span>{w}</span>
-                  <input value={store.words[`${meta.slug}:${w}`] ?? ""} onChange={(e) => setWord(`${meta.slug}:${w}`, e.target.value)} placeholder="One sentence, no looking" />
-                </label>
-              ))}
+              {meta.words.map((w) => <WordField key={w} slug={meta.slug} word={w} />)}
             </div>
           )}
-          <p className="score">
-            {brief.questions.length ? `${answered} of ${brief.questions.length} answered · ${right} right` : "No multiple-choice questions on this page"}
-          </p>
-          <div className="finish-actions">
-            <CopyButton className="btn primary lg" label="Copy everything for my AI tutor" build={copy} />
-            {meta.kind !== "project" && (
-              <button type="button" className={`btn lg${isDone ? " is-ok" : ""}`} onClick={() => setDone(meta.slug, !isDone)}>
-                {isDone ? "✓ Marked as done" : "Mark as done"}
-              </button>
-            )}
-          </div>
-          <p className="followup">Anything unclear? Ask your AI tutor. There's no such thing as a question too basic for this course.</p>
-          {isDone && meta.builds && (
-            <div className="why ok cando">
-              <p><strong>New skill.</strong> You can now {meta.builds}. It's been added to your <Link href="/skills/">progress</Link>.</p>
-            </div>
-          )}
-          {after && (
-            <Link href={after.href} className="card link-card next-step">
-              <span className="band">Next on your roadmap · {KIND_LABEL[after.kind]}</span>
-              <span className="next-title">{after.title}</span>
-              <span className="muted">{after.note}</span>
-            </Link>
-          )}
+          <Score brief={brief} />
+          <Finish meta={meta} brief={brief} after={after} copy={copy} />
         </section>
 
         <nav className="pager" aria-label="Next and previous">
@@ -131,7 +169,7 @@ export function DocView({
             <li><a href="#finish">Get corrected</a></li>
           </ol>
           <CopyButton className="btn primary rail-copy" label="Copy for my AI tutor" done="Copied" build={copy} />
-          <p className="rail-score">{brief.questions.length ? `${answered}/${brief.questions.length} answered` : ""}</p>
+          <RailScore brief={brief} />
         </div>
       </aside>
 

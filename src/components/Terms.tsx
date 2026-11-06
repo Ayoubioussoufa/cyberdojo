@@ -5,6 +5,59 @@ import type { Term } from "@/lib/types";
 
 const SKIP = new Set(["CODE", "PRE", "A", "H1", "H2", "H3", "TH", "BUTTON", "TEXTAREA", "INPUT", "KBD", "SCRIPT"]);
 
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * All the names go into one pattern, so each text node is scanned once however
+ * many terms the page has. Names with two capitals in a row (TCP, SQLi) must
+ * match case exactly, so that "tar" in a sentence isn't the TAR acronym.
+ */
+function underline(root: Element, terms: Term[]) {
+  const byName = new Map<string, Term>();
+  for (const t of terms) for (const name of [t.term, ...t.aliases]) if (name && !byName.has(name.toLowerCase())) byName.set(name.toLowerCase(), t);
+  if (byName.size === 0) return;
+  const exact = new Map<string, string>();
+  for (const t of terms) for (const name of [t.term, ...t.aliases]) if (/[A-Z]{2}/.test(name)) exact.set(name.toLowerCase(), name);
+  const names = [...byName.keys()].sort((a, b) => b.length - a.length).map(escapeRe);
+  const re = new RegExp(`(?<![A-Za-z0-9-])(?:${names.join("|")})(?![A-Za-z0-9-])`, "gi");
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n) {
+      for (let p = n.parentElement; p && p !== root; p = p.parentElement) {
+        if (SKIP.has(p.tagName) || p.classList.contains("term") || p.classList.contains("noterms")) return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+  const nodes: Text[] = [];
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) nodes.push(n as Text);
+
+  const seen = new Set<string>();
+  for (const node of nodes) {
+    const hits: { at: number; len: number; t: Term }[] = [];
+    for (const m of node.data.matchAll(re)) {
+      const key = m[0].toLowerCase();
+      const t = byName.get(key);
+      const must = exact.get(key);
+      if (!t || seen.has(t.term) || (must && must !== m[0])) continue;
+      seen.add(t.term);
+      hits.push({ at: m.index, len: m[0].length, t });
+    }
+    // Last hit first: splitting moves everything after the split point.
+    for (const { at, len, t } of hits.reverse()) {
+      const hit = node.splitText(at);
+      hit.splitText(len);
+      const span = document.createElement("span");
+      span.className = "term";
+      span.tabIndex = 0;
+      span.dataset.title = t.term;
+      span.dataset.def = t.definition;
+      hit.parentNode?.replaceChild(span, hit);
+      span.appendChild(hit);
+    }
+  }
+}
+
 /**
  * Underlines the first use of each glossary term in the document, and shows
  * its definition on hover, focus or tap, so nothing is ever left unexplained.
@@ -14,44 +67,20 @@ export function Terms({ terms, scope }: { terms: Term[]; scope: string }) {
   const done = useRef(false);
 
   useEffect(() => {
-    const root = document.querySelector(scope);
-    if (!root || done.current) return;
-    done.current = true;
-    const names = terms
-      .flatMap((t) => [t.term, ...t.aliases].map((name) => ({ name, t })))
-      .sort((a, b) => b.name.length - a.name.length);
-    const seen = new Set<string>();
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-      acceptNode(n) {
-        for (let p = n.parentElement; p && p !== root; p = p.parentElement) {
-          if (SKIP.has(p.tagName) || p.classList.contains("term") || p.classList.contains("noterms")) return NodeFilter.FILTER_REJECT;
-        }
-        return NodeFilter.FILTER_ACCEPT;
-      },
-    });
-    const nodes: Text[] = [];
-    for (let n = walker.nextNode(); n; n = walker.nextNode()) nodes.push(n as Text);
-    for (const node of nodes) {
-      let cur: Text | null = node;
-      for (const { name, t } of names) {
-        if (!cur || seen.has(t.term)) continue;
-        const safe = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const m = new RegExp(`(^|[^A-Za-z0-9-])(${safe})(?![A-Za-z0-9-])`, /[A-Z]{2}/.test(name) ? "" : "i").exec(cur.data);
-        if (!m) continue;
-        const at = m.index + (m[1] as string).length;
-        const hit = cur.splitText(at);
-        const rest = hit.splitText((m[2] as string).length);
-        const span = document.createElement("span");
-        span.className = "term";
-        span.tabIndex = 0;
-        span.dataset.title = t.term;
-        span.dataset.def = t.definition;
-        hit.parentNode?.replaceChild(span, hit);
-        span.appendChild(hit);
-        seen.add(t.term);
-        cur = rest;
-      }
+    if (done.current || terms.length === 0) return;
+    const mark = () => {
+      const root = document.querySelector(scope);
+      if (!root || done.current) return;
+      done.current = true;
+      underline(root, terms);
+    };
+    const idle = window.requestIdleCallback;
+    if (idle) {
+      const job = idle(mark, { timeout: 1000 });
+      return () => window.cancelIdleCallback(job);
     }
+    const job = window.setTimeout(mark, 200);
+    return () => window.clearTimeout(job);
   }, [terms, scope]);
 
   useEffect(() => {
