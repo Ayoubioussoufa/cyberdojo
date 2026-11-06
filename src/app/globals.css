@@ -501,6 +501,26 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .project-check { display: flex; align-items: flex-start; gap: 10px; margin: 8px 0; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); cursor: pointer; font-size: 16.5px; }
 .project-check input { flex: none; width: 19px; height: 19px; margin-top: 3px; accent-color: var(--accent); }
 
+/* Projects */
+.project-intro { margin: 8px 0 24px; }
+.project-intro h2 { font-size: 21px; margin: 22px 0 8px; }
+.tested { font-family: var(--sans); font-size: 14px; color: var(--muted); background: var(--sunk); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
+.tested strong { color: var(--ink); }
+.level-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-family: var(--sans); font-size: 12.5px; white-space: nowrap; border: 1px solid var(--rule-strong); }
+.level-chip.guided { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.level-chip.recall { background: var(--accent-soft); color: var(--ink); border-color: var(--accent); }
+.fade-table { border-collapse: collapse; font-family: var(--sans); font-size: 13px; }
+.fade-table th, .fade-table td { padding: 3px 4px; text-align: center; border: 0; background: none; }
+.fade-table th:first-child, .fade-table td:first-child { text-align: left; white-space: nowrap; padding-right: 10px; position: sticky; left: 0; background: var(--bg); }
+.fade-table thead th { color: var(--muted); font-weight: 500; }
+.fade-cell { display: inline-block; width: 18px; height: 18px; border-radius: 4px; line-height: 18px; font-size: 11px; font-weight: 600; }
+.fade-cell.guided { background: var(--accent); color: var(--accent-ink); }
+.fade-cell.recall { background: var(--accent-soft); color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
+.fade-cell.solo { box-shadow: inset 0 0 0 1px var(--rule-strong); color: var(--muted); }
+.fade-key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--sans); font-size: 13.5px; color: var(--muted); margin: 8px 0 12px; }
+.fade-key span { display: inline-flex; align-items: center; gap: 6px; }
+.project-row-bar { display: block; margin-top: 6px; max-width: 14rem; }
+
 /* Exercise player */
 .why p { margin: 0 0 6px; }
 .why .given { font-weight: 600; }

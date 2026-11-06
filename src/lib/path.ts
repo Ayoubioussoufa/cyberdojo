@@ -55,6 +55,6 @@ export function buildPath(): PathStep[] {
 /** The step after this document on the path, for the end of each page. */
 export function stepAfter(href: string): PathStep | null {
   const path = buildPath();
-  const i = path.findIndex((s) => s.href === href);
+  const i = path.findLastIndex((s) => s.href.split("#")[0] === href);
   return i >= 0 ? (path[i + 1] ?? null) : null;
 }

@@ -17,7 +17,7 @@ import type { DocBrief, DocMeta, Segment, Term, TocEntry } from "@/lib/types";
 type Near = Pick<DocMeta, "slug" | "title"> | null;
 
 export function DocView({
-  meta, brief, segments, toc, terms, kicker, prev, next, base, after, intro,
+  meta, brief, segments, toc, terms, kicker, prev, next, base, after, intro, outro,
 }: {
   meta: DocMeta;
   brief: DocBrief;
@@ -32,6 +32,8 @@ export function DocView({
   after?: PathStep | null;
   /** Sits under the header: a project's tools table, for example. */
   intro?: React.ReactNode;
+  /** Sits after the content, before "Get corrected". */
+  outro?: React.ReactNode;
 }) {
   const store = useStore();
   const answered = brief.questions.filter((q) => store.picks[q.id] !== undefined).length;
@@ -48,7 +50,7 @@ export function DocView({
           <h1>{meta.title}</h1>
           <p className="lede">{meta.summary}</p>
           <p className="meta">
-            {meta.minutes} min{meta.questions ? ` · ${meta.questions} questions` : ""}
+            {meta.hours ? `About ${meta.hours} hours` : `${meta.minutes} min`}{meta.questions ? ` · ${meta.questions} questions` : ""}
             {meta.builds ? <> · You will: {meta.builds}</> : null}
           </p>
           {meta.source && (
@@ -69,6 +71,8 @@ export function DocView({
           if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
           return <HelpBadge key={i} tool={s.tool} level={s.level} />;
         })}
+
+        {outro}
 
         <section className="finish">
           <h2 id="finish">Get corrected</h2>
@@ -92,9 +96,11 @@ export function DocView({
           </p>
           <div className="finish-actions">
             <CopyButton className="btn primary lg" label="Copy everything for my AI tutor" build={copy} />
-            <button type="button" className={`btn lg${isDone ? " is-ok" : ""}`} onClick={() => setDone(meta.slug, !isDone)}>
-              {isDone ? "✓ Marked as done" : "Mark as done"}
-            </button>
+            {meta.kind !== "project" && (
+              <button type="button" className={`btn lg${isDone ? " is-ok" : ""}`} onClick={() => setDone(meta.slug, !isDone)}>
+                {isDone ? "✓ Marked as done" : "Mark as done"}
+              </button>
+            )}
           </div>
           <p className="followup">Anything unclear? Ask your AI tutor. There's no such thing as a question too basic for this course.</p>
           {isDone && meta.builds && (

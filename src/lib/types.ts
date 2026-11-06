@@ -80,6 +80,8 @@ export interface DocMeta {
   parts?: { from: number; to: number; hours: number }[];
   /** Projects: rough total hours. */
   hours?: number;
+  /** Projects: what was really run while writing the page. */
+  tested?: string;
   questions: number;
 }
 

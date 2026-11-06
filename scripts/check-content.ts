@@ -2,7 +2,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DRILLS } from "../src/lib/drills";
-import { guides, lessons, glossary, machines, sheets } from "../src/lib/content";
+import { PLACEMENT } from "../src/data/path";
+import { TOOLS } from "../src/data/tools";
+import { guides, lessons, glossary, machines, projects, sheets } from "../src/lib/content";
+import { PROJECTS } from "../src/lib/data";
+import { buildPath } from "../src/lib/path";
+import type { HelpLevel } from "../src/lib/types";
 import { RANGES } from "../src/lib/missions";
 
 let bad = 0;
@@ -10,7 +15,7 @@ const fail = (msg: string) => {
   bad++;
   console.log(`✗ ${msg}`);
 };
-const docs = [...lessons(), ...guides(), ...machines()];
+const docs = [...lessons(), ...guides(), ...machines(), ...projects()];
 const words = (s: string) => s.trim().split(/\s+/).length;
 const plain = (s: string) => s.replace(/`/g, "");
 let questions = 0;
@@ -57,6 +62,55 @@ if (thin) console.log(`note: ${thin} sections in lessons 1–${DEEP_FROM - 1} ha
 
 const slugs = new Set([...docs, ...sheets()].map((d) => d.meta.slug));
 
+// Projects: every step ends in a checkpoint, and help fades tool by tool.
+const RANK: Record<HelpLevel, number> = { guided: 0, recall: 1, solo: 2 };
+const seenTools = new Map<string, string[]>();
+if (projects().length !== PROJECTS.length) fail(`projects: ${projects().length} guides for ${PROJECTS.length} projects`);
+for (const p of PROJECTS) {
+  const d = projects().find((x) => x.meta.slug === p.id);
+  if (!d) {
+    fail(`no guide for ${p.id}`);
+    continue;
+  }
+  const steps = [...new Set(d.toc.flatMap((t) => /^Step (\d+)/.exec(t.text)?.[1] ?? []))].map(Number);
+  steps.forEach((n, i) => {
+    if (n !== i + 1) fail(`${p.id}: steps are out of order at ${n}`);
+    if (!d.checks.some((c) => c.step === n)) fail(`${p.id}: step ${n} has no checkpoint`);
+  });
+  if (steps.length < 5) fail(`${p.id}: only ${steps.length} steps`);
+  for (const part of d.meta.parts ?? []) if (part.to > steps.length) fail(`${p.id}: a part goes past the last step`);
+  if (d.meta.parts && d.meta.parts[d.meta.parts.length - 1]?.to !== steps.length) fail(`${p.id}: its parts don't reach the last step`);
+  if (!d.meta.tested && !["P01", "P02", "P03", "P04", "P05"].includes(p.id)) fail(`${p.id}: doesn't say how it was checked`);
+  const best = new Map<string, HelpLevel>();
+  for (const t of d.tools) {
+    if (!TOOLS[t.tool]) fail(`${p.id}: unknown tool ${t.tool}`);
+    const was = best.get(t.tool);
+    if (!was || RANK[t.level] < RANK[was]) best.set(t.tool, t.level);
+  }
+  for (const [tool, level] of best) {
+    const before = seenTools.get(tool) ?? [];
+    // First use: a full walkthrough. Second: recall at most. Third onwards: no help.
+    const most: HelpLevel = before.length === 0 ? "guided" : before.length === 1 ? "recall" : "solo";
+    if (before.length === 0 && level !== "guided") fail(`${p.id}: ${tool} is new here, so it needs a full walkthrough`);
+    if (RANK[level] < RANK[most]) fail(`${p.id}: ${tool} gets too much help (${level}), as it was used in ${before.join(", ")}`);
+    if (before.length === 0 && TOOLS[tool]?.first !== p.id) fail(`${tool}: tools.ts says ${TOOLS[tool]?.first}, but it's taught in ${p.id}`);
+    seenTools.set(tool, [...before, p.id]);
+  }
+}
+
+// The roadmap: everything sits on it exactly once, and every part is reachable.
+const roadmap = buildPath();
+const refs = Object.values(PLACEMENT).flatMap((m) => [...(m.before ?? []), ...(m.after ?? [])]).map((p) => p.ref);
+for (const d of guides()) if (refs.filter((r) => r === `guide:${d.meta.slug}`).length !== 1) fail(`roadmap: ${d.meta.slug} should appear once`);
+for (const d of machines()) if (!refs.includes(`machine:${d.meta.slug}`)) fail(`roadmap: ${d.meta.slug} is missing`);
+for (const d of projects()) {
+  const parts = d.meta.parts?.length ?? 1;
+  for (let n = 1; n <= parts; n++) if (!refs.includes(`project:${d.meta.slug}:${n}`)) fail(`roadmap: ${d.meta.slug} part ${n} is missing`);
+  const covered = roadmap.filter((s) => s.id.startsWith(`project:${d.meta.slug}:`)).flatMap((s) => s.checks ?? []);
+  if (new Set(covered).size !== d.checks.length) fail(`roadmap: ${d.meta.slug} covers ${covered.length} of ${d.checks.length} checkpoints`);
+}
+if (new Set(roadmap.map((s) => s.id)).size !== roadmap.length) fail("roadmap: a step appears twice");
+
 // The subnet table is arithmetic, so it must match the arithmetic.
 const subnet = fs.readFileSync("content/reference/subnetting.md", "utf8");
 let prefixes = 0;
@@ -91,5 +145,6 @@ for (const t of glossary()) {
 
 void fs;
 void path;
+console.log(`${roadmap.length} roadmap steps, ${projects().flatMap((p) => p.checks).length} project checkpoints, ${Object.keys(TOOLS).length} tools`);
 console.log(`${docs.length} documents, ${questions} questions, ${glossary().length} terms, ${Object.keys(DRILLS).length} drills, ${Object.values(RANGES).reduce((n, r) => n + r.missions.length, 0)} missions`);
 process.exit(bad ? 1 : 0);

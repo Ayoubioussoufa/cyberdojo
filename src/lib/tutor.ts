@@ -21,7 +21,7 @@ function questionBlock(q: Question, n: number, store: Store): string {
 
 /** One button: every question, my picks, my written answers and my definitions. */
 export function fullMessage(doc: DocBrief, store: Store): string {
-  const label = doc.kind === "lesson" ? `Lesson ${doc.number}` : doc.kind === "machine" ? "Machine" : "Guide";
+  const label = doc.kind === "lesson" ? `Lesson ${doc.number}` : doc.kind === "machine" ? "Machine" : doc.kind === "project" ? "Project" : "Handbook page";
   const parts = [
     ROLE,
     `I just worked through "${label}: ${doc.title}" (${doc.summary})`,

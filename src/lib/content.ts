@@ -61,7 +61,8 @@ function makeMarked(toc: TocEntry[]) {
         const inner = this.parser.parseInline(tokens);
         if (depth !== 2) return `<h${depth}>${inner}</h${depth}>\n`;
         const text = decode(inner.replace(/<[^>]+>/g, ""));
-        let id = slugify(text);
+        const stepN = /^Step (\d+)/.exec(text);
+        let id = stepN ? `step-${stepN[1]}` : slugify(text);
         const n = seen.get(id) ?? 0;
         seen.set(id, n + 1);
         if (n) id += `-${n}`;
@@ -312,6 +313,7 @@ function load(kindDir: DocDir, file: string): Doc {
   if (front.group) meta.group = front.group;
   if (front.level) meta.level = front.level;
   if (front.hours) meta.hours = Number(front.hours);
+  if (front.tested) meta.tested = front.tested;
   if (front.parts) {
     meta.parts = front.parts.split(",").map((p) => {
       const m = /(\d+)-(\d+)\s*@\s*(\d+)h/.exec(p);
