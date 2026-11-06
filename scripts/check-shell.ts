@@ -303,6 +303,7 @@ jq -r 'select(.eventName == "Nope")' trail.json
 jq -r 'select(.eventTime >= "2026-10-27T09:03:00Z") | .eventName' trail.json
 cat trail.json | jq -r .sourceIPAddress | sort | uniq -c | sort -rn
 jq -r .eventName trail.json | wc -l
+jq -r 'select(.sourceIPAddress | test("^10") | not) | .eventName' trail.json
 jq .x nothere.json
 `.trim().split("\n");
 

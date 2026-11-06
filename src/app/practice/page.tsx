@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Range } from "@/components/Range";
 import { DRILL_LIST } from "@/lib/drills";
 import { RANGES } from "@/lib/missions";
+import { MISSIONS_MACHINES } from "@/lib/missions/machines";
 
 export const metadata: Metadata = { title: "Practice" };
 
@@ -25,9 +26,9 @@ export default function Page() {
         ))}
       </div>
       <h2 className="section-title">Terminal missions</h2>
-      <p className="muted">Open any lesson that has them, or use the sets below.</p>
+      <p className="muted">Open any lesson that has them, or use the sets below. For a whole story on one target, try the <Link href="/machines/">machines</Link>.</p>
       <div className="grid3">
-        {Object.entries(RANGES).filter(([id]) => id !== "sandbox").map(([id, r]) => (
+        {Object.entries(RANGES).filter(([id]) => id !== "sandbox" && !(id in MISSIONS_MACHINES)).map(([id, r]) => (
           <Link key={id} href={`/practice/${id}/`} className="card link-card">
             <span className="phase-n">{r.missions.length} missions</span>
             <h3>{r.title}</h3>

@@ -10,8 +10,10 @@ const LINKS = [
   { href: "/roadmap/", label: "Roadmap" },
   { href: "/guides/", label: "Guides" },
   { href: "/practice/", label: "Practice" },
+  { href: "/machines/", label: "Machines" },
   { href: "/review/", label: "Review" },
   { href: "/glossary/", label: "Glossary" },
+  { href: "/sheets/", label: "Sheets" },
   { href: "/resources/", label: "Resources" },
 ];
 

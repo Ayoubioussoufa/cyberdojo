@@ -19,6 +19,8 @@ export interface Mission {
   passed: (w: Built, cmd: string) => boolean;
   /** The reference solution, used only by scripts/check-missions.ts. */
   solve: (w: Built) => string[];
+  /** Commands that look right but must not pass: a half fix, or the wrong order. */
+  notEnough?: (w: Built) => string[];
   debrief: string;
 }
 

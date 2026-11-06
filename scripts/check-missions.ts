@@ -18,6 +18,19 @@ for (const [rid, range] of Object.entries(RANGES)) {
         console.log(`✗ ${rid}/${m.id}: already passed at the start`);
         break;
       }
+      if (m.notEnough) {
+        const half = m.build(new Rng(seed * 7919));
+        let cmd = "";
+        for (const line of m.notEnough(half)) {
+          half.shell.run(line);
+          cmd = line;
+        }
+        if (m.passed(half, cmd)) {
+          bad++;
+          console.log(`✗ ${rid}/${m.id}: a half fix passed`);
+          break;
+        }
+      }
       let last = "";
       let out = "";
       let seen = "";
