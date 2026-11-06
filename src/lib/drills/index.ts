@@ -259,6 +259,91 @@ const list: DrillDef[] = [
     const opts = rng.shuffle(["Low", "Medium", "High"]);
     return { kind: "choice", prompt: `Likelihood ${l}, impact ${i}. Scale: under 8 is Low, 8–14 Medium, 15 or more High.\n\nWhat's the rating?`, options: opts, correct: opts.indexOf(label), why: `${l} × ${i} = ${v}, so ${label}. Real scales are defined by each organisation: what matters is defining them first.` };
   } },
+  table("ioc-rank", "Climb the pyramid", "Name the level of the Pyramid of Pain.", 9, ["Hash value", "IP address", "Domain name", "Artifact", "Tool", "TTP"], [
+    ["`4f2a…91c0`, the SHA-256 of a dropped file", "Hash value", "Change one byte and it's a new hash."],
+    ["`203.0.113.7`, seen connecting to a server", "IP address", "Attackers rent new addresses cheaply."],
+    ["`update-check.example`, seen in DNS logs", "Domain name", "Registering a new one takes minutes."],
+    ["A file always dropped at `C:\\ProgramData\\svc\\cfg.dat`", "Artifact", "A distinctive trace on a host: annoying to change."],
+    ["An unusual User-Agent string in proxy logs", "Artifact", "A network artifact that needs a code or config change."],
+    ["Mimikatz was run on a server", "Tool", "They would need a different tool, or to build one."],
+    ["They always dump credentials from memory, then move using admin shares", "TTP", "That's how they work, whatever tool they use."],
+    ["They send invoice-themed mail, then run an Office macro that starts a script", "TTP", "A repeated way of operating."],
+    ["A scheduled task name, `WinSysUpd`, used in three incidents", "Artifact", "A host artifact: specific, but it can be renamed."],
+    ["A remote access tool that their group always uses", "Tool", "Replacing a tool costs effort, but less than changing behaviour."],
+  ]),
+  { id: "phish-auth", title: "Does DMARC pass?", blurb: "Read the results, compare the domains, decide.", month: 9, make: (rng) => {
+    const seen = rng.pick(["oasis.example", "bank-north.example", "shop-atlas.example"]);
+    const other = rng.pick(["mailer-77.example", "bulk-send.example", "cheap-host.example"]);
+    const spfDom = rng.pick([seen, other]);
+    const dkimDom = rng.pick([seen, other]);
+    const spf = rng.pick(["pass", "fail"]);
+    const dkim = rng.pick(["pass", "fail"]);
+    const passes = (spf === "pass" && spfDom === seen) || (dkim === "pass" && dkimDom === seen);
+    const opts = rng.shuffle(["DMARC passes", "DMARC fails"]);
+    return { kind: "choice", prompt: `From: billing@${seen}\n\nspf=${spf} (mail-from domain ${spfDom})\ndkim=${dkim} (signing domain ${dkimDom})`, options: opts, correct: opts.indexOf(passes ? "DMARC passes" : "DMARC fails"), why: passes ? "At least one check passed for the domain in the From line, so it's aligned." : "DMARC needs a check that both passes and matches the From domain. Neither did both." };
+  } },
+  table("ir-phase", "Which incident phase?", "Place the action in the response lifecycle.", 11, ["Prepare", "Detect and analyse", "Contain", "Eradicate", "Recover", "Learn"], [
+    ["Writing a ransomware playbook and testing your backups", "Prepare", "Done before anything goes wrong."],
+    ["Working out whether an alert is real, and how far it has spread", "Detect and analyse", "Understanding comes before acting."],
+    ["Moving an infected laptop to an isolated network", "Contain", "Stops the spread."],
+    ["Disabling a stolen account so it can't be used", "Contain", "Stops further harm right away."],
+    ["Removing the attacker's scheduled task and web shell", "Eradicate", "Removes their foothold."],
+    ["Patching the flaw they came in through", "Eradicate", "Removes the way back in."],
+    ["Restoring servers from clean backups and watching them closely", "Recover", "Getting back to normal, safely."],
+    ["Holding a blameless review and assigning actions with dates", "Learn", "Turns the incident into improvements."],
+  ]),
+  table("risk-treat", "Which risk treatment?", "Mitigate, transfer, avoid or accept.", 12, ["Mitigate", "Transfer", "Avoid", "Accept"], [
+    ["Adding MFA to the customer portal", "Mitigate", "It reduces the likelihood."],
+    ["Buying cyber insurance for ransomware losses", "Transfer", "Part of the financial impact moves to the insurer."],
+    ["Retiring the old file-transfer service entirely", "Avoid", "With no activity there's no risk."],
+    ["The CFO signs off an unpatched kiosk until a review date", "Accept", "Recorded by someone with the authority."],
+    ["Moving hosting to a provider with a contractual liability clause", "Transfer", "The contract shares the impact."],
+    ["Adding offline backups to reduce ransomware downtime", "Mitigate", "It reduces the impact."],
+    ["Deciding not to launch in a country with data rules you can't meet", "Avoid", "You stop the activity."],
+  ]),
+  table("framework-pick", "Which framework fits?", "Match the need to the framework.", 12, ["ISO/IEC 27001", "NIST CSF 2.0", "CIS Controls", "SOC 2", "GDPR"], [
+    ["A European customer wants a certificate from an accredited body.", "ISO/IEC 27001", "It's certifiable, and it covers your whole management system."],
+    ["You want to describe your current and target posture to the board.", "NIST CSF 2.0", "Its profiles exist for exactly that."],
+    ["A small company asks what to do first, in a prioritised order.", "CIS Controls", "Implementation Group 1 is a practical baseline."],
+    ["A US customer of your SaaS asks for an auditor's report on your controls.", "SOC 2", "It's an attestation report by a CPA firm."],
+    ["You process personal data of people living in France.", "GDPR", "It's law, not a voluntary framework."],
+  ]),
+  { id: "rto-rpo", title: "RPO and RTO", blurb: "Does the plan meet the business target?", month: 12, make: (rng) => {
+    const every = rng.pick([1, 4, 6, 12, 24]);
+    const rpo = rng.pick([1, 2, 4, 8, 12, 24, 48]);
+    const restore = rng.pick([2, 4, 8, 12]);
+    const rto = rng.pick([1, 4, 6, 8, 24]);
+    const q = rng.pick(["rpo", "rto"]);
+    const opts = rng.shuffle(["Meets the target", "Misses the target"]);
+    const good = q === "rpo" ? every <= rpo : restore <= rto;
+    return { kind: "choice", prompt: q === "rpo" ? `Backups run every ${every} h. The business says it can lose at most ${rpo} h of data.\n\nDoes the backup schedule meet the RPO?` : `A full restore takes ${restore} h. The business needs the service back within ${rto} h.\n\nDoes this meet the RTO?`, options: opts, correct: opts.indexOf(good ? "Meets the target" : "Misses the target"), why: q === "rpo" ? `In the worst case you lose ${every} h of data, just before the next backup. The limit is ${rpo} h.` : `Recovery takes ${restore} h against a limit of ${rto} h. Only a tested restore proves this number.` };
+  } },
+  { id: "volatility", title: "Collect this first", blurb: "Order of volatility: which evidence disappears sooner?", month: 15, make: (rng) => {
+    const order = ["CPU registers and cache", "RAM contents", "Current network connections", "Running processes", "Temporary files", "Files on the hard disk", "Remote logs", "Backups on archive media"];
+    const a = rng.int(0, order.length - 3);
+    const b = rng.int(a + 1, order.length - 1);
+    const first = order[a] as string;
+    const opts = rng.shuffle([first, order[b] as string]);
+    return { kind: "choice", prompt: "You can only collect one before the machine loses power. Which one goes first?", options: opts, correct: opts.indexOf(first), why: `RFC 3227: collect what vanishes fastest first. ${first} changes or disappears sooner than ${(order[b] as string).toLowerCase()}.` };
+  } },
+  table("fact-inference", "Fact or inference?", "Does the sentence state evidence, or a conclusion?", 15, ["Fact", "Inference"], [
+    ["Event 4624 shows a logon by svc_web at 03:14 UTC.", "Fact", "It reports what a log records."],
+    ["The attacker wanted to reach the finance server.", "Inference", "Motive is a judgement, not a record."],
+    ["Prefetch shows that tool.exe last ran at 03:20 UTC.", "Fact", "A statement of what the artifact shows."],
+    ["The password was probably stolen through phishing.", "Inference", "\"Probably\" gives it away: a likely cause, not an observation."],
+    ["The SHA-256 of the file matches the collected hash.", "Fact", "A check that anyone can repeat."],
+    ["Sam must have run the script.", "Inference", "The account did. Who was at the keyboard is another question."],
+    ["The firewall logged 4 GB sent to 203.0.113.7 at 04:02 UTC.", "Fact", "It's a measurement in a log."],
+    ["The 4 GB transfer was customer data.", "Inference", "Unless you can see the contents, this is a judgement."],
+  ]),
+  table("tlp", "May I share this?", "Apply the Traffic Light Protocol 2.0.", 15, ["Yes, sharing is allowed", "No, it isn't allowed"], [
+    ["`TLP:CLEAR`, and you want to post it on a public blog.", "Yes, sharing is allowed", "CLEAR has no limit on disclosure."],
+    ["`TLP:GREEN`, and you want to share it with your national security community.", "Yes, sharing is allowed", "GREEN may travel within the community."],
+    ["`TLP:GREEN`, and you want to post it publicly on social media.", "No, it isn't allowed", "Community isn't the same as the public."],
+    ["`TLP:AMBER`, and you want to tell a colleague who needs it to protect your organisation.", "Yes, sharing is allowed", "Need-to-know inside the organisation is fine."],
+    ["`TLP:AMBER+STRICT`, and you want to tell a client.", "No, it isn't allowed", "STRICT stays inside your organisation."],
+    ["`TLP:RED`, and you want to forward it to your whole team.", "No, it isn't allowed", "RED stays with the named recipients."],
+  ]),
   table("iam-eval", "Allow or deny?", "AWS evaluation: explicit deny wins, and otherwise you need an allow.", 13, ["Allowed", "Denied"], [
     ["An identity policy allows s3:GetObject. Nothing denies it.", "Allowed", "An explicit allow with no deny."],
     ["No policy mentions the action at all.", "Denied", "The default is deny."],

@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DRILLS } from "../src/lib/drills";
-import { guides, lessons, glossary } from "../src/lib/content";
+import { guides, lessons, glossary, machines, sheets } from "../src/lib/content";
 import { RANGES } from "../src/lib/missions";
 
 let bad = 0;
@@ -10,7 +10,7 @@ const fail = (msg: string) => {
   bad++;
   console.log(`✗ ${msg}`);
 };
-const docs = [...lessons(), ...guides()];
+const docs = [...lessons(), ...guides(), ...machines()];
 const words = (s: string) => s.trim().split(/\s+/).length;
 const plain = (s: string) => s.replace(/`/g, "");
 let questions = 0;
@@ -42,10 +42,23 @@ for (const d of docs) {
   }
 }
 
-const slugs = new Set(docs.map((d) => d.meta.slug));
-for (const d of docs) {
+// Every section of the deepened lessons needs a question: the student's format.
+// Lessons 1–45 predate this rule and are reported, not failed, until they catch up.
+const DEEP_FROM = 46;
+let thin = 0;
+for (const d of lessons()) {
+  const parts = fs.readFileSync(path.join("content/lessons", `${d.meta.slug}.md`), "utf8").split(/^## /m).slice(1);
+  const empty = parts.filter((p) => !/^(\?[?!] |@range )/m.test(p)).map((p) => p.split("\n")[0]);
+  if (d.meta.number >= DEEP_FROM) for (const e of empty) fail(`${d.meta.slug}: section with no question: ${e}`);
+  else thin += empty.length;
+  if (d.meta.number >= DEEP_FROM && d.text.split(/\s+/).length < 550) fail(`${d.meta.slug}: only ${d.text.split(/\s+/).length} words`);
+}
+if (thin) console.log(`note: ${thin} sections in lessons 1–${DEEP_FROM - 1} have no question yet`);
+
+const slugs = new Set([...docs, ...sheets()].map((d) => d.meta.slug));
+for (const d of [...docs, ...sheets()]) {
   const html = d.segments.map((s) => (s.kind === "html" ? s.html : "")).join("");
-  for (const m of html.matchAll(/href="\/(courses|guides)\/([^/"#]+)/g)) {
+  for (const m of html.matchAll(/href="\/(courses|guides|machines|sheets)\/([^/"#]+)/g)) {
     if (!slugs.has(m[2] as string)) fail(`${d.meta.slug}: broken internal link /${m[1]}/${m[2]}`);
   }
 }

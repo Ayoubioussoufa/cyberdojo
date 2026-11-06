@@ -4,6 +4,8 @@ import type { Shell } from "@/lib/shell/shell";
 export interface Built {
   shell: Shell;
   flag?: string;
+  /** Whatever a world's own tools record, for grading. */
+  state?: Record<string, unknown>;
 }
 
 export interface Mission {
