@@ -2,6 +2,7 @@
 import type { Rng } from "@/lib/rng";
 import type { Shell } from "@/lib/shell/shell";
 import { machine } from "@/lib/shell/world";
+import { MODE_DRILLS } from "./modes";
 
 export type Exercise =
   | { kind: "choice"; prompt: string; options: string[]; correct: number; why: string; whyNot?: Record<string, string> }
@@ -600,5 +601,5 @@ const list: DrillDef[] = [
   ]),
 ];
 
-export const DRILLS: Record<string, DrillDef> = Object.fromEntries(list.map((d) => [d.id, d]));
-export const DRILL_LIST = list;
+export const DRILL_LIST: DrillDef[] = [...MODE_DRILLS, ...list];
+export const DRILLS: Record<string, DrillDef> = Object.fromEntries(DRILL_LIST.map((d) => [d.id, d]));

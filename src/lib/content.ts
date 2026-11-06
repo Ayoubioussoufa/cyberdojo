@@ -11,6 +11,7 @@
  *   @drill <id>                 a generated drill
  *   @range <id>                 terminal missions
  *   @flow A > B > C             a small flow diagram
+ *   @seq, @stack, @pyramid, @bits, @perm   larger diagrams: see diagrams.ts
  *   @term name (alias) = text   a glossary entry, shown on hover everywhere
  *   ::: key|tip|trap|try|why|law Title … :::   a callout
  *
@@ -21,6 +22,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Marked } from "marked";
+import { bitsHtml, permHtml, pyramidHtml, seqSvg, stackHtml } from "./diagrams";
 import type { Check, Doc, DocBrief, DocMeta, HelpLevel, Question, Segment, Term, TocEntry, ToolUse, Written } from "./types";
 
 const ROOT = path.join(process.cwd(), "content");
@@ -233,6 +235,27 @@ function parseBody(slug: string, title: string, body: string, href: string) {
     if (range) {
       flush();
       segments.push({ kind: "range", id: range[1] as string });
+      i++;
+      continue;
+    }
+    const block = /^@(seq|stack|pyramid)\b\s*(.*)$/.exec(line);
+    if (block) {
+      const rows: string[] = [];
+      i++;
+      while (i < lines.length && (lines[i] as string).trim() !== "") rows.push((lines[i++] as string).trim());
+      const html = block[1] === "seq" ? seqSvg(block[2] as string, rows) : block[1] === "stack" ? stackHtml(rows) : pyramidHtml(rows);
+      buf.push("", html, "");
+      continue;
+    }
+    const bits = /^@bits\s+(\d+)\s+(\S+)/.exec(line);
+    if (bits) {
+      buf.push("", bitsHtml(Number(bits[1]), bits[2] as string), "");
+      i++;
+      continue;
+    }
+    const perm = /^@perm\s+(\S+)/.exec(line);
+    if (perm) {
+      buf.push("", permHtml(perm[1] as string), "");
       i++;
       continue;
     }
