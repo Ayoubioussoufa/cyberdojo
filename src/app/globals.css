@@ -378,7 +378,7 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .gloss dt { font-weight: 650; font-size: 18px; }
 .gloss dt small { font-family: var(--sans); font-weight: 400; color: var(--muted); margin-left: 8px; font-size: 13px; }
 .gloss dd { margin: 2px 0 0; font-size: 16.5px; line-height: 1.5; }
-.gloss dd a { font-family: var(--sans); font-size: 13px; margin-left: 4px; white-space: nowrap; }
+.gloss dd a { font-family: var(--sans); font-size: 13px; margin-left: 4px; overflow-wrap: anywhere; }
 .res { list-style: none; margin: 0; padding: 0; }
 .res li { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 10px 0; border-top: 1px solid var(--rule); }
 .res li:first-child { border-top: 0; }
@@ -390,7 +390,7 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .review-start .btn { margin-top: 8px; }
 
 /* Subnav, roadmap, tour, progress */
-.subnav { display: flex; gap: 4px; margin: -12px 0 24px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); overflow-x: auto; font-family: var(--sans); }
+.subnav { display: flex; flex-wrap: wrap; gap: 4px; margin: -12px 0 24px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); font-family: var(--sans); }
 .subnav a { padding: 6px 12px; border-radius: 7px; font-size: 14px; color: var(--muted); text-decoration: none; white-space: nowrap; }
 .subnav a:hover { background: var(--sunk); color: var(--ink); }
 .subnav a.on { background: var(--sunk); color: var(--ink); font-weight: 600; }
@@ -448,7 +448,7 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .belt-row span { display: block; height: 10px; border-radius: 3px; background: var(--sunk); border: 1px solid var(--rule); }
 .belt-row small { display: block; margin-top: 4px; font-size: 11px; }
 .belt-row li.got { color: var(--ink); }
-.stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: 10px; margin: 14px 0; }
+.stat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
 .stat-tiles .card { padding: 12px 14px; }
 .stat-tiles strong { display: block; font: 600 24px var(--sans); }
 .stat-tiles span { font-family: var(--sans); font-size: 13px; color: var(--muted); }
@@ -513,7 +513,7 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .fade-table th, .fade-table td { padding: 3px 4px; text-align: center; border: 0; background: none; }
 .fade-table th:first-child, .fade-table td:first-child { text-align: left; white-space: nowrap; padding-right: 10px; position: sticky; left: 0; background: var(--bg); }
 .fade-table thead th { color: var(--muted); font-weight: 500; }
-.fade-cell { display: inline-block; width: 18px; height: 18px; border-radius: 4px; line-height: 18px; font-size: 11px; font-weight: 600; }
+.fade-cell { display: inline-block; width: 18px; height: 18px; border-radius: 4px; line-height: 18px; font-size: 11px; font-weight: 600; font-style: normal; text-align: center; flex: none; }
 .fade-cell.guided { background: var(--accent); color: var(--accent-ink); }
 .fade-cell.recall { background: var(--accent-soft); color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
 .fade-cell.solo { box-shadow: inset 0 0 0 1px var(--rule-strong); color: var(--muted); }
@@ -533,7 +533,7 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .case { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
 .case-text { font-size: 18.5px; line-height: 1.55; margin: 0 0 12px; }
 .case-ask { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--muted); margin: 14px 0 8px; }
-.case-evidence { background: var(--term-bg); color: var(--term-ink); border-radius: 8px; padding: 12px 14px; font: 13px/1.55 var(--mono); overflow-x: auto; margin: 10px 0; white-space: pre; }
+.case-evidence { background: var(--term-bg); color: var(--term-ink); border-radius: 8px; padding: 12px 14px; font: 13px/1.55 var(--mono); margin: 10px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .case-end { background: var(--surface); border: 1px solid var(--rule); border-top: 3px solid var(--rule-strong); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
 .case-end.good { border-top-color: var(--ok); }
 .case-end.bad { border-top-color: var(--bad); }
@@ -573,11 +573,11 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .pyr-bar strong.on-accent { color: var(--accent-ink); }
 .pyr-row span { color: var(--muted); font-size: 13.5px; }
 .bits { margin: 16px 0; font-family: var(--mono); }
-.bit-row { display: flex; flex-wrap: wrap; gap: 1px; font-size: 13px; }
-.bit-row span { display: inline-grid; place-items: center; width: 1.25em; height: 1.7em; border-radius: 2px; }
-.bit-row .net { background: var(--accent); color: var(--accent-ink); }
-.bit-row .host { background: var(--sunk); color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-strong); }
-.bit-row .gap { margin-left: 5px; }
+.bit-row { display: flex; flex-wrap: wrap; gap: 5px 6px; font-size: 13px; }
+.octet { display: inline-flex; gap: 1px; }
+.octet span { display: inline-grid; place-items: center; width: 1.25em; height: 1.7em; border-radius: 2px; }
+.octet .net { background: var(--accent); color: var(--accent-ink); }
+.octet .host { background: var(--sunk); color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule-strong); }
 .bits figcaption { margin-top: 6px; font: 13.5px var(--sans); color: var(--muted); display: flex; flex-wrap: wrap; gap: 14px; }
 .perm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0; font-family: var(--sans); }
 .perm-cell { display: grid; gap: 2px; justify-items: center; padding: 10px 6px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); text-align: center; }
@@ -673,3 +673,5 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
   .sheet-body th { font-size: 7.5pt; }
   .sheet-source { font-size: 7.5pt; margin-top: 3mm; padding: 0; background: none; border: 0; }
 }
+
+#doc-body a { overflow-wrap: anywhere; }

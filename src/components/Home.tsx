@@ -56,7 +56,7 @@ export function Home({ path, questionIds }: { path: PathStep[]; questionIds: str
           <BeltChip belt={b.belt} />
           {b.next && <p className="meta">{b.got} of {b.need} steps to your {b.next.name.toLowerCase()}</p>}
           <div className="stat-row">
-            <div><strong>{doneSteps}</strong><span>steps done</span></div>
+            <div><strong>{doneSteps}</strong><span>{doneSteps === 1 ? "step" : "steps"} done</span></div>
             <div><strong>{days}</strong><span>day streak</span></div>
           </div>
           {due > 0 && <Link className="btn wide" href="/review/">Do today's {due} review{due > 1 ? "s" : ""}</Link>}

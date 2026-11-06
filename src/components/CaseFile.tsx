@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CopyButton } from "./Copy";
 import { CASE_MAP, type Choice } from "@/lib/cases";
 import { roundDone } from "@/lib/progress";
@@ -14,10 +14,14 @@ const END_LABEL = { good: "Good outcome", mixed: "Mixed outcome", bad: "Bad outc
 export function CaseFilePlayer({ id }: { id: string }) {
   const file = CASE_MAP[id];
   const [run, setRun] = useState(0);
+  // The first render must match the server's HTML, or React rebuilds the whole page
+  // and drops the dark theme. So the details only change after the page has loaded.
+  const [seed, setSeed] = useState(1);
+  useEffect(() => setSeed(freshSeed()), []);
   const vars = useMemo(() => {
-    const rng = new Rng(freshSeed() + run);
+    const rng = new Rng(seed + run);
     return Object.fromEntries(Object.entries(file?.vars ?? {}).map(([k, v]) => [k, rng.pick(v)]));
-  }, [file, run]);
+  }, [file, seed, run]);
   const [at, setAt] = useState(file?.start ?? "");
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<Choice | null>(null);

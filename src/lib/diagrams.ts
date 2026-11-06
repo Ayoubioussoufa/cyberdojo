@@ -70,7 +70,9 @@ export function pyramidHtml(rows: string[]): string {
 export function bitsHtml(prefix: number, ip: string): string {
   const octets = ip.split(".").map(Number);
   const bits = octets.map((o) => o.toString(2).padStart(8, "0")).join("");
-  const cells = [...bits].map((b, i) => `<span class="${i < prefix ? "net" : "host"}${i % 8 === 0 && i ? " gap" : ""}">${b}</span>`);
+  const cell = (b: string, i: number) => `<span class="${i < prefix ? "net" : "host"}">${b}</span>`;
+  // Each byte stays whole, so that a narrow screen wraps between bytes.
+  const cells = [0, 8, 16, 24].map((o) => `<span class="octet">${[...bits.slice(o, o + 8)].map((b, i) => cell(b, o + i)).join("")}</span>`);
   return `<figure class="bits noterms" aria-label="${esc(ip)} with ${prefix} network bits and ${32 - prefix} host bits"><div class="bit-row">${cells.join("")}</div><figcaption><span class="net-key">Network: ${prefix} bits</span> <span class="host-key">Host: ${32 - prefix} bits</span></figcaption></figure>`;
 }
 
