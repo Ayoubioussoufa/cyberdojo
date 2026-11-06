@@ -19,6 +19,16 @@ Security people who can build are far more useful than those who only criticise.
 
 An agent is smaller than people think. Here's the whole thing, using only the standard library. `fake_model` stands in for any real model, so you can run this with no account, and it plays a fooled model on purpose.
 
+@seq User | App | Model | Tool
+User > App: A question
+App > Model: Question + tool list
+Model > App: Please call this tool
+App > Tool: Only if the user may
+Tool > App: A result, treated as data
+App > Model: The result
+Model > App: An answer
+App > User: The answer
+
 ```python
 import json
 

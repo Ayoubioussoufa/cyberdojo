@@ -81,6 +81,8 @@ In the [triage mission](/courses/0051-how-a-soc-works/) you saw a `.php` file in
 
 Many apps fetch a URL on the user's behalf: a link preview, a webhook, an image from an address. If the user picks the address, your server becomes their messenger. Your server can reach things that they can't, such as internal admin panels and the cloud metadata service you met in Month 13. That's **SSRF**, which OWASP now counts under broken access control.
 
+@flow Someone supplies a URL > Your server fetches it > From inside your network > It reaches what they couldn't
+
 | Defence | Why |
 |---|---|
 | Allow-list destinations | Only known hosts can be reached |

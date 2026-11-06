@@ -17,6 +17,10 @@ A file on disk does nothing until it runs. So when something is wrong on a serve
 
 ## Seeing what's running
 
+Every process has a parent, so a running system forms a tree:
+
+@flow systemd (PID 1) > sshd > bash > your command
+
 ```
 $ ps aux
 USER   PID %CPU %MEM COMMAND

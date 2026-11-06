@@ -81,6 +81,21 @@ A **container** isn't a virtual machine. A VM has a whole operating system. A co
 | Isolation | Strong | Weaker: a kernel flaw can matter |
 | Used for | Labs, malware analysis | Packaging and running apps |
 
+A virtual machine carries a whole operating system:
+
+@stack
+App | your tool and its libraries |
+Guest OS | with its own kernel |
+Hypervisor | VirtualBox |
+Host | hardware and host OS |
+
+A container shares the host's kernel, which is why it starts so fast:
+
+@stack
+App | your tool and its libraries |
+Container runtime | Docker |
+Host | hardware and the shared kernel |
+
 ```dockerfile
 FROM python:3.13-slim
 WORKDIR /app

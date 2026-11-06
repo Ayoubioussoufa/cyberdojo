@@ -20,6 +20,12 @@ Nearly every server in the world is managed remotely over one protocol: **SSH**.
 
 SSH opens a shell on another machine, over an encrypted connection, so nobody on the network can read what you type. The basic form:
 
+@seq You | Server
+You > Server: Hello, on port 22
+Server > You: My host key, to prove who I am
+You > Server: Your key or password, encrypted
+Server > You: You're in: an encrypted shell
+
 ```
 ssh username@address
 ssh -p 2220 username@address     use a non-standard port

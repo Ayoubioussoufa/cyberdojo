@@ -22,6 +22,12 @@ Most enterprise endpoints run Windows, so this month is about understanding it t
 
 The CPU itself enforces the wall from lesson 3. It has at least two modes:
 
+@stack
+User mode | your programs | can't touch hardware
+System call | the controlled gate | the kernel checks each request
+Kernel mode | the kernel and drivers | full access
+Hardware | CPU, memory and disks |
+
 - **User mode:** where your programs run. They can't touch hardware or other programs' memory.
 - **Kernel mode:** where the kernel runs, with full access.
 

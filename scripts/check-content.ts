@@ -51,6 +51,14 @@ for (const d of docs) {
 // Lessons 1–45 predate this rule and are reported, not failed, until they catch up.
 const DEEP_FROM = 46; // the word minimum applies to the deepened months
 const ASKED_FROM = 1; // every section of every lesson has a question
+// A diagram typed inside a code block would print as text, so it fails here.
+for (const f of fs.readdirSync("content/lessons")) {
+  let fenced = false;
+  for (const line of fs.readFileSync(path.join("content/lessons", f), "utf8").split("\n")) {
+    if (line.startsWith("```")) fenced = !fenced;
+    else if (fenced && /^@(seq|stack|pyramid|flow|bits|perm)\b/.test(line)) fail(`${f}: a diagram sits inside a code block`);
+  }
+}
 let thin = 0;
 for (const d of lessons()) {
   const parts = fs.readFileSync(path.join("content/lessons", `${d.meta.slug}.md`), "utf8").split(/^## /m).slice(1);

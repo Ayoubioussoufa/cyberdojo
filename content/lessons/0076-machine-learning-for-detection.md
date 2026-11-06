@@ -45,6 +45,8 @@ With labels, it's **supervised learning**. Without labels, it's **unsupervised**
 
 This is a complete **Naive Bayes** classifier, which is the idea behind early spam filters. It counts how often each word appears in each class, then asks which class makes a new URL more likely. It uses no libraries, and the data is generated, so every domain is a harmless fake.
 
+@flow Labelled examples > Split into train and test > Train > Measure on the test set > Decide
+
 ```python
 import math
 import random

@@ -83,6 +83,8 @@ Tools give you breadth. Your own understanding of the application finds the fail
 
 Models vary, so one run proves nothing. Run each case many times, and report a rate, with the conditions.
 
+@flow One attack case > Many trials > A success rate > Fix > Same trials again > Compare
+
 ```
 Case: indirect injection through a support ticket
 Model and version: recorded

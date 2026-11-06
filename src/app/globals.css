@@ -553,7 +553,8 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 
 /* Diagrams */
 .diagram { margin: 18px auto; max-width: 34rem; }
-.diagram svg { display: block; width: 100%; height: auto; }
+.diagram { overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 420px; height: auto; }
 .d-box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
 .d-name { font: 600 14px var(--sans); fill: var(--ink); }
 .d-life { stroke: var(--rule-strong); stroke-width: 1.2; stroke-dasharray: 4 4; }
@@ -675,3 +676,4 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 }
 
 #doc-body a { overflow-wrap: anywhere; }
+.pyr-note { overflow-wrap: anywhere; }

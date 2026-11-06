@@ -24,7 +24,11 @@ HTTP has no memory. Each request stands alone, so how does a site know you're st
 2. The server sends it in a `Set-Cookie` header.
 3. Your browser attaches it to every later request to that site.
 
-@flow Login > Set-Cookie: session=x7f... > Browser stores it > Cookie sent on every request
+@seq Browser | Server
+Browser > Server: Log in with a password
+Server > Browser: Set-Cookie: session=x7f...
+Browser > Server: Next request, with the cookie
+Server > Browser: I know this session: it's you
 
 So that cookie **is** your login. Whoever holds it is you, with no password needed. Protecting it is the point of everything below.
 

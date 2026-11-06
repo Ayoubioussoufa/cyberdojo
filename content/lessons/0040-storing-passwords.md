@@ -27,6 +27,8 @@ Two defences:
 
 **Slowness.** Use a function designed to be expensive. If each guess costs 100 ms and lots of memory, an attacker's billions per second becomes a handful.
 
+@flow Password > Add a random salt > Slow hash: Argon2id > Store the salt and hash
+
 ?? Why isn't a plain SHA-256 password hash enough?
 + Guessing is cheap, at billions per second
 - SHA-256 can be reversed with a key

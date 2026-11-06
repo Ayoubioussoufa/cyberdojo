@@ -39,6 +39,12 @@ Hiding the admin button is not a check. Anyone can call the URL directly.
 
 Here's the most frequent serious bug in web applications, and its fix.
 
+@seq Browser | App | Database
+Browser > App: Ana asks for note 42
+App > Database: Who owns note 42?
+Database > App: Sam does
+App > Browser: 403: Ana isn't Sam
+
 ```python
 # Unsafe: it finds the invoice, but never asks whose it is
 invoice = Invoice.get(id=invoice_id)

@@ -60,6 +60,8 @@ NAT isn't a security feature, though it hides internal addresses as a side effec
 
 Divide your network into zones by trust, and force traffic between them through a firewall.
 
+@flow Internet > Firewall > DMZ: public servers > Firewall > Internal: staff and data
+
 ```
 Internet
    │

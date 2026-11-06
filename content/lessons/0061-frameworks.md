@@ -44,6 +44,8 @@ ISO 27001 is a certifiable management system, with requirements and a Statement 
 
 CSF 2.0, published in 2024, organises security into six functions. Five are the familiar cycle, and **Govern** sits at the centre.
 
+@flow Govern, at the centre > Identify > Protect > Detect > Respond > Recover
+
 | Function | Question | Example |
 |---|---|---|
 | Govern | Who decides, and by what rules? | Policy, roles, risk appetite |

@@ -22,6 +22,12 @@ Think of a form letter: "Dear ___, your balance is ___." If someone writes a who
 
 Software does this whenever it glues text from a user into something that's then interpreted: a query, a web page, a shell command.
 
+@flow Your code + user input > One string > Interpreter runs it all as code
+
+The fix keeps the two apart, whatever the input contains:
+
+@flow Your code > Input sent separately > Interpreter treats input as data
+
 | What gets interpreted | The flaw | The fix |
 |---|---|---|
 | A SQL query | SQL injection | Parameterised queries |

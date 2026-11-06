@@ -23,6 +23,12 @@ Until now, everything has run in your browser. Real security work needs real mac
 
 A **hypervisor** is a program that pretends to be a computer. It gives each **guest** a virtual CPU, memory, disk and network card. The guest doesn't know it's not real hardware. This gives you three superpowers for security:
 
+@stack
+Virtual machines | firewall, Kali, Ubuntu server | each thinks it's a real computer
+Hypervisor | VirtualBox | shares out the hardware
+Your laptop's OS | Windows, macOS or Linux | the host
+Hardware | CPU, RAM and disk |
+
 - **Isolation.** What happens in the VM stays there, provided you set it up properly.
 - **Snapshots.** Save the state, try something dangerous, and restore it in seconds.
 - **Variety.** Run Linux, Windows and a firewall on one laptop.

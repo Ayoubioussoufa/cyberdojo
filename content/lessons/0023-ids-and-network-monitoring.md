@@ -23,6 +23,14 @@ A firewall decides what passes. It doesn't tell you much about what's happening 
 
 An **IDS** watches a copy of the traffic and alerts. An **IPS** sits in the path and can drop packets. An IPS can stop attacks, but a bad rule can also block real business traffic. That's why many teams start in detect-only mode.
 
+An IPS sits in the path, so it can drop traffic:
+
+@flow Traffic > IPS > Server
+
+An IDS only watches a copy, so it can alert, but it can't block:
+
+@flow Traffic > Switch > Server, with a copy to the IDS
+
 ?? What can an IPS do that an IDS can't?
 + Block traffic, as it sits in the path
 - Read encrypted traffic, without needing any key material

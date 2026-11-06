@@ -38,14 +38,15 @@ Wear gloves and the fingerprint is gone. The habit is much harder to change. So 
 
 [David Bianco's model](https://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html), from easiest to replace to hardest:
 
-| Level | Example | Pain for the attacker |
-|---|---|---|
-| Hash values | A file's SHA-256 | Trivial: change one byte |
-| IP addresses | `203.0.113.7` | Easy |
-| Domain names | `evil.example` | Simple |
-| Network and host artifacts | A distinctive path or user agent | Annoying |
-| Tools | A specific attack tool | Challenging |
-| **TTPs** | How they behave | Tough: they must change how they work |
+The higher you detect, the more it costs an attacker to get round you:
+
+@pyramid
+TTPs | how they behave. Tough: they must change how they work
+Tools | a specific attack tool. Challenging
+Network and host artifacts | a distinctive path or user agent. Annoying
+Domain names | evil.example. Simple
+IP addresses | 203.0.113.7. Easy
+Hash values | a file's SHA-256. Trivial: change one byte
 
 Indicators are still useful: they're quick to search, and they help you scope. But **detections built on behaviour last longer**.
 
