@@ -26,9 +26,33 @@ export interface Store {
   missions: Record<string, string>;
   gates: Record<string, boolean>;
   skills: Record<string, number>;
+  /** Drill id → best share right, rounds played. */
+  drills: Record<string, { best: number; plays: number }>;
+  /** Drill id → rows already dealt, so each round shows new ones first. */
+  seen: Record<string, number[]>;
+  /** Wrong answers, saved to retry. Newest first. */
+  mistakes: Mistake[];
+  /** yyyy-mm-dd → things done that day, for the streak and the calendar. */
+  days: Record<string, number>;
+  /** Project checkpoint → the day it was ticked. */
+  checks: Record<string, string>;
+  /** Hours a week, and the day she started. */
+  plan: { hours: number; start: string } | null;
 }
 
-const EMPTY: Store = { picks: {}, first: {}, written: {}, words: {}, done: {}, srs: {}, missions: {}, gates: {}, skills: {} };
+export interface Mistake {
+  key: string;
+  source: string;
+  prompt: string;
+  right: string;
+  given: string;
+  why: string;
+  /** The options, when it was multiple choice. */
+  options?: string[];
+  date: string;
+}
+
+const EMPTY: Store = { picks: {}, first: {}, written: {}, words: {}, done: {}, srs: {}, missions: {}, gates: {}, skills: {}, drills: {}, seen: {}, mistakes: [], days: {}, checks: {}, plan: null };
 
 let cacheRaw: string | null = null;
 let cacheValue: Store = EMPTY;
@@ -92,10 +116,13 @@ function schedule(srs: Record<string, Card>, id: string, right: boolean) {
   return { ...srs, [id]: { box, due: addDays(today(), right ? (INTERVALS[box] as number) : 1) } };
 }
 
+const tick = (days: Store["days"]) => ({ ...days, [today()]: (days[today()] ?? 0) + 1 });
+
 export function answer(id: string, option: number, right: boolean) {
   const s = read();
   write({
     ...s,
+    days: tick(s.days),
     picks: { ...s.picks, [id]: option },
     first: id in s.first ? s.first : { ...s.first, [id]: right },
     srs: id in s.srs ? s.srs : schedule(s.srs, id, right),
@@ -104,7 +131,44 @@ export function answer(id: string, option: number, right: boolean) {
 
 export function reviewed(id: string, right: boolean) {
   const s = read();
-  write({ ...s, srs: schedule(s.srs, id, right) });
+  write({ ...s, days: tick(s.days), srs: schedule(s.srs, id, right) });
+}
+
+/** One finished exercise round. */
+export function roundDone(id: string, right: number, total: number) {
+  const s = read();
+  const was = s.drills[id];
+  const score = total ? right / total : 0;
+  write({ ...s, days: tick(s.days), drills: { ...s.drills, [id]: { best: Math.max(was?.best ?? 0, score), plays: (was?.plays ?? 0) + 1 } } });
+}
+
+export function markSeen(id: string, rows: number[], deck: number) {
+  const s = read();
+  const all = [...new Set([...(s.seen[id] ?? []), ...rows])];
+  write({ ...s, seen: { ...s.seen, [id]: all.length >= deck ? [] : all } });
+}
+
+export function addMistake(m: Omit<Mistake, "date">) {
+  const s = read();
+  const rest = s.mistakes.filter((x) => x.key !== m.key);
+  write({ ...s, mistakes: [{ ...m, date: today() }, ...rest].slice(0, 200) });
+}
+
+export function clearMistake(key: string) {
+  const s = read();
+  write({ ...s, mistakes: s.mistakes.filter((x) => x.key !== key) });
+}
+
+export function setCheck(key: string, on: boolean) {
+  const s = read();
+  const checks = { ...s.checks };
+  if (on) checks[key] = today();
+  else delete checks[key];
+  write({ ...s, days: on ? tick(s.days) : s.days, checks });
+}
+
+export function setPlan(hours: number, start: string) {
+  write({ ...read(), plan: { hours, start } });
 }
 
 export function setWritten(id: string, text: string) {
@@ -122,12 +186,12 @@ export function setDone(slug: string, done: boolean) {
   const next = { ...s.done };
   if (done) next[slug] = today();
   else delete next[slug];
-  write({ ...s, done: next });
+  write({ ...s, days: done ? tick(s.days) : s.days, done: next });
 }
 
 export function setMission(id: string) {
   const s = read();
-  if (!s.missions[id]) write({ ...s, missions: { ...s.missions, [id]: today() } });
+  if (!s.missions[id]) write({ ...s, days: tick(s.days), missions: { ...s.missions, [id]: today() } });
 }
 
 export function setGate(key: string, on: boolean) {

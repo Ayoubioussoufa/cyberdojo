@@ -149,7 +149,7 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
         </form>
       </div>
       <div className="term-foot">
-        <span className="term-keys"><kbd>Tab</kbd> completes · <kbd>↑</kbd> recalls · <code>man ls</code> explains · <code>help</code> lists</span>
+        <span className="term-keys"><code>submit your-answer</code> hands it in · <kbd>Tab</kbd> completes · <kbd>↑</kbd> recalls · <code>man ls</code> explains · <code>help</code> lists</span>
         <CopyButton className="link-btn on-dark" label="Stuck? Copy for my AI" done="Copied" build={() => missionMessage(mission.title, mission.brief, world.current?.shell.history ?? [], lastOut.current)} />
       </div>
     </div>

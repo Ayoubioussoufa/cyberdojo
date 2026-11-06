@@ -1,33 +1,167 @@
 /** Generated exercises. Each round has new values, so answers can't be memorised. */
 import type { Rng } from "@/lib/rng";
+import type { Shell } from "@/lib/shell/shell";
 import { machine } from "@/lib/shell/world";
 
 export type Exercise =
-  | { kind: "choice"; prompt: string; options: string[]; correct: number; why: string }
-  | { kind: "input"; prompt: string; answer: string; accept: (s: string) => boolean; placeholder: string; why: string };
+  | { kind: "choice"; prompt: string; options: string[]; correct: number; why: string; whyNot?: Record<string, string> }
+  | { kind: "input"; prompt: string; answer: string; accept: (s: string) => boolean; placeholder: string; why: string }
+  | { kind: "spot"; prompt: string; lines: string[]; correct: number; why: string; notes: Record<number, string>; code?: boolean }
+  | { kind: "order"; prompt: string; items: string[]; why: string; notes?: string[] }
+  | { kind: "multi"; prompt: string; options: string[]; correct: number[]; why: string; notes: string[] }
+  | { kind: "build"; prompt: string; tokens: string[]; solution: string; expected: string; setup: () => Shell; why: string };
 
 export interface DrillDef {
   id: string;
   title: string;
   blurb: string;
   month: number;
-  make: (rng: Rng) => Exercise;
+  /** Rows to deal from, for table drills: a round never repeats one. */
+  deck?: number;
+  make: (rng: Rng, index?: number) => Exercise;
 }
+
+/** What each answer means, so a wrong pick gets a real explanation. */
+export const DEFS: Record<string, string> = {
+  Confidentiality: "only the right people can read the data. It breaks when data reaches someone who shouldn't see it.",
+  Integrity: "the data stays correct and unaltered. It breaks when data is changed without permission.",
+  Availability: "people can use the system when they need it. It breaks when the service or data can't be reached.",
+  Threat: "whoever or whatever could cause harm.",
+  Vulnerability: "a weakness that could be exploited.",
+  Risk: "the chance of harm combined with how bad it would be.",
+  Control: "a measure that reduces risk.",
+  Govern: "strategy, roles and policy.",
+  Identify: "knowing your assets and your risks.",
+  Protect: "safeguards that prevent or limit harm.",
+  Detect: "noticing that something may be wrong.",
+  Respond: "acting on an incident once it's been found.",
+  Recover: "getting back to normal operations afterwards.",
+  Reconnaissance: "gathering information before an attack starts.",
+  "Initial Access": "getting the first foothold inside.",
+  Execution: "running the attacker's code.",
+  Persistence: "surviving reboots and logouts, to keep access.",
+  "Privilege Escalation": "gaining higher rights than the account should have.",
+  "Credential Access": "stealing passwords, hashes or tokens.",
+  Discovery: "looking around from inside to learn the environment.",
+  "Lateral Movement": "moving from one system to another.",
+  Exfiltration: "getting stolen data out.",
+  Impact: "disrupting, destroying or encrypting things.",
+  "SQL injection": "input changes the meaning of a database query.",
+  "Cross-site scripting": "input runs as script in another person's browser.",
+  XSS: "input runs as script in another person's browser.",
+  CSRF: "a logged-in person's browser is tricked into sending a request they didn't intend.",
+  IDOR: "changing an ID reaches someone else's data, because the server doesn't check who owns it.",
+  SSRF: "the server is made to send a request for the attacker.",
+  "Path traversal": "input reaches files outside the intended folder.",
+  "Command injection": "input ends up inside an operating system command.",
+  "Mass assignment": "the server saves a field that the client should never control.",
+  Encoding: "a change of format with no key. Anyone can reverse it.",
+  Hashing: "a one-way fingerprint with no key. It can't be reversed.",
+  Encryption: "scrambling with a key. Whoever has the key can reverse it.",
+  Signature: "proof of who produced something, made with a private key.",
+  "Windows Security log": "records logons, accounts and policy changes on Windows.",
+  Sysmon: "records rich detail such as process command lines and parents.",
+  "Firewall log": "records connections allowed or blocked between addresses.",
+  "DNS log": "records which host looked up which name.",
+  "Web proxy log": "records the web addresses people visited.",
+  "Cloud audit log": "records who called which cloud API.",
+  "Prompt injection": "text makes a model follow an attacker's instructions.",
+  "Sensitive information disclosure": "a model reveals private data to the wrong person.",
+  "Improper output handling": "model output is used without being treated as untrusted.",
+  "Excessive agency": "an AI system has more power than its job needs.",
+  "Unbounded consumption": "nothing limits how much a system can be made to use or cost.",
+  Spoofing: "pretending to be someone else.",
+  Tampering: "changing data without permission.",
+  Repudiation: "denying an action when there's no proof either way.",
+  "Information disclosure": "data reaches people who shouldn't see it.",
+  "Denial of service": "stopping legitimate people from using a system.",
+  "Elevation of privilege": "gaining rights you shouldn't have.",
+  "True positive": "the alert was right: this is real malicious activity.",
+  "False positive": "the alert fired on something that wasn't malicious.",
+  Link: "the local network: frames, MAC addresses, switches.",
+  Internet: "addressing and routing packets between networks.",
+  Transport: "ports and delivery between programs: TCP and UDP.",
+  Application: "the programs' own language, such as HTTP or DNS.",
+  "2xx Success": "the request worked.",
+  "3xx Redirection": "go and look somewhere else.",
+  "4xx Client error": "the request itself was the problem.",
+  "5xx Server error": "the server failed while handling it.",
+  "Hash value": "a file's fingerprint. Change one byte and it's new.",
+  "IP address": "where traffic came from. Cheap to replace.",
+  "Domain name": "a registered name. Quick to replace.",
+  Artifact: "a distinctive trace left on a host or the network.",
+  Tool: "the specific software the attacker uses.",
+  TTP: "how they operate, whichever tool they use.",
+  Prepare: "plans, tools and practice before anything happens.",
+  "Detect and analyse": "working out whether it's real, and how far it has gone.",
+  Contain: "stopping it from getting worse.",
+  Eradicate: "removing the attacker's foothold.",
+  Learn: "the review that turns an incident into improvements.",
+  Mitigate: "reducing the risk.",
+  Transfer: "moving part of the cost to someone else, such as an insurer.",
+  Avoid: "stopping the activity altogether.",
+  Accept: "living with the risk, recorded by someone with authority.",
+  "ISO/IEC 27001": "a certifiable security management system.",
+  "NIST CSF 2.0": "voluntary outcomes for describing your posture.",
+  "CIS Controls": "a prioritised list of what to do first.",
+  "SOC 2": "an auditor's report on a service provider's controls.",
+  GDPR: "EU law on personal data, not a voluntary framework.",
+  SAST: "scans your own source code for risky patterns.",
+  SCA: "checks your dependencies for known flaws.",
+  DAST: "tests the running application from the outside.",
+  "Secret scanning": "looks for keys and passwords in code.",
+  "IaC scanning": "checks infrastructure files such as Terraform and manifests.",
+  RBAC: "who can do what through the Kubernetes API.",
+  NetworkPolicy: "which pods may talk to each other.",
+  "Pod Security Standards": "built-in profiles limiting what a pod may do.",
+  "Admission policy": "custom rules checked when something is created.",
+  Falco: "alerts on behaviour while containers run.",
+  "AI can do it alone": "a mistake costs little, and it's easily checked.",
+  "AI drafts, human checks": "AI saves time, and a person verifies before it counts.",
+  "Human decides": "the consequences are serious, so a person owns the call.",
+  Overfitting: "it memorised the training data, and fails on new data.",
+  "Data leakage": "the answer slipped into the inputs, inflating the score.",
+  "Concept drift": "the world changed, so an old model decays.",
+  Poisoning: "the training data itself was corrupted.",
+  Evasion: "an input is changed at prediction time to fool the model.",
+  "Per-user authorization": "each call runs with the asking user's rights.",
+  "Human approval": "a person confirms an action before it happens.",
+  "Egress allow-list": "only known destinations can be reached.",
+  "Output encoding": "output is made safe before it's displayed.",
+  "Step and budget limits": "a cap stops runaway loops and costs.",
+  "Parameterised queries": "the query and its values travel separately.",
+  "Ownership check on the server": "the server confirms who owns each record.",
+  "SameSite cookies and tokens": "the browser and a secret token stop forged requests.",
+  "Destination allow-list": "the server may only contact known hosts.",
+  "Field allow-list": "only named fields can be changed.",
+  Fact: "a statement of what a source shows, which anyone can check.",
+  Inference: "a judgement about what the evidence means.",
+  "Yes, sharing is allowed": "the label permits this audience.",
+  "No, it isn't allowed": "the label forbids this audience.",
+  Allowed: "an allow applies at every layer, and nothing denies it.",
+  Denied: "either nothing allows it, or something denies it.",
+};
+
+const defined = (o: string) => (DEFS[o] ? `${o} means: ${DEFS[o]}` : `${o} doesn't fit this case.`);
 
 const classify = (rng: Rng, prompt: string, options: readonly string[], right: string, why: string): Exercise => {
   // At most four options: the right one plus three random others.
   const others = rng.shuffle(options.filter((o) => o !== right)).slice(0, 3);
   const opts = rng.shuffle([right, ...others]);
-  return { kind: "choice", prompt, options: opts, correct: opts.indexOf(right), why };
+  const lead = DEFS[right] ? `${right} means: ${DEFS[right]} ` : "";
+  return { kind: "choice", prompt, options: opts, correct: opts.indexOf(right), why: `${lead}Here: ${why}`, whyNot: Object.fromEntries(opts.map((o) => [o, defined(o)])) };
 };
 
 const input = (prompt: string, answer: string, why: string, placeholder = "Your answer", norm: (s: string) => string = (s) => s.trim().toLowerCase()): Exercise => ({
   kind: "input", prompt, answer, why, placeholder, accept: (s) => norm(s) === norm(answer),
 });
 
-/** A table of scenario → category, asked at random. */
+/** A table of scenario → category. Rows are dealt, so a round can't repeat one. */
 function table(id: string, title: string, blurb: string, month: number, cats: readonly string[], rows: [string, string, string][]): DrillDef {
-  return { id, title, blurb, month, make: (rng) => { const [p, c, w] = rng.pick(rows); return classify(rng, p, cats, c, w); } };
+  return { id, title, blurb, month, deck: rows.length, make: (rng, i) => {
+    const [p, c, w] = i === undefined ? rng.pick(rows) : (rows[i] as [string, string, string]);
+    return classify(rng, p, cats, c, w);
+  } };
 }
 
 const rwx = (n: number) => `${n & 4 ? "r" : "-"}${n & 2 ? "w" : "-"}${n & 1 ? "x" : "-"}`;
@@ -184,7 +318,7 @@ const list: DrillDef[] = [
     if (rng.int(0, 1)) return input(`Which port does ${name} use by default?`, port, `${name} is ${port}. Registered with IANA.`, "port number");
     const wrong = rng.shuffle(PORTS.filter((p) => p[1] !== port)).slice(0, 3).map((p) => p[0]);
     const opts = rng.shuffle([name, ...wrong]);
-    return { kind: "choice", prompt: `Traffic to port ${port} is usually:`, options: opts, correct: opts.indexOf(name), why: `Port ${port} is ${name} by default. Default doesn't mean guaranteed: services can run on any port.` };
+    return { kind: "choice", prompt: `Traffic to port ${port} is usually:`, options: opts, correct: opts.indexOf(name), whyNot: Object.fromEntries(opts.map((o) => [o, `${o} uses port ${PORTS.find((x) => x[0] === o)?.[1]}.`])), why: `Port ${port} is ${name} by default. Default doesn't mean guaranteed: services can run on any port.` };
   } },
   table("layers", "Which layer?", "Place a protocol or device in the TCP/IP model.", 2, ["Link", "Internet", "Transport", "Application"], [
     ["ARP resolves an IP to a MAC address.", "Link", "ARP works on the local network segment."],
@@ -215,13 +349,13 @@ const list: DrillDef[] = [
     const [id, name] = rng.pick(EVENTS);
     const wrong = rng.shuffle(EVENTS.filter((e) => e[0] !== id)).slice(0, 3).map((e) => e[1]);
     const opts = rng.shuffle([name, ...wrong]);
-    return { kind: "choice", prompt: `Windows event ${id} means:`, options: opts, correct: opts.indexOf(name), why: `${id}: ${name}. Check Microsoft's documentation whenever a tool or AI gives you an event ID.` };
+    return { kind: "choice", prompt: `Windows event ${id} means:`, options: opts, correct: opts.indexOf(name), whyNot: Object.fromEntries(opts.map((o) => [o, `That one is event ${EVENTS.find((x) => x[1] === o)?.[0]}.`])), why: `${id}: ${name}. Check Microsoft's documentation whenever a tool or AI gives you an event ID.` };
   } },
   { id: "sysmon-ids", title: "Sysmon event IDs", blurb: "The extra telemetry Sysmon adds.", month: 5, make: (rng) => {
     const [id, name] = rng.pick(SYSMON);
     const wrong = rng.shuffle(SYSMON.filter((e) => e[0] !== id)).slice(0, 3).map((e) => e[1]);
     const opts = rng.shuffle([name, ...wrong]);
-    return { kind: "choice", prompt: `Sysmon event ID ${id} records:`, options: opts, correct: opts.indexOf(name), why: `Sysmon ${id}: ${name}.` };
+    return { kind: "choice", prompt: `Sysmon event ID ${id} records:`, options: opts, correct: opts.indexOf(name), whyNot: Object.fromEntries(opts.map((o) => [o, `That one is Sysmon ID ${SYSMON.find((x) => x[1] === o)?.[0]}.`])), why: `Sysmon ${id}: ${name}.` };
   } },
   table("web-vuln", "Name the vulnerability", "Read what happened and name the class.", 8, WEB, [
     ["The input `' OR 1=1 --` logs you in without a password.", "SQL injection", "Input became part of the query."],
@@ -257,7 +391,7 @@ const list: DrillDef[] = [
     const l = rng.int(1, 5); const i = rng.int(1, 5); const v = l * i;
     const label = v >= 15 ? "High" : v >= 8 ? "Medium" : "Low";
     const opts = rng.shuffle(["Low", "Medium", "High"]);
-    return { kind: "choice", prompt: `Likelihood ${l}, impact ${i}. Scale: under 8 is Low, 8–14 Medium, 15 or more High.\n\nWhat's the rating?`, options: opts, correct: opts.indexOf(label), why: `${l} × ${i} = ${v}, so ${label}. Real scales are defined by each organisation: what matters is defining them first.` };
+    return { kind: "choice", prompt: `Likelihood ${l}, impact ${i}. Scale: under 8 is Low, 8–14 Medium, 15 or more High.\n\nWhat's the rating?`, options: opts, correct: opts.indexOf(label), whyNot: Object.fromEntries(opts.map((o) => [o, `${l} × ${i} = ${v}. ${o} covers ${o === "Low" ? "scores under 8" : o === "Medium" ? "8 to 14" : "15 and over"}.`])), why: `${l} × ${i} = ${v}, so ${label}. Real scales are defined by each organisation: what matters is defining them first.` };
   } },
   table("ioc-rank", "Climb the pyramid", "Name the level of the Pyramid of Pain.", 9, ["Hash value", "IP address", "Domain name", "Artifact", "Tool", "TTP"], [
     ["`4f2a…91c0`, the SHA-256 of a dropped file", "Hash value", "Change one byte and it's a new hash."],
@@ -324,7 +458,7 @@ const list: DrillDef[] = [
     const b = rng.int(a + 1, order.length - 1);
     const first = order[a] as string;
     const opts = rng.shuffle([first, order[b] as string]);
-    return { kind: "choice", prompt: "You can only collect one before the machine loses power. Which one goes first?", options: opts, correct: opts.indexOf(first), why: `RFC 3227: collect what vanishes fastest first. ${first} changes or disappears sooner than ${(order[b] as string).toLowerCase()}.` };
+    return { kind: "choice", prompt: `The machine may lose power at any moment, and you can only collect one in time.\n\n${opts[0]}, or ${(opts[1] as string).toLowerCase()}?`, options: opts, correct: opts.indexOf(first), why: `RFC 3227: collect what vanishes fastest first. ${first} changes or disappears sooner than ${(order[b] as string).toLowerCase()}.` };
   } },
   table("fact-inference", "Fact or inference?", "Does the sentence state evidence, or a conclusion?", 15, ["Fact", "Inference"], [
     ["Event 4624 shows a logon by svc_web at 03:14 UTC.", "Fact", "It reports what a log records."],
@@ -406,7 +540,8 @@ const list: DrillDef[] = [
     const v = rng.int(0, 100) / 10;
     const label = v === 0 ? "None" : v < 4 ? "Low" : v < 7 ? "Medium" : v < 9 ? "High" : "Critical";
     const opts = rng.shuffle(["None", "Low", "Medium", "High", "Critical"]);
-    return { kind: "choice", prompt: `A flaw scores ${v.toFixed(1)}. What's its CVSS rating?`, options: opts, correct: opts.indexOf(label), why: "None 0.0, Low 0.1–3.9, Medium 4.0–6.9, High 7.0–8.9, Critical 9.0–10.0." };
+    const band: Record<string, string> = { None: "only 0.0", Low: "0.1 to 3.9", Medium: "4.0 to 6.9", High: "7.0 to 8.9", Critical: "9.0 to 10.0" };
+    return { kind: "choice", prompt: `A flaw scores ${v.toFixed(1)}. What's its CVSS rating?`, options: opts, correct: opts.indexOf(label), whyNot: Object.fromEntries(opts.map((o) => [o, `${o} covers ${band[o]}, and this flaw is ${v.toFixed(1)}.`])), why: "None 0.0, Low 0.1–3.9, Medium 4.0–6.9, High 7.0–8.9, Critical 9.0–10.0." };
   } },
   { id: "vuln-prio", title: "What gets fixed first?", blurb: "Apply a simple priority rule to a new finding each round.", month: 10, make: (rng) => {
     const kev = rng.pick([true, false]);
@@ -415,7 +550,7 @@ const list: DrillDef[] = [
     const cvss = rng.pick([5.3, 6.5, 7.5, 8.8, 9.8]);
     const label = kev && exposed ? "Today" : kev || (epss >= 50 && exposed) ? "This week" : "Normal cycle";
     const opts = rng.shuffle(["Today", "This week", "Normal cycle"]);
-    return { kind: "choice", prompt: `Rule: in KEV and internet-facing is Today. In KEV, or EPSS at least 50% and internet-facing, is This week. Anything else is Normal cycle.\n\nCVSS ${cvss} · EPSS ${epss}% · ${kev ? "in KEV" : "not in KEV"} · ${exposed ? "internet-facing" : "internal only"}`, options: opts, correct: opts.indexOf(label), why: `${label}. CVSS played no part: it says how bad a flaw could be, not how likely it is to hit you. Each organisation writes its own version of this rule.` };
+    return { kind: "choice", prompt: `Rule: in KEV and internet-facing is Today. In KEV, or EPSS at least 50% and internet-facing, is This week. Anything else is Normal cycle.\n\nCVSS ${cvss} · EPSS ${epss}% · ${kev ? "in KEV" : "not in KEV"} · ${exposed ? "internet-facing" : "internal only"}`, options: opts, correct: opts.indexOf(label), whyNot: Object.fromEntries(opts.map((o) => [o, o === "Today" ? "Today needs both: in KEV and internet-facing." : o === "This week" ? "This week needs KEV, or a high EPSS on something internet-facing." : "Normal cycle is for what isn't exploited, and isn't likely to be."])), why: `${label}. CVSS played no part: it says how bad a flaw could be, not how likely it is to hit you. Each organisation writes its own version of this rule.` };
   } },
   table("ai-task", "Who should do this?", "Automate, use AI with a human check, or keep it human?", 20, ["AI can do it alone", "AI drafts, human checks", "Human decides"], [
     ["Summarising a long alert into three lines for the analyst.", "AI can do it alone", "Low harm: the analyst still reads the evidence."],
