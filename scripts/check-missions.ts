@@ -4,7 +4,7 @@ import { RANGE_FAMILY } from "../src/lib/missions/lazy";
 import { Rng } from "../src/lib/rng";
 
 /** Flags the learner works out from the output, such as a percentage. */
-const COMPUTED = new Set(["detect-3", "eval-1", "eval-2", "trail-3"]);
+const COMPUTED = new Set(["detect-3", "eval-1", "eval-2", "trail-3", "dojo-audit-1"]);
 
 let bad = 0;
 let runs = 0;
@@ -20,6 +20,12 @@ for (const [rid, range] of Object.entries(RANGES)) {
     for (let seed = 1; seed <= 25; seed++) {
       const w = m.build(new Rng(seed * 7919));
       runs++;
+      // The browser never calls solve(), so anything a right answer depends on must exist after build().
+      if (w.flag === "") {
+        bad++;
+        console.log(`✗ ${rid}/${m.id}: empty flag after build, so every answer would be refused`);
+        break;
+      }
       if (m.passed(w, "")) {
         bad++;
         console.log(`✗ ${rid}/${m.id}: already passed at the start`);

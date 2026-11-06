@@ -7,6 +7,27 @@ const page = (name: string, what: string, synopsis: string, options: string) =>
     .join("\n")}`;
 
 export const MAN: Record<string, string> = {
+  xxd: page("xxd", "show a file's bytes in hex, or turn hex back into bytes", "xxd [-p] [-r] [FILE]", `
+       -p     plain hex, with no offsets and no text column
+       -r     reverse: read hex and write the original bytes
+       Example: echo -n hi | xxd -p   prints 6869`),
+  curl: page("curl", "send a web request and print the response", "curl [OPTIONS] URL", `
+       -i     include the response headers
+       -I     ask for the headers only (a HEAD request)
+       -L     follow redirects
+       -s     hide errors and progress
+       -v     show the whole conversation
+       -H 'Name: value'     add a request header
+       -d 'a=1&b=2'         send a form with POST
+       -X METHOD            choose the method
+       -c FILE              save cookies to FILE
+       -b FILE              send cookies from FILE, or -b 'name=value'
+       -o FILE              write the response to FILE`),
+  sqlite3: page("sqlite3", "query a SQLite database", "sqlite3 DATABASE \"SQL\"", `
+       Prints each row with | between columns. Put the query in quotes.
+       -header     print the column names first
+       ".tables"   list the tables
+       ".schema"   show how each table was created`),
   sha256sum: page("sha256sum", "compute or check SHA-256 hashes", "sha256sum [-c] [FILE]...", `
     no flag   print each file's hash, then its name
     -c        read a list of hashes from FILE and check each one`),

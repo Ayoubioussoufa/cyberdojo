@@ -1300,6 +1300,34 @@ export const COMMANDS: Record<string, Cmd> = {
     return shell.invoke(ctx.args, ctx.stdin, root, ctx.piped);
   },
   passwd: () => ok("(Passwords don't change in this simulator.)\n"),
+  xxd: (ctx) => {
+    const { flags, rest } = opts(ctx.args);
+    const inp = inputs(ctx, rest);
+    if (inp.errors) return err(inp.errors.replace(/^[a-z0-9]+: /, "xxd: "), 2);
+    const text = inp.map((f) => f.text).join("");
+    if (flags.has("r")) {
+      const hex = flags.has("p")
+        ? text.replace(/\s/g, "")
+        : text.split("\n").map((l) => /^[0-9a-f]+: ((?:[0-9a-f]{2,4} ?)+)/i.exec(l)?.[1] ?? "").join("").replace(/\s/g, "");
+      const out = new Uint8Array(Math.floor(hex.length / 2));
+      for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+      return ok(new TextDecoder().decode(out));
+    }
+    const bytes = new TextEncoder().encode(text);
+    const hexOf = (b: number) => b.toString(16).padStart(2, "0");
+    if (flags.has("p")) {
+      const all = [...bytes].map(hexOf).join("");
+      return ok(all ? `${all.replace(/(.{60})/g, "$1\n").replace(/\n$/, "")}\n` : "");
+    }
+    let out = "";
+    for (let at = 0; at < bytes.length; at += 16) {
+      const line = bytes.slice(at, at + 16);
+      const hex = [...line].map(hexOf).join("").replace(/(.{4})/g, "$1 ").trimEnd();
+      const ascii = [...line].map((b) => (b >= 32 && b < 127 ? String.fromCharCode(b) : ".")).join("");
+      out += `${at.toString(16).padStart(8, "0")}: ${hex.padEnd(39)}  ${ascii}\n`;
+    }
+    return ok(out);
+  },
   sha256sum: (ctx) => {
     const { flags, rest } = opts(ctx.args);
     const inp = inputs(ctx, rest);

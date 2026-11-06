@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/", label: "Today", also: [] as string[] },
   { href: "/roadmap/", label: "Roadmap", also: ["/start/"] },
   { href: "/courses/", label: "Lessons", also: [] },
+  { href: "/dojo/", label: "Dojo", also: [] },
   { href: "/practice/", label: "Practice", also: ["/machines/", "/review/"] },
   { href: "/projects/", label: "Projects", also: [] },
   { href: "/library/", label: "Library", also: ["/guides/", "/sheets/", "/glossary/", "/resources/"] },

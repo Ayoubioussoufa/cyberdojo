@@ -8,10 +8,11 @@
     "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
     "test:shell": "tsx scripts/check-shell.ts",
+    "test:sim": "tsx scripts/check-sim-tools.ts",
     "test:missions": "tsx scripts/check-missions.ts",
     "test:content": "tsx scripts/check-content.ts",
     "test:drills": "tsx scripts/check-drills.ts",
-    "test": "pnpm test:shell && pnpm test:missions && pnpm test:drills && pnpm test:content && pnpm build && pnpm test:auth",
+    "test": "pnpm test:shell && pnpm test:sim && pnpm test:missions && pnpm test:drills && pnpm test:content && pnpm build && pnpm test:auth",
     "user:reset": "tsx scripts/reset-password.ts",
     "test:auth": "tsx scripts/check-auth.ts"
   },

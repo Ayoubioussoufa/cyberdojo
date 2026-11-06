@@ -274,6 +274,17 @@ sed -i 's/x/y/' locked.txt
 touch -d '2020-01-01' old.txt; touch fresh.txt; find . -name '*.txt' -newer old.txt | sort | grep -c old.txt
 touch -d '2020-01-01' old.txt; touch fresh.txt; find . -newer old.txt -name fresh.txt
 find . -newer nothere
+xxd notes.txt
+xxd users.csv
+xxd -p notes.txt
+xxd -p auth.log | head -3
+echo -n CD | xxd -p
+echo -n hello | xxd
+echo 434445 | xxd -r -p
+echo 48 65 6c 6c 6f | xxd -r -p
+xxd notes.txt | xxd -r
+xxd -p notes.txt | xxd -r -p
+xxd nothere
 sha256sum notes.txt
 sha256sum notes.txt nums.txt
 echo -n hello | sha256sum
