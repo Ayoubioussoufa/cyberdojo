@@ -40,7 +40,7 @@ export default async function Page({ params }: Props) {
       <ProjectMeter ids={doc.checks.map((c) => c.id)} />
       {doc.meta.tested && <p className="tested"><strong>How this page was checked:</strong> {doc.meta.tested}</p>}
       <h2>The tools, and how much help you'll get</h2>
-      <p className="muted">Help fades as you go. A new tool gets a full walkthrough. The next project asks you to recall it, with the answer hidden. After that, it's yours.</p>
+      <p className="muted">Each step gives you the goal, the documentation and things to search for. Its walkthrough stays off until you switch it on, so try it yourself first. Help also fades as you go: the walkthrough for a new tool explains everything, the next project asks you to recall it, and after that it's yours.</p>
       <div className="table-wrap">
         <table>
           <thead><tr><th>Tool</th><th>What it does</th><th>Help here</th></tr></thead>

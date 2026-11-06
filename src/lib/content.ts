@@ -15,6 +15,12 @@
  *   @term name (alias) = text   a glossary entry, shown on hover everywhere
  *   ::: key|tip|trap|try|why|law Title … :::   a callout
  *
+ * In a project, each `## Step N` starts with these. They stay visible, and the
+ * rest of the step becomes a walkthrough the learner can switch on:
+ *   @goal What to achieve, with any names and addresses later steps rely on
+ *   @search first search | second search
+ *   @docs Label | url      extra documentation; tool docs are added automatically
+ *
  * Lessons sort by file name, and the number in that name is the lesson number.
  * Machines (content/machines) are lessons built around one simulated box;
  * sheets (content/reference) are printable reference pages.
@@ -23,7 +29,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { Marked } from "marked";
 import { bitsHtml, permHtml, pyramidHtml, seqSvg, stackHtml } from "./diagrams";
-import type { Check, Doc, DocBrief, DocMeta, HelpLevel, Question, Segment, Term, TocEntry, ToolUse, Written } from "./types";
+import { TOOLS } from "@/data/tools";
+import type { Check, Doc, DocBrief, DocLink, DocMeta, HelpLevel, Question, Segment, StepSegment, Term, TocEntry, ToolUse, Written } from "./types";
 
 const ROOT = path.join(process.cwd(), "content");
 
@@ -123,6 +130,30 @@ function splitFront(raw: string, file: string): Parsed {
   return { front, body: m[2] as string };
 }
 
+const LINK = /\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g;
+
+/** The tools' official docs, then what the author chose, then links from the walkthrough. */
+function stepDocs(step: StepSegment, raw: string): DocLink[] {
+  const seen = new Set<string>();
+  const out: DocLink[] = [];
+  const add = (d: DocLink) => {
+    const key = d.href.replace(/[#?].*$/, "").replace(/\/$/, "");
+    if (seen.has(key)) return;
+    seen.add(key);
+    // "lesson 14" reads better capitalised; "draw.io" and "gitleaks" keep their own spelling.
+    const label = d.href.startsWith("/") ? d.label.charAt(0).toUpperCase() + d.label.slice(1) : d.label;
+    out.push({ label, href: d.href });
+  };
+  for (const t of step.tools) (TOOLS[t.tool]?.docs ?? []).forEach(add);
+  step.docs.forEach(add);
+  for (const m of raw.matchAll(LINK)) add({ label: (m[1] as string).replace(/[*`]/g, ""), href: m[2] as string });
+  return out;
+}
+
+/** Every segment, including those inside project steps. */
+export const flatSegments = (list: Segment[]): Segment[] =>
+  list.flatMap((s) => (s.kind === "step" ? [s, ...flatSegments(s.body), ...s.after] : [s]));
+
 function parseBody(slug: string, title: string, body: string, href: string) {
   const toc: TocEntry[] = [];
   const marked = makeMarked(toc);
@@ -140,7 +171,20 @@ function parseBody(slug: string, title: string, body: string, href: string) {
   const flush = () => {
     const text = buf.join("\n").trim();
     buf = [];
-    if (text) segments.push({ kind: "html", html: md(text) });
+    if (text) out.push({ kind: "html", html: md(text) });
+  };
+
+  // Project steps. `out` is wherever the parser is writing now.
+  const isProject = href.startsWith("/projects/");
+  let out: Segment[] = segments;
+  let current: StepSegment | null = null;
+  const stepRaw: string[] = [];
+  const stopStep = () => {
+    if (!current) return;
+    current.docs = stepDocs(current, stepRaw.join("\n"));
+    current = null;
+    stepRaw.length = 0;
+    out = segments;
   };
 
   const lines = body.split("\n");
@@ -156,13 +200,46 @@ function parseBody(slug: string, title: string, body: string, href: string) {
     }
     const stepHead = /^## Step (\d+)/.exec(line);
     if (stepHead) step = Number(stepHead[1]);
+    if (isProject && line.startsWith("## ")) {
+      flush();
+      stopStep();
+      if (stepHead) {
+        current = { kind: "step", n: Number(stepHead[1]), headingHtml: md(line), goalHtml: "", tools: [], notices: [], docs: [], search: [], body: [], after: [] };
+        segments.push(current);
+        out = current.body;
+        i++;
+        continue;
+      }
+    }
+    if (current) {
+      stepRaw.push(line);
+      const goal = /^@goal\s+(.+)$/.exec(line);
+      if (goal) {
+        current.goalHtml = inline(goal[1] as string);
+        i++;
+        continue;
+      }
+      const search = /^@search\s+(.+)$/.exec(line);
+      if (search) {
+        current.search.push(...(search[1] as string).split("|").map((t) => t.trim()).filter(Boolean));
+        i++;
+        continue;
+      }
+      const doc = /^@docs\s+(.+?)\s*\|\s*(\S+)\s*$/.exec(line);
+      if (doc) {
+        current.docs.push({ label: doc[1] as string, href: doc[2] as string });
+        i++;
+        continue;
+      }
+    }
     const help = /^@help\s+(\S+)\s+(guided|recall|solo)\s*$/.exec(line);
     if (help) {
       flush();
       const tool = help[1] as string;
       const level = help[2] as HelpLevel;
       tools.push({ tool, level, step });
-      segments.push({ kind: "help", tool, level });
+      if (current) current.tools.push({ tool, level });
+      else out.push({ kind: "help", tool, level });
       i++;
       continue;
     }
@@ -170,7 +247,7 @@ function parseBody(slug: string, title: string, body: string, href: string) {
       flush();
       const check: Check = { id: `${slug}:${checks.length + 1}`, step, text: line.slice(6).trim() };
       checks.push(check);
-      segments.push({ kind: "check", id: check.id, html: inline(check.text) });
+      (current?.after ?? out).push({ kind: "check", id: check.id, html: inline(check.text) });
       i++;
       continue;
     }
@@ -212,7 +289,7 @@ function parseBody(slug: string, title: string, body: string, href: string) {
         whyHtml: inline(why),
       };
       questions.push(q);
-      segments.push({ kind: "question", question: q });
+      (current?.after ?? out).push({ kind: "question", question: q });
       continue;
     }
     if (line.startsWith("?! ")) {
@@ -220,21 +297,21 @@ function parseBody(slug: string, title: string, body: string, href: string) {
       const prompt = line.slice(3).trim();
       const w: Written = { id: `${slug}~${written.length + 1}`, prompt, promptHtml: inline(prompt) };
       written.push(w);
-      segments.push({ kind: "written", written: w });
+      (current?.after ?? out).push({ kind: "written", written: w });
       i++;
       continue;
     }
     const drill = /^@drill\s+(\S+)/.exec(line);
     if (drill) {
       flush();
-      segments.push({ kind: "drill", id: drill[1] as string });
+      out.push({ kind: "drill", id: drill[1] as string });
       i++;
       continue;
     }
     const range = /^@range\s+(\S+)/.exec(line);
     if (range) {
       flush();
-      segments.push({ kind: "range", id: range[1] as string });
+      out.push({ kind: "range", id: range[1] as string });
       i++;
       continue;
     }
@@ -286,13 +363,17 @@ function parseBody(slug: string, title: string, body: string, href: string) {
       i++;
       while (i < lines.length && (lines[i] as string).trim() !== ":::") inner.push(lines[i++] as string);
       i++;
-      buf.push("", `<div class="callout ${kind}"><span class="label">${esc(label as string)}</span>${md(inner.join("\n"))}</div>`, "");
+      const box = `<div class="callout ${kind}"><span class="label">${esc(label as string)}</span>${md(inner.join("\n"))}</div>`;
+      // A safety notice must be seen whether or not the walkthrough is open.
+      if (current && kind === "law") current.notices.push(box);
+      else buf.push("", box, "");
       continue;
     }
     buf.push(line);
     i++;
   }
   flush();
+  stopStep();
   const text = body
     .split("\n")
     .filter((l) => !/^(\?\?|\?!|\+ |=> |@|:::)/.test(l))

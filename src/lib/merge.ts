@@ -6,7 +6,7 @@ import type { Card, Mistake, Store } from "./progress-types";
 
 export const MAX_PROGRESS_BYTES = 2_000_000;
 
-export const EMPTY_STORE: Store = { picks: {}, first: {}, written: {}, words: {}, done: {}, srs: {}, missions: {}, gates: {}, skills: {}, drills: {}, seen: {}, mistakes: [], days: {}, checks: {}, plan: null };
+export const EMPTY_STORE: Store = { picks: {}, first: {}, written: {}, words: {}, done: {}, srs: {}, missions: {}, gates: {}, skills: {}, drills: {}, seen: {}, mistakes: [], days: {}, checks: {}, walk: {}, plan: null };
 
 const earliest = (a: Record<string, string>, b: Record<string, string>) => {
   const out = { ...a };
@@ -62,6 +62,7 @@ export function mergeStores(base: Store, mine: Store): Store {
     mistakes: [...byKey.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 200),
     days,
     checks: earliest(base.checks, mine.checks),
+    walk: { ...base.walk, ...mine.walk },
     plan: mine.plan ?? base.plan,
   };
 }
@@ -78,15 +79,15 @@ export function cleanProgress(v: unknown): Store | null {
   const s = { ...EMPTY_STORE, ...v } as Store;
   const fine =
     mapOf(s.picks, isNum) && mapOf(s.first, isBool) && mapOf(s.written, isStr) && mapOf(s.words, isStr) && mapOf(s.done, isStr) &&
-    mapOf(s.missions, isStr) && mapOf(s.gates, isBool) && mapOf(s.skills, isNum) && mapOf(s.days, isNum) && mapOf(s.checks, isStr) &&
+    mapOf(s.missions, isStr) && mapOf(s.gates, isBool) && mapOf(s.walk, isBool) && mapOf(s.skills, isNum) && mapOf(s.days, isNum) && mapOf(s.checks, isStr) &&
     mapOf(s.srs, (c) => isMap(c) && isNum(c.box) && isStr(c.due)) &&
     mapOf(s.drills, (d) => isMap(d) && isNum(d.best) && isNum(d.plays)) &&
     mapOf(s.seen, (a) => Array.isArray(a) && a.every(isNum)) &&
     Array.isArray(s.mistakes) && s.mistakes.length <= 500 && s.mistakes.every((m) => isMap(m) && isStr(m.key) && isStr(m.date)) &&
     (s.plan === null || (isMap(s.plan) && isNum(s.plan.hours) && isStr(s.plan.start)));
   if (!fine) return null;
-  const { picks, first, written, words, done, srs, missions, gates, skills, drills, seen, mistakes, days, checks, plan } = s;
-  return { picks, first, written, words, done, srs, missions, gates, skills, drills, seen, mistakes, days, checks, plan };
+  const { picks, first, written, words, done, srs, missions, gates, skills, drills, seen, mistakes, days, checks, walk, plan } = s;
+  return { picks, first, written, words, done, srs, missions, gates, skills, drills, seen, mistakes, days, checks, walk, plan };
 }
 
 export const hasProgress = (s: Store) =>

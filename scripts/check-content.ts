@@ -4,10 +4,10 @@ import path from "node:path";
 import { DRILLS } from "../src/lib/drills";
 import { PLACEMENT } from "../src/data/path";
 import { TOOLS } from "../src/data/tools";
-import { guides, lessons, glossary, machines, projects, sheets } from "../src/lib/content";
+import { flatSegments, guides, lessons, glossary, machines, projects, sheets } from "../src/lib/content";
 import { PROJECTS } from "../src/lib/data";
 import { buildPath } from "../src/lib/path";
-import type { HelpLevel } from "../src/lib/types";
+import type { HelpLevel, StepSegment } from "../src/lib/types";
 import { RANGES } from "../src/lib/missions";
 
 let bad = 0;
@@ -41,7 +41,7 @@ for (const d of docs) {
   }
   const positions = new Set(d.questions.map((q) => q.correct));
   if (d.questions.length >= 4 && positions.size < 2) fail(`${name}: the right answer always sits in the same place`);
-  for (const s of d.segments) {
+  for (const s of flatSegments(d.segments)) {
     if (s.kind === "drill" && !DRILLS[s.id]) fail(`${name}: unknown drill ${s.id}`);
     if (s.kind === "range" && !RANGES[s.id]) fail(`${name}: unknown range ${s.id}`);
   }
@@ -90,6 +90,20 @@ for (const p of PROJECTS) {
   for (const part of d.meta.parts ?? []) if (part.to > steps.length) fail(`${p.id}: a part goes past the last step`);
   if (d.meta.parts && d.meta.parts[d.meta.parts.length - 1]?.to !== steps.length) fail(`${p.id}: its parts don't reach the last step`);
   if (!d.meta.tested && !["P01", "P02", "P03", "P04", "P05"].includes(p.id)) fail(`${p.id}: doesn't say how it was checked`);
+  // With the walkthrough off, a step must still say what to do and where to look.
+  const stepSegs = d.segments.filter((s): s is StepSegment => s.kind === "step");
+  if (stepSegs.length !== steps.length) fail(`${p.id}: ${steps.length} steps but ${stepSegs.length} step blocks`);
+  for (const s of stepSegs) {
+    const at = `${p.id} step ${s.n}`;
+    if (!s.goalHtml) fail(`${at}: no @goal`);
+    if (s.goalHtml.includes("<pre")) fail(`${at}: a goal says what to achieve, so no code blocks`);
+    if (!/\.|:/.test(s.goalHtml)) fail(`${at}: the goal isn't a sentence`);
+    if (s.search.length === 0) fail(`${at}: no @search terms`);
+    if (s.docs.length === 0) fail(`${at}: no documentation`);
+    if (!s.after.some((x) => x.kind === "check")) fail(`${at}: its checkpoint would be hidden`);
+    const hidden = flatSegments(s.body).map((x) => (x.kind === "html" ? x.html : "")).join("");
+    if (hidden.includes('class="callout law"')) fail(`${at}: a safety notice is inside the walkthrough`);
+  }
   const best = new Map<string, HelpLevel>();
   for (const t of d.tools) {
     if (!TOOLS[t.tool]) fail(`${p.id}: unknown tool ${t.tool}`);
@@ -140,7 +154,7 @@ for (const id of [...Array.from({ length: 29 }, (_, i) => i + 1), 255]) {
   if (!new RegExp(`^\\| \\**${id}\\** \\|`, "m").test(sysmon)) fail(`sysmon sheet: ID ${id} is missing`);
 }
 for (const d of [...docs, ...sheets()]) {
-  const html = d.segments.map((s) => (s.kind === "html" ? s.html : "")).join("");
+  const html = flatSegments(d.segments).map((s) => (s.kind === "html" ? s.html : "")).join("");
   for (const m of html.matchAll(/href="\/(courses|guides|machines|sheets)\/([^/"#]+)/g)) {
     if (!slugs.has(m[2] as string)) fail(`${d.meta.slug}: broken internal link /${m[1]}/${m[2]}`);
   }

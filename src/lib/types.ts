@@ -28,7 +28,30 @@ export type Segment =
   /** A project checkpoint she ticks off. */
   | { kind: "check"; id: string; html: string }
   /** How much help this tool gets here. */
-  | { kind: "help"; tool: string; level: HelpLevel };
+  | { kind: "help"; tool: string; level: HelpLevel }
+  /** One project step: the task stays visible, and the walkthrough is opt-in. */
+  | StepSegment;
+
+export interface DocLink {
+  label: string;
+  href: string;
+}
+
+export interface StepSegment {
+  kind: "step";
+  n: number;
+  headingHtml: string;
+  goalHtml: string;
+  tools: { tool: string; level: HelpLevel }[];
+  /** Legal and safety notices. Never hidden behind the walkthrough. */
+  notices: string[];
+  docs: DocLink[];
+  search: string[];
+  /** The walkthrough. */
+  body: Segment[];
+  /** Checkpoints and questions: always available. */
+  after: Segment[];
+}
 
 export type HelpLevel = "guided" | "recall" | "solo";
 

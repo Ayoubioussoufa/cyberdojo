@@ -26,6 +26,8 @@ export interface Store {
   days: Record<string, number>;
   /** Project checkpoint → the day it was ticked. */
   checks: Record<string, string>;
+  /** Project step → its walkthrough is switched on. Off unless the learner asks. */
+  walk: Record<string, boolean>;
   /** Hours a week, and the day she started. */
   plan: { hours: number; start: string } | null;
 }

@@ -52,7 +52,7 @@ export default function Page() {
       <h2 className="section-title">Why you'll need less help as you go</h2>
       <p className="muted">The first time you meet a tool, every step is explained. The next time, you're asked to recall it, and the answer stays hidden until you need it. After that, you're on your own, because by then you know it. This map shows each tool that comes back.</p>
       <p className="fade-key">
-        <span><i className="fade-cell guided">F</i> Full walkthrough</span>
+        <span><i className="fade-cell guided">F</i> Walkthrough available</span>
         <span><i className="fade-cell recall">R</i> Recall, answer hidden</span>
         <span><i className="fade-cell solo" /> On your own</span>
       </p>

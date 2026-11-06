@@ -9,6 +9,7 @@ import { Html } from "./Html";
 import { QuestionCard } from "./Question";
 import { Terms } from "./Terms";
 import { WrittenCard } from "./Written";
+import { ProjectStep } from "./ProjectStep";
 import { getStore, setDone, setWord, useSlice } from "@/lib/progress";
 import { KIND_LABEL, type PathStep } from "@/lib/pathState";
 import { fullMessage } from "@/lib/tutor";
@@ -18,20 +19,19 @@ type Near = Pick<DocMeta, "slug" | "title"> | null;
 
 /** The body never watches the store, so answering or typing can't re-render a whole lesson. */
 const Segments = memo(function Segments({ segments, brief }: { segments: Segment[]; brief: DocBrief }) {
-  let n = 0;
-  return (
-    <>
-      {segments.map((s, i) => {
-        if (s.kind === "html") return <Html key={i} html={s.html} />;
-        if (s.kind === "question") return <QuestionCard key={s.question.id} q={s.question} doc={brief} n={++n} />;
-        if (s.kind === "written") return <WrittenCard key={s.written.id} w={s.written} />;
-        if (s.kind === "drill") return <LazyDrill key={i} id={s.id} />;
-        if (s.kind === "range") return <LazyRange key={i} id={s.id} />;
-        if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
-        return <HelpBadge key={i} tool={s.tool} level={s.level} />;
-      })}
-    </>
-  );
+  const counter = { n: 0 };
+  const render = (list: Segment[]): React.ReactNode =>
+    list.map((s, i) => {
+      if (s.kind === "html") return <Html key={i} html={s.html} />;
+      if (s.kind === "question") return <QuestionCard key={s.question.id} q={s.question} doc={brief} n={++counter.n} />;
+      if (s.kind === "written") return <WrittenCard key={s.written.id} w={s.written} />;
+      if (s.kind === "drill") return <LazyDrill key={i} id={s.id} />;
+      if (s.kind === "range") return <LazyRange key={i} id={s.id} />;
+      if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
+      if (s.kind === "step") return <ProjectStep key={s.n} slug={brief.slug} step={s} walkthrough={render(s.body)} after={render(s.after)} />;
+      return <HelpBadge key={i} tool={s.tool} level={s.level} />;
+    });
+  return <>{render(segments)}</>;
 });
 
 function useTally(brief: DocBrief) {

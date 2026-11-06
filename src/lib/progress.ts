@@ -173,6 +173,11 @@ export function setCheck(key: string, on: boolean) {
   write({ ...s, days: on ? tick(s.days) : s.days, checks });
 }
 
+export function setWalk(key: string, on: boolean) {
+  const s = read();
+  write({ ...s, walk: { ...s.walk, [key]: on } });
+}
+
 export function setPlan(hours: number, start: string) {
   write({ ...read(), plan: { hours, start } });
 }

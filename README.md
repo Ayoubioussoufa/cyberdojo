@@ -20,6 +20,7 @@ Needs Node 22.13 or newer, for the built-in SQLite. It runs on a Node server, no
 - `src/lib/missions/`: graded terminal missions, and the machines in `machines.ts`. `src/lib/drills/`: generated exercises.
 - `src/lib/missions/dojo/` and `src/data/dojo.ts`: the Dojo's 54 flag challenges. See `THIRD_PARTY_NOTICES.md`.
 - `src/data/*.json`: the 24 months, 16 projects and resources, parsed from the PDF.
+- `content/projects/*.md`: each step has `@goal`, `@search` and `@docs`. Walkthroughs are off until the student turns them on.
 - `src/server/`, `src/app/api/`: accounts. `src/lib/account.ts`: sync. `src/lib/merge.ts`: combining two copies.
 
 ## Accounts
