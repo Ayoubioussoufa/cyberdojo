@@ -7,7 +7,7 @@ builds: write joins and aggregates from memory
 source: SQLBolt, interactive SQL lessons | https://sqlbolt.com/
 words: SQL, join, parameterised query
 ---
-SQL shows up three times in your career: in the apps you'll attack, in the databases you'll defend, and in SIEM queries that look a lot like it. Learn it once and you'll use it daily.
+SQL shows up three times in your career: in the apps you'll secure, in the databases you'll defend, and in SIEM queries that look a lot like it. Learn it once and you'll use it daily.
 
 @term database = An organised store of data that many programs can query.
 @term SQL = Structured Query Language: the language for querying relational databases.

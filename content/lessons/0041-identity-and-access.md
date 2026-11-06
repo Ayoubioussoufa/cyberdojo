@@ -29,6 +29,13 @@ Most access problems come from how people change over time:
 
 IAM analyst is a common entry-level job, especially in banks and telecoms. Much of it is exactly this.
 
+?? Someone changes team and keeps the old access. What's that called?
++ Privilege creep, a mover problem
+- Orphaned accounts, a leaver problem
+- Credential stuffing, a login problem
+- Token theft, a session problem
+=> Rights pile up over time unless the mover step removes the old ones.
+
 ## Authentication factors
 
 | Factor | Example | Weakness |
@@ -63,6 +70,13 @@ Why are passkeys different? The device uses a key pair, and the login is [bound 
 | **ABAC** | By attributes and context | "Managers, on managed devices, in working hours" |
 
 RBAC is simple but roles multiply. ABAC is flexible but harder to reason about. Many systems mix both. Conditional Access in Microsoft Entra is ABAC in practice.
+
+?? "Managers, on managed devices, in working hours" is an example of what?
++ ABAC, which uses attributes and context
+- RBAC, which only ever uses roles
+- MFA, which uses several login factors
+- SSO, which uses one single login
+=> It decides on attributes of the user, device and time, not just a role.
 
 ## Reducing standing privilege
 

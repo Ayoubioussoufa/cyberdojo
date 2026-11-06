@@ -61,8 +61,8 @@ Every part of that request is under the sender's control: the method, the header
 :::
 
 ?? Which part of a request does the sender control?
-+ All of it, headers included
-- Only the body of a form
++ All of it, headers too
+- Only the form's body text
 - Only the web address itself
 - None, as browsers control it
 => Tools can send anything, which is why the server must never trust the client.
@@ -82,9 +82,9 @@ GET should never change anything. Values in a URL also end up in logs and browse
 
 ?? Why shouldn't secrets go in a URL?
 + URLs end up in logs and history
-- URLs can't contain letters and numbers
-- GET requests are always encrypted twice
-- Browsers refuse to load such addresses
+- URLs can't safely contain letters or numbers
+- GET requests are always encrypted twice over
+- Browsers refuse to load such long addresses
 => Even over HTTPS, a URL gets written to server logs and browser history.
 
 ## Status codes

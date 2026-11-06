@@ -129,10 +129,10 @@ sudo lynis audit system       a scored audit, with suggestions
 ```
 
 ?? What's a CIS Benchmark?
-+ An agreed list of secure settings
-- A speed test for your server
-- A law that every company follows
-- A scanner that fixes everything automatically
++ An expert list of secure product settings
+- A speed test for your own server
+- A law that every company must follow
+- A scanner that fixes everything by itself
 => It's expert consensus for one product, and you choose a sensible subset.
 
 ## Finish P01

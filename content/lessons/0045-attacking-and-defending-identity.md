@@ -27,10 +27,7 @@ SharpHound queries your domain heavily, and it's a known tool that will trip mon
 
 Reading a path is reading permissions:
 
-```
-ana ──MemberOf──▶ HelpDesk ──ForceChangePassword──▶ svc_sql
-    ──AdminTo──▶ SRV1 ──HasSession──▶ dadmin ──MemberOf──▶ Domain Admins
-```
+@flow ana > MemberOf HelpDesk > ForceChangePassword svc_sql > AdminTo SRV1 > HasSession dadmin > MemberOf Domain Admins
 
 In plain words: Ana is in HelpDesk, which can reset `svc_sql`'s password. That account is admin on SRV1, where a Domain Admin is logged in, so their credentials can be taken from memory.
 
@@ -74,6 +71,13 @@ Many companies run **hybrid**: on-premises AD synced to Entra. So a compromise c
 Create a free [Microsoft Entra](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) tenant. Add users and groups, enforce MFA, sign in, and read the sign-in logs. See what a failed login looks like, and what a successful one records.
 :::
 
+?? Is Entra ID simply Active Directory in the cloud?
++ No, it's a different web-based system
+- Yes, it's the same relocated database
+- Yes, but it's only for Windows
+- No, it's a cloud firewall product
+=> It uses OAuth and OIDC rather than Kerberos and LDAP, and it has no OUs.
+
 ## Identity attacks at a glance
 
 | Attack | Stops it |
@@ -99,7 +103,7 @@ Create a free [Microsoft Entra](https://www.microsoft.com/en-us/security/busines
 The gate: a domain with 20+ users, 5 groups, 3 GPOs and a Kerberoastable service account, rebuilt from your own script. A Kerberos diagram with event IDs. Three BloodHound paths explained in writing. The authorization-code flow with PKCE, without notes. An Entra tenant with MFA enforced. See [Month 7](/roadmap/7/).
 
 ::: ai Roadmap exercise
-Ask an LLM to explain Kerberoasting step by step. Reproduce it in your lab, and verify the detection it claimed (event 4769 with type 0x17). Anything it got wrong goes in the AI log.
+Ask an LLM how Kerberoasting shows up in the logs. Check its claim (event 4769 with type 0x17) against Microsoft's documentation and your lab's Security log. Anything it got wrong goes in the AI log.
 :::
 
 ?! Write your lab's "identity attack surface" review in five bullet points.

@@ -7,7 +7,7 @@ builds: the P05 baseline app, with verified secure login
 source: OWASP Password Storage Cheat Sheet | https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 words: salt, Argon2id, credential stuffing
 ---
-Databases get stolen. When yours does, what's in the password column decides whether it's a bad day or a disaster. This lesson closes Phase 1: you'll build the app you break in Month 8.
+Databases get stolen. When yours does, what's in the password column decides whether it's a bad day or a disaster. This lesson closes Phase 1: you'll build the app you test and fix in Month 8.
 
 @term salt = Random data added to each password before hashing, so identical passwords hash differently.
 @term Argon2id = The recommended password hashing algorithm: deliberately slow and memory-hard.
@@ -26,6 +26,13 @@ Two defences:
 **Salt.** Add a random value per user before hashing. Two people with the same password get different hashes, and precomputed **rainbow tables** become useless. The salt isn't secret: it's stored beside the hash.
 
 **Slowness.** Use a function designed to be expensive. If each guess costs 100 ms and lots of memory, an attacker's billions per second becomes a handful.
+
+?? Why isn't a plain SHA-256 password hash enough?
++ Guessing is cheap, at billions per second
+- SHA-256 can be reversed with a key
+- Hashes always grow too long to store
+- Passwords can't be hashed more than once
+=> A hash can't be undone, but it can be guessed at huge speed. Salt and slowness are the answer.
 
 ## What to use
 
@@ -83,6 +90,13 @@ A small notes app with registration, login, roles and notes a user owns. Use Fla
 ::: ai Roadmap exercise: audit an AI-written login
 Ask an LLM to generate a login implementation. Audit it line by line against the OWASP cheat sheets for password storage, session management and authentication. List every flaw and compare it with yours. Expect missing rate limits and weak defaults.
 :::
+
+?? Why say "invalid username or password" rather than which one failed?
++ It doesn't reveal which valid usernames exist
+- It makes the login page load faster
+- It stops anyone from ever guessing passwords
+- It's required by the HTTP protocol itself
+=> A precise error lets an attacker list valid accounts. Keep the detail in your logs.
 
 ## The Phase 1 checkpoint
 

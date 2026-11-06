@@ -29,6 +29,13 @@ words: Kerberos, TGT, NTLM
 
 Your password is only used at step 1. After that, tickets do the work.
 
+?? When is your password used in Kerberos?
++ Only at the start, for the TGT
+- At every service, for each new ticket
+- Never, as Kerberos has no passwords here
+- Each hour, to refresh the whole ticket
+=> After the first exchange, tickets do the work.
+
 ## The three exchanges
 
 | Step | Message | What happens | Event on the DC |
@@ -37,7 +44,12 @@ Your password is only used at step 1. After that, tickets do the work.
 | 2 | **TGS-REQ / TGS-REP** | Client presents the TGT and names a service by its SPN. The KDC returns a **service ticket**, encrypted with **the service account's key** | **4769** (service ticket requested) |
 | 3 | **AP-REQ** | Client presents the ticket to the service | Logon on the server: **4624** |
 
-@flow Client to KDC: prove password > TGT > Client to KDC: ask for service > Service ticket > Client to service: present ticket
+@seq Client | KDC | Service
+Client > KDC: AS-REQ: I know my password
+KDC > Client: AS-REP: here's a TGT
+Client > KDC: TGS-REQ: TGT, and I want this service
+KDC > Client: TGS-REP: here's a service ticket
+Client > Service: AP-REQ: here's my ticket
 
 Two details matter for what comes next:
 
@@ -56,6 +68,13 @@ Two details matter for what comes next:
 **NTLM** is older. The server sends a challenge, and the client answers using its **NT hash**. No third party issues tickets. It survives for compatibility, and when you connect by IP address rather than name, Windows generally falls back to it.
 
 The big weakness: the hash itself is enough. Steal it and you can authenticate without ever knowing the password. That's **pass-the-hash**.
+
+?? Why is pass-the-hash possible with NTLM?
++ The hash alone is enough to log in
+- The hash can be reversed into the password
+- NTLM sends the password across in plain text
+- NTLM has no form of authentication at all
+=> The client answers the challenge using the hash, so whoever holds it can answer too.
 
 ## The attacks, in concept
 

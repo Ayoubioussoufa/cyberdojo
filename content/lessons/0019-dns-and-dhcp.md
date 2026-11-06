@@ -38,6 +38,13 @@ Resolver > Device: 93.184.216.34, cached
 
 The protocol is defined in [RFC 1035](https://www.rfc-editor.org/rfc/rfc1035). It uses port 53, mostly over UDP.
 
+?? You change a DNS record, and some users still reach the old address. Why?
++ Their resolver is still using its cached answer
+- Their browser can't handle any more DNS records
+- Root servers take a week to read changes
+- The old server is copying traffic to itself
+=> Answers are cached for as long as the record's TTL says.
+
 ## Records you'll meet
 
 | Type | Holds | Example |

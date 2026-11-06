@@ -104,10 +104,10 @@ Find the certificate chain, the protocol and the cipher. Then capture a handshak
 :::
 
 ?? What gives TLS its proof of who you're talking to?
-+ The server's certificate
-- The client's cookie
-- The TCP handshake
-- The DNS answer
++ The server's signed certificate
+- The client's session cookie
+- The first TCP handshake
+- The resolver's DNS answer
 => The server signs the handshake with the key that matches its certificate.
 
 ## Post-quantum, briefly

@@ -33,23 +33,35 @@ You check in at reception with your passport (authentication), and you're given 
 | **Access token** | May this call proceed? | The API | Short-lived |
 | **Refresh token** | Can I get a new access token? | The app | Long-lived, so guard it carefully |
 
+?? Which token tells an app who logged in?
++ The ID token, a signed JWT
+- The access token, for the API
+- The refresh token, which is long-lived
+- The session cookie, for the browser
+=> Access tokens are for APIs. Using one as proof of login is a classic mistake.
+
 ## The authorization code flow
 
 The flow you need to know, drawn by hand:
 
-```
-You     App                Identity provider        API
- │── click login ─▶│                  │                │
- │◀─ redirect ─────│                  │                │
- │── log in, consent ─────────────────▶│               │
- │◀─ redirect with one-time code ──────│               │
- │── code ────────▶│                  │                │
- │                 │── code + proof ─▶│                │
- │                 │◀─ tokens ─────────│               │
- │                 │── access token ──────────────────▶│
-```
+@seq You | App | Identity provider | API
+You > App: Click "Log in"
+App > You: Redirect to the provider
+You > Identity provider: Log in and consent
+Identity provider > You: Redirect with a one-time code
+You > App: The code
+App > Identity provider: Code + proof
+Identity provider > App: Tokens
+App > API: Access token
 
 The clever part: the browser only sees a short-lived **code**, and the tokens are fetched directly by the app, away from the browser.
+
+?? Why does the browser only see a short-lived code?
++ Tokens stay away from the browser
+- The code is easier to remember
+- Browsers can't display very long tokens
+- It makes the page load faster
+=> The app swaps the code for tokens directly, so they don't pass through the browser.
 
 ## PKCE
 
@@ -72,9 +84,23 @@ A thief with only the code can't produce the secret. The [OAuth 2.0 Security Bes
 
 Apps ask for **scopes**, and you click Allow. That click is the attack surface. **Consent phishing** tricks a user into approving a malicious app, which then reads their mail through a valid token. No password stolen, and MFA doesn't help, because the user approved it.
 
+?? Why doesn't MFA stop consent phishing?
++ The user approved it themselves
+- MFA only works on SMS
+- The app steals the password
+- Consent screens turn MFA off
+=> The app holds a valid token that the user granted, so no login is being faked.
+
 ## SAML
 
 SAML does SSO with signed XML assertions passed through the browser. It's older, heavier and still everywhere in enterprises. The concept is the same: an identity provider vouches for you to a service. Its risks centre on validating signatures properly.
+
+?? What does SAML share with OIDC?
++ An identity provider vouches for you
+- Both rely entirely on Kerberos tickets
+- Both send passwords to every site
+- Both only work on Windows machines
+=> The format differs, with XML in SAML and JSON tokens in OIDC, but the idea is the same.
 
 ## Common failures
 

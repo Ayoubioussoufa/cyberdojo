@@ -23,13 +23,11 @@ Active Directory is the phone book, the bouncer and the rulebook of most compani
 
 ## The structure
 
-```
-Forest: corp.example
-└── Domain: corp.example
-    ├── OU: Finance      users, computers, a GPO
-    ├── OU: IT
-    └── OU: Servers
-```
+@stack
+Forest | corp.example | the true security boundary
+Domain | corp.example | one managed database
+OU | Finance, IT, Servers | folders that hold users and computers
+Object | users, computers, groups | what GPOs and permissions apply to
 
 | Object | What it is |
 |---|---|
@@ -60,13 +58,34 @@ Get-ADComputer -Filter *
 
 A GPO can install software or run scripts on every machine under an OU. So write access to a GPO linked to the Workstations OU means code execution on every workstation. Permissions in AD are as important as those on files, and they're invisible unless you look. That's what [BloodHound](https://bloodhound.specterops.io/) is for.
 
+?? Why is write access to a GPO so dangerous?
++ It can run code on many machines
+- It only changes the desktop background picture
+- It lets you read all the logs
+- It deletes the forest all at once
+=> A GPO applies to everything under its OU, so one permission reaches every machine there.
+
 ## Service accounts and SPNs
 
 Programs like SQL Server run under **service accounts**. An **SPN** ties a service to its account. These accounts often have weak, never-changed passwords and too many rights. Remember that: it's what makes Kerberoasting work, two lessons from now.
 
+?? What's an SPN?
++ A name tying a service to its account
+- A password that a service account always uses
+- A log of every service on a machine
+- A group of accounts that all share permissions
+=> Clients find services by SPN. Weak passwords on those accounts are the real risk.
+
 ## Tiering
 
 The [tier model](https://learn.microsoft.com/en-us/security/privileged-access-workstations/privileged-access-access-model) says: never log in to a low-trust machine with a high-trust account. When a Domain Admin logs in to a workstation, their credentials land in that machine's memory. Compromise the workstation and you've got the domain.
+
+?? What does the tier model forbid?
++ High-trust accounts logging in to low-trust machines
+- Low-trust accounts printing to any shared printers
+- Accounts with passwords over twelve characters long
+- All logins from outside normal working hours
+=> A login leaves credentials in that machine's memory, so a weak machine puts a strong account at risk.
 
 ## Build the lab
 
