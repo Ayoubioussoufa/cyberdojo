@@ -2,6 +2,9 @@
 import { RANGES } from "../src/lib/missions";
 import { Rng } from "../src/lib/rng";
 
+/** Flags the learner works out from the output, such as a percentage. */
+const COMPUTED = new Set(["detect-3", "eval-1", "eval-2", "trail-3"]);
+
 let bad = 0;
 let runs = 0;
 for (const [rid, range] of Object.entries(RANGES)) {
@@ -17,10 +20,18 @@ for (const [rid, range] of Object.entries(RANGES)) {
       }
       let last = "";
       let out = "";
+      let seen = "";
       const lines = m.solve(w);
       for (const line of lines) {
         out = w.shell.run(line);
+        seen += out;
         last = line;
+      }
+      // The reference commands must reveal the answer, or a right answer could be marked wrong.
+      if (w.flag !== undefined && !COMPUTED.has(m.id) && !seen.includes(w.flag)) {
+        bad++;
+        console.log(`✗ ${rid}/${m.id} seed ${seed}: the solution never shows the flag ${w.flag}\n  ${seen.slice(0, 200)}`);
+        break;
       }
       if (!m.passed(w, last)) {
         bad++;

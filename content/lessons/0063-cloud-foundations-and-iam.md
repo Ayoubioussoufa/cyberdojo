@@ -51,7 +51,7 @@ The provider secures the cloud itself: buildings, hardware, the hypervisor. **Yo
 Whatever you rent, **data and access stay yours**.
 
 ?? A public S3 bucket leaks customer files. Under the model, who's responsible?
-+ The customer, who controls that bucket's access configuration
++ The customer, who controls that bucket's own settings
 - The provider, because it owns the storage hardware
 - Nobody, because cloud storage is public by nature
 - The hardware manufacturer that built the disk drives

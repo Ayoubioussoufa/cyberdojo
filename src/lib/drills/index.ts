@@ -344,6 +344,47 @@ const list: DrillDef[] = [
     ["`TLP:AMBER+STRICT`, and you want to tell a client.", "No, it isn't allowed", "STRICT stays inside your organisation."],
     ["`TLP:RED`, and you want to forward it to your whole team.", "No, it isn't allowed", "RED stays with the named recipients."],
   ]),
+  table("pipeline-check", "Which check catches it?", "Match the finding to the pipeline tool.", 17, ["SAST", "SCA", "DAST", "Secret scanning", "IaC scanning"], [
+    ["A dependency has a published critical CVE.", "SCA", "SCA compares what you use with known flaws."],
+    ["A Python file builds a SQL query with an f-string.", "SAST", "SAST reads your own source code for risky patterns."],
+    ["The running login page sends no security headers.", "DAST", "DAST tests the application while it runs."],
+    ["An API key was committed to a config file.", "Secret scanning", "It looks for key-shaped strings, ideally before commit."],
+    ["A Terraform file makes a storage bucket public.", "IaC scanning", "It checks infrastructure definitions before deployment."],
+    ["A Kubernetes manifest sets privileged: true.", "IaC scanning", "Manifests are infrastructure as code."],
+    ["A package in your lock file is known to be vulnerable.", "SCA", "That's about a component, not your code."],
+  ]),
+  table("k8s-control", "Which Kubernetes control?", "Match the need to the control.", 19, ["RBAC", "NetworkPolicy", "Pod Security Standards", "Admission policy", "Falco"], [
+    ["Stop the frontend pods reaching the database directly.", "NetworkPolicy", "It controls traffic between pods."],
+    ["Let a CI account update one Deployment, and nothing else.", "RBAC", "It's who can do what through the API."],
+    ["Forbid privileged containers across a namespace.", "Pod Security Standards", "The Restricted and Baseline profiles cover this."],
+    ["Reject any image that doesn't come from your own registry.", "Admission policy", "A custom rule checked at creation time."],
+    ["Alert when a shell starts inside a running web container.", "Falco", "That's runtime detection."],
+  ]),
+  { id: "pr-calc", title: "Precision and recall", blurb: "Work them out from the raw counts, with new numbers each time.", month: 20, make: (rng) => {
+    const [tp, fp, fn] = rng.pick([[40, 10, 10], [36, 4, 12], [30, 10, 20], [45, 5, 15], [24, 6, 16], [18, 2, 6], [27, 3, 9], [16, 4, 4], [8, 2, 8], [12, 3, 4]] as [number, number, number][]);
+    const which = rng.pick(["precision", "recall"]);
+    const v = Math.round(((which === "precision" ? tp / (tp + fp) : tp / (tp + fn)) * 100));
+    return { kind: "input", prompt: `True positives: ${tp}\nFalse positives: ${fp}\nFalse negatives: ${fn}\n\nWhat's the ${which}, as a whole percentage?`, answer: String(v), placeholder: "Number only", why: which === "precision" ? `Precision = TP ÷ (TP + FP) = ${tp} ÷ ${tp + fp} = ${v}%.` : `Recall = TP ÷ (TP + FN) = ${tp} ÷ ${tp + fn} = ${v}%.`, accept: (s) => s.trim().replace("%", "") === String(v) };
+  } },
+  { id: "base-rate", title: "The base-rate trap", blurb: "Why a 99% detector can still mostly raise false alarms.", month: 20, make: (rng) => {
+    const total = 100000;
+    const bad = rng.pick([10, 50, 100, 500, 1000]);
+    const recall = rng.pick([90, 100]);
+    const fpr = rng.pick([1, 2, 5]);
+    const tp = (bad * recall) / 100;
+    const fp = ((total - bad) * fpr) / 100;
+    const v = Math.round((tp / (tp + fp)) * 100);
+    return { kind: "input", prompt: `${total.toLocaleString("en-GB")} events a day, and ${bad} are really attacks.\nThe detector catches ${recall}% of attacks, and wrongly flags ${fpr}% of normal events.\n\nOf the alerts it raises, what percentage are real? Round to a whole number.`, answer: String(v), placeholder: "Number only", why: `True alerts: ${tp}. False alerts: ${fp}. ${tp} ÷ ${tp + fp} = ${v}%. When attacks are rare, even a small false-positive rate swamps the real ones.`, accept: (s) => s.trim().replace("%", "") === String(v) };
+  } },
+  { id: "trifecta", title: "Spot the trifecta", blurb: "Private data, untrusted content, a way out: which systems have all three?", month: 18, make: (rng) => {
+    const data = rng.pick([true, false]);
+    const content = rng.pick([true, false]);
+    const out = rng.pick([true, false]);
+    const all = data && content && out;
+    const opts = rng.shuffle(["All three present", "A leg is missing"]);
+    const line = [data ? "Can read all customer records." : "Reads only a public product manual.", content ? "Summarises emails from anyone." : "Only ever sees text from your own staff.", out ? "Can send email to any address." : "Its replies stay in a private chat with no links or images."];
+    return { kind: "choice", prompt: `An assistant:\n• ${line.join("\n• ")}\n\nIs the lethal trifecta present?`, options: opts, correct: opts.indexOf(all ? "All three present" : "A leg is missing"), why: all ? "Private data, untrusted content and a way out: an attacker's email could steal your data." : "Without all three, this particular theft path breaks. Removing one leg is the design goal." };
+  } },
   table("iam-eval", "Allow or deny?", "AWS evaluation: explicit deny wins, and otherwise you need an allow.", 13, ["Allowed", "Denied"], [
     ["An identity policy allows s3:GetObject. Nothing denies it.", "Allowed", "An explicit allow with no deny."],
     ["No policy mentions the action at all.", "Denied", "The default is deny."],

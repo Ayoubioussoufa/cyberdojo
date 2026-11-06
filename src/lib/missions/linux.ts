@@ -159,7 +159,7 @@ const findThings: Mission[] = [
       return { shell, flag };
     },
     passed: submitted,
-    solve: (w) => ["find /opt -name keys.bak -exec cat {} \;", `submit ${w.flag}`],
+    solve: (w) => ["find /opt -name keys.bak -exec cat {} \\;", `submit ${w.flag}`],
     debrief: "`find` walks a whole tree for you. Backups like `.bak` are a classic place where secrets get left behind.",
   },
   {
@@ -175,7 +175,7 @@ const findThings: Mission[] = [
       return { shell, flag };
     },
     passed: submitted,
-    solve: (w) => ["find /srv/data -type f -size 33c -exec cat {} \;", `submit ${w.flag}`],
+    solve: (w) => ["find /srv/data -type f -size 33c -exec cat {} \\;", `submit ${w.flag}`],
     debrief: "You read a manual to solve a problem instead of guessing. That is the skill the whole first month is about.",
   },
   {
