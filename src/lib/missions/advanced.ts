@@ -608,12 +608,73 @@ const evals: Mission[] = [
   },
 ];
 
+function vulnWorld(rng: Rng) {
+  const shell = ana();
+  const kevExposed = `CVE-2026-${rng.int(10000, 19999)}`;
+  const kevInternal = `CVE-2026-${rng.int(20000, 29999)}`;
+  const highScore = `CVE-2026-${rng.int(30000, 39999)}`;
+  const epss = `CVE-2026-${rng.int(40000, 49999)}`;
+  const rows = [
+    `${highScore},lab-printer,internal,9.8,0.002,2026-10-01`,
+    `${kevExposed},web-portal,internet,7.5,0.910,2026-10-20`,
+    `${kevInternal},hr-laptop,internal,8.1,0.640,2026-10-22`,
+    `${epss},vpn-gateway,internet,6.5,0.720,2026-10-25`,
+    ...Array.from({ length: 24 }, (_, i) => `CVE-2026-${50000 + i},${rng.pick(["file-server", "test-vm", "hr-laptop"])},internal,${rng.int(40, 79) / 10},0.0${two(rng.int(1, 30))},2026-10-${two(rng.int(10, 28))}`),
+  ];
+  shell.fs.put("/home/ana/scan.csv", `cve,asset,exposure,cvss,epss,found\n${rng.shuffle(rows).join("\n")}\n`, own);
+  shell.fs.put("/home/ana/kev.txt", `${rng.shuffle([kevExposed, kevInternal, "CVE-2025-11111", "CVE-2024-22222"]).join("\n")}\n`, own);
+  return { shell, kevExposed, kevInternal, highScore, epss };
+}
+
+const vuln: Mission[] = [
+  {
+    id: "vuln-1",
+    title: "The scary number",
+    brief: "`~/scan.csv` is a scanner export: `cve,asset,exposure,cvss,epss,found`. Sort by CVSS and find the highest score. Submit the **asset** it's on. You'll see why that alone doesn't decide what you fix first.",
+    hints: ["`awk -F, 'NR > 1 {print $4, $2, $1}' scan.csv | sort -rn | head -3`"],
+    build: (rng) => {
+      const w = vulnWorld(rng);
+      return { shell: w.shell, flag: "lab-printer" };
+    },
+    passed: submitted,
+    solve: (w) => ["awk -F, 'NR > 1 {print $4, $2, $1}' scan.csv | sort -rn | head -3", `submit ${w.flag}`],
+    debrief: "A 9.8 on an internal printer, with a tiny EPSS. If you patch by CVSS alone, this is where your first morning goes.",
+  },
+  {
+    id: "vuln-2",
+    title: "Being exploited right now",
+    brief: "`~/kev.txt` lists CVEs known to be exploited in the wild, like CISA's KEV catalogue. Find the finding in `scan.csv` that is in that list **and** on an internet-exposed asset. Submit its CVE.",
+    hints: ["`grep internet scan.csv` shows the exposed assets.", "Compare those CVEs with `cat kev.txt`."],
+    build: (rng) => {
+      const w = vulnWorld(rng);
+      return { shell: w.shell, flag: w.kevExposed };
+    },
+    passed: submitted,
+    solve: (w) => ["grep internet scan.csv", "cat kev.txt", `submit ${w.flag}`],
+    debrief: "Known exploited and reachable from the internet: that's today's job, whatever its CVSS says. Its score was only 7.5.",
+  },
+  {
+    id: "vuln-3",
+    title: "Likely next",
+    brief: "EPSS estimates the chance of exploitation in the next 30 days. Find the internet-exposed finding with the highest EPSS that's **not** in `kev.txt`. Submit its CVE.",
+    hints: ["`awk -F, '$3 == \"internet\" {print $5, $1}' scan.csv | sort -rn`", "Skip anything that's in `kev.txt`."],
+    build: (rng) => {
+      const w = vulnWorld(rng);
+      return { shell: w.shell, flag: w.epss };
+    },
+    passed: submitted,
+    solve: (w) => ["awk -F, '$3 == \"internet\" {print $5, $1}' scan.csv | sort -rn", "cat kev.txt", `submit ${w.flag}`],
+    debrief: "Now you've got a plan a team can follow: the known-exploited exposed item first, then the likely-next one, and the printer in the normal cycle. That's risk-based prioritisation.",
+  },
+];
+
 export const MISSIONS_ADVANCED: Record<string, RangeSet> = {
   iam: { title: "Read cloud permissions", missions: iam },
   trail: { title: "Investigate with CloudTrail", missions: trail },
   forensics: { title: "Work from evidence", missions: forensics },
   intel: { title: "Turn a report into answers", missions: intel },
   malware: { title: "Triage a sample without running it", missions: malware },
+  vuln: { title: "Prioritise a scanner report", missions: vuln },
   appsec: { title: "Review code like a defender", missions: appsec },
   supply: { title: "Audit a software supply chain", missions: supply },
   aiops: { title: "Investigate an AI assistant's logs", missions: aiops },

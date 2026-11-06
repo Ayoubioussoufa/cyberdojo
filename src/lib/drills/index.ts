@@ -385,6 +385,61 @@ const list: DrillDef[] = [
     const line = [data ? "Can read all customer records." : "Reads only a public product manual.", content ? "Summarises emails from anyone." : "Only ever sees text from your own staff.", out ? "Can send email to any address." : "Its replies stay in a private chat with no links or images."];
     return { kind: "choice", prompt: `An assistant:\n• ${line.join("\n• ")}\n\nIs the lethal trifecta present?`, options: opts, correct: opts.indexOf(all ? "All three present" : "A leg is missing"), why: all ? "Private data, untrusted content and a way out: an attacker's email could steal your data." : "Without all three, this particular theft path breaks. Removing one leg is the design goal." };
   } },
+  table("web-class", "Name the web flaw", "Map the scenario to its class.", 8, ["SQL injection", "XSS", "IDOR", "CSRF", "SSRF", "Path traversal", "Mass assignment"], [
+    ["A search box's text is glued into a database query.", "SQL injection", "Input changes the meaning of the query."],
+    ["A stored comment runs as script in other users' browsers.", "XSS", "Input became code in the page."],
+    ["Changing the number in `/orders/991` shows someone else's order.", "IDOR", "The server never checked who owns that record."],
+    ["A page on another site makes your browser submit a transfer to your bank.", "CSRF", "It abuses cookies being sent automatically."],
+    ["A link preview feature makes the server fetch an internal admin page.", "SSRF", "The server is sending the request for the user."],
+    ["A download feature uses the file name from the URL, and reaches files outside its folder.", "Path traversal", "Input decided which file was opened."],
+    ["A profile update also saves a `role` field that the user added.", "Mass assignment", "The server saved a field the client shouldn't control."],
+  ]),
+  table("web-fix", "Pick the real fix", "Which fix addresses the root cause?", 8, ["Parameterised queries", "Output encoding", "Ownership check on the server", "SameSite cookies and tokens", "Destination allow-list", "Field allow-list"], [
+    ["SQL injection in a report filter.", "Parameterised queries", "Query structure and values travel separately."],
+    ["Stored XSS in user comments.", "Output encoding", "The browser then treats the comment as text."],
+    ["Users can read others' invoices by changing an ID.", "Ownership check on the server", "Every object request must check who owns it."],
+    ["Another website can trigger actions in a logged-in session.", "SameSite cookies and tokens", "The browser stops sending the cookie, and other sites can't read the token."],
+    ["The server fetches any URL a user gives it.", "Destination allow-list", "Only known hosts may be reached."],
+    ["Users can set `is_admin` through a profile update.", "Field allow-list", "Only named fields can be changed."],
+  ]),
+  { id: "cvss-band", title: "CVSS rating bands", blurb: "Turn a score into its qualitative rating.", month: 8, make: (rng) => {
+    const v = rng.int(0, 100) / 10;
+    const label = v === 0 ? "None" : v < 4 ? "Low" : v < 7 ? "Medium" : v < 9 ? "High" : "Critical";
+    const opts = rng.shuffle(["None", "Low", "Medium", "High", "Critical"]);
+    return { kind: "choice", prompt: `A flaw scores ${v.toFixed(1)}. What's its CVSS rating?`, options: opts, correct: opts.indexOf(label), why: "None 0.0, Low 0.1–3.9, Medium 4.0–6.9, High 7.0–8.9, Critical 9.0–10.0." };
+  } },
+  { id: "vuln-prio", title: "What gets fixed first?", blurb: "Apply a simple priority rule to a new finding each round.", month: 10, make: (rng) => {
+    const kev = rng.pick([true, false]);
+    const exposed = rng.pick([true, false]);
+    const epss = rng.pick([1, 4, 12, 35, 61, 88]);
+    const cvss = rng.pick([5.3, 6.5, 7.5, 8.8, 9.8]);
+    const label = kev && exposed ? "Today" : kev || (epss >= 50 && exposed) ? "This week" : "Normal cycle";
+    const opts = rng.shuffle(["Today", "This week", "Normal cycle"]);
+    return { kind: "choice", prompt: `Rule: in KEV and internet-facing is Today. In KEV, or EPSS at least 50% and internet-facing, is This week. Anything else is Normal cycle.\n\nCVSS ${cvss} · EPSS ${epss}% · ${kev ? "in KEV" : "not in KEV"} · ${exposed ? "internet-facing" : "internal only"}`, options: opts, correct: opts.indexOf(label), why: `${label}. CVSS played no part: it says how bad a flaw could be, not how likely it is to hit you. Each organisation writes its own version of this rule.` };
+  } },
+  table("ai-task", "Who should do this?", "Automate, use AI with a human check, or keep it human?", 20, ["AI can do it alone", "AI drafts, human checks", "Human decides"], [
+    ["Summarising a long alert into three lines for the analyst.", "AI can do it alone", "Low harm: the analyst still reads the evidence."],
+    ["Drafting a detection rule.", "AI drafts, human checks", "Useful speed, but it must be tested before it's deployed."],
+    ["Deciding to tell a regulator about a breach.", "Human decides", "It's a legal and business decision with real consequences."],
+    ["Mapping an alert to ATT&CK techniques.", "AI drafts, human checks", "Models over-map, so check each one against the evidence."],
+    ["Disabling a director's account during an incident.", "Human decides", "It's disruptive and hard to undo, so a person owns the call."],
+    ["Translating a report into French.", "AI drafts, human checks", "Quick to do, and worth reading, as terms can shift."],
+    ["Enriching an IP address with public reputation data.", "AI can do it alone", "A lookup with little harm if it's slightly off."],
+  ]),
+  table("ml-problem", "What went wrong with the model?", "Name the machine learning problem.", 20, ["Overfitting", "Data leakage", "Concept drift", "Poisoning", "Evasion"], [
+    ["99% on training data, and 60% on new data.", "Overfitting", "It memorised examples instead of learning a pattern."],
+    ["A feature was the analyst's verdict, so the test score was perfect.", "Data leakage", "The answer slipped into the inputs."],
+    ["A phishing model decays over a year as attackers change their wording.", "Concept drift", "The world changed, and the model didn't."],
+    ["Attackers submit many crafted samples, so that future retraining trusts them.", "Poisoning", "The training data itself was attacked."],
+    ["A sample is changed slightly so the model calls it safe.", "Evasion", "The attack happens at prediction time."],
+  ]),
+  table("ai-control", "Which control fits?", "Match the risk to the design control.", 18, ["Per-user authorization", "Human approval", "Egress allow-list", "Output encoding", "Step and budget limits"], [
+    ["An agent could read any customer's records.", "Per-user authorization", "Each tool call runs with the asking user's rights."],
+    ["An agent could delete production data.", "Human approval", "Consequential actions wait for a person."],
+    ["A fooled agent could post data to any web address.", "Egress allow-list", "Only known destinations are reachable."],
+    ["Model output containing HTML could run in a user's browser.", "Output encoding", "Treat output as untrusted input."],
+    ["A looping agent could run up a huge bill overnight.", "Step and budget limits", "Bounded loops stop runaway use."],
+  ]),
   table("iam-eval", "Allow or deny?", "AWS evaluation: explicit deny wins, and otherwise you need an allow.", 13, ["Allowed", "Denied"], [
     ["An identity policy allows s3:GetObject. Nothing denies it.", "Allowed", "An explicit allow with no deny."],
     ["No policy mentions the action at all.", "Denied", "The default is deny."],

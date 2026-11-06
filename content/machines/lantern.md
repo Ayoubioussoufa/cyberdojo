@@ -54,7 +54,7 @@ Your **proof of impact** was one harmless line. You didn't create accounts, chan
 
 ?? The chain had four links. Which fix would have stopped the attacker earliest?
 + Keeping the backup out of the web root
-- Tightening the permissions on that cron script
+- Tightening all the permissions on that cron script
 - Restarting the server every single night at midnight
 - Renaming the `deploy` account to something else entirely
 => The earlier a chain breaks, the less the attacker learns. But fix every link, because defence shouldn't depend on one.
@@ -65,8 +65,8 @@ You read `access.log` differently once you've made those entries yourself. You k
 
 ?? What's the best detection idea from this machine?
 + A secret file fetched, then a login from there
-- Any visit to the home page of the site today
-- Every successful login from one internal address here
+- Any visit to the home page of the site
+- Every single successful login from one internal address here
 - All the requests that return a status of 200
 => Correlating two events from one source is far stronger than either alone, and it fires rarely.
 

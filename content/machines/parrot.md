@@ -49,7 +49,7 @@ The stronger prompt failed for a simple reason: a prompt is a request, and the a
 ?? Why did the policy change work when the prompt change didn't?
 + Code limits hold even when the model's fooled
 - Policy files are written in a smarter language
-- The model reads policy files more carefully
+- The model reads policy files much more carefully
 - Attackers aren't able to see any policy files
 => Controls outside the model don't depend on its judgement. That's the test of any AI defence.
 

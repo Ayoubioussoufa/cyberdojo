@@ -21,7 +21,7 @@ You'll need IAM from [lesson 63](/courses/0063-cloud-foundations-and-iam/), and 
 ?? Why start by looking at the bucket as an anonymous outsider?
 + It shows exactly what anyone can already reach
 - Anonymous requests can't appear in any logs anywhere
-- Admins are not allowed to view buckets
+- Admins are not allowed to view those buckets
 - It costs far less than an authenticated request
 => An outsider's view is the honest measure of exposure, and it tells you what was public, rather than what you can see as an admin.
 
@@ -42,7 +42,7 @@ You'll need IAM from [lesson 63](/courses/0063-cloud-foundations-and-iam/), and 
 + The attacker had already created another admin user
 - Deactivated keys automatically come back within one day
 - Keys can only be removed by the provider
-- The key was never used by anyone
+- The key was never really used by anyone
 => A smart attacker makes their own way back within minutes. Always look for what was created while the key was live.
 
 ## The fixes that outlast today

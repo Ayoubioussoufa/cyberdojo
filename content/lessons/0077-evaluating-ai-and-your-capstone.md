@@ -15,7 +15,6 @@ This is when your profile stops looking like a student's. You choose one substan
 @term capstone = The substantial final project of the roadmap.
 @term failure taxonomy = Named categories for the ways a system goes wrong.
 @term human in the loop = A design where a person reviews or approves before an action happens.
-@term regression test (AI) = Rerunning a fixed evaluation after a change, to see whether quality dropped.
 
 ## Scope the capstone
 

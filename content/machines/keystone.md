@@ -23,7 +23,7 @@ You'll need Windows logging from [lesson 33](/courses/0033-windows-logging-and-s
 ?? Attackers spray one password across 500 accounts. Why doesn't account lockout help?
 + Each account sees only one failure here
 - Lockout works only on domain administrator accounts
-- Spraying never reaches the domain controller
+- Spraying never reaches a domain controller here
 - Windows has no lockout feature for passwords
 => Lockout counts failures per account. You need a detection that looks across accounts.
 
