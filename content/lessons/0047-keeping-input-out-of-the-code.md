@@ -10,7 +10,6 @@ words: injection, parameterised query, output encoding
 Injection is one idea wearing many costumes: **data gets treated as code**. Learn the idea once, and each flaw in this family, and each fix, makes sense.
 
 @term injection = A flaw where input is treated as part of a command or code.
-@term parameterised query = A database query where values are sent separately from the SQL text.
 @term output encoding = Converting characters so that a browser treats them as text, not code.
 @term CSP (Content Security Policy) = A browser header limiting where a page may load and run code from.
 @term command injection = Input becoming part of an operating system command.

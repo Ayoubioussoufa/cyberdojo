@@ -1,11 +1,11 @@
 ---
 title: Databases and SQL
-summary: Tables, queries, joins and aggregates, plus the parameterized queries that stop SQL injection.
+summary: Tables, queries, joins and aggregates, plus the parameterised queries that stop SQL injection.
 month: 6
 minutes: 40
 builds: write joins and aggregates from memory
 source: SQLBolt, interactive SQL lessons | https://sqlbolt.com/
-words: SQL, join, parameterized query
+words: SQL, join, parameterised query
 ---
 SQL shows up three times in your career: in the apps you'll attack, in the databases you'll defend, and in SIEM queries that look a lot like it. Learn it once and you'll use it daily.
 
@@ -18,7 +18,7 @@ SQL shows up three times in your career: in the apps you'll attack, in the datab
 @term aggregate = A calculation over many rows, like COUNT or SUM.
 @term index = A database structure that makes lookups fast.
 @term transaction = A group of database operations that succeed or fail together.
-@term parameterized query = A query where values are sent separately from the SQL, so that they can't change its meaning.
+@term parameterised query = A query where values are sent separately from the SQL, so that they can't change its meaning.
 @term ORM = Object-relational mapper: a library that writes SQL for your code.
 @term SQL injection (SQLi) = Getting input interpreted as part of a SQL query.
 
@@ -75,7 +75,7 @@ An **index** is like a book's index: it makes lookups fast. Without one, the dat
 
 A **transaction** groups changes so that they all happen or none do: move money from A to B, and never lose it halfway.
 
-## Parameterized queries: the most important thing here
+## Parameterised queries: the most important thing here
 
 This is the code that creates SQL injection:
 
@@ -92,7 +92,7 @@ SELECT * FROM users WHERE name = '' OR 1=1 --' AND pw = ''
 
 `OR 1=1` is always true, and `--` comments out the rest. The attacker logs in without a password.
 
-The fix is a **parameterized query**: the SQL and the values travel separately, so input can never become code.
+The fix is a **parameterised query**: the SQL and the values travel separately, so input can never become code.
 
 ```python
 # RIGHT: the database treats name as data, whatever it contains
@@ -105,7 +105,7 @@ The root cause of injection is **mixing code and data in one string**. You'll se
 
 An **ORM** uses parameters for you, unless you build raw queries with string formatting. See the [OWASP SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html).
 
-?? Why do parameterized queries stop injection where escaping quotes can fail?
+?? Why do parameterised queries stop injection where escaping quotes can fail?
 + Values never get parsed as SQL code
 - They encrypt each value before it's sent
 - They reject any input containing a quote

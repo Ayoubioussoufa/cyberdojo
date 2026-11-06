@@ -62,7 +62,7 @@ Notice that only some of these are coding mistakes. Design, configuration and lo
 
 ## Reading a request
 
-Everything you investigate this month starts here. This is a web server's access log line, which you met in Month 5:
+Everything you investigate this month starts here. This is a line from a web server's access log:
 
 ```
 203.0.113.7 - - [27/Oct/2026:22:14:21 +0000] "GET /invoices/1043 HTTP/1.1" 200 1893

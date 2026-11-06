@@ -14,7 +14,13 @@ interface Line {
   prompt?: string;
 }
 
-const inlineCode = (s: string) => s.split("`").map((part, i) => (i % 2 ? <code key={i}>{part}</code> : part));
+/** Briefs and hints use a little Markdown: `code` and **bold**. */
+const inlineCode = (s: string) =>
+  s.split(/(`[^`]+`|\*\*[^*]+\*\*)/).map((part, i) => {
+    if (part.startsWith("`") && part.endsWith("`") && part.length > 1) return <code key={i}>{part.slice(1, -1)}</code>;
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) return <strong key={i}>{part.slice(2, -2)}</strong>;
+    return part;
+  });
 
 function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () => void; passed: boolean }) {
   const [seed, setSeed] = useState(0);

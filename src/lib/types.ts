@@ -37,6 +37,8 @@ export interface Term {
   definition: string;
   doc: string;
   docTitle: string;
+  /** Where the term is taught. */
+  href: string;
 }
 
 export type DocKind = "lesson" | "guide" | "machine" | "sheet";

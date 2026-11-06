@@ -27,6 +27,10 @@ const ROOT = path.join(process.cwd(), "content");
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+/** Marked escapes headings; the table of contents needs plain text. */
+const decode = (s: string) =>
+  s.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
 const slugify = (s: string) =>
   s.toLowerCase().replace(/<[^>]+>/g, "").replace(/&[a-z]+;/g, "").replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
 
@@ -56,12 +60,12 @@ function makeMarked(toc: TocEntry[]) {
       heading({ tokens, depth }) {
         const inner = this.parser.parseInline(tokens);
         if (depth !== 2) return `<h${depth}>${inner}</h${depth}>\n`;
-        const text = inner.replace(/<[^>]+>/g, "");
+        const text = decode(inner.replace(/<[^>]+>/g, ""));
         let id = slugify(text);
         const n = seen.get(id) ?? 0;
         seen.set(id, n + 1);
         if (n) id += `-${n}`;
-        toc.push({ id, text: text.replace(/&amp;/g, "&") });
+        toc.push({ id, text });
         return `<h2 id="${id}">${inner}</h2>\n`;
       },
       link({ href, tokens }) {
@@ -116,7 +120,7 @@ function splitFront(raw: string, file: string): Parsed {
   return { front, body: m[2] as string };
 }
 
-function parseBody(slug: string, title: string, body: string) {
+function parseBody(slug: string, title: string, body: string, href: string) {
   const toc: TocEntry[] = [];
   const marked = makeMarked(toc);
   const inline = (s: string) => marked.parseInline(s, { async: false }) as string;
@@ -212,6 +216,7 @@ function parseBody(slug: string, title: string, body: string) {
         definition: term[3] as string,
         doc: slug,
         docTitle: title,
+        href,
       });
       i++;
       continue;
@@ -241,6 +246,7 @@ function parseBody(slug: string, title: string, body: string) {
 
 type DocDir = "lessons" | "guides" | "machines" | "reference";
 const KIND = { lessons: "lesson", guides: "guide", machines: "machine", reference: "sheet" } as const;
+const BASE = { lessons: "/courses/", guides: "/guides/", machines: "/machines/", reference: "/sheets/" } as const;
 
 function readDir(kind: DocDir): string[] {
   const dir = path.join(ROOT, kind);
@@ -257,7 +263,7 @@ function load(kindDir: DocDir, file: string): Doc {
   const { front, body } = splitFront(raw, file);
   const kind = KIND[kindDir];
   const title = front.title ?? slug;
-  const parsed = parseBody(slug, title, body);
+  const parsed = parseBody(slug, title, body, `${BASE[kindDir]}${slug}/`);
   const src = front.source?.split("|").map((s) => s.trim());
   const meta: DocMeta = {
     slug,

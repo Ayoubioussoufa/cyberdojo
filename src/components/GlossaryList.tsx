@@ -15,7 +15,7 @@ export function GlossaryList({ terms }: { terms: Term[] }) {
         {shown.map((t) => (
           <div key={t.term}>
             <dt>{t.term}{t.aliases.length > 0 && <small>{t.aliases.join(", ")}</small>}</dt>
-            <dd>{t.definition} <Link href={`/${t.doc.match(/^\d/) ? "courses" : "guides"}/${t.doc}/`}>{t.docTitle}</Link></dd>
+            <dd>{t.definition} <Link href={t.href}>{t.docTitle}</Link></dd>
           </div>
         ))}
       </dl>

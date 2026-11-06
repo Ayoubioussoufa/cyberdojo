@@ -67,7 +67,7 @@ Good libraries handle the salt for you. Check that you're using recent defaults 
 You'll need these in the build:
 
 - **Passwords:** Argon2id or bcrypt.
-- **Queries:** always parameterized.
+- **Queries:** always parameterised.
 - **Cookies:** `HttpOnly`, `Secure`, `SameSite`.
 - **Sessions:** new ID at login, expiry, real logout.
 - **Authorization:** check ownership **on the server, on every request**.
@@ -88,7 +88,7 @@ Ask an LLM to generate a login implementation. Audit it line by line against the
 
 You've reached the end of the Foundations phase. The Month 6 gate:
 
-- The app uses Argon2id or bcrypt, parameterized queries and secure cookies: verified, not assumed.
+- The app uses Argon2id or bcrypt, parameterised queries and secure cookies: verified, not assumed.
 - You can explain the TLS 1.3 handshake and what a certificate chain proves.
 - CryptoHack ≥ 30, and SQL joins and aggregates without looking anything up.
 - Foundations self-test ≥ 80%, with gaps scheduled into buffer days.
