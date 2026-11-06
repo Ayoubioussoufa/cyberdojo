@@ -48,6 +48,7 @@ export default async function Page({ params }: Props) {
         <h1>{m.title}</h1>
         <p className="lede">{m.goal}</p>
         <p className="meta">{m.hours}</p>
+        <p className="page-links"><Link href="/roadmap/">Back to my roadmap</Link></p>
       </header>
 
       {here.length > 0 && (
@@ -57,7 +58,7 @@ export default async function Page({ params }: Props) {
         </section>
       )}
 
-      <Gates month={m} />
+      <div id="gate"><Gates month={m} /></div>
 
       {m.weeks && (
         <section>

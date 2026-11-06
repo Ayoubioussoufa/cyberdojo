@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { stepAfter } from "@/lib/path";
 import { DocView } from "@/components/DocView";
 import { brief, getMachine, machines, termsFor } from "@/lib/content";
 
@@ -31,6 +32,7 @@ export default async function Page({ params }: Props) {
       prev={near(all[i - 1])}
       next={near(all[i + 1])}
       base="/machines/"
+      after={stepAfter(`/machines/${doc.meta.slug}/`)}
     />
   );
 }

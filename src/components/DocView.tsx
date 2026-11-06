@@ -3,19 +3,21 @@
 import Link from "next/link";
 import { CopyButton } from "./Copy";
 import { Drill } from "./Drill";
+import { CheckBox, HelpBadge } from "./ProjectParts";
 import { Html } from "./Html";
 import { QuestionCard } from "./Question";
 import { Range } from "./Range";
 import { Terms } from "./Terms";
 import { WrittenCard } from "./Written";
 import { setDone, setWord, useStore } from "@/lib/progress";
+import { KIND_LABEL, type PathStep } from "@/lib/pathState";
 import { fullMessage } from "@/lib/tutor";
 import type { DocBrief, DocMeta, Segment, Term, TocEntry } from "@/lib/types";
 
 type Near = Pick<DocMeta, "slug" | "title"> | null;
 
 export function DocView({
-  meta, brief, segments, toc, terms, kicker, prev, next, base,
+  meta, brief, segments, toc, terms, kicker, prev, next, base, after, intro,
 }: {
   meta: DocMeta;
   brief: DocBrief;
@@ -26,6 +28,10 @@ export function DocView({
   prev: Near;
   next: Near;
   base: string;
+  /** What comes after this page on the roadmap. */
+  after?: PathStep | null;
+  /** Sits under the header: a project's tools table, for example. */
+  intro?: React.ReactNode;
 }) {
   const store = useStore();
   const answered = brief.questions.filter((q) => store.picks[q.id] !== undefined).length;
@@ -52,12 +58,16 @@ export function DocView({
           )}
         </header>
 
+        {intro}
+
         {segments.map((s, i) => {
           if (s.kind === "html") return <Html key={i} html={s.html} />;
           if (s.kind === "question") return <QuestionCard key={s.question.id} q={s.question} doc={brief} n={++n} />;
           if (s.kind === "written") return <WrittenCard key={s.written.id} w={s.written} />;
           if (s.kind === "drill") return <Drill key={i} id={s.id} />;
-          return <Range key={i} id={s.id} />;
+          if (s.kind === "range") return <Range key={i} id={s.id} />;
+          if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
+          return <HelpBadge key={i} tool={s.tool} level={s.level} />;
         })}
 
         <section className="finish">
@@ -87,6 +97,18 @@ export function DocView({
             </button>
           </div>
           <p className="followup">Anything unclear? Ask your AI tutor. There's no such thing as a question too basic for this course.</p>
+          {isDone && meta.builds && (
+            <div className="why ok cando">
+              <p><strong>New skill.</strong> You can now {meta.builds}. It's been added to your <Link href="/skills/">progress</Link>.</p>
+            </div>
+          )}
+          {after && (
+            <Link href={after.href} className="card link-card next-step">
+              <span className="band">Next on your roadmap · {KIND_LABEL[after.kind]}</span>
+              <span className="next-title">{after.title}</span>
+              <span className="muted">{after.note}</span>
+            </Link>
+          )}
         </section>
 
         <nav className="pager" aria-label="Next and previous">

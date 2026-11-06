@@ -4,7 +4,7 @@ import { Nav } from "@/components/Nav";
 
 export const metadata: Metadata = {
   title: { default: "CyberDojo", template: "%s · CyberDojo" },
-  description: "Cybersecurity from absolute zero to job-ready: a 24-month course with lessons, guides, drills and a browser terminal.",
+  description: "Cybersecurity from absolute zero to job-ready: a 24-month course with a step-by-step roadmap, lessons, projects and a browser terminal.",
 };
 
 export const viewport: Viewport = {

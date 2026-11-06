@@ -5,16 +5,13 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const LINKS = [
-  { href: "/", label: "Today" },
-  { href: "/courses/", label: "Courses" },
-  { href: "/roadmap/", label: "Roadmap" },
-  { href: "/guides/", label: "Guides" },
-  { href: "/practice/", label: "Practice" },
-  { href: "/machines/", label: "Machines" },
-  { href: "/review/", label: "Review" },
-  { href: "/glossary/", label: "Glossary" },
-  { href: "/sheets/", label: "Sheets" },
-  { href: "/resources/", label: "Resources" },
+  { href: "/", label: "Today", also: [] as string[] },
+  { href: "/roadmap/", label: "Roadmap", also: ["/start/"] },
+  { href: "/courses/", label: "Lessons", also: [] },
+  { href: "/practice/", label: "Practice", also: ["/machines/", "/review/"] },
+  { href: "/projects/", label: "Projects", also: [] },
+  { href: "/library/", label: "Library", also: ["/guides/", "/sheets/", "/glossary/", "/resources/"] },
+  { href: "/skills/", label: "Progress", also: [] },
 ];
 
 export function Nav() {
@@ -38,7 +35,7 @@ export function Nav() {
     }
   };
 
-  const active = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const active = (l: (typeof LINKS)[number]) => (l.href === "/" ? path === "/" : [l.href, ...l.also].some((h) => path.startsWith(h)));
 
   return (
     <header className="nav">
@@ -54,7 +51,7 @@ export function Nav() {
         </Link>
         <nav className={`nav-links${open ? " open" : ""}`} aria-label="Main">
           {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className={active(l.href) ? "on" : ""} aria-current={active(l.href) ? "page" : undefined}>
+            <Link key={l.href} href={l.href} className={active(l) ? "on" : ""} aria-current={active(l) ? "page" : undefined}>
               {l.label}
             </Link>
           ))}

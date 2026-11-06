@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Subnav } from "@/components/Subnav";
 import { MachineCards } from "@/components/MachineCards";
 import { machines } from "@/lib/content";
 import { MISSIONS_MACHINES } from "@/lib/missions/machines";
@@ -12,6 +13,7 @@ export default function Page() {
   const cards = docs.map((d) => ({ ...d.meta, stages: (MISSIONS_MACHINES[d.meta.slug]?.missions ?? []).map((m) => m.id) }));
   return (
     <div className="page">
+      <Subnav group="practice" />
       <header className="page-head">
         <p className="kicker">Machines</p>
         <h1>Attack it, trace it, defend it</h1>

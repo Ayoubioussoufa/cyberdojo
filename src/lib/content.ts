@@ -21,7 +21,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Marked } from "marked";
-import type { Doc, DocBrief, DocMeta, Question, Segment, Term, TocEntry, Written } from "./types";
+import type { Check, Doc, DocBrief, DocMeta, HelpLevel, Question, Segment, Term, TocEntry, ToolUse, Written } from "./types";
 
 const ROOT = path.join(process.cwd(), "content");
 
@@ -130,6 +130,9 @@ function parseBody(slug: string, title: string, body: string, href: string) {
   const questions: Question[] = [];
   const written: Written[] = [];
   const terms: Term[] = [];
+  const checks: Check[] = [];
+  const tools: ToolUse[] = [];
+  let step = 0;
   let buf: string[] = [];
   const flush = () => {
     const text = buf.join("\n").trim();
@@ -146,6 +149,35 @@ function parseBody(slug: string, title: string, body: string, href: string) {
     if (inFence) {
       buf.push(line);
       i++;
+      continue;
+    }
+    const stepHead = /^## Step (\d+)/.exec(line);
+    if (stepHead) step = Number(stepHead[1]);
+    const help = /^@help\s+(\S+)\s+(guided|recall|solo)\s*$/.exec(line);
+    if (help) {
+      flush();
+      const tool = help[1] as string;
+      const level = help[2] as HelpLevel;
+      tools.push({ tool, level, step });
+      segments.push({ kind: "help", tool, level });
+      i++;
+      continue;
+    }
+    if (line.startsWith("@done ")) {
+      flush();
+      const check: Check = { id: `${slug}:${checks.length + 1}`, step, text: line.slice(6).trim() };
+      checks.push(check);
+      segments.push({ kind: "check", id: check.id, html: inline(check.text) });
+      i++;
+      continue;
+    }
+    const reveal = /^@reveal\s+(.+)$/.exec(line);
+    if (reveal) {
+      const inner: string[] = [];
+      i++;
+      while (i < lines.length && (lines[i] as string).trim() !== "@endreveal") inner.push(lines[i++] as string);
+      i++;
+      buf.push("", `<details class="reveal"><summary>${esc(reveal[1] as string)}</summary>${md(inner.join("\n"))}</details>`, "");
       continue;
     }
     if (line.startsWith("?? ")) {
@@ -241,12 +273,12 @@ function parseBody(slug: string, title: string, body: string, href: string) {
     .split("\n")
     .filter((l) => !/^(\?\?|\?!|\+ |=> |@|:::)/.test(l))
     .join("\n");
-  return { segments, questions, written, terms, toc, text };
+  return { segments, questions, written, terms, toc, text, checks, tools };
 }
 
-type DocDir = "lessons" | "guides" | "machines" | "reference";
-const KIND = { lessons: "lesson", guides: "guide", machines: "machine", reference: "sheet" } as const;
-const BASE = { lessons: "/courses/", guides: "/guides/", machines: "/machines/", reference: "/sheets/" } as const;
+type DocDir = "lessons" | "guides" | "machines" | "reference" | "projects";
+const KIND = { lessons: "lesson", guides: "guide", machines: "machine", reference: "sheet", projects: "project" } as const;
+const BASE = { lessons: "/courses/", guides: "/guides/", machines: "/machines/", reference: "/sheets/", projects: "/projects/" } as const;
 
 function readDir(kind: DocDir): string[] {
   const dir = path.join(ROOT, kind);
@@ -279,11 +311,19 @@ function load(kindDir: DocDir, file: string): Doc {
   if (front.builds) meta.builds = front.builds;
   if (front.group) meta.group = front.group;
   if (front.level) meta.level = front.level;
+  if (front.hours) meta.hours = Number(front.hours);
+  if (front.parts) {
+    meta.parts = front.parts.split(",").map((p) => {
+      const m = /(\d+)-(\d+)\s*@\s*(\d+)h/.exec(p);
+      if (!m) throw new Error(`${slug}: bad parts: ${p}`);
+      return { from: Number(m[1]), to: Number(m[2]), hours: Number(m[3]) };
+    });
+  }
   if (src && src.length === 2) meta.source = { label: src[0] as string, url: src[1] as string };
   return { meta, ...parsed };
 }
 
-let cache: { lessons: Doc[]; guides: Doc[]; machines: Doc[]; sheets: Doc[] } | null = null;
+let cache: { lessons: Doc[]; guides: Doc[]; machines: Doc[]; sheets: Doc[]; projects: Doc[] } | null = null;
 
 function all() {
   if (cache && process.env.NODE_ENV === "production") return cache;
@@ -292,6 +332,7 @@ function all() {
     guides: readDir("guides").map((f) => load("guides", f)),
     machines: readDir("machines").map((f) => load("machines", f)),
     sheets: readDir("reference").map((f) => load("reference", f)),
+    projects: readDir("projects").map((f) => load("projects", f)),
   };
   return cache;
 }
@@ -300,6 +341,8 @@ export const lessons = () => all().lessons;
 export const guides = () => all().guides;
 export const machines = () => all().machines;
 export const sheets = () => all().sheets;
+export const projects = () => all().projects;
+export const getProject = (slug: string) => projects().find((d) => d.meta.slug === slug);
 export const getMachine = (slug: string) => machines().find((d) => d.meta.slug === slug);
 export const getSheet = (slug: string) => sheets().find((d) => d.meta.slug === slug);
 export const lessonMetas = (): DocMeta[] => lessons().map((d) => d.meta);
@@ -308,7 +351,7 @@ export const getLesson = (slug: string) => lessons().find((d) => d.meta.slug ===
 export const getGuide = (slug: string) => guides().find((d) => d.meta.slug === slug);
 
 export function glossary(): Term[] {
-  const out = [...lessons(), ...guides(), ...machines(), ...sheets()].flatMap((d) => d.terms);
+  const out = [...lessons(), ...guides(), ...machines(), ...sheets(), ...projects()].flatMap((d) => d.terms);
   return out.sort((a, b) => a.term.toLowerCase().localeCompare(b.term.toLowerCase()));
 }
 

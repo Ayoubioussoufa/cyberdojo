@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Subnav } from "@/components/Subnav";
 import Link from "next/link";
 import { Range } from "@/components/Range";
 import { DRILL_LIST } from "@/lib/drills";
@@ -10,6 +11,7 @@ export const metadata: Metadata = { title: "Practice" };
 export default function Page() {
   return (
     <div className="page">
+      <Subnav group="practice" />
       <header className="page-head">
         <p className="kicker">Practice</p>
         <h1>Exercises that never run out</h1>

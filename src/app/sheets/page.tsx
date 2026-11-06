@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Subnav } from "@/components/Subnav";
 import Link from "next/link";
 import { sheets } from "@/lib/content";
 
@@ -10,6 +11,7 @@ export default function Page() {
   const docs = ORDER.flatMap((s) => sheets().filter((d) => d.meta.slug === s));
   return (
     <div className="page">
+      <Subnav group="library" />
       <header className="page-head">
         <p className="kicker">Cheat sheets</p>
         <h1>Keep these next to you</h1>

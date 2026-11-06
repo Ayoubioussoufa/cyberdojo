@@ -1,29 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MonthGrid } from "@/components/Roadmap";
-import { lessonMetas } from "@/lib/content";
-import { MONTHS, PHASES } from "@/lib/data";
+import { PathView } from "@/components/PathView";
+import { buildPath } from "@/lib/path";
 
-export const metadata: Metadata = { title: "Roadmap" };
+export const metadata: Metadata = { title: "Your roadmap" };
 
 export default function Page() {
-  const counts: Record<number, number> = {};
-  for (const l of lessonMetas()) counts[l.month] = (counts[l.month] ?? 0) + 1;
   return (
-    <div className="page">
+    <div className="page narrow">
       <header className="page-head">
         <p className="kicker">Roadmap</p>
-        <h1>24 months, one gate at a time</h1>
-        <p className="lede">Each month ends with an exit gate: the difference between “I studied that” and “I can do that”. About 12–15 hours a week on top of your Master’s, roughly 1,300 hours of deliberate practice in all.</p>
-        <p className="page-links"><Link href="/projects/">The 16 projects</Link><Link href="/skills/">Skill matrix and your data</Link><Link href="/guides/a2-how-to-use-this-plan/">How to run a month</Link></p>
+        <h1>Your whole path, one step at a time</h1>
+        <p className="lede">Every lesson, project and exit gate for 24 months, in the right order. You never have to work out what to do next: do the step marked below, and the roadmap moves on by itself.</p>
+        <p className="page-links"><Link href="/start/">How this site works</Link><Link href="/guides/a2-how-to-use-this-plan/">How to run a month</Link></p>
       </header>
-      {PHASES.filter((p) => p.n > 0).map((p) => (
-        <section key={p.n} id={`phase-${p.n}`} className="phase-block">
-          <h2 className="phase-h"><span>{p.months}</span>{p.title}</h2>
-          <p className="muted phase-q">{p.question}</p>
-          <MonthGrid months={MONTHS.filter((m) => m.phase === p.n)} counts={counts} />
-        </section>
-      ))}
+      <PathView path={buildPath()} />
     </div>
   );
 }

@@ -24,7 +24,25 @@ export type Segment =
   | { kind: "question"; question: Question }
   | { kind: "written"; written: Written }
   | { kind: "drill"; id: string }
-  | { kind: "range"; id: string };
+  | { kind: "range"; id: string }
+  /** A project checkpoint she ticks off. */
+  | { kind: "check"; id: string; html: string }
+  /** How much help this tool gets here. */
+  | { kind: "help"; tool: string; level: HelpLevel };
+
+export type HelpLevel = "guided" | "recall" | "solo";
+
+export interface ToolUse {
+  tool: string;
+  level: HelpLevel;
+  step: number;
+}
+
+export interface Check {
+  id: string;
+  step: number;
+  text: string;
+}
 
 export interface TocEntry {
   id: string;
@@ -41,7 +59,7 @@ export interface Term {
   href: string;
 }
 
-export type DocKind = "lesson" | "guide" | "machine" | "sheet";
+export type DocKind = "lesson" | "guide" | "machine" | "sheet" | "project";
 
 export interface DocMeta {
   slug: string;
@@ -58,6 +76,10 @@ export interface DocMeta {
   group?: string;
   /** Machines: how hard it is. */
   level?: string;
+  /** Projects: how the steps split across the roadmap. */
+  parts?: { from: number; to: number; hours: number }[];
+  /** Projects: rough total hours. */
+  hours?: number;
   questions: number;
 }
 
@@ -68,6 +90,8 @@ export interface Doc {
   questions: Question[];
   written: Written[];
   terms: Term[];
+  checks: Check[];
+  tools: ToolUse[];
   /** Plain text of the body, for "explain this lesson". */
   text: string;
 }
