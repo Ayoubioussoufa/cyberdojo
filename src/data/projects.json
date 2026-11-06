@@ -1,0 +1,317 @@
+[
+ {
+  "id": "P01",
+  "title": "Segmented home lab + hardened Linux server",
+  "when": "Beginner · Months 1–3",
+  "objective": "Build a small, documented, reproducible network (firewall + Linux server + attacker VM), harden the server against a benchmark, and prove the improvement with your own audit script.",
+  "skills": "Virtualization, network segmentation, firewall rules, Linux administration, SSH hardening, Bash scripting, benchmark-driven hardening, technical documentation.",
+  "tools": "VirtualBox/VMware, OPNsense or pfSense, Ubuntu Server, Kali, nftables/ufw, Nmap, Lynis, ShellCheck, draw.io.",
+  "plan": [
+   "Design the topology and IP plan; draw it before building it.",
+   "Deploy the firewall with LAN/DMZ segments; write each rule with a one-line justification.",
+   "Deploy the Ubuntu server; enable only the services it needs.",
+   "Write audit.sh: UID-0 accounts, SUID files, world-writable paths, listening ports, SSH configuration, sudoers, updates.",
+   "Apply a CIS Benchmark subset; re-run the audit; capture before/after.",
+   "Scan from Kali with Nmap; explain every open port; close what should not be there."
+  ],
+  "deliverables": "Repository with: topology diagram, IP plan, firewall ruleset with rationale, audit.sh, before/after audit output, Nmap reports, rebuild instructions.",
+  "presentation": "README opens with the diagram and a two-sentence purpose; a “Findings” section listing what the audit caught and how you fixed it; a “Rebuild in 20 minutes” section.",
+  "pitch": "“I built a segmented lab and wrote an audit script that checks the eight controls I most often see missing. Hardening cut my own findings from 14 to 3 — and I can show why the last three are accepted risks.”",
+  "bar": "Basic: screenshots of VMs. Impressive: justified rules, a measurable before/after, accepted-risk reasoning, and instructions that let a stranger rebuild it."
+ },
+ {
+  "id": "P02",
+  "title": "Network traffic investigation casebook",
+  "when": "Beginner · Months 2–3",
+  "objective": "Analyze three real capture files and answer, with evidence, what happened, when, and what the defender should do next.",
+  "skills": "Protocol analysis, Wireshark filtering, indicator extraction, evidence-based writing, the habit of separating observation from inference.",
+  "tools": "Wireshark, tcpdump, Zeek (optional), CyberChef, VirusTotal (hashes only).",
+  "plan": [
+   "Pick three cases of rising difficulty (a scan, a malware infection, an exfiltration).",
+   "For each: build a timeline first, then answer who/what/when/how.",
+   "Extract indicators and classify them on the Pyramid of Pain.",
+   "Write one page per case: summary, timeline, evidence (filters and packet numbers), indicators, recommendations.",
+   "Add a “what I got wrong first” section — it shows method, and senior reviewers read it."
+  ],
+  "deliverables": "Three case write-ups + a reusable Wireshark filter cheat sheet + the indicator list.",
+  "presentation": "One markdown file per case with screenshots of the decisive packets; the cheat sheet as the repository’s front page.",
+  "pitch": "“Give me a capture and I will give you a timeline, the indicators and a recommendation — here are three I have already done.”",
+  "bar": "Basic: answering the quiz questions. Impressive: a timeline, explicit fact-versus-inference language, and recommendations tied to detections."
+ },
+ {
+  "id": "P03",
+  "title": "Python security toolkit",
+  "when": "Beginner · Months 4–5",
+  "objective": "Ship a small, tested command-line toolkit that does real work: parse logs, enrich indicators, and triage a Windows host.",
+  "skills": "Python engineering (structure, tests, packaging), API usage with rate limiting and caching, secrets hygiene, Docker, PowerShell interop, README writing.",
+  "tools": "Python, pytest, requests, argparse, Docker, gitleaks, VirusTotal/AbuseIPDB APIs, PowerShell.",
+  "plan": [
+   "logparse: auth/web logs → structured records → summary of anomalies (brute force, rare user agents, unusual hours).",
+   "enrich: IPs/hashes/domains → reputation data, with caching, rate limiting and offline mode.",
+   "wintriage.ps1: processes, services, tasks, connections, recent logons → JSON consumed by the Python tools.",
+   "Tests for every parser with fixture files; a --json output mode so tools compose.",
+   "Dockerfile, pre-commit with gitleaks, GitHub Actions running the tests."
+  ],
+  "deliverables": "Repository with three tools, ≥ 10 tests, CI badge, Dockerfile, sample data and documented usage.",
+  "presentation": "README with a 30-second demo (asciinema or GIF), example commands and real output. Issues and pull requests used like a real project.",
+  "pitch": "“I automate the parts of triage I was repeating by hand — and I test the parsers, because a silent parsing bug is worse than no tool.”",
+  "bar": "Basic: a 50-line script. Impressive: tests, composability, caching, error handling, CI — the difference between a script and a tool."
+ },
+ {
+  "id": "P04",
+  "title": "Enterprise-in-a-box: scripted Active Directory lab",
+  "when": "",
+  "objective": "Build a realistic small-enterprise Active Directory environment that can be rebuilt from scripts and instrumented for detection — the environment every later project uses.",
+  "skills": "Windows Server, AD DS design, GPOs, service accounts, PowerShell automation, logging configuration, lab documentation.",
+  "tools": "Windows Server, Windows 11 Enterprise, PowerShell, BadBlood or your own population script, Sysmon, GPMC, BloodHound CE, PingCastle.",
+  "plan": [
+   "Design: domain name, OU structure, groups, three realistic departments, one service account with an SPN.",
+   "Automate the build (unattended install + PowerShell for OUs, users, groups, GPOs).",
+   "Add deliberate, documented weaknesses (weak service-account password, over-privileged group, unconstrained delegation).",
+   "Instrument: audit policy, Sysmon with a maintained configuration, log forwarding to the future SIEM.",
+   "Baseline with PingCastle and BloodHound; record the attack paths before any attack."
+  ],
+  "deliverables": "Build scripts, environment documentation, deliberate-weakness register, baseline BloodHound/PingCastle reports.",
+  "presentation": "README with the domain diagram, a “build in one command” section, and the weakness register explaining why each weakness is realistic.",
+  "pitch": "“I built the environment I then attacked and defended. I can show the attack paths before and after remediation.”",
+  "bar": "Basic: a domain controller and a client. Impressive: scripted, instrumented, documented weaknesses, and a measurable security posture that improves in P07/P08."
+ },
+ {
+  "id": "P05",
+  "title": "Build–break–fix web application",
+  "when": "Intermediate · Months 6–8",
+  "objective": "Write a small web application correctly, then break it deliberately, then fix it — and show the diffs. This is the project that proves you understand vulnerabilities rather than recognizing them.",
+  "skills": "Secure coding (authN/authZ, input handling, password storage, session management), exploitation, remediation, regression testing, threat modeling (extended in M17).",
+  "tools": "Flask/Express/Next.js, PostgreSQL, Burp Suite, pytest/Playwright, Docker, Semgrep (from M17).",
+  "plan": [
+   "Build the baseline app (registration, login, roles, a resource users can own) with security done properly.",
+   "Branch vulnerable: introduce IDOR, stored XSS and a SQL injection — each in a realistic way, not a toy.",
+   "Exploit each one with Burp and record proof.",
+   "Fix each on main and write a regression test that fails on the vulnerable branch.",
+   "Write the comparison: root cause, exploit, fix, test, and the design change that would have prevented it."
+  ],
+  "deliverables": "Two branches, three documented vulnerabilities with exploits and fixes, regression tests, a short threat model.",
+  "presentation": "README table: vulnerability | root cause | exploit | fix commit | test. Links to the diffs — that table is what reviewers read.",
+  "pitch": "“I can show you the commit that introduced an IDOR, the request that exploits it, the fix, and the test that keeps it dead.”",
+  "bar": "Basic: deploying a vulnerable app someone else wrote. Impressive: your own code, your own bugs, your own tests, and a design-level lesson per bug."
+ },
+ {
+  "id": "P06",
+  "title": "SOC-in-a-box",
+  "when": "Intermediate · Month 9",
+  "objective": "Run a miniature security operations centre: collect telemetry from your lab, detect ten techniques, and triage alerts with documented verdicts.",
+  "skills": "SIEM deployment and tuning, log source onboarding, query writing, ATT&CK mapping, alert triage, playbook writing, case documentation.",
+  "tools": "Wazuh or Elastic Security, Sysmon, auditd, firewall logs, MITRE ATT&CK Navigator, CyberChef.",
+  "plan": [
+   "Deploy the SIEM; onboard Windows (Sysmon), Linux (auditd) and firewall logs; verify parsing on real events.",
+   "Write ten detections mapped to ATT&CK techniques you can actually trigger.",
+   "Trigger each one; capture the alert and the underlying evidence.",
+   "Write triage playbooks for three alert types (suspicious PowerShell, new service, phishing report).",
+   "Triage 25 alerts and write verdicts with reasoning and next actions."
+  ],
+  "deliverables": "SIEM configuration in the repository, detection list with ATT&CK mapping and test evidence, playbooks, 25 triage notes, a coverage layer.",
+  "presentation": "README with an architecture diagram, a detections table (technique, data source, logic, test result, false-positive notes) and two full sample investigations.",
+  "pitch": "“I built the pipeline, wrote the detections, tested that they fire, and triaged the alerts they produced — including the ones that were noise, which I then tuned.”",
+  "bar": "Basic: a screenshot of a dashboard. Impressive: tested detections, false-positive analysis, playbooks and written investigations."
+ },
+ {
+  "id": "P07",
+  "title": "Internal penetration test & remediation plan",
+  "when": "Intermediate · Month 10",
+  "objective": "Run a full engagement against your own Active Directory lab and produce a client-grade report with a risk-based remediation plan.",
+  "skills": "Methodology, enumeration, exploitation, privilege escalation, lateral movement, evidence handling, CVSS 4.0 scoring, executive communication.",
+  "tools": "Kali, Nmap, NetExec, BloodHound, Impacket, hashcat, linPEAS/winPEAS, Greenbone/Nessus Essentials, Nuclei.",
+  "plan": [
+   "Write the scope and rules of engagement for yourself — practising the discipline that keeps testers out of trouble.",
+   "Enumerate methodically; keep engagement notes with timestamps and commands.",
+   "Exploit, escalate and pivot to domain compromise; capture proof at every step.",
+   "Score findings (CVSS 4.0) and prioritize using exploitability, asset value, KEV and EPSS.",
+   "Write the report: executive summary, methodology, findings with evidence and fixes, strategic recommendations, appendix.",
+   "Retest after remediating three findings and document the delta."
+  ],
+  "deliverables": "PDF report (10–20 pages), engagement notes, remediation plan with owners and deadlines, retest results.",
+  "presentation": "Publish the report as a PDF in the repository plus a README summarizing the attack path in five steps with a diagram.",
+  "pitch": "“Here is a report I would be comfortable handing to a client: an executive summary a manager can act on and findings an engineer can fix.”",
+  "bar": "Basic: a list of tool outputs. Impressive: a narrative attack path, business-relevant risk framing, prioritized remediation and a retest."
+ },
+ {
+  "id": "P08",
+  "title": "Detection-as-code repository",
+  "when": "Intermediate → Advanced · Month 11",
+  "objective": "Turn attacker behaviour into tested, versioned detections with continuous integration — and prove coverage with real test results.",
+  "skills": "Sigma authoring, purple teaming, false-positive tuning, CI for detections, coverage measurement, incident reporting.",
+  "tools": "Sigma + pySigma/sigconverter, Atomic Red Team, your SIEM from P06, GitHub Actions, ATT&CK Navigator, Velociraptor.",
+  "plan": [
+   "Choose 15 techniques you can execute safely in your lab (from P07 and Atomic Red Team).",
+   "Write a Sigma rule per technique with a documented detection strategy (data source, logic, known gaps, expected false positives).",
+   "Execute each atomic test; record whether the rule fired and tune until signal beats noise.",
+   "Add CI that validates rule syntax and converts rules to your SIEM query language.",
+   "Produce an ATT&CK Navigator layer from test results, not intentions.",
+   "Run one simulated intrusion end to end and write the incident report."
+  ],
+  "deliverables": "Rules repository with tests, CI pipeline, coverage layer, tuning notes, one full incident report.",
+  "presentation": "README explaining the detection lifecycle you follow, with one exemplary rule documented end to end (hypothesis → logic → test → tuning → result).",
+  "pitch": "“Every rule in this repository has a test that proves it fires and notes on what it misses. I measure coverage from test results, not from wishful mapping.”",
+  "bar": "Basic: a folder of copied Sigma rules. Impressive: your own rules, executed tests, honest gaps, CI, and an incident report that uses them."
+ },
+ {
+  "id": "P09",
+  "title": "GRC pack for a fictional SME",
+  "when": "Intermediate · Month 12",
+  "objective": "Produce the documents a small company actually needs: a risk assessment, a framework gap analysis, three policies and an executive summary.",
+  "skills": "Risk assessment method, NIST CSF 2.0 profiles, CIS Controls, ISO 27001 structure, policy writing, executive communication.",
+  "tools": "Spreadsheets, NIST SP 800-30, CIS Controls v8.1, CSF 2.0 quick-start guides, draw.io.",
+  "plan": [
+   "Define the fictional company precisely (size, sector, systems, cloud usage, regulatory exposure) — vagueness ruins GRC work.",
+   "Inventory assets and data flows; identify threats and vulnerabilities.",
+   "Build the risk register: likelihood, impact, inherent and residual risk, owner, treatment.",
+   "Run a CSF 2.0 / CIS IG1 gap assessment and produce a 90-day prioritized roadmap.",
+   "Write three policies people can follow, with defined exceptions.",
+   "Write a one-page executive summary that a non-technical director could act on."
+  ],
+  "deliverables": "Risk register, gap assessment, remediation roadmap, three policies, executive summary, optional tabletop exercise report.",
+  "presentation": "A clean repository or PDF pack; the executive summary first, everything else as annexes — exactly how it would be delivered to a client.",
+  "pitch": "“I can translate technical findings into a risk register and a 90-day plan that a director will approve, and I can defend each rating.”",
+  "bar": "Basic: a copied policy template. Impressive: a specific company context, defensible ratings, costed priorities, and a plan tied to real controls."
+ },
+ {
+  "id": "P10",
+  "title": "Cloud attack → detect → respond lab",
+  "when": "Advanced · Months 13–14",
+  "objective": "Deploy a deliberately vulnerable cloud environment as code, exploit it, detect every step, respond to the incident, and ship the hardened version.",
+  "skills": "Cloud IAM, Terraform, cloud attack paths, CloudTrail/GuardDuty detection engineering, cloud incident response, posture management.",
+  "tools": "AWS, Terraform, AWS CLI, Pacu, Prowler, CloudTrail/Athena, GuardDuty, IAM Access Analyzer.",
+  "plan": [
+   "Terraform an environment with realistic flaws: an SSRF-able app on an instance with metadata v1, an over-permissive role, a bucket with sensitive data, missing logging.",
+   "Exploit the chain: SSRF → instance credentials → data access → privilege escalation. Record every API call.",
+   "Build detections for each step and validate by replaying the attack.",
+   "Run the response playbook: revoke sessions, rotate keys, scope the exposure, write the incident report.",
+   "Harden as code (IMDSv2, least privilege, bucket policy, logging, SCP/RCP) and re-run the attack to prove it fails.",
+   "Run Prowler before and after and publish the score difference. Destroy everything; keep the costs near zero."
+  ],
+  "deliverables": "Terraform for vulnerable and hardened states, attack walkthrough, detection rules, incident report, Prowler before/after.",
+  "presentation": "README as a story: architecture → attack path diagram → what the logs showed → response → fixes → proof it now fails.",
+  "pitch": "“I can show the CloudTrail events for each step of a cloud compromise, the detections that catch them, and the Terraform change that stops it.”",
+  "bar": "Basic: completing CloudGoat scenarios. Impressive: your own environment, full attack–detect–respond–fix loop, and measurable posture improvement."
+ },
+ {
+  "id": "P11",
+  "title": "DFIR investigation report",
+  "when": "Advanced · Month 15",
+  "objective": "Investigate a compromised host from disk and memory evidence and produce a report that answers what happened, how, when, and what to do now.",
+  "skills": "Evidence handling, Windows artifact analysis, memory forensics, timeline construction, disciplined reporting.",
+  "tools": "FTK Imager, KAPE, Eric Zimmerman tools, Volatility 3, Plaso, Timeline Explorer, Autopsy.",
+  "plan": [
+   "Choose a public case image or generate your own by attacking a snapshotted VM.",
+   "Acquire and hash the evidence; document the chain of custody.",
+   "Triage: execution artifacts, persistence, account activity, network traces.",
+   "Memory: processes, injected code, network connections, credential artifacts.",
+   "Build the timeline; separate what the evidence shows from what you infer.",
+   "Write the report: executive summary, scope, timeline, findings with evidence, IOCs, containment and hardening recommendations."
+  ],
+  "deliverables": "Investigation report, timeline (CSV/Timeline Explorer), IOC list, the commands used (so results are reproducible).",
+  "presentation": "Report as PDF plus a README with the timeline highlights and the three artifacts that cracked the case.",
+  "pitch": "“Given a host and an alert, I can produce a defensible timeline and tell you what to contain first — here is one I did end to end.”",
+  "bar": "Basic: answering lab questions. Impressive: reproducible methodology, explicit uncertainty, and recommendations that a responder could act on tonight."
+ },
+ {
+  "id": "P12",
+  "title": "Threat intelligence report → detection package",
+  "when": "Intermediate → Advanced · Month 15",
+  "objective": "Turn open-source reporting about one adversary or campaign into an analytical product and into working detections.",
+  "skills": "Intelligence lifecycle, source evaluation, ATT&CK mapping, confidence language, detection derivation, stakeholder-focused writing.",
+  "tools": "ATT&CK Navigator, MISP or OpenCTI, abuse.ch feeds, your SIEM, Sigma.",
+  "plan": [
+   "Pick a campaign with several independent public reports; state the intelligence requirement you are answering.",
+   "Extract TTPs and map them to ATT&CK, citing the source sentence for each mapping.",
+   "Write the assessment with calibrated language (“likely”, “high confidence”) and explicit gaps.",
+   "Derive five detections and test them in your lab; note which TTPs cannot be detected with your telemetry.",
+   "Add a one-paragraph executive brief and a defender action list."
+  ],
+  "deliverables": "Intelligence report (5–8 pages), ATT&CK layer, five tested detections, hunting queries, TLP marking.",
+  "presentation": "README stating the requirement, the key judgments, and the detections — CTI that ends in detections is what employers actually want.",
+  "pitch": "“I read the reporting, mapped the behaviours, then proved which of them I could actually detect with the telemetry I had.”",
+  "bar": "Basic: summarizing a vendor blog. Impressive: multi-source analysis, calibrated confidence, explicit collection gaps, and tested detections."
+ },
+ {
+  "id": "P13",
+  "title": "Malware analysis report + YARA rules",
+  "when": "Advanced · Month 16",
+  "objective": "Analyze two commodity samples safely and convert the findings into detections others can use.",
+  "skills": "Safe lab handling, static and dynamic analysis, PE structure, deobfuscation, YARA authoring, IOC extraction.",
+  "tools": "FLARE-VM, REMnux, PEStudio, capa, FLOSS, Ghidra, x64dbg, Procmon, FakeNet-NG, YARA, CyberChef.",
+  "plan": [
+   "Verify lab isolation before touching a sample (no host-only leakage, snapshots ready).",
+   "Static triage: hashes, imports, strings, packing, capa capabilities.",
+   "Dynamic: file/registry/network behaviour, persistence, C2 patterns.",
+   "Light reverse engineering of one interesting function in Ghidra.",
+   "Write YARA rules; test against the samples and against a clean corpus for false positives.",
+   "Map behaviours to ATT&CK and write two Sigma detections."
+  ],
+  "deliverables": "Two analysis reports, IOC lists, tested YARA rules, Sigma detections, ATT&CK mapping.",
+  "presentation": "Reports in the repository with a clear safety notice, hashes only (never the samples), and the rules ready to reuse.",
+  "pitch": "“I triage a sample in two hours and leave the team with indicators, YARA rules and detections — not just a sandbox link.”",
+  "bar": "Basic: pasting a sandbox report. Impressive: your own static/dynamic evidence, tested rules with false-positive analysis, and detections."
+ },
+ {
+  "id": "P14",
+  "title": "Secure delivery pipeline: commit → signed image → hardened Kubernetes",
+  "when": "Advanced · Months 17 & 19",
+  "objective": "Build the pipeline that prevents the vulnerabilities you learned to exploit, and deploy to a cluster that resists the attacks you learned to run.",
+  "skills": "Threat modeling, secure code review, SAST/SCA/secret/IaC scanning, SBOM and signing, policy as code, Kubernetes hardening, runtime detection.",
+  "tools": "GitHub Actions, Semgrep, Trivy, Syft/Grype, gitleaks, Checkov, ZAP, cosign, kind, Kyverno, Falco, kube-bench.",
+  "plan": [
+   "Threat model the application (DFD + STRIDE) and map mitigations to ASVS requirements.",
+   "Pipeline stage 1: lint, unit tests, Semgrep (including 5 custom rules), gitleaks.",
+   "Stage 2: dependency scanning, SBOM generation, container build with a minimal non-root image, image scan.",
+   "Stage 3: sign the image and verify the signature at deploy time; fail closed.",
+   "Stage 4: deploy to a hardened kind cluster (least-privilege RBAC, NetworkPolicies, restricted Pod Security Standard, Kyverno policies).",
+   "Stage 5: runtime detection with Falco; prove three attack scenarios are caught.",
+   "Document the exception process — a pipeline nobody can bypass legitimately is a pipeline teams will route around."
+  ],
+  "deliverables": "Repository with pipeline definitions, custom rules, SBOM, signing and verification, cluster manifests, Falco rules, threat model, exception policy.",
+  "presentation": "README with a pipeline diagram, a table of each gate and what it blocks, and screenshots of a blocked build and a caught runtime attack.",
+  "pitch": "“I built the paved road: a commit with a hard-coded secret or a vulnerable dependency does not reach the cluster, and if something malicious runs anyway, Falco catches it.”",
+  "bar": "Basic: adding a scanner to a workflow file. Impressive: threat-model-driven gates, custom rules, provenance, admission control, runtime detection and a usable exception path."
+ },
+ {
+  "id": "P15",
+  "title": "LLM application red-team & hardening",
+  "when": "Advanced · Month 18",
+  "objective": "Build a realistic AI application with tools and retrieval, attack it systematically, harden it, and measure the improvement.",
+  "skills": "LLM application architecture, prompt injection (direct and indirect), tool and agent abuse, guardrail design, evaluation methodology, AI security reporting.",
+  "tools": "Python, an LLM API or Ollama, a vector store, garak, PyRIT, promptfoo, Burp Suite, Docker.",
+  "plan": [
+   "Build a support assistant: retrieval over documents you control + two tools (a read tool and an action tool).",
+   "Threat model it with OWASP LLM/Agentic Top 10 and MITRE ATLAS; mark trust boundaries.",
+   "Attack: direct injection, indirect injection via a poisoned document, system-prompt extraction, tool misuse, data exfiltration through rendered output, memory poisoning.",
+   "Measure each attack over ≥ 10 runs and record the success rate.",
+   "Harden: scope tools per user, enforce authorization outside the model, isolate retrieved content, encode output, allow-list egress, add approval gates.",
+   "Re-measure; add the attack suite to CI so regressions are caught."
+  ],
+  "deliverables": "Application repository, attack case library with reproducible prompts, before/after metrics, hardening notes, red-team report.",
+  "presentation": "README with the architecture, the trifecta analysis (data, untrusted content, egress), a metrics table and the residual risks named honestly.",
+  "pitch": "“I reduced the success rate of indirect prompt injection from 80% to under 10% by removing the agent’s ability to exfiltrate, not by writing a better system prompt — and I can show the numbers.”",
+  "bar": "Basic: screenshots of a chatbot saying something silly. Impressive: reproducible attacks, measured rates, architectural mitigations and honest residual risk."
+ },
+ {
+  "id": "P16",
+  "title": "AI-augmented analyst assistant with an evaluation harness",
+  "when": "Advanced · Months 20–21",
+  "objective": "Build an AI assistant for your own track workflow — and, more importantly, prove with data how good it is and where it fails.",
+  "skills": "Applied AI engineering, evaluation design, ground-truth datasets, metrics, cost analysis, failure taxonomy, human-in-the-loop design.",
+  "tools": "Python, an LLM API and/or a local model, promptfoo or a pytest harness, your own data from P06–P14.",
+  "plan": [
+   "Choose the task by track: alert triage, recon summarization, cloud finding explanation, code review support, agent testing, control mapping.",
+   "Build a ground-truth dataset of ≥ 100 items from your own labs (never client or personal data).",
+   "Build the assistant with structured output so results can be scored automatically.",
+   "Evaluate: accuracy/precision/recall, cost per item, latency, and a taxonomy of failures.",
+   "Iterate on prompts, context and guardrails; keep a changelog of what actually moved the numbers.",
+   "Add a human-in-the-loop design: what it may do alone, what needs review, what it must never do."
+  ],
+  "deliverables": "Repository with the assistant, dataset, evaluation harness, results table, failure analysis and an operating policy.",
+  "presentation": "README leading with the results table and the failure taxonomy — the evaluation is the project; the assistant is the excuse.",
+  "pitch": "“My assistant agreed with my verdicts on 84% of 120 historical alerts, and I can describe the 19 cases where it was confidently wrong and why.”",
+  "bar": "Basic: a chatbot wrapper. Impressive: a ground-truth dataset, measured results, an honest failure analysis and an operating policy — this is what AI-augmented work looks like professionally."
+ }
+]

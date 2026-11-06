@@ -1,0 +1,35 @@
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
+import { Nav } from "@/components/Nav";
+
+export const metadata: Metadata = {
+  title: { default: "CyberDojo", template: "%s · CyberDojo" },
+  description: "Cybersecurity from absolute zero to job-ready: a 24-month course with lessons, guides, drills and a browser terminal.",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf6" },
+    { media: "(prefers-color-scheme: dark)", color: "#14161a" },
+  ],
+};
+
+const THEME = `try{var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME }} />
+      </head>
+      <body>
+        <a className="skip" href="#main">Skip to content</a>
+        <Nav />
+        <main id="main">{children}</main>
+        <footer className="foot">
+          <span>CyberDojo</span> · Build, break, defend, document. Only test what you own or have written permission to test.
+        </footer>
+      </body>
+    </html>
+  );
+}

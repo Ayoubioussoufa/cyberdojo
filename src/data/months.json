@@ -1,0 +1,1815 @@
+[
+ {
+  "n": 1,
+  "phase": 1,
+  "title": "Security foundations, Linux I & your lab",
+  "hours": "12 h/week · ≈ 50 h",
+  "goal": "Build the lab and the learning system, become fluent in the Linux terminal, and draw the mental map of the field that every later month plugs into.",
+  "topics": [
+   "Security mental model: CIA triad; authentication vs authorization vs accounting; least privilege; defense in depth; threat, vulnerability, risk; attack surface.",
+   "The map of the field: NIST CSF 2.0 functions (Govern, Identify, Protect, Detect, Respond, Recover) and the attacker lifecycle as MITRE ATT&CK tactics.",
+   "Linux: filesystem hierarchy, users/groups, permissions (rwx, SUID/SGID, sticky bit, umask), processes and signals, packages, pipes and redirection, grep/sed/awk/cut/sort/uniq, SSH keys.",
+   "Virtualization: hypervisors, snapshots, NAT vs host-only vs internal networks."
+  ],
+  "skills": [
+   "Navigate, search and edit files entirely from the CLI; read man pages instead of guessing.",
+   "Create users and groups, fix permission problems, find SUID binaries.",
+   "Build pipelines, e.g. the top 10 source IPs of failed SSH logins in auth.log.",
+   "Create VMs, take and restore snapshots; use Git (clone, commit, branch, push)."
+  ],
+  "weeks": [
+   "W1 Install VirtualBox or VMware Workstation Pro; create Ubuntu Server + Kali VMs; set up the Obsidian vault and cyber-journey repo; write the learning contract.",
+   "W2 pwn.college Linux Luminarium (first modules) + OverTheWire Bandit 0–10.",
+   "W3 Permissions, processes, services; Bandit 11–20; Git branching and a pull request on your own repo.",
+   "W4 NIST CSF 2.0 overview + ATT&CK tactics; Bandit 21+; first public write-up; first monthly retrospective."
+  ],
+  "labs": [
+   {
+    "text": "OverTheWire Bandit to level 20+ (≥ 20 minutes of effort before any hint).",
+    "url": "https://overthewire.org/wargames/bandit/"
+   },
+   {
+    "text": "pwn.college Linux Luminarium; TryHackMe Pre Security (Linux rooms).",
+    "url": "https://pwn.college/"
+   },
+   {
+    "text": "Home lab v0: two VMs on an isolated network, snapshot discipline documented.",
+    "url": null
+   }
+  ],
+  "tools": "VirtualBox or VMware Workstation Pro, Ubuntu Server 26.04 LTS, Kali Linux, bash, man, grep/find/awk, ssh, Git + GitHub, Obsidian.",
+  "free": [
+   {
+    "text": "OverTheWire Bandit — every level; one written lesson per level.",
+    "url": "https://overthewire.org/wargames/bandit/"
+   },
+   {
+    "text": "pwn.college — Linux Luminarium dojo.",
+    "url": "https://pwn.college/"
+   },
+   {
+    "text": "The Linux Command Line (free book) — Parts 1–2 as reference.",
+    "url": "https://linuxcommand.org/tlcl.php"
+   },
+   {
+    "text": "CS50 Cybersecurity — lectures 0–1 for the security mindset.",
+    "url": "https://cs50.harvard.edu/cybersecurity/"
+   },
+   {
+    "text": "NIST CSF 2.0 — overview + quick-start guide.",
+    "url": "https://www.nist.gov/cyberframework"
+   }
+  ],
+  "paid": [
+   {
+    "text": "How Linux Works, 3rd ed. (Brian Ward, No Starch) — the best “why” book for Linux.",
+    "url": null
+   },
+   {
+    "text": "TryHackMe Premium — optional now, strongly recommended from Month 9.",
+    "url": null
+   }
+  ],
+  "ai": "Set the rules now: attempt 20 minutes before asking an AI; never keep an answer you cannot explain; start an AI verification log (claim → checked against man page/docs → correct / wrong / half-right). Use an LLM as a quiz master on permissions and processes — never as a Bandit solver.",
+  "portfolio": "Start P01 (segmented lab + hardened Linux server). Publish write-up #1: “What Bandit taught me about Linux” (no level spoilers).",
+  "gate": [
+   "Bandit ≥ level 20, with ≥ 70% of levels solved without walkthroughs.",
+   "Explains rwx, SUID/SGID and the sticky bit; finds all SUID binaries with one find command.",
+   "One-liner that extracts the top failed-login source IPs from auth.log.",
+   "Lab of two VMs + snapshots, documented in a README; ≥ 8 meaningful commits."
+  ],
+  "jobs": "Linux is daily work for SOC analysts (log servers, SIEM nodes), pentesters (Kali) and cloud/DevSecOps engineers (containers). Permission and process questions appear in almost every junior technical interview."
+ },
+ {
+  "n": 2,
+  "phase": 1,
+  "title": "Networking I: how data actually moves",
+  "hours": "12–14 h/week · ≈ 55 h",
+  "goal": "Understand the path of a packet well enough to read any capture, subnet in your head and explain every step of “what happens when I open a website”.",
+  "topics": [
+   "OSI vs TCP/IP models; Ethernet, MAC addresses, ARP; switching basics and VLANs (intro).",
+   "IPv4 addressing, CIDR subnetting, private ranges, NAT; IPv6 essentials; ICMP; routing basics.",
+   "TCP (handshake, flags, states, retransmission) vs UDP; ports and sockets.",
+   "DNS (records, recursion, caching, resolvers), DHCP, HTTP basics; how these protocols are abused (spoofing, tunneling, amplification)."
+  ],
+  "skills": [
+   "Subnet any /8–/30 in under 60 seconds.",
+   "Capture and read traffic in Wireshark: display filters, follow streams, export objects, statistics.",
+   "Use dig, ip, ss, traceroute/mtr and tcpdump confidently.",
+   "Explain a full web request with packet evidence (DNS → TCP → TLS → HTTP)."
+  ],
+  "weeks": [
+   "W1 Models, Ethernet/ARP, IPv4 + daily 10-minute subnetting drills.",
+   "W2 TCP/UDP, ports, the handshake; capture your own traffic in Wireshark.",
+   "W3 DNS, DHCP, HTTP; tcpdump; build a two-subnet network in Cisco Packet Tracer.",
+   "W4 Investigate two beginner PCAP exercises and write them up (P02 case #1)."
+  ],
+  "labs": [
+   {
+    "text": "TryHackMe Pre Security → Network Fundamentals; Wireshark rooms.",
+    "url": null
+   },
+   {
+    "text": "Cisco Packet Tracer: 2 subnets + router + DHCP + DNS.",
+    "url": null
+   },
+   {
+    "text": "malware-traffic-analysis.net beginner exercises (answer every question in writing).",
+    "url": "https://www.malware-traffic-analysis.net/"
+   }
+  ],
+  "tools": "Wireshark, tcpdump, dig/nslookup, ip, ss, traceroute/mtr, Cisco Packet Tracer (free via Cisco NetAcad).",
+  "free": [
+   {
+    "text": "Practical Networking (Ed Harmoush) — the clearest explanations of packets, ARP, subnetting.",
+    "url": "https://www.practicalnetworking.net/"
+   },
+   {
+    "text": "Jeremy’s IT Lab — free CCNA course — selected days (fundamentals, subnetting, VLANs).",
+    "url": "https://www.youtube.com/@JeremysITLab"
+   },
+   {
+    "text": "Professor Messer Network+ — fast conceptual review.",
+    "url": "https://www.professormesser.com/"
+   },
+   {
+    "text": "Wireshark documentation — user guide chapters on filters.",
+    "url": "https://www.wireshark.org/docs/"
+   },
+   {
+    "text": "Cloudflare Learning Center — DNS, DDoS and TLS explainers.",
+    "url": "https://www.cloudflare.com/learning/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Practical Packet Analysis, 3rd ed. (Chris Sanders, No Starch).",
+    "url": null
+   },
+   {
+    "text": "Computer Networking: A Top-Down Approach (Kurose & Ross) — check the university library first.",
+    "url": null
+   }
+  ],
+  "ai": "Ask an LLM for 20 subnetting problems with answers, solve them yourself, then check the AI’s answers — log every AI error. Ask it to explain a TCP flag sequence, then confirm or refute the explanation in your own Wireshark capture.",
+  "portfolio": "Start P02 (Network Traffic Investigation Casebook), case #1.",
+  "gate": [
+   "20 subnetting questions in a row, each under 60 seconds.",
+   "Annotated capture showing DNS → TCP handshake → TLS → HTTP for one site.",
+   "Two PCAP exercises solved with written evidence; case #1 published.",
+   "Can explain ARP spoofing and DNS tunneling and how each appears in traffic."
+  ],
+  "jobs": "SOC analysts live in network data (firewall, proxy, DNS logs); pentesters enumerate services; cloud security is virtual networking. “Explain the TCP handshake / DNS resolution” is a universal interview question."
+ },
+ {
+  "n": 3,
+  "phase": 1,
+  "title": "Networking II, network defense, Linux II & Bash",
+  "hours": "13–15 h/week · ≈ 60 h",
+  "goal": "Build a segmented lab network, defend it with a firewall and IDS, scan it like an attacker, and automate a Linux audit in Bash.",
+  "topics": [
+   "Firewalls (stateful rules, default deny), NAT/port forwarding, segmentation and VLANs, VPNs (WireGuard/IPsec), proxies.",
+   "IDS/IPS and network security monitoring (Suricata, Zeek); common network attacks: scanning, MITM, ARP/DNS spoofing.",
+   "Linux II: systemd services, journald and /var/log, cron, nftables/ufw, SSH hardening, CIS Benchmark concepts.",
+   "Bash scripting: variables, loops, conditionals, functions, exit codes, set -euo pipefail, quoting."
+  ],
+  "skills": [
+   "Deploy OPNsense (or pfSense) with LAN/DMZ segments and justified firewall rules.",
+   "Run and interpret Nmap: host discovery, port and service scans, basic NSE scripts.",
+   "Read Suricata/Zeek output and relate alerts to packets.",
+   "Write ShellCheck-clean Bash scripts that audit and harden a host."
+  ],
+  "weeks": [
+   "W1 OPNsense VM, two segments, IP plan, firewall rules with a one-line reason each.",
+   "W2 Nmap against your own lab; Suricata or Zeek sensor; compare scan traffic with alerts.",
+   "W3 Bash: audit script (UID-0 accounts, SUID files, world-writable paths, listening ports, SSH config, sudoers).",
+   "W4 Harden Ubuntu with a CIS Benchmark subset + SSH keys only; rerun the audit; document before/after."
+  ],
+  "labs": [
+   {
+    "text": "Your own segmented lab (OPNsense + Ubuntu + Kali) — this is P01.",
+    "url": null
+   },
+   {
+    "text": "TryHackMe Nmap and firewall/IDS rooms; finish OverTheWire Bandit.",
+    "url": null
+   },
+   {
+    "text": "Two more PCAP cases for P02 (one involving scanning or exfiltration).",
+    "url": null
+   }
+  ],
+  "tools": "OPNsense/pfSense, Nmap, Suricata or Zeek, nftables/ufw, systemd/journalctl, cron, Bash, ShellCheck, Lynis, draw.io.",
+  "free": [
+   {
+    "text": "Nmap Network Scanning (official book, online).",
+    "url": "https://nmap.org/book/"
+   },
+   {
+    "text": "Greg’s Bash Guide + ShellCheck.",
+    "url": "https://mywiki.wooledge.org/BashGuide"
+   },
+   {
+    "text": "CIS Benchmarks (free PDF for Ubuntu) — implement a subset.",
+    "url": "https://www.cisecurity.org/cis-benchmarks"
+   },
+   {
+    "text": "Suricata docs / Zeek docs.",
+    "url": "https://docs.suricata.io/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "The Practice of Network Security Monitoring (Richard Bejtlich) — old but still the best NSM mindset book.",
+    "url": null
+   }
+  ],
+  "ai": "Have an LLM review your Bash script for bugs and injection risks, then run ShellCheck and compare: which issues did the AI miss, which did it invent? Record the result in the AI log.",
+  "portfolio": "P01 complete (diagram, IP plan, firewall rules with rationale, audit script, hardening before/after). P02 cases #2–#3.",
+  "gate": [
+   "Network diagram + IP plan in the repo; every firewall rule justified.",
+   "Nmap report of your own lab explaining each open port and whether it should exist.",
+   "Audit script with ≥ 8 checks, ShellCheck clean, run before and after hardening.",
+   "SSH: key-only, no root login, verified from another VM."
+  ],
+  "jobs": "Network defense and hardening are the core of security engineering and security-minded sysadmin roles; Nmap is day-one pentest work; Bash automation is everyday SOC and engineering work."
+ },
+ {
+  "n": 4,
+  "phase": 1,
+  "title": "Python for security & automation",
+  "hours": "13–15 h/week · ≈ 60 h",
+  "goal": "Write clean, tested Python tools that parse logs, call security APIs and automate boring work — the skill that separates juniors who scale from juniors who click.",
+  "topics": [
+   "Python core: types, control flow, functions, modules, exceptions, virtual environments, packaging basics.",
+   "Files, CSV/JSON/YAML, regular expressions, argparse CLIs, logging, subprocess, hashlib, socket basics.",
+   "HTTP APIs with requests: authentication, rate limits, pagination, retries; secrets hygiene (.env, never commit keys).",
+   "Testing with pytest; Git branching and pull requests; Docker basics (images, containers, volumes, compose)."
+  ],
+  "skills": [
+   "Turn a messy log file into a structured report.",
+   "Enrich indicators (IPs, hashes, domains) via threat-intel APIs, with caching and rate limiting.",
+   "Write unit tests and a README a stranger can follow.",
+   "Containerize a tool and run it anywhere."
+  ],
+  "weeks": [
+   "W1 CS50P weeks 0–4 pace (or Automate the Boring Stuff ch. 1–9); small daily exercises.",
+   "W2 Regex, files, JSON/CSV; log parser for auth.log and web access logs → suspicious IPs and user agents.",
+   "W3 requests + APIs; IOC enrichment CLI (VirusTotal / AbuseIPDB free tiers); argparse; 10+ tests.",
+   "W4 Docker basics; package the toolkit; extras: TCP port scanner with socket, file-hash checker."
+  ],
+  "labs": [
+   {
+    "text": "CS50P problem sets; TryHackMe Python rooms.",
+    "url": "https://cs50.harvard.edu/python/"
+   },
+   {
+    "text": "Build P03 in your own repo with issues, branches and pull requests (practising a real workflow).",
+    "url": null
+   }
+  ],
+  "tools": "Python 3.12+, VS Code, venv (or uv), pytest, requests, argparse, Docker, Git, pre-commit + gitleaks.",
+  "free": [
+   {
+    "text": "CS50P — Harvard’s Python course.",
+    "url": "https://cs50.harvard.edu/python/"
+   },
+   {
+    "text": "Automate the Boring Stuff with Python.",
+    "url": "https://automatetheboringstuff.com/"
+   },
+   {
+    "text": "Python official tutorial.",
+    "url": "https://docs.python.org/3/tutorial/"
+   },
+   {
+    "text": "Docker — Get started.",
+    "url": "https://docs.docker.com/get-started/"
+   },
+   {
+    "text": "gitleaks as a pre-commit hook from day one.",
+    "url": "https://github.com/gitleaks/gitleaks"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Black Hat Python, 2nd ed. (Seitz & Arnold) — keep for Months 10–16.",
+    "url": null
+   },
+   {
+    "text": "Python Crash Course, 3rd ed. (Eric Matthes) if you prefer a book path.",
+    "url": null
+   }
+  ],
+  "ai": "Write the tool yourself first. Then ask an LLM to review it and to explain every suggestion; accept only changes you can justify, and add a test for each accepted fix. Track: bugs caught by your tests vs bugs caught by the AI vs AI suggestions that were wrong.",
+  "portfolio": "P03 Python security toolkit (log parser + IOC enricher + utilities).",
+  "gate": [
+   "CLI tool with --help, ≥ 10 passing tests, README and Dockerfile.",
+   "No secrets anywhere in Git history (gitleaks clean).",
+   "Can explain every line of your code in a 10-minute walkthrough.",
+   "≥ 5 small scripts (scanner, hash checker, log utilities) in the repo."
+  ],
+  "jobs": "Python is the most requested scripting language in security job ads. It powers SOC automation, detection engineering, pentest tooling and cloud security (boto3, Azure SDK)."
+ },
+ {
+  "n": 5,
+  "phase": 1,
+  "title": "Windows internals & PowerShell",
+  "hours": "13–15 h/week · ≈ 60 h",
+  "goal": "Understand Windows the way defenders and attackers do: processes, services, registry, tokens and — above all — the logs that record what happened.",
+  "topics": [
+   "OS concepts: user vs kernel mode, processes/threads, virtual memory, handles, DLLs (OSTEP chapters for depth).",
+   "Windows: services, scheduled tasks, registry hives, NTFS (ADS, MFT basics), users/groups/SIDs, access tokens, UAC, WMI.",
+   "Logging: Security log IDs 4624/4625/4634/4648/4672/4688/4697/4720/4732/1102, 7045; Sysmon IDs 1/3/7/8/10/11/13/22; PowerShell 4104.",
+   "PowerShell: objects and the pipeline, cmdlets, remoting, execution policy (not a security boundary), script-block logging."
+  ],
+  "skills": [
+   "Investigate a live host with Sysinternals (Process Explorer, Autoruns, Procmon, TCPView).",
+   "List persistence locations and check each one.",
+   "Query event logs with Get-WinEvent -FilterHashtable in under two minutes.",
+   "Deploy Sysmon with a maintained configuration and generate/find specific events."
+  ],
+  "weeks": [
+   "W1 Windows 11 Enterprise + Windows Server evaluation VMs; OS concepts; Sysinternals tour.",
+   "W2 Registry and persistence: Run keys, services, scheduled tasks, WMI subscriptions; Autoruns.",
+   "W3 Audit policy + Sysmon (sysmon-modular config); trigger events and find them.",
+   "W4 PowerShell triage script: processes, services, tasks, connections, recent logons → JSON."
+  ],
+  "labs": [
+   {
+    "text": "TryHackMe Windows Fundamentals 1–3, Sysinternals, Windows Event Logs and Sysmon rooms.",
+    "url": null
+   },
+   {
+    "text": "Your own Windows VMs: create persistence on purpose, then hunt for it with Autoruns and logs.",
+    "url": null
+   }
+  ],
+  "tools": "Windows 11 Enterprise / Server evaluation images, Sysinternals Suite, Sysmon, PowerShell 7, Event Viewer, Get-WinEvent.",
+  "free": [
+   {
+    "text": "Sysinternals docs + Sysmon.",
+    "url": "https://learn.microsoft.com/sysinternals/"
+   },
+   {
+    "text": "sysmon-modular configuration.",
+    "url": "https://github.com/olafhartong/sysmon-modular"
+   },
+   {
+    "text": "OSTEP (free OS textbook) — processes and virtual memory chapters.",
+    "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/"
+   },
+   {
+    "text": "SANS posters — “Hunt Evil” and Windows forensics posters.",
+    "url": "https://www.sans.org/posters/"
+   },
+   {
+    "text": "Microsoft Learn: PowerShell — PowerShell 101.",
+    "url": "https://learn.microsoft.com/powershell/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Learn PowerShell in a Month of Lunches (4th ed.).",
+    "url": null
+   },
+   {
+    "text": "Windows Internals, 7th ed., Part 1 — a reference to dip into, not to read cover to cover.",
+    "url": null
+   }
+  ],
+  "ai": "Ask an LLM for “the 15 most important event IDs for detecting lateral movement”. Verify each against Microsoft documentation and your own lab. Classify errors (wrong ID, wrong log, invented field). This builds the reflex you will need in a SOC.",
+  "portfolio": "Start P04 (Enterprise-in-a-box). Add the Windows triage script to P03.",
+  "gate": [
+   "Names ≥ 8 persistence locations and how to check each.",
+   "Finds a specific logon event with PowerShell in under two minutes.",
+   "Sysmon deployed with a documented config; 5 generated events located.",
+   "Explains SIDs, tokens, UAC and services to a non-expert."
+  ],
+  "jobs": "Most enterprise endpoints run Windows. SOC, incident response and forensics revolve around Windows artifacts and event logs; Windows privilege escalation is core pentest work."
+ },
+ {
+  "n": 6,
+  "phase": 1,
+  "title": "Web, databases & cryptography fundamentals",
+  "hours": "13–15 h/week · ≈ 60 h",
+  "goal": "Understand how web applications, databases and cryptography work — by building a small app correctly before learning to break it in Month 8.",
+  "topics": [
+   "HTTP in depth: methods, status codes, headers, cookies, sessions, caching; same-origin policy, CORS; REST/JSON APIs; sessions vs tokens (JWT).",
+   "Web architecture: browser, reverse proxy, app server, database; SQL (joins, aggregates, indexes, transactions); ORMs and parameterized queries.",
+   "Cryptography: AES-GCM, RSA/ECC, SHA-2/3, HMAC, KDFs, password hashing (Argon2id, bcrypt), signatures, PKI, TLS 1.3, randomness.",
+   "Classic failures: ECB, nonce reuse, hard-coded keys, homemade crypto; post-quantum awareness (NIST FIPS 203/204/205, 2024)."
+  ],
+  "skills": [
+   "Build a small web app with login (Flask, Express or Next.js + PostgreSQL).",
+   "Inspect traffic with browser DevTools and curl; inspect certificates with openssl s_client.",
+   "Store passwords correctly and set secure cookie flags (HttpOnly, Secure, SameSite).",
+   "Explain the TLS 1.3 handshake and certificate validation."
+  ],
+  "weeks": [
+   "W1 HTTP via MDN + curl/DevTools exercises; SQLBolt (all lessons).",
+   "W2 Build the P05 baseline app: notes app with registration, login, roles.",
+   "W3 Crypto: CryptoHack (Introduction, General, starter Symmetric); openssl exercises; sign and verify files.",
+   "W4 Foundations checkpoint: 50-question self-test across Months 1–6; write “How HTTPS actually works”."
+  ],
+  "labs": [
+   {
+    "text": "CryptoHack (≥ 30 challenges); SQLBolt; OverTheWire Natas 0–10.",
+    "url": "https://cryptohack.org/"
+   },
+   {
+    "text": "TryHackMe web fundamentals rooms (How websites work, HTTP in detail).",
+    "url": null
+   }
+  ],
+  "tools": "curl, browser DevTools, HTTPie or Postman, PostgreSQL + psql, Flask or Express, openssl, CyberChef.",
+  "free": [
+   {
+    "text": "MDN — HTTP and web security pages.",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP"
+   },
+   {
+    "text": "SQLBolt interactive SQL.",
+    "url": "https://sqlbolt.com/"
+   },
+   {
+    "text": "OWASP Password Storage & Session Management cheat sheets.",
+    "url": "https://cheatsheetseries.owasp.org/"
+   },
+   {
+    "text": "Dan Boneh — Cryptography I (audit free) — selected weeks.",
+    "url": "https://www.coursera.org/learn/crypto"
+   },
+   {
+    "text": "CyberChef for encodings and hashes.",
+    "url": "https://gchq.github.io/CyberChef/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Serious Cryptography, 2nd ed. (Aumasson, 2024) — the practitioner’s crypto book.",
+    "url": null
+   },
+   {
+    "text": "Real-World Cryptography (David Wong) — an alternative with protocols focus.",
+    "url": null
+   }
+  ],
+  "ai": "Ask an LLM to generate a login implementation, then audit it line by line against the OWASP cheat sheets (password storage, session management, authentication). List every flaw and compare it with your own implementation.",
+  "portfolio": "Start P05 (Build–Break–Fix app): the secure baseline version with a short design note.",
+  "gate": [
+   "App uses Argon2id/bcrypt, parameterized queries and secure cookies — verified, not assumed.",
+   "Explains the TLS 1.3 handshake and what a certificate chain proves.",
+   "CryptoHack ≥ 30; SQL joins and aggregates without looking anything up.",
+   "Foundations self-test ≥ 80%; gaps scheduled into buffer days."
+  ],
+  "jobs": "The web is the largest attack surface (web pentest, AppSec, bug bounty). Crypto literacy prevents classic design mistakes, and SQL is used every day in SIEM queries and data analysis.",
+  "note": {
+   "title": "Certification window (optional): Security+ or ISC2 CC",
+   "text": "If your target employers filter CVs on a baseline certificate (government, defense suppliers, MSSPs, multinationals), Months 6–8 are the right moment for CompTIA Security+ — your Phase 1 work covers most of it with ~3–4 weeks of exam-style review. SY0-701 is expected to retire around 2027 once SY0-801 (which adds AI/LLM objectives) launches; the certification is the same either way. ISC2’s free CC programme ended in May 2026, so CC is now a paid, lighter alternative. Skip both if your market does not ask for them — see Part G."
+  }
+ },
+ {
+  "n": 7,
+  "phase": 2,
+  "title": "Identity, IAM & Active Directory",
+  "hours": "14–15 h/week · ≈ 60 h",
+  "goal": "Build a realistic Active Directory lab and understand identity — the single most attacked layer in every enterprise, on-premises and in the cloud.",
+  "topics": [
+   "IAM concepts: identity lifecycle (joiner/mover/leaver), authentication factors, phishing-resistant MFA (FIDO2/passkeys), RBAC vs ABAC, least privilege, just-in-time access, privileged access management.",
+   "Federation and SSO: SAML 2.0, OAuth 2.0 grants, OIDC, tokens (ID vs access vs refresh), PKCE, consent.",
+   "Active Directory: domains/forests/OUs, GPOs, DNS dependency, LDAP, Kerberos (AS-REQ, TGT, TGS, SPNs), NTLM, delegation, service accounts, the tiering model.",
+   "Entra ID: tenants, users/groups, app registrations and service principals, Conditional Access, sign-in and audit logs.",
+   "Identity attacks (conceptually, then in lab): password spraying, credential stuffing, MFA fatigue, token theft, Kerberoasting, AS-REP roasting, pass-the-hash, ACL abuse."
+  ],
+  "skills": [
+   "Deploy and populate an AD domain (users, groups, OUs, GPOs, a service account with an SPN).",
+   "Explain a Kerberos authentication end-to-end and point to the events that record it (4768/4769/4771).",
+   "Enumerate AD with PowerShell and BloodHound CE, and read attack paths.",
+   "Create an Entra ID tenant, enforce MFA and read sign-in logs."
+  ],
+  "weeks": [
+   "W1 Identity concepts + OAuth/OIDC flows drawn by hand; jwt.io experiments.",
+   "W2 Build the AD lab (domain controller + 2 clients + member server); populate with a script (e.g., BadBlood) and add deliberate weaknesses you document.",
+   "W3 Kerberos/NTLM deep dive; BloodHound CE collection and path analysis; audit policy for identity events.",
+   "W4 Free Entra ID tenant: users, groups, MFA, sign-in log review; write an “identity attack surface” review of your lab."
+  ],
+  "labs": [
+   {
+    "text": "Your own AD lab — this is P04 (GOAD or GOAD-Light if you have 32 GB RAM; otherwise a hand-built 3-VM domain).",
+    "url": "https://github.com/Orange-Cyberdefense/GOAD"
+   },
+   {
+    "text": "TryHackMe Active Directory Basics; HTB Academy “Introduction to Active Directory”.",
+    "url": null
+   }
+  ],
+  "tools": "Windows Server (AD DS, DNS, GPMC), PowerShell AD module, BadBlood, BloodHound CE + SharpHound, ADExplorer, PingCastle, Entra admin center.",
+  "free": [
+   {
+    "text": "The Hacker Recipes — Active Directory — concepts and attack mechanics.",
+    "url": "https://www.thehacker.recipes/"
+   },
+   {
+    "text": "adsecurity.org — Sean Metcalf’s AD security reference.",
+    "url": "https://adsecurity.org/"
+   },
+   {
+    "text": "GOAD — Game of Active Directory — automated vulnerable AD lab.",
+    "url": "https://github.com/Orange-Cyberdefense/GOAD"
+   },
+   {
+    "text": "OAuth 2.0 Simplified + Microsoft Entra docs.",
+    "url": "https://www.oauth.com/"
+   },
+   {
+    "text": "BloodHound CE documentation.",
+    "url": "https://github.com/SpecterOps/BloodHound"
+   }
+  ],
+  "paid": [
+   {
+    "text": "TryHackMe Premium (AD path) or HTB Academy student plan — either is enough; do not buy both.",
+    "url": null
+   }
+  ],
+  "ai": "Ask an LLM to explain Kerberoasting step by step, then reproduce it in your lab and verify the detection evidence it claimed (event 4769 with RC4 ticket encryption 0x17). Anything it got wrong goes in the AI log — this is exactly how AI fails in interviews and incidents.",
+  "portfolio": "P04 complete: scripted, documented, reproducible AD lab with a build guide others can follow.",
+  "gate": [
+   "Domain with ≥ 20 users, 5 groups, 3 GPOs and a Kerberoastable service account, rebuilt from your own script.",
+   "Hand-drawn Kerberos diagram annotated with the event IDs that record each step.",
+   "Three BloodHound attack paths identified and explained in writing.",
+   "Explains the OAuth authorization-code flow with PKCE without notes; Entra tenant with MFA enforced."
+  ],
+  "jobs": "Identity is the number-one initial access vector. AD and Entra knowledge is required for SOC, IR and pentest roles, and “IAM analyst” is itself a common entry-level job in banks, telecoms and large enterprises."
+ },
+ {
+  "n": 8,
+  "phase": 2,
+  "title": "Web application security",
+  "hours": "14–15 h/week · ≈ 60 h",
+  "goal": "Find, exploit, explain and fix the vulnerability classes that dominate real applications — and write findings a developer can act on.",
+  "topics": [
+   "OWASP Top 10:2025 — A01 Broken Access Control (now including SSRF), A02 Security Misconfiguration, A03 Software Supply Chain Failures, A04 Cryptographic Failures, A05 Injection, A06 Insecure Design, A07 Authentication Failures, A08 Software/Data Integrity Failures, A09 Logging & Alerting Failures, A10 Mishandling of Exceptional Conditions.",
+   "Attack classes hands-on: SQL injection, XSS (reflected/stored/DOM), CSRF, SSRF, IDOR and access control, path traversal, command injection, file upload, XXE, deserialization basics, business-logic flaws.",
+   "API security: OWASP API Top 10 (BOLA/BFLA), JWT attacks, mass assignment, rate limiting.",
+   "Web LLM attacks: prompt injection through application features, excessive agency in chatbots (first contact with AI security).",
+   "Methodology: OWASP Web Security Testing Guide; evidence, severity (CVSS 4.0) and remediation writing."
+  ],
+  "skills": [
+   "Drive Burp Suite fluently: Proxy, Repeater, Intruder, Decoder, Comparer, scope and match/replace.",
+   "Find vulnerabilities manually before reaching for automation; use ffuf and sqlmap knowingly.",
+   "Write a finding: impact, reproduction steps, evidence, severity rationale, concrete fix.",
+   "Fix your own code and prove the fix with a regression test."
+  ],
+  "weeks": [
+   "W1 PortSwigger Academy: SQL injection, authentication, path traversal, command injection (all Apprentice labs).",
+   "W2 Access control/IDOR, SSRF, file upload, XSS (through Practitioner level where possible).",
+   "W3 CSRF, CORS, JWT, API testing on crAPI; the Web LLM attacks labs.",
+   "W4 Time-boxed Juice Shop assessment (10 h) → mini pentest report; break and fix P05 (3 vulnerabilities, with diffs)."
+  ],
+  "labs": [
+   {
+    "text": "PortSwigger Web Security Academy — target ≥ 60 labs (all Apprentice in covered topics + ≥ 15 Practitioner).",
+    "url": "https://portswigger.net/web-security"
+   },
+   {
+    "text": "OWASP Juice Shop — ≥ 30 challenges, documented like an engagement.",
+    "url": "https://owasp.org/www-project-juice-shop/"
+   },
+   {
+    "text": "crAPI for API-specific flaws.",
+    "url": "https://github.com/OWASP/crAPI"
+   }
+  ],
+  "tools": "Burp Suite Community, browser DevTools, ffuf, sqlmap, jwt_tool, Postman/HTTPie, Docker (for the vulnerable apps).",
+  "free": [
+   {
+    "text": "OWASP Top 10:2025 — read the category pages, not summaries.",
+    "url": "https://owasp.org/Top10/"
+   },
+   {
+    "text": "OWASP Web Security Testing Guide — your methodology checklist.",
+    "url": "https://owasp.org/www-project-web-security-testing-guide/"
+   },
+   {
+    "text": "OWASP Cheat Sheet Series — the remediation half of every finding.",
+    "url": "https://cheatsheetseries.owasp.org/"
+   },
+   {
+    "text": "PortSwigger Web LLM attacks — prompt injection in real apps.",
+    "url": "https://portswigger.net/web-security/llm-attacks"
+   },
+   {
+    "text": "Hacker101 — free videos + CTF.",
+    "url": "https://www.hacker101.com/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Bug Bounty Bootcamp (Vickie Li) or Hacking APIs (Corey Ball).",
+    "url": null
+   },
+   {
+    "text": "Burp Suite Professional is not needed yet; PortSwigger’s BSCP exam (~$99) becomes relevant around Month 17–20.",
+    "url": null
+   }
+  ],
+  "ai": "Two exercises: (1) use an LLM to brainstorm payload variations, then verify every one in the lab — count how many are invalid; (2) let it draft remediation text for three findings and correct it against the OWASP cheat sheets. Then do the PortSwigger LLM labs to see the attacker side of AI features.",
+  "portfolio": "P05 complete (vulnerable and fixed versions + write-up) and a Juice Shop assessment report with 5+ findings.",
+  "gate": [
+   "≥ 60 PortSwigger labs solved, with notes per vulnerability class in your own words.",
+   "Five findings written to professional standard (impact, steps, evidence, CVSS 4.0, fix).",
+   "Three vulnerabilities introduced into P05 and fixed, each with a regression test.",
+   "Can explain SSRF, IDOR and stored XSS to a developer in two minutes each, with a fix."
+  ],
+  "jobs": "Web application testing is the highest-volume work in offensive security and the core of AppSec. SOC analysts also triage web attacks from WAF and proxy logs, and bug bounty is the most accessible way to build public proof."
+ },
+ {
+  "n": 9,
+  "phase": 2,
+  "title": "SOC operations: logging, SIEM & alert triage",
+  "hours": "14–15 h/week · ≈ 60 h",
+  "goal": "Run a small SOC end-to-end in your own lab: collect telemetry, write queries, triage alerts, analyze phishing and document cases the way a real analyst does.",
+  "topics": [
+   "SOC structure: tiers, shifts, SLAs, escalation, the alert lifecycle; true vs false positive; alert fatigue.",
+   "Log sources and what each proves: Windows Security + Sysmon, Linux auditd, EDR, firewall, proxy, DNS, e-mail, cloud audit logs.",
+   "SIEM architecture: ingestion, parsing, normalization, correlation, retention and cost; query languages (KQL, SPL, ES|QL).",
+   "MITRE ATT&CK: mapping alerts to techniques; the Pyramid of Pain; IOCs vs TTPs.",
+   "Phishing analysis: headers, SPF/DKIM/DMARC, URL and attachment detonation, user-reported workflow."
+  ],
+  "skills": [
+   "Deploy Wazuh (or Elastic Security) and onboard Windows, Linux and firewall logs.",
+   "Write queries that answer investigative questions, not just display data.",
+   "Triage an alert to a verdict with evidence and a recommended action, in under 20 minutes.",
+   "Analyze a phishing e-mail safely and extract IOCs."
+  ],
+  "weeks": [
+   "W1 Deploy the SIEM; onboard Sysmon + auditd + OPNsense logs; verify parsing.",
+   "W2 Query languages: KC7 (KQL) modules and Splunk BOTS data through TryHackMe rooms.",
+   "W3 Phishing analysis (BTLO/LetsDefend challenges); build a phishing triage playbook.",
+   "W4 Ten detection use-cases + triage playbooks; 25 alerts triaged and documented → P06."
+  ],
+  "labs": [
+   {
+    "text": "TryHackMe SOC Level 1 path (the core rooms).",
+    "url": null
+   },
+   {
+    "text": "KC7 — free KQL-based investigation game; Blue Team Labs Online free challenges.",
+    "url": "https://kc7cyber.com/"
+   },
+   {
+    "text": "CyberDefenders easy investigations; LetsDefend free SOC alerts.",
+    "url": "https://cyberdefenders.org/"
+   }
+  ],
+  "tools": "Wazuh or Elastic Security, Sysmon, auditd, Splunk (free tier/BOTS datasets), KQL, CyberChef, URLScan.io, VirusTotal, MITRE ATT&CK Navigator.",
+  "free": [
+   {
+    "text": "MITRE ATT&CK — and its free “getting started” resources.",
+    "url": "https://attack.mitre.org/"
+   },
+   {
+    "text": "Must Learn KQL — free KQL series.",
+    "url": "https://github.com/rod-trent/MustLearnKQL"
+   },
+   {
+    "text": "Wazuh documentation / Elastic Security.",
+    "url": "https://documentation.wazuh.com/"
+   },
+   {
+    "text": "Splunk BOTS datasets — realistic security data.",
+    "url": "https://github.com/splunk/botsv3"
+   },
+   {
+    "text": "SANS Internet Storm Center — daily practitioner diaries.",
+    "url": "https://isc.sans.edu/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "TryHackMe Premium — the best value of the whole roadmap this month.",
+    "url": null
+   },
+   {
+    "text": "Blue Team Handbook: SOC, SIEM and Threat Hunting (Don Murdoch).",
+    "url": null
+   }
+  ],
+  "ai": "Shadow triage: triage 20 alerts yourself and record verdicts; then give the same (sanitized) alerts to an LLM and compare. Measure agreement, and classify each disagreement: AI missed context, AI hallucinated, or AI was right and you were wrong. This single exercise teaches more about AI in the SOC than any article.",
+  "portfolio": "P06 SOC-in-a-box: SIEM + telemetry + 10 detections + playbooks + triage notes.",
+  "gate": [
+   "SIEM ingesting ≥ 3 log sources with working parsing.",
+   "Ten detections mapped to ATT&CK, each with evidence that it fires.",
+   "25 alerts triaged with written verdicts; 5 phishing analyses with IOCs.",
+   "Writes, from memory, queries for: failed logons by source, new service installed, rare parent–child process pairs."
+  ],
+  "jobs": "SOC analyst is still the most common entry point into the field, and these are literally the day-one tasks. Even for red-team careers, this month is what makes your dangerous later: you know what defenders see."
+ },
+ {
+  "n": 10,
+  "phase": 2,
+  "title": "Penetration testing & vulnerability management",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Run a complete internal engagement against your own lab — enumerate, exploit, escalate, pivot, report — and learn to prioritize vulnerabilities like a defender who cannot patch everything.",
+  "topics": [
+   "Engagement lifecycle: scoping, rules of engagement, written authorization, evidence handling, reporting, retesting.",
+   "Enumeration: SMB, LDAP, RDP, SSH, HTTP, SNMP, DNS; credential attacks (spraying, hashcat/john basics).",
+   "Exploitation: using and adapting public exploits, Metasploit fundamentals; Linux and Windows privilege escalation; pivoting.",
+   "AD attack paths in your own lab: Kerberoasting, AS-REP roasting, ACL abuse, credential dumping, and how each looks in logs.",
+   "Vulnerability management: CVE/CWE, CVSS 4.0, EPSS, CISA KEV, SSVC, asset criticality, patch SLAs, exceptions, and the instability of the CVE/NVD ecosystem since 2024."
+  ],
+  "skills": [
+   "Enumerate methodically and keep engagement notes that become the report.",
+   "Escalate privileges on both operating systems and explain why each technique works.",
+   "Produce a risk-based remediation plan, not a 400-page scanner dump.",
+   "Write a professional pentest report with an executive summary a manager can act on."
+  ],
+  "weeks": [
+   "W1 Methodology + enumeration; TryHackMe Jr Penetration Tester modules; 3 easy boxes.",
+   "W2 Linux and Windows privilege escalation; 3 more boxes; build your own privesc checklists.",
+   "W3 AD attacks against P04, then find the same activity in P06’s SIEM (this is the purple-team bridge to Month 11).",
+   "W4 Vulnerability management: authenticated scan of the lab, prioritization sheet (CVSS × EPSS × KEV × asset value) → P07 report."
+  ],
+  "labs": [
+   {
+    "text": "Hack The Box Starting Point + 6–8 retired easy machines (attempt ≥ 2 h before watching IppSec or 0xdf).",
+    "url": null
+   },
+   {
+    "text": "TryHackMe Jr Penetration Tester path; your own AD lab (P04).",
+    "url": null
+   },
+   {
+    "text": "Greenbone/OpenVAS or Nessus Essentials scan of the lab; Nuclei against your web app.",
+    "url": null
+   }
+  ],
+  "tools": "Kali, Nmap, NetExec, Impacket, BloodHound CE, Metasploit, hashcat/john, linPEAS/winPEAS, Greenbone/OpenVAS, Nessus Essentials, Nuclei.",
+  "free": [
+   {
+    "text": "HackTricks, PayloadsAllTheThings.",
+    "url": "https://book.hacktricks.wiki/"
+   },
+   {
+    "text": "GTFOBins + LOLBAS — living-off-the-land references.",
+    "url": "https://gtfobins.github.io/"
+   },
+   {
+    "text": "IppSec videos and 0xdf write-ups — after your own attempt.",
+    "url": "https://ippsec.rocks/"
+   },
+   {
+    "text": "CVSS v4.0, EPSS, CISA KEV.",
+    "url": "https://www.first.org/cvss/v4-0/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "TCM Security Practical Ethical Hacking — inexpensive and directly aligned with this month.",
+    "url": null
+   },
+   {
+    "text": "HTB VIP (retired machines) or HTB Academy; TryHackMe Premium if not already active.",
+    "url": null
+   }
+  ],
+  "ai": "Give an LLM your (lab-only) enumeration notes and ask “what did I miss?” — verify every suggestion, then compare with the official walkthrough afterwards. Separately, have it prioritize 20 scanner findings and compare with your KEV/EPSS-based ranking: where does it over-rank cosmetic issues?",
+  "portfolio": "P07 Internal penetration test report (10+ pages) + vulnerability prioritization plan.",
+  "gate": [
+   "10 machines compromised, ≥ 6 without walkthroughs.",
+   "Privilege-escalation checklists written in your own words for Linux and Windows.",
+   "Three AD attack paths executed and detected in your SIEM.",
+   "P07 report reviewed by one other person and revised."
+  ],
+  "jobs": "Junior penetration tester, vulnerability management analyst (a very common and underrated entry role) and security engineer. Blue-team roles interview on this material too: you cannot detect what you do not understand.",
+  "note": {
+   "title": "Certification window (red lean): eJPT or PJPT",
+   "text": "If you are leaning offensive, Months 10–12 are the natural moment for a first practical certification: eJPT (INE, ~$249 voucher or ~$299/year subscription including it) or PJPT (TCM, ~$249, Active-Directory focused). Both are hands-on, lifetime credentials and pair perfectly with P07 as evidence. See Part G before buying."
+  }
+ },
+ {
+  "n": 11,
+  "phase": 2,
+  "title": "Detection engineering & incident response",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Turn attacker behaviour into tested detections, then run a full incident from alert to lessons-learned report.",
+  "topics": [
+   "Detection engineering lifecycle: hypothesis → data source → logic → test → tune → deploy → measure; detection as code in Git with CI.",
+   "Sigma rule syntax and conversion; false-positive tuning; ATT&CK coverage mapping and its limits.",
+   "Purple teaming with Atomic Red Team: execute a technique, verify the detection, fix the gap.",
+   "Incident response: NIST SP 800-61r3 lifecycle, playbooks (phishing, ransomware, compromised account, BEC), triage collection, containment trade-offs, chain of custody, communication.",
+   "Incident reporting: timelines in UTC, scope, root cause, impact, actions, lessons learned."
+  ],
+  "skills": [
+   "Write, test and tune Sigma rules and convert them to your SIEM’s language.",
+   "Run atomic tests safely and measure detection coverage honestly.",
+   "Collect triage data with Velociraptor/KAPE and build a timeline.",
+   "Write an incident report that a manager, a lawyer and an engineer can each use."
+  ],
+  "weeks": [
+   "W1 Sigma syntax; 5 rules for your lab; conversion + CI validation in GitHub Actions.",
+   "W2 Atomic Red Team across 10 techniques; measure what fired, tune what did not.",
+   "W3 Deploy Velociraptor; run a simulated intrusion against P04 and respond to it end-to-end.",
+   "W4 Incident report + three playbooks; publish the detection repository (P08)."
+  ],
+  "labs": [
+   {
+    "text": "TryHackMe SOC Level 2 rooms (detection engineering, threat hunting).",
+    "url": null
+   },
+   {
+    "text": "CyberDefenders / BTLO incident-response investigations.",
+    "url": null
+   },
+   {
+    "text": "Your own purple-team loop: attack (Month 10 techniques) → detect → tune → document.",
+    "url": null
+   }
+  ],
+  "tools": "Sigma + sigconverter/pySigma, Atomic Red Team, Caldera (optional), Velociraptor, KAPE, Chainsaw or Hayabusa, Git + GitHub Actions, ATT&CK Navigator.",
+  "free": [
+   {
+    "text": "SigmaHQ — rules, specification and examples.",
+    "url": "https://github.com/SigmaHQ/sigma"
+   },
+   {
+    "text": "Atomic Red Team — test cases per technique.",
+    "url": "https://github.com/redcanaryco/atomic-red-team"
+   },
+   {
+    "text": "NIST SP 800-61r3 — the current incident-response guidance.",
+    "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+   },
+   {
+    "text": "Palantir ADS framework — how to document a detection.",
+    "url": "https://github.com/palantir/alerting-detection-strategy-framework"
+   },
+   {
+    "text": "The DFIR Report — real intrusions with timelines; build detections from them.",
+    "url": "https://thedfirreport.com/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Practical Threat Detection Engineering (Packt) — the structured version of this month.",
+    "url": null
+   },
+   {
+    "text": "Red Canary Threat Detection Report (free) as the reality check on which techniques matter.",
+    "url": null
+   }
+  ],
+  "ai": "Let an LLM draft ten Sigma rules from technique descriptions. Then test each with Atomic Red Team and keep only what fires without drowning your in false positives. Report the numbers (drafted / valid / kept). The lesson you will reuse for a decade: AI drafts, tests decide.",
+  "portfolio": "P08 Detection-as-code repository (rules + tests + coverage map) and a full incident report.",
+  "gate": [
+   "≥ 15 Sigma rules with test evidence and ATT&CK tags in a Git repo with CI.",
+   "ATT&CK Navigator coverage layer produced from real test results, not wishful mapping.",
+   "One complete incident report: timeline, scope, root cause, containment, recovery, lessons learned.",
+   "Three IR playbooks that another person could execute."
+  ],
+  "jobs": "Detection engineer, SOC Tier 2, incident responder, MDR analyst. “Write a detection for this technique” and “walk me through an incident you handled” are standard interview tasks — you will have real answers."
+ },
+ {
+  "n": 12,
+  "phase": 2,
+  "title": "Risk, governance & compliance + midpoint review",
+  "hours": "12 h/week · ≈ 50 h",
+  "goal": "Learn to express security in the language of the business — risk, controls, frameworks — then take stock of 12 months and choose a provisional specialization.",
+  "topics": [
+   "Risk fundamentals: assets, threats, vulnerabilities, likelihood × impact, inherent vs residual risk, treatment options, risk appetite, risk register.",
+   "Frameworks: NIST CSF 2.0 (profiles and tiers), NIST SP 800-30, CIS Controls v8.1 (IG1–IG3), ISO/IEC 27001:2022 (clauses 4–10 + Annex A themes), SOC 2 in one page.",
+   "Policies, standards, procedures; third-party/vendor risk; business continuity and disaster recovery; awareness programmes; security metrics.",
+   "Privacy and local law: GDPR essentials; in francophone North Africa, personal-data law 09-08 and the CNDP; cybersecurity law 05-20 and the DNSSI baseline; EU NIS2/DORA if your employers serve Europe.",
+   "AI governance preview: NIST AI RMF, ISO/IEC 42001, the EU AI Act (deepened in Month 18)."
+  ],
+  "skills": [
+   "Run a risk assessment and defend the ratings.",
+   "Produce a CSF 2.0 current/target profile and a CIS IG1 gap assessment.",
+   "Write policies people can actually follow.",
+   "Translate a technical finding into business risk in three sentences."
+  ],
+  "weeks": [
+   "W1 Risk concepts + SP 800-30; build a risk register for a fictional 180-person company (“Oasis Logistics”: hybrid cloud, e-commerce portal, 3 branches).",
+   "W2 CSF 2.0 profile + CIS IG1 self-assessment; map findings from P01–P08 into it.",
+   "W3 Three policies (acceptable use, access control, incident response) + ISO 27001 Annex A mapping; a one-page executive summary.",
+   "W4 Midpoint: portfolio review, skills re-score, Part C decision exercise, plan for Months 13–18, public retrospective post."
+  ],
+  "labs": [
+   {
+    "text": "CISA tabletop exercise package (CTEP) run with two friends — 45 minutes, ransomware scenario.",
+    "url": null
+   },
+   {
+    "text": "CIS Controls self-assessment; optional: CISA CSET tool.",
+    "url": null
+   }
+  ],
+  "tools": "Spreadsheets (the real GRC tool), draw.io, CIS CSAT or CSET, ATT&CK Navigator (for threat-informed control selection).",
+  "free": [
+   {
+    "text": "NIST CSF 2.0 + quick-start guides.",
+    "url": "https://www.nist.gov/cyberframework"
+   },
+   {
+    "text": "NIST SP 800-30r1 — risk assessments.",
+    "url": "https://csrc.nist.gov/pubs/sp/800/30/r1/final"
+   },
+   {
+    "text": "CIS Controls v8.1 — IG1 is the world’s best free security baseline.",
+    "url": "https://www.cisecurity.org/controls"
+   },
+   {
+    "text": "CISA tabletop exercise packages.",
+    "url": "https://www.cisa.gov/resources-tools/services/cisa-tabletop-exercise-packages"
+   },
+   {
+    "text": "ENISA publications for European context.",
+    "url": "https://www.enisa.europa.eu/publications"
+   }
+  ],
+  "paid": [
+   {
+    "text": "ISO/IEC 27001:2022 standard (national standards body or ISO) — worth it only if you lean GRC.",
+    "url": null
+   },
+   {
+    "text": "PECB/other ISO 27001 Lead Implementer training — Months 21–24 at the earliest (Part G).",
+    "url": null
+   }
+  ],
+  "ai": "Have an LLM draft a policy and a control mapping, then audit them: do the clause numbers exist? Are the control IDs real? Compliance hallucinations are the most dangerous kind because nobody checks a confident policy document. Record the error rate in the AI log.",
+  "portfolio": "P09 GRC pack: risk register, CSF 2.0 profile, CIS IG1 gap assessment, 3 policies, executive summary.",
+  "gate": [
+   "Risk register with ≥ 15 risks, owners, treatment decisions and residual ratings.",
+   "Gap assessment with a prioritized 90-day remediation roadmap.",
+   "Explains the difference between ISO 27001 and NIST CSF in 60 seconds.",
+   "Midpoint self-assessment complete; provisional track chosen with a written 6-month plan."
+  ],
+  "jobs": "GRC analyst, IT auditor, risk analyst and junior consultant are among the most accessible entry roles — especially in banking, telecoms and consulting. Every technical role also needs this vocabulary the day it talks to management.",
+  "note": {
+   "title": "Midpoint checkpoint — do not skip this",
+   "text": "Week 4 is a full stop: re-score the skill matrix (Part A), re-read your write-ups, list what you can do unaided, and work through the specialization framework in Part C. You pick a lean, not a life sentence: 70% of effort stays on the common core through Month 18, 30% goes to the lean. The real commitment happens at the end of Month 18."
+  }
+ },
+ {
+  "n": 13,
+  "phase": 3,
+  "title": "Cloud security I: AWS foundations, IAM & misconfigurations",
+  "hours": "14–15 h/week · ≈ 60 h",
+  "goal": "Learn cloud the way attackers and defenders meet it: identity policies, logging, and the handful of misconfigurations behind most real cloud breaches.",
+  "topics": [
+   "Shared responsibility model; regions/AZs; account and organization structure (Organizations, SCPs and RCPs).",
+   "Core services: IAM (users, roles, policies, STS), VPC/security groups, S3, EC2, Lambda, KMS, CloudTrail, CloudWatch, Config, GuardDuty, Security Hub.",
+   "IAM policy evaluation logic: explicit deny, identity vs resource policies, permission boundaries, trust policies, iam:PassRole.",
+   "Classic attack paths: public buckets, leaked access keys, SSRF → instance metadata (IMDSv1) → credentials, over-permissive roles, privilege escalation via policy versions, missing/disabled logging.",
+   "Infrastructure as code with Terraform; cost control (budgets and alarms) as a security control."
+  ],
+  "skills": [
+   "Stand up a safe account baseline: MFA everywhere, no long-lived root keys, budget alarm, CloudTrail, GuardDuty.",
+   "Read and write least-privilege IAM policies and test them.",
+   "Exploit and then fix classic misconfigurations in a lab you own.",
+   "Deploy and destroy environments reproducibly with Terraform."
+  ],
+  "weeks": [
+   "W1 AWS fundamentals (Skill Builder), account hardening, IAM deep dive with the policy simulator.",
+   "W2 flAWS and flAWS2 (attacker and defender paths) + the Big IAM Challenge; write up each lesson.",
+   "W3 CloudGoat: 3–4 scenarios (IAM privilege escalation, SSRF/metadata, S3 exposure); Terraform basics.",
+   "W4 Build P10-A: your own deliberately vulnerable Terraform environment + exploitation walkthrough."
+  ],
+  "labs": [
+   {
+    "text": "flAWS and flAWS2 — free, still the best cloud-security first contact.",
+    "url": "http://flaws.cloud/"
+   },
+   {
+    "text": "CloudGoat — deploy, exploit, destroy.",
+    "url": "https://github.com/RhinoSecurityLabs/cloudgoat"
+   },
+   {
+    "text": "The Big IAM Challenge — IAM policy reasoning under pressure.",
+    "url": "https://bigiamchallenge.com/"
+   }
+  ],
+  "tools": "AWS CLI, Terraform, IAM Access Analyzer + policy simulator, Pacu, Prowler, CloudTrail, GuardDuty, Athena.",
+  "free": [
+   {
+    "text": "AWS Skill Builder — free Cloud Practitioner and security courses.",
+    "url": "https://skillbuilder.aws/"
+   },
+   {
+    "text": "AWS Well-Architected — Security Pillar.",
+    "url": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+   },
+   {
+    "text": "AWS Security Reference Architecture.",
+    "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html"
+   },
+   {
+    "text": "Hacking the Cloud — offensive cloud techniques, with defences.",
+    "url": "https://hackingthe.cloud/"
+   },
+   {
+    "text": "Pwned Labs — free tier of realistic cloud labs.",
+    "url": "https://pwnedlabs.io/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Pwned Labs subscription (excellent, cheap) if cloud becomes your track.",
+    "url": "https://pwnedlabs.io/"
+   },
+   {
+    "text": "AWS Certified Security – Specialty (SCS-C03) later — see Part G; the exam now includes generative-AI/ML security.",
+    "url": null
+   }
+  ],
+  "ai": "Ask an LLM to write three IAM policies for specific tasks, then validate with IAM Access Analyzer and the policy simulator. Count how often it grants more than asked (* actions, missing conditions). This is the single most common AI failure mode in cloud work.",
+  "portfolio": "P10-A: vulnerable-by-design cloud lab (Terraform) + attack narrative with evidence.",
+  "gate": [
+   "Account baseline checklist completed and screenshotted; spend under $10 with an active budget alarm.",
+   "Explains IAM policy evaluation (deny precedence, SCP/RCP boundaries, trust policies) without notes.",
+   "flAWS 1 and 2 finished with your own write-ups; ≥ 3 CloudGoat scenarios.",
+   "Terraform lab deploys and destroys cleanly from a fresh clone."
+  ],
+  "jobs": "Cloud security analyst/engineer roles are growing faster than the talent pool, SOC analysts increasingly investigate cloud logs, and pentesters are asked for cloud assessments."
+ },
+ {
+  "n": 14,
+  "phase": 3,
+  "title": "Cloud security II: detection, Entra ID & posture",
+  "hours": "14–15 h/week · ≈ 60 h",
+  "goal": "Close the loop in the cloud: detect the attacks you performed last month, respond to a key compromise, and measure posture continuously.",
+  "topics": [
+   "Cloud detection and response: CloudTrail analysis at scale (Athena/CloudTrail Lake), GuardDuty findings, key-compromise playbook, forensics of ephemeral resources.",
+   "Posture management: CIS AWS Foundations Benchmark, Prowler, prioritizing findings without drowning the team; remediation as code.",
+   "Microsoft identity: Entra ID RBAC, managed identities, Conditional Access, PIM, sign-in/audit logs; consent phishing, device-code phishing, token theft.",
+   "Microsoft 365 threats: business e-mail compromise, malicious inbox rules, OAuth app abuse.",
+   "Multi-cloud awareness: GCP equivalents; where Kubernetes fits (Month 19)."
+  ],
+  "skills": [
+   "Write cloud detections (new access key for another user, CloudTrail disabled, unusual AssumeRole, S3 policy change).",
+   "Run Prowler, triage its output and fix the top findings in Terraform.",
+   "Investigate an Entra ID sign-in log and reconstruct a suspicious login.",
+   "Execute a credential-compromise response: revoke, rotate, scope, contain, document."
+  ],
+  "weeks": [
+   "W1 CloudTrail deep dive; detections for every P10-A attack step; Athena queries.",
+   "W2 Prowler + CIS benchmark; fix the top 10 findings as code; re-scan to prove improvement.",
+   "W3 Entra ID lab (free tenant, BadZure or Pwned Labs Azure scenarios); sign-in log investigation.",
+   "W4 P10-B: attack → detect → respond → remediate narrative + cloud incident report."
+  ],
+  "labs": [
+   {
+    "text": "Pwned Labs AWS/Azure scenarios; BadZure for a vulnerable Entra tenant.",
+    "url": null
+   },
+   {
+    "text": "Wiz free CTFs (e.g., EKS Cluster Games) as a bridge to Month 19.",
+    "url": null
+   },
+   {
+    "text": "CyberDefenders cloud investigations.",
+    "url": null
+   }
+  ],
+  "tools": "Prowler, CloudTrail Lake/Athena, GuardDuty, Security Hub, Terraform, Entra admin center, Microsoft Sentinel trial, ROADtools/AzureHound.",
+  "free": [
+   {
+    "text": "CIS AWS Foundations Benchmark — the checklist everyone audits against.",
+    "url": "https://www.cisecurity.org/cis-benchmarks"
+   },
+   {
+    "text": "Microsoft Entra documentation — Conditional Access and identity protection.",
+    "url": "https://learn.microsoft.com/entra/"
+   },
+   {
+    "text": "Prowler — open-source multi-cloud posture scanning.",
+    "url": "https://github.com/prowler-cloud/prowler"
+   },
+   {
+    "text": "Datadog Security Labs — excellent free cloud-attack research.",
+    "url": "https://securitylabs.datadoghq.com/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Microsoft SC-200 or AZ-500 study path (Microsoft Learn content is free; only the exam costs).",
+    "url": null
+   }
+  ],
+  "ai": "Build a small script that feeds your lab’s CloudTrail events to an LLM for summarization, then compare the summary with the ground-truth attack timeline: what did it omit or invent? Repeat with a local model (Ollama) to practise handling data that must never leave the environment.",
+  "portfolio": "P10 complete: one repository containing the vulnerable infrastructure, the attack, the detections, the response report and the hardened version.",
+  "gate": [
+   "≥ 8 cloud detections validated by replaying your own attacks.",
+   "Prowler baseline with the top 10 findings remediated in code and a before/after score.",
+   "Entra ID investigation write-up showing how you distinguished a suspicious sign-in from a benign one.",
+   "Cloud incident report following NIST SP 800-61r3 structure."
+  ],
+  "jobs": "Detection and response in cloud environments is now a core SOC skill, not a specialty. Microsoft-heavy enterprises (very common in Europe and North Africa) specifically ask for Entra ID and M365 incident experience."
+ },
+ {
+  "n": 15,
+  "phase": 3,
+  "title": "Digital forensics & threat intelligence",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Answer “what exactly happened on this machine?” from evidence — and turn public reporting about adversaries into detections your team can use.",
+  "topics": [
+   "Forensic principles: order of volatility, acquisition and integrity (hashing), chain of custody, documentation that survives scrutiny.",
+   "Windows artifacts: Prefetch, Amcache/Shimcache, LNK and Jump Lists, ShellBags, SRUM, user registry hives, $MFT/$UsnJrnl, event logs.",
+   "Memory forensics with Volatility 3: processes, network connections, injected code, credential material.",
+   "Timelines: super-timeline creation, pivoting, and the discipline of separating fact from inference.",
+   "Threat intelligence: the intelligence cycle; strategic/operational/tactical; Diamond Model; ATT&CK-based CTI; Pyramid of Pain; sourcing, confidence language and TLP 2.0; MISP/OpenCTI."
+  ],
+  "skills": [
+   "Acquire and analyze disk and memory images and reconstruct an intrusion timeline.",
+   "Distinguish evidence from assumption in writing (“the log shows X” vs “the attacker probably did Y”).",
+   "Profile a threat actor from public reporting and map it to ATT&CK accurately.",
+   "Convert intelligence into hunting queries and detections."
+  ],
+  "weeks": [
+   "W1 Forensic principles + Windows artifacts (13Cubed series, Eric Zimmerman tools); 3 CyberDefenders/BTLO labs.",
+   "W2 Memory forensics (Volatility 3, MemLabs); practise on a known-bad image.",
+   "W3 Full investigation of a public case image → P11 report (who, what, when, how, with evidence).",
+   "W4 CTI: pick one actor or campaign; write P12 intelligence report + 5 derived detections tested in your SIEM."
+  ],
+  "labs": [
+   {
+    "text": "CyberDefenders DFIR challenges; Blue Team Labs Online investigations.",
+    "url": "https://cyberdefenders.org/"
+   },
+   {
+    "text": "MemLabs memory challenges; NIST CFReDS reference images.",
+    "url": "https://github.com/stuxnet999/MemLabs"
+   },
+   {
+    "text": "The DFIR Report — read one full report and rebuild its timeline and detections.",
+    "url": "https://thedfirreport.com/"
+   }
+  ],
+  "tools": "FTK Imager, KAPE, Eric Zimmerman tools (MFTECmd, PECmd, RECmd, Timeline Explorer), Volatility 3, Autopsy, Plaso, Velociraptor, MISP or OpenCTI, ATT&CK Navigator.",
+  "free": [
+   {
+    "text": "13Cubed (YouTube) — the best free Windows forensics teaching.",
+    "url": "https://www.youtube.com/@13Cubed"
+   },
+   {
+    "text": "Eric Zimmerman’s tools + SANS DFIR posters.",
+    "url": "https://ericzimmerman.github.io/"
+   },
+   {
+    "text": "MITRE ATT&CK CTI training — free, four hours, superb.",
+    "url": "https://attack.mitre.org/resources/learn-more-about-attack/training/cti/"
+   },
+   {
+    "text": "FIRST TLP 2.0 — how to label and share intelligence.",
+    "url": "https://www.first.org/tlp/"
+   },
+   {
+    "text": "abuse.ch (MalwareBazaar, URLhaus, ThreatFox) — free tactical feeds.",
+    "url": "https://abuse.ch/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Intelligence-Driven Incident Response, 2nd ed. (Roberts & Brown).",
+    "url": null
+   },
+   {
+    "text": "CyberDefenders subscription if DFIR becomes your track (leads to the CCD certification).",
+    "url": null
+   }
+  ],
+  "ai": "Give an LLM a 40-page vendor threat report and ask for an ATT&CK mapping. Then verify every technique ID against the source text and the ATT&CK site: typical error rates here are high, and a wrong mapping produces wrong detections. Record precision and the error types.",
+  "portfolio": "P11 DFIR investigation report and P12 CTI report → detection package (rules + hunting queries).",
+  "gate": [
+   "≥ 6 forensic labs completed with written answers.",
+   "One full investigation report with a defensible timeline and clear fact/inference separation.",
+   "Memory analysis that identifies an injected or hollowed process and proves it.",
+   "CTI report with ≥ 10 correctly sourced ATT&CK techniques and 5 tested detections."
+  ],
+  "jobs": "DFIR analyst and IR consultant roles (consultancies, Big Four, MDR providers) and CTI analyst roles. Even for SOC jobs, forensic depth is what gets someone promoted from Tier 1 to Tier 2."
+ },
+ {
+  "n": 16,
+  "phase": 3,
+  "title": "Malware analysis fundamentals",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Safely triage malicious files, describe what they do, and convert that understanding into YARA rules and detections — without needing to be a reverse engineer.",
+  "topics": [
+   "Safe lab design: isolated network, snapshots, no shared folders, INetSim/FakeNet-NG, handling rules for live samples.",
+   "Malware families and behaviours: loaders, stealers, ransomware, RATs; persistence, injection, C2 patterns.",
+   "Static analysis: PE format, imports/exports, sections, entropy and packers, strings, capa, FLOSS.",
+   "Dynamic analysis: Procmon, registry/file/network telemetry, sandbox reports (ANY.RUN, Triage) and their limits.",
+   "Script and document malware: PowerShell, VBA macros, JS, LNK, ISO/IMG delivery chains; deobfuscation.",
+   "Light reverse engineering with Ghidra; YARA rule writing and testing; malware that abuses LLM APIs at runtime (reported in 2025)."
+  ],
+  "skills": [
+   "Triage an unknown sample and produce IOCs and TTPs within two hours.",
+   "Write YARA rules that catch a family without matching clean binaries.",
+   "Read a decompiled function well enough to describe its purpose.",
+   "Convert malware behaviour into Sigma detections (bridge back to P08)."
+  ],
+  "weeks": [
+   "W1 Build FLARE-VM + REMnux isolated lab; PE format; static triage of two known samples.",
+   "W2 Dynamic analysis; macro/script malware with oletools and CyberChef deobfuscation.",
+   "W3 Ghidra basics (Malware Unicorn RE101, simple crackmes).",
+   "W4 Analyze two commodity samples from MalwareBazaar → P13 report + YARA + Sigma."
+  ],
+  "labs": [
+   {
+    "text": "Malware Unicorn RE101 — free, structured, still excellent.",
+    "url": "https://malwareunicorn.org/workshops/re101.html"
+   },
+   {
+    "text": "crackmes.one (easy level) for RE practice; CyberDefenders malware challenges.",
+    "url": "https://crackmes.one/"
+   },
+   {
+    "text": "MalwareBazaar — commodity samples only, in the isolated lab, never on your host.",
+    "url": "https://bazaar.abuse.ch/"
+   }
+  ],
+  "tools": "FLARE-VM, REMnux, PEStudio, Detect It Easy, capa, FLOSS, Ghidra, x64dbg, Procmon, FakeNet-NG, oletools, YARA, CyberChef.",
+  "free": [
+   {
+    "text": "FLARE-VM and REMnux — ready-made analysis environments.",
+    "url": "https://github.com/mandiant/flare-vm"
+   },
+   {
+    "text": "capa — automatic capability identification; read its rules to learn.",
+    "url": "https://github.com/mandiant/capa"
+   },
+   {
+    "text": "YARA documentation — write rules, then test against clean sets.",
+    "url": "https://yara.readthedocs.io/"
+   },
+   {
+    "text": "OALabs (YouTube) — real unpacking and analysis sessions.",
+    "url": "https://www.youtube.com/@OALABS"
+   }
+  ],
+  "paid": [
+   {
+    "text": "TCM Security Practical Malware Analysis & Triage (PMAT) — inexpensive, exactly this month’s scope.",
+    "url": null
+   },
+   {
+    "text": "Practical Malware Analysis (Sikorski & Honig) — dated tooling, timeless method.",
+    "url": null
+   }
+  ],
+  "ai": "Use an LLM to explain decompiled functions and to deobfuscate a PowerShell stage — then verify by executing in the lab and comparing with CyberChef. Never upload samples or customer data to public services you have no right to share.",
+  "portfolio": "P13 Malware analysis report (2 samples) with IOCs, ATT&CK mapping, YARA rules and detection ideas.",
+  "gate": [
+   "Lab verified isolated (no callbacks leave the host-only network).",
+   "Two reports: static + dynamic findings, IOCs, capabilities, ATT&CK techniques.",
+   "YARA rules that match the samples and produce zero hits on a clean Windows directory.",
+   "Explains PE sections/imports and five persistence mechanisms you observed yourself."
+  ],
+  "jobs": "Full-time malware analyst roles are rare for juniors, but triage skill is prized in SOC Tier 2, IR, CTI and detection engineering — and it is a strong differentiator in interviews."
+ },
+ {
+  "n": 17,
+  "phase": 3,
+  "title": "Application security, secure coding & DevSecOps",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Move from finding bugs to preventing them: threat model, review code, and build a pipeline that blocks the classes of flaw you learned to exploit.",
+  "topics": [
+   "Secure SDLC; threat modeling (STRIDE, data-flow diagrams, the four-question frame); OWASP ASVS 5.0 as a requirements checklist.",
+   "Secure code review: authentication, authorization, input handling, injection sinks, secrets, error handling; writing custom Semgrep rules.",
+   "Software supply chain (OWASP Top 10:2025 A03): dependencies, SCA, SBOM (CycloneDX/SPDX), SLSA levels, signing with Sigstore/cosign, pinned CI actions.",
+   "CI/CD security: OWASP Top 10 CI/CD risks, GitHub Actions hardening (least-privilege tokens, pinned SHAs, OIDC to cloud), secrets management.",
+   "Container image security: minimal bases, non-root, scanning, provenance.",
+   "Case studies to study properly: xz-utils backdoor (2024), tj-actions/changed-files compromise (2025), npm worm campaigns and AI-CLI abuse in the Nx incident (2025)."
+  ],
+  "skills": [
+   "Produce a threat model with mitigations mapped to ASVS requirements.",
+   "Review code and find real issues manually, then encode them as Semgrep rules.",
+   "Build a pipeline with SAST, SCA, secret scanning, IaC scanning, SBOM and signing — with a sane exception process.",
+   "Fix findings in a pull request and explain the fix to a developer."
+  ],
+  "weeks": [
+   "W1 Threat model P05 (DFD + STRIDE + mitigations); ASVS L1 checklist against it.",
+   "W2 Secure code review of two open-source projects; write 5 custom Semgrep rules with tests.",
+   "W3 Build the pipeline in GitHub Actions: Semgrep, Trivy/Grype, gitleaks, Checkov, ZAP baseline, policy gates.",
+   "W4 Containers: harden a Dockerfile, generate an SBOM (Syft), sign and verify (cosign) → P14 v1."
+  ],
+  "labs": [
+   {
+    "text": "CI/CD Goat — pipeline attacks, hands-on.",
+    "url": "https://github.com/cider-security-research/cicd-goat"
+   },
+   {
+    "text": "Semgrep Playground — rule writing; GitHub Security Lab CodeQL tutorials.",
+    "url": "https://semgrep.dev/playground"
+   },
+   {
+    "text": "WebGoat / Juice Shop revisited, this time fixing the code rather than exploiting it.",
+    "url": null
+   }
+  ],
+  "tools": "Semgrep, CodeQL, gitleaks, Trivy, Syft/Grype, OSV-Scanner, Checkov, ZAP, cosign, GitHub Actions, OpenSSF Scorecard, Dependabot/Renovate.",
+  "free": [
+   {
+    "text": "OWASP ASVS — requirements, not opinions.",
+    "url": "https://owasp.org/www-project-application-security-verification-standard/"
+   },
+   {
+    "text": "OWASP Top 10 CI/CD Security Risks.",
+    "url": "https://owasp.org/www-project-top-10-ci-cd-security-risks/"
+   },
+   {
+    "text": "SLSA and Sigstore — supply-chain integrity.",
+    "url": "https://slsa.dev/"
+   },
+   {
+    "text": "GitHub Actions security hardening.",
+    "url": "https://docs.github.com/actions/security-guides/security-hardening-for-github-actions"
+   },
+   {
+    "text": "Threat Modeling Manifesto + OWASP Threat Dragon.",
+    "url": "https://www.threatmodelingmanifesto.org/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Alice and Bob Learn Application Security (Tanya Janca) — the friendliest complete AppSec book.",
+    "url": null
+   },
+   {
+    "text": "Threat Modeling: Designing for Security (Adam Shostack) for depth.",
+    "url": null
+   }
+  ],
+  "ai": "Three-way comparison on the same repository: your manual review vs Semgrep vs an LLM. Build a confusion matrix (true positives, false positives, misses) — this table is genuinely interview-worthy. Then test package hallucination: ask for libraries for a niche task and verify each exists before anyone installs it.",
+  "portfolio": "P14 Secure delivery pipeline (threat model → scanned, signed build → policy gate), extended in Month 19 to Kubernetes.",
+  "gate": [
+   "Threat model document with DFD, STRIDE table and mitigations traced to ASVS items.",
+   "Five custom Semgrep rules with passing/failing test cases.",
+   "Pipeline that blocks a critical finding, with a documented exception workflow.",
+   "One accepted pull request to an open-source project (fix, test or security documentation)."
+  ],
+  "jobs": "AppSec engineer, DevSecOps/platform security engineer and product security roles — the best-paid junior-accessible track for anyone comfortable with code."
+ },
+ {
+  "n": 18,
+  "phase": 3,
+  "title": "AI security: LLM apps, agents & red teaming — and track commitment",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Build an AI application, break it methodically, harden it, and measure the difference — then commit to a specialization for Months 19–24.",
+  "topics": [
+   "LLM mechanics that matter for security: context windows, system prompts, tool calling, RAG, embeddings, agents, Model Context Protocol (MCP).",
+   "OWASP Top 10 for LLM Applications (2025): prompt injection, sensitive information disclosure, supply chain, data & model poisoning, improper output handling, excessive agency, system-prompt leakage, vector/embedding weaknesses, misinformation, unbounded consumption.",
+   "OWASP Top 10 for Agentic Applications (published December 2025): ASI01 goal hijack, ASI02 tool misuse, ASI03 identity & privilege abuse, ASI04 agentic supply chain, ASI05 unexpected code execution, ASI06 memory/context poisoning, ASI07 insecure inter-agent communication, ASI08 cascading failures, ASI09 human–agent trust exploitation, ASI10 rogue agents.",
+   "Direct vs indirect prompt injection; the “lethal trifecta” (private data + untrusted content + outbound communication); real incidents: zero-click exfiltration from an AI assistant (EchoLeak, CVE-2025-32711), a compromised AI coding extension, an agent deleting a production database.",
+   "Defences that actually work: least-privilege tools, human approval gates, isolation of untrusted content, output encoding, egress allow-lists, per-user authorization enforced outside the model, provenance for models and data, guardrails as defence-in-depth.",
+   "Governance and taxonomies: MITRE ATLAS, NIST AI RMF + the generative-AI profile, ISO/IEC 42001, the EU AI Act."
+  ],
+  "skills": [
+   "Build a small RAG + tool-using agent (support assistant with a lookup tool and an action tool).",
+   "Attack it: direct and indirect injection, data exfiltration, tool misuse, memory poisoning.",
+   "Harden it and measure attack success rate before and after, across repeated trials.",
+   "Write an AI red-team report with reproducible prompts and severity rationale."
+  ],
+  "weeks": [
+   "W1 Build the app (API or local model via Ollama) with two tools and a document store you control.",
+   "W2 Attack playgrounds first (Gandalf, PortSwigger LLM labs, Crucible), then your own app; log every case.",
+   "W3 Defend: scope tools down, add confirmation gates, isolate retrieved content, encode outputs, add automated probes (promptfoo/garak/PyRIT) to CI.",
+   "W4 P15 report + track commitment memo (Part C): chosen track, why, 6-month plan, target roles."
+  ],
+  "labs": [
+   {
+    "text": "Gandalf (Lakera) — a fast, addictive introduction to prompt injection.",
+    "url": "https://gandalf.lakera.ai/"
+   },
+   {
+    "text": "PortSwigger Web LLM attacks; Crucible (Dreadnode) challenges.",
+    "url": "https://portswigger.net/web-security/llm-attacks"
+   },
+   {
+    "text": "Your own agent — the only lab where you control both sides.",
+    "url": null
+   }
+  ],
+  "tools": "Python, an LLM API or Ollama, a small vector store, garak, PyRIT, promptfoo, Burp Suite, MCP Inspector.",
+  "free": [
+   {
+    "text": "OWASP GenAI Security Project — LLM Top 10, Agentic Top 10, agentic security guides.",
+    "url": "https://genai.owasp.org/"
+   },
+   {
+    "text": "MITRE ATLAS — adversarial ML/AI technique matrix.",
+    "url": "https://atlas.mitre.org/"
+   },
+   {
+    "text": "NIST AI Risk Management Framework + generative-AI profile.",
+    "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+   },
+   {
+    "text": "Simon Willison on prompt injection — the clearest running commentary.",
+    "url": "https://simonwillison.net/tags/prompt-injection/"
+   },
+   {
+    "text": "Embrace The Red — practical AI attack research with proofs of concept.",
+    "url": "https://embracethered.com/blog/"
+   },
+   {
+    "text": "Google SAIF — a vendor-neutral-ish control framework for AI systems.",
+    "url": "https://saif.google/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "HTB Academy AI Red Teamer path (built with Google) — the most structured hands-on option today.",
+    "url": null
+   },
+   {
+    "text": "CompTIA SecAI+ exists (launched February 2026) but expects 3–4 years of experience — park it for after the first job.",
+    "url": null
+   }
+  ],
+  "ai": "This whole month is the AI thread. One rule governs everything: LLMs are non-deterministic, so a finding is not a finding until it reproduces. Every attack case must record the exact input, the success rate over N trials, and the conditions. That discipline is what separates AI security work from anecdotes.",
+  "portfolio": "P15 LLM application red-team and hardening report, with before/after attack-success metrics.",
+  "gate": [
+   "Working agent with ≥ 2 tools and retrieval, deployed in a container you can reset.",
+   "≥ 10 distinct attack cases with reproducibility statistics.",
+   "Mitigations that measurably reduce attack success, with the residual risks named honestly.",
+   "Track commitment memo written and shared with a mentor or peer."
+  ],
+  "jobs": "AI security is the fastest-growing niche, but it hires people who are already good at AppSec, identity or detection. This month makes your the person on the team who can answer “is this AI feature safe to ship?” — a question every employer now faces.",
+  "note": {
+   "title": "Track commitment — the decision that shapes Months 19–24",
+   "text": "You now have hands-on evidence from SOC work, offensive testing, cloud, DFIR, CTI, malware, AppSec/DevSecOps and AI security. Use the framework in Part C: score interest, demonstrated aptitude, local market demand, entry accessibility and AI resilience; then run two informational interviews and read twenty job adverts per finalist. Choose one primary track (70% of time) and one adjacent secondary (30%). It is a two-way door — people move between tracks constantly — but the next six months need one direction."
+  }
+ },
+ {
+  "n": 19,
+  "phase": 4,
+  "title": "Kubernetes, security architecture & track sprint 1",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Finish the common core with containers and architecture thinking, and start converting your track choice into daily practice.",
+  "topics": [
+   "Kubernetes: architecture (API server, etcd, kubelet), RBAC and service accounts, namespaces, NetworkPolicies, Pod Security Standards, admission control, secrets handling.",
+   "Container/K8s attack paths: exposed dashboards and APIs, over-privileged service accounts, hostPath/privileged pods, container escape concepts, supply-chain images.",
+   "Runtime detection (Falco) and policy as code (Kyverno or OPA Gatekeeper); benchmarking with kube-bench.",
+   "Security architecture: zero trust (NIST SP 800-207, CISA maturity model), segmentation, identity-centric design, reference architectures (AWS SRA, Microsoft MCRA), writing an architecture decision record."
+  ],
+  "trackSprint": [
+   "A · SOC/IR — hypothesis-driven threat hunting; advanced KQL/SPL; EDR telemetry; start SC-200 or BTL1/CDSA preparation.",
+   "B · Red team/pentest — HTB Academy Penetration Tester modules (AD, pivoting, web attacks); 8–10 medium boxes; report speed drills; plan CPTS or PNPT.",
+   "C · Cloud security — multi-account design (Organizations, SCP/RCP), identity center, detection at scale; plan AWS SCS-C03 or AZ-500.",
+   "D · AppSec/DevSecOps — code review in two languages, PortSwigger Practitioner labs, threat model an open-source project; plan BSCP.",
+   "E · Security & detection engineering — log pipelines, SOAR automation (e.g., Shuffle), detection CI/CD, Python/Go tooling.",
+   "F · AI security — HTB AI Red Teamer path; ATLAS case studies; build an evaluation harness; study MCP server security.",
+   "G · GRC — build an ISMS document set for “Oasis Logistics”; internal audit simulation; plan ISO/IEC 27001 Lead Implementer."
+  ],
+  "labs": [
+   {
+    "text": "Kubernetes Goat — scenario-based cluster attacks and defences.",
+    "url": "https://madhuakula.com/kubernetes-goat/"
+   },
+   {
+    "text": "Local cluster (kind/minikube): RBAC least privilege, NetworkPolicies, restricted Pod Security Standard, Kyverno policies, Falco alerts.",
+    "url": null
+   },
+   {
+    "text": "Wiz EKS Cluster Games for cloud-native attack reasoning.",
+    "url": null
+   }
+  ],
+  "tools": "kind/minikube, kubectl, kube-bench, Trivy, Falco, Kyverno/OPA, Helm, draw.io for architecture diagrams.",
+  "free": [
+   {
+    "text": "Kubernetes security checklist — official and concise.",
+    "url": "https://kubernetes.io/docs/concepts/security/security-checklist/"
+   },
+   {
+    "text": "Falco and Kyverno documentation.",
+    "url": "https://falco.org/"
+   },
+   {
+    "text": "NIST SP 800-207 Zero Trust Architecture + CISA Zero Trust Maturity Model.",
+    "url": "https://csrc.nist.gov/pubs/sp/800/207/final"
+   },
+   {
+    "text": "Microsoft Cybersecurity Reference Architectures — free architecture patterns.",
+    "url": "https://learn.microsoft.com/security/adoption/mcra"
+   }
+  ],
+  "paid": [
+   {
+    "text": "Track-specific platform access (HTB Academy / TryHackMe / Pwned Labs / CyberDefenders) — one, not four.",
+    "url": null
+   }
+  ],
+  "ai": "Use an LLM to generate Kubernetes manifests and policies, then validate with kube-bench, Kyverno test cases and your own review. Keep a tally of insecure defaults it produced (privileged pods, wide RBAC, latest tags) — that tally is a blog post.",
+  "career": [
+   "Update CV with Phase 3 projects; rewrite the LinkedIn headline around the chosen track.",
+   "Draw up a target list of 30 employers (local, remote-friendly, and international) and note who they hire and how.",
+   "Ask two practitioners in the track for a 20-minute informational interview."
+  ],
+  "portfolio": "P14 extended: the pipeline now deploys to a hardened Kubernetes cluster with admission policy and runtime detection.",
+  "gate": [
+   "Hardened kind cluster: least-privilege RBAC, NetworkPolicies, restricted PSS, 3 Kyverno policies, Falco catching 3 attack scenarios.",
+   "One architecture decision record and one zero-trust-informed design diagram for your lab environment.",
+   "Track sprint 1 objectives completed and logged; certification choice fixed (or deliberately skipped).",
+   "CV and LinkedIn updated; two informational interviews booked or completed."
+  ],
+  "jobs": "Containers and Kubernetes appear in most modern infrastructure job adverts; architecture literacy is what turns a good analyst into a senior candidate later."
+ },
+ {
+  "n": 20,
+  "phase": 4,
+  "title": "Track sprint 2 + capstone design",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Go deep in the track, design a capstone worth talking about in every interview, and start the AI-augmented analyst project.",
+  "topics": [
+   "Depth in the track (60% of the month’s hours) using one platform path, not five.",
+   "Capstone design: problem statement, scope, success criteria, threat model, architecture, timeline, deliverables.",
+   "P16 (all tracks): an AI-augmented assistant for your own work with a real evaluation harness — for example alert triage (A/E), recon summarization (B), cloud finding explanation (C), code review assistance (D), agent testing (F), control mapping (G).",
+   "Measurement discipline: ground-truth dataset, accuracy/precision/recall, cost per task, failure taxonomy, human-in-the-loop design."
+  ],
+  "trackSprint": [
+   "A — Build a hunting programme: 6 hypotheses, queries, findings, tuning notes.",
+   "B — Full internal engagement against a multi-host lab (GOAD full) with a client-grade report.",
+   "C — Multi-account baseline as code: SCPs, centralized logging, detections, break-glass procedure.",
+   "D — Security review of a real open-source app: threat model, code review, fixes submitted upstream.",
+   "E — Build a log/detection pipeline with tests and dashboards; automate two response actions.",
+   "F — Red-team an agentic application (including an MCP server) and publish reproducible findings.",
+   "G — Run a mock internal audit against ISO 27001 Annex A with evidence requests and findings."
+  ],
+  "labs": [
+   {
+    "text": "Track platform path (HTB Academy CPTS/CDSA, TryHackMe SOC L2, Pwned Labs, PortSwigger Practitioner/Expert, CyberDefenders).",
+    "url": null
+   },
+   {
+    "text": "Capstone environment build starts — keep it reproducible (Terraform/Ansible/scripts).",
+    "url": null
+   }
+  ],
+  "tools": "Track tools + an evaluation framework (promptfoo or a small pytest harness) + a spreadsheet of ground truth for P16.",
+  "free": [
+   {
+    "text": "Track documentation and the public datasets already used in Months 9–18 (BOTS, DFIR Report, MalwareBazaar, CloudTrail samples).",
+    "url": null
+   },
+   {
+    "text": "promptfoo — test and compare prompts/models like code.",
+    "url": "https://www.promptfoo.dev/"
+   }
+  ],
+  "paid": [
+   {
+    "text": "The one platform subscription for your track; the chosen certification voucher if the exam is in Month 22.",
+    "url": null
+   }
+  ],
+  "ai": "P16 is the AI exercise: build the assistant, then prove what it is worth. A junior who can say “my triage assistant agreed with my verdict on 84% of 120 historical alerts, and here are the 19 cases where it was confidently wrong” is instantly more credible than one who says “I use AI a lot”.",
+  "career": [
+   "CV v2 tailored to the track; portfolio site live with six best projects.",
+   "Publish two write-ups this month (one technical deep dive, one “lessons learned”).",
+   "Start applying: 5–10 tailored applications per week for internships or junior roles; track everything in a sheet."
+  ],
+  "portfolio": "P16 started (assistant + evaluation harness); capstone proposal published in the repo.",
+  "gate": [
+   "Capstone proposal reviewed by a mentor/peer and scoped to something finishable in 8 weeks.",
+   "P16 ground-truth dataset assembled (≥ 100 items) and a first measured baseline.",
+   "Track sprint 2 objectives complete; certification preparation on schedule.",
+   "Application pipeline running with at least 20 applications sent and logged."
+  ],
+  "jobs": "This is the month your profile stops looking like a student’s and starts looking like a practitioner’s: a specialization, a measurable AI project and a live job-search process."
+ },
+ {
+  "n": 21,
+  "phase": 4,
+  "title": "Capstone build + certification preparation",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Build the capstone to a professional standard while preparing the one certification that matches the track.",
+  "topics": [
+   "Capstone build (60%): end-to-end, documented as you go, with weekly progress notes.",
+   "Certification preparation (25%): exam-style practice, not passive reading; simulate exam conditions at least twice.",
+   "Portfolio hygiene (15%): rewrite the README of every project, add diagrams, fix broken links, remove anything sloppy.",
+   "Interview preparation begins: two hours a week (fundamentals drills + one project walkthrough rehearsed aloud)."
+  ],
+  "trackSprint": [
+   "A — CDSA / SC-200 / BTL1 preparation; capstone: detection & response programme for a simulated company.",
+   "B — CPTS or PNPT preparation; capstone: multi-host engagement + custom tooling + retest.",
+   "C — AWS SCS-C03 or AZ-500 preparation; capstone: secure landing zone with detections as code.",
+   "D — BSCP preparation; capstone: AppSec programme for an open-source project (threat model, pipeline, fixes).",
+   "E — Cloud or SC-200 preparation; capstone: security automation platform (pipeline + SOAR playbooks + metrics).",
+   "F — No exam needed yet; capstone: AI red-team toolkit and public methodology with reproducible results.",
+   "G — ISO/IEC 27001 Lead Implementer preparation; capstone: complete ISMS starter kit + audit simulation."
+  ],
+  "labs": [
+   {
+    "text": "Capstone environment; exam-style practice labs for the chosen certification.",
+    "url": null
+   },
+   {
+    "text": "One CTF weekend for freshness (team or solo), with one write-up.",
+    "url": null
+   }
+  ],
+  "tools": "Track tools; a dedicated capstone repository with issues and milestones so progress is visible to recruiters.",
+  "free": [
+   {
+    "text": "Official exam objectives for your certification — the only authoritative scope document.",
+    "url": null
+   },
+   {
+    "text": "Community write-ups of the exam format (never exam content — sharing that violates every certification agreement).",
+    "url": null
+   }
+  ],
+  "paid": [
+   {
+    "text": "Exam voucher; one practice-test bundle if the exam is multiple-choice.",
+    "url": null
+   }
+  ],
+  "ai": "Use AI to generate practice questions from official objectives, then verify each against the documentation — you will find errors, and correcting them is itself revision. Never use AI during a practical exam: most prohibit it, and it teaches your nothing about your real level.",
+  "career": [
+   "Weekly mock interview (record it, watch it once, note two fixes).",
+   "Ask two people in your network to review the CV and the portfolio site.",
+   "Keep applying; refine the CV based on response rates rather than guesses."
+  ],
+  "portfolio": "Capstone at 70%; P16 measured and documented; all repositories cleaned.",
+  "gate": [
+   "Capstone core functionality working and demonstrated in a 5-minute recording.",
+   "Two full practice exams at passing level (or equivalent readiness for a practical exam).",
+   "Every project README rewritten to the standard in Part F.",
+   "Four mock interview questions per week answered aloud without notes."
+  ],
+  "jobs": "Interviewers ask for one thing above all: something real you built and can explain under questioning. This month produces exactly that."
+ },
+ {
+  "n": 22,
+  "phase": 4,
+  "title": "Capstone delivery, exam & applications",
+  "hours": "15 h/week · ≈ 62 h",
+  "goal": "Ship the capstone, sit the certification, and turn the job search into a disciplined weekly process.",
+  "topics": [
+   "Capstone completion: documentation, diagrams, demo video (10–15 minutes), lessons learned and limitations section.",
+   "Certification exam (if chosen) — book the date at the start of the month so it cannot drift.",
+   "Job search cadence: 5–10 tailored applications per week, 3 outreach messages, 1 informational interview.",
+   "Public presentation: submit a lightning-talk proposal to a local chapter, university club or student conference."
+  ],
+  "trackSprint": [
+   "A/E — Publish the detection repository and hunting results; contribute one rule upstream to Sigma.",
+   "B — Publish a sanitized engagement report and a retired-machine write-up series.",
+   "C — Publish the landing zone as a reusable Terraform module with a security README.",
+   "D — Publish the AppSec programme and the merged upstream fixes.",
+   "F — Publish the AI red-team methodology and (responsibly disclosed) findings.",
+   "G — Publish the ISMS starter kit as a template others can reuse."
+  ],
+  "labs": [
+   {
+    "text": "Retest your own capstone as an adversary would — the weaknesses you find belong in the “limitations” section, which is what senior reviewers read first.",
+    "url": null
+   }
+  ],
+  "tools": "Video recording (OBS), diagramming, GitHub releases and tags, a tracking spreadsheet for applications.",
+  "free": [
+   {
+    "text": "Conference and meetup calls for papers: OWASP chapters, BSides events, university and national student conferences.",
+    "url": null
+   }
+  ],
+  "paid": [
+   {
+    "text": "Exam fee (already budgeted). Nothing else this month.",
+    "url": null
+   }
+  ],
+  "ai": "Use AI to compress the capstone into three audiences: a 150-word abstract for recruiters, a one-page executive summary, and a technical README. Rewrite every sentence in your own voice — recruiters and engineers recognize unedited AI prose immediately, and it signals exactly the wrong thing.",
+  "career": [
+   "CV v3 with the capstone and certification.",
+   "Apply to “bridge” roles too (IT support, NOC, sysadmin, junior developer, junior DevOps) — many security careers start there.",
+   "Ask for referrals explicitly: a warm introduction outperforms 50 cold applications."
+  ],
+  "portfolio": "Capstone complete and published (repository + report + demo video + blog post).",
+  "gate": [
+   "Capstone shipped with documentation a stranger can follow and reproduce.",
+   "Certification passed, or a retake scheduled without drama.",
+   "≥ 40 applications sent this month, logged, with response-rate analysis.",
+   "One talk proposal submitted (accepted or not — the submission is the milestone)."
+  ],
+  "jobs": "Shipping is the skill nobody teaches. A finished, documented, demonstrated project beats three unfinished impressive ideas in every hiring conversation."
+ },
+ {
+  "n": 23,
+  "phase": 4,
+  "title": "Interview season, research & community",
+  "hours": "14–15 h/week · ≈ 60 h",
+  "goal": "Convert applications into offers: rehearse relentlessly, contribute publicly, and keep your technical edge sharp.",
+  "topics": [
+   "Interview drills: fundamentals (networking, OS, identity, web), scenario questions, live lab walkthroughs, behavioural STAR stories — see Part H.",
+   "Portfolio walkthrough: a rehearsed 5–7 minute story per flagship project (problem → approach → evidence → result → what you would do differently).",
+   "Contribution: one open-source contribution (detection rule, tool fix, documentation) or one piece of original research (a measured experiment, a small tool, a comparative analysis).",
+   "Negotiation basics: market ranges, total compensation, how to answer the salary question, what to ask before accepting."
+  ],
+  "trackSprint": [
+   "All tracks — two technical mock interviews with practitioners; one take-home exercise completed under timed conditions.",
+   "A/E — Practise live triage and “write a detection for this technique” exercises.",
+   "B/D — Practise live exploitation and code-review exercises under time pressure and observation.",
+   "C — Practise whiteboard design of a secure cloud environment and a key-compromise response.",
+   "F — Practise explaining prompt injection and agent hardening to both engineers and managers.",
+   "G — Practise explaining a risk assessment and defending control decisions to a sceptical stakeholder."
+  ],
+  "labs": [
+   {
+    "text": "Weekly: two hard lab machines or investigations to keep hands sharp between interviews.",
+    "url": null
+   },
+   {
+    "text": "One CTF with a team — teamwork under time pressure is itself interview material.",
+    "url": null
+   }
+  ],
+  "tools": "Recording software for mock interviews, a question bank, an offer/interview tracking sheet.",
+  "free": [
+   {
+    "text": "Part H of this document (question bank and answer structures).",
+    "url": null
+   },
+   {
+    "text": "Community Discord/Slack groups for mock interview partners; local OWASP or BSides chapters.",
+    "url": null
+   }
+  ],
+  "paid": [
+   {
+    "text": "Nothing required. If interviews reveal a specific gap, buy exactly one targeted resource to fix it.",
+    "url": null
+   }
+  ],
+  "ai": "Use an LLM as an interviewer: feed it a job advert and ask it to grill your, including follow-ups — then rate its questions against the real ones you get. Never let it write your answers; your value in the room is what you can defend live.",
+  "career": [
+   "Follow up on every application after 7–10 days; keep a rejection log with the reason when known.",
+   "Publish one write-up and one short post about the capstone.",
+   "Build a “questions for them” list: team structure, tooling, on-call, mentoring, how they use AI."
+  ],
+  "portfolio": "Portfolio frozen and polished; a one-page project index (PDF) that can be attached to applications.",
+  "gate": [
+   "≥ 6 mock interviews completed and reviewed.",
+   "One public contribution merged or published.",
+   "Clear, rehearsed answers for the 25 questions in Part H.",
+   "At least one real technical interview passed to the next stage (or specific feedback captured)."
+  ],
+  "jobs": "Interviewing is a separate skill from doing the work. Deliberate practice here is worth more per hour than another lab machine."
+ },
+ {
+  "n": 24,
+  "phase": 4,
+  "title": "Final assessment, portfolio polish & the next 12 months",
+  "hours": "12–14 h/week · ≈ 52 h",
+  "goal": "Measure honestly what you can do, close the last gaps, and set the plan for the year after the roadmap.",
+  "topics": [
+   "Final competency checklist (Part L) completed with evidence links — not from memory.",
+   "Skill matrix re-scored against the Month 24 targets; every gap becomes a dated action.",
+   "Portfolio final pass: consistent READMEs, diagrams, a pinned top-6 on GitHub, CV, LinkedIn, portfolio site.",
+   "Next-phase plan: one of the post-24 specialization plans in Part L (3–6 months), or the first-90-days plan if you have an offer."
+  ],
+  "trackSprint": [
+   "All — One “prove it” exercise in your track under exam conditions (timed, no AI, no notes) to confirm the level you claim.",
+   "If employed already — convert the roadmap into a first-90-days plan: learn the environment, ship one improvement, find a mentor.",
+   "If still searching — widen geographically (remote, francophone Europe), widen role titles, and consider a 3-month internship or apprenticeship as a deliberate entry route."
+  ],
+  "labs": [
+   {
+    "text": "A final self-set challenge: a novel scenario you have never seen, solved end-to-end in one weekend and written up.",
+    "url": null
+   }
+  ],
+  "tools": "Everything you have built — the point is that the lab, the pipelines and the notes keep working without your rebuilding them.",
+  "free": [
+   {
+    "text": "Part L checklists; Part K sources for staying current after the roadmap ends.",
+    "url": null
+   }
+  ],
+  "paid": [
+   {
+    "text": "Budget the next certification only if a specific job advert demands it.",
+    "url": null
+   }
+  ],
+  "ai": "Final AI-skills check: can you (1) explain where AI helps and where it fails in your track, (2) show measured results from P16, (3) attack and harden an AI feature, (4) state your rules for verification and data handling? If yes, you are ahead of most working professionals today.",
+  "career": [
+   "Thank-you messages to everyone who helped — mentors, reviewers, interviewers. This is how a network survives.",
+   "Write the 24-month retrospective publicly: what worked, what you would cut, what you would do earlier.",
+   "Set the next three professional goals with dates."
+  ],
+  "portfolio": "Final portfolio: 16 projects + capstone, ~20 write-ups, one talk, a clean CV and profiles.",
+  "gate": [
+   "Final checklist complete with evidence for every claimed item.",
+   "Timed, unaided challenge completed and published.",
+   "Written next-12-months plan with dates.",
+   "Portfolio index PDF ready to attach to any application."
+  ],
+  "jobs": "At this point your profile answers the only three questions junior hiring really asks: can you do the work, can you explain it, and will you keep learning? You have written proof of all three."
+ }
+]

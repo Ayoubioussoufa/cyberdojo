@@ -1,0 +1,1149 @@
+[
+{
+"title": "Foundations: Linux, networking and operating systems",
+"items": [
+{
+"name": "OverTheWire",
+"use": "Bandit for Linux reflexes; Natas for raw web intuition",
+"cost": "Free",
+"when": "M1–M6",
+"url": "https://overthewire.org/wargames/bandit/"
+},
+{
+"name": "pwn.college",
+"use": "Linux Luminarium and low-level dojos",
+"cost": "Free",
+"when": "M1, M16",
+"url": "https://pwn.college/"
+},
+{
+"name": "The Linux Command Line",
+"use": "Free book covering the shell properly",
+"cost": "Free",
+"when": "M1–M3",
+"url": "https://linuxcommand.org/tlcl.php"
+},
+{
+"name": "Greg’s Bash Guide",
+"use": "Correct Bash, not Stack Overflow Bash",
+"cost": "Free",
+"when": "M3",
+"url": "https://mywiki.wooledge.org/BashGuide"
+},
+{
+"name": "ShellCheck",
+"use": "Static analysis for shell scripts",
+"cost": "Free",
+"when": "M3+",
+"url": "https://www.shellcheck.net/"
+},
+{
+"name": "Practical Networking",
+"use": "The clearest packet-level explanations available",
+"cost": "Free",
+"when": "M2–M3",
+"url": "https://www.practicalnetworking.net/"
+},
+{
+"name": "Jeremy’s IT Lab (CCNA)",
+"use": "Full free CCNA-level networking course",
+"cost": "Free",
+"when": "M2–M3",
+"url": "https://www.youtube.com/@JeremysITLab"
+},
+{
+"name": "Professor Messer",
+"use": "Free Network+ and Security+ courses",
+"cost": "Free",
+"when": "M2, M6",
+"url": "https://www.professormesser.com/"
+},
+{
+"name": "Wireshark documentation",
+"use": "Filters, statistics, protocol dissection",
+"cost": "Free",
+"when": "M2+",
+"url": "https://www.wireshark.org/docs/"
+},
+{
+"name": "Nmap Network Scanning",
+"use": "The official Nmap book, online",
+"cost": "Free",
+"when": "M3, M10",
+"url": "https://nmap.org/book/"
+},
+{
+"name": "Suricata docs",
+"use": "IDS/IPS rules and deployment",
+"cost": "Free",
+"when": "M3",
+"url": "https://docs.suricata.io/"
+},
+{
+"name": "Zeek docs",
+"use": "Network security monitoring at protocol level",
+"cost": "Free",
+"when": "M3",
+"url": "https://docs.zeek.org/"
+},
+{
+"name": "OSTEP (free OS textbook)",
+"use": "Processes, memory, file systems — the real foundation",
+"cost": "Free",
+"when": "M5",
+"url": "https://pages.cs.wisc.edu/~remzi/OSTEP/"
+},
+{
+"name": "Sysinternals",
+"use": "Windows investigation tooling from Microsoft",
+"cost": "Free",
+"when": "M5+",
+"url": "https://learn.microsoft.com/sysinternals/"
+},
+{
+"name": "Sysmon",
+"use": "Endpoint telemetry that makes detection possible",
+"cost": "Free",
+"when": "M5+",
+"url": "https://learn.microsoft.com/sysinternals/downloads/sysmon"
+},
+{
+"name": "sysmon-modular",
+"use": "A maintained Sysmon configuration",
+"cost": "Free",
+"when": "M5+",
+"url": "https://github.com/olafhartong/sysmon-modular"
+},
+{
+"name": "Microsoft Learn: PowerShell",
+"use": "PowerShell from first principles",
+"cost": "Free",
+"when": "M5",
+"url": "https://learn.microsoft.com/powershell/"
+},
+{
+"name": "SANS posters & cheat sheets",
+"use": "Hunt Evil, Windows forensics, and more",
+"cost": "Free",
+"when": "M5+",
+"url": "https://www.sans.org/posters/"
+}
+]
+},
+{
+"title": "Programming, automation and tooling",
+"items": [
+{
+"name": "CS50P (Harvard Python)",
+"use": "Structured Python from zero",
+"cost": "Free",
+"when": "M4",
+"url": "https://cs50.harvard.edu/python/"
+},
+{
+"name": "Automate the Boring Stuff",
+"use": "Practical scripting for real tasks",
+"cost": "Free",
+"when": "M4",
+"url": "https://automatetheboringstuff.com/"
+},
+{
+"name": "Python documentation",
+"use": "The authoritative reference",
+"cost": "Free",
+"when": "M4+",
+"url": "https://docs.python.org/3/tutorial/"
+},
+{
+"name": "Docker — Get started",
+"use": "Containers for labs and tools",
+"cost": "Free",
+"when": "M4+",
+"url": "https://docs.docker.com/get-started/"
+},
+{
+"name": "gitleaks",
+"use": "Secret scanning as a pre-commit hook",
+"cost": "Free",
+"when": "M4+",
+"url": "https://github.com/gitleaks/gitleaks"
+},
+{
+"name": "Terraform documentation",
+"use": "Infrastructure as code for cloud labs",
+"cost": "Free",
+"when": "M13+",
+"url": "https://developer.hashicorp.com/terraform/docs"
+}
+]
+},
+{
+"title": "Web, databases and cryptography",
+"items": [
+{
+"name": "MDN — HTTP",
+"use": "How the web actually works",
+"cost": "Free",
+"when": "M6",
+"url": "https://developer.mozilla.org/en-US/docs/Web/HTTP"
+},
+{
+"name": "SQLBolt",
+"use": "Interactive SQL in an evening",
+"cost": "Free",
+"when": "M6",
+"url": "https://sqlbolt.com/"
+},
+{
+"name": "Cloudflare Learning Center",
+"use": "DNS, TLS, DDoS explainers",
+"cost": "Free",
+"when": "M2, M6",
+"url": "https://www.cloudflare.com/learning/"
+},
+{
+"name": "CryptoHack",
+"use": "Cryptography through challenges",
+"cost": "Free",
+"when": "M6",
+"url": "https://cryptohack.org/"
+},
+{
+"name": "Cryptopals",
+"use": "Break real crypto by implementing it",
+"cost": "Free",
+"when": "M6+",
+"url": "https://cryptopals.com/"
+},
+{
+"name": "Cryptography I (Dan Boneh)",
+"use": "The reference university course",
+"cost": "Free to audit",
+"when": "M6",
+"url": "https://www.coursera.org/learn/crypto"
+},
+{
+"name": "CyberChef",
+"use": "Encoding, decoding, deobfuscation",
+"cost": "Free",
+"when": "M6+",
+"url": "https://gchq.github.io/CyberChef/"
+},
+{
+"name": "PortSwigger Web SecurityAcademy",
+"use": "y The best free web security training that exists",
+"cost": "Free",
+"when": "M8, M17",
+"url": "https://portswigger.net/web-security"
+},
+{
+"name": "OWASP Top 10:2025",
+"use": "The current list, with category detail",
+"cost": "Free",
+"when": "M8+",
+"url": "https://owasp.org/Top10/"
+},
+{
+"name": "OWASP Web Security TestingGuide",
+"use": "e Testing methodology",
+"cost": "Free",
+"when": "M8+",
+"url": "https://owasp.org/www-project-web-security-testing-guide/"
+},
+{
+"name": "OWASP Cheat Sheet Series",
+"use": "The remediation half of every finding",
+"cost": "Free",
+"when": "M6+",
+"url": "https://cheatsheetseries.owasp.org/"
+},
+{
+"name": "OWASP API Security Top 10",
+"use": "API-specific vulnerability classes",
+"cost": "Free",
+"when": "M8",
+"url": "https://owasp.org/API-Security/"
+},
+{
+"name": "OWASP Juice Shop",
+"use": "Realistic vulnerable application",
+"cost": "Free",
+"when": "M8",
+"url": "https://owasp.org/www-project-juice-shop/"
+},
+{
+"name": "crAPI",
+"use": "Vulnerable API for hands-on practice",
+"cost": "Free",
+"when": "M8, M17",
+"url": "https://github.com/OWASP/crAPI"
+}
+]
+},
+{
+"title": "Practice platforms and competitions",
+"items": [
+{
+"name": "TryHackMe",
+"use": "Guided paths: Pre Security, SOC L1/L2, Jr Pentester",
+"cost": "Free + Premium",
+"when": "M1–M15",
+"url": "https://tryhackme.com/"
+},
+{
+"name": "Hack The Box",
+"use": "Machines and Pro Labs for offensive depth",
+"cost": "Free + VIP",
+"when": "M10+",
+"url": "https://www.hackthebox.com/"
+},
+{
+"name": "HTB Academy",
+"use": "Job-role paths and practical certifications",
+"cost": "Paid (student plan)",
+"when": "M18+",
+"url": "https://academy.hackthebox.com/"
+},
+{
+"name": "Blue Team Labs Online",
+"use": "Defensive investigations and challenges",
+"cost": "Free + paid",
+"when": "M9–M15",
+"url": "https://blueteamlabs.online/"
+},
+{
+"name": "CyberDefenders",
+"use": "Realistic DFIR and SOC investigations",
+"cost": "Free + paid",
+"when": "M9–M16",
+"url": "https://cyberdefenders.org/"
+},
+{
+"name": "LetsDefend",
+"use": "SOC simulator with a live alert queue",
+"cost": "Free + paid",
+"when": "M9–M11",
+"url": "https://letsdefend.io/"
+},
+{
+"name": "KC7",
+"use": "Free KQL investigation game with real-feeling data",
+"cost": "Free",
+"when": "M9",
+"url": "https://kc7cyber.com/"
+},
+{
+"name": "picoCTF",
+"use": "Beginner CTF gym, available year-round",
+"cost": "Free",
+"when": "M4+",
+"url": "https://picoctf.org/"
+},
+{
+"name": "CTFtime",
+"use": "Event calendar and team ratings",
+"cost": "Free",
+"when": "M6+",
+"url": "https://ctftime.org/"
+},
+{
+"name": "Malware Traffic Analysis",
+"use": "Real PCAPs with exercises",
+"cost": "Free",
+"when": "M2+",
+"url": "https://www.malware-traffic-analysis.net/"
+},
+{
+"name": "IppSec",
+"use": "Searchable video walkthroughs of retired machines",
+"cost": "Free",
+"when": "M10+",
+"url": "https://ippsec.rocks/"
+},
+{
+"name": "0xdf write-ups",
+"use": "Exemplary technical write-ups — study the writing too",
+"cost": "Free",
+"when": "M10+",
+"url": "https://0xdf.gitlab.io/"
+}
+]
+},
+{
+"title": "Blue team: SOC, detection, incident response, forensics, intelligence",
+"items": [
+{
+"name": "MITRE ATT&CK",
+"use": "The shared language of adversary behaviour",
+"cost": "Free",
+"when": "M9+",
+"url": "https://attack.mitre.org/"
+},
+{
+"name": "ATT&CK Navigator",
+"use": "Coverage mapping layers",
+"cost": "Free",
+"when": "M9+",
+"url": "https://mitre-attack.github.io/attack-navigator/"
+},
+{
+"name": "MITRE D3FEND",
+"use": "Defensive countermeasure taxonomy",
+"cost": "Free",
+"when": "M11+",
+"url": "https://d3fend.mitre.org/"
+},
+{
+"name": "Sigma",
+"use": "Vendor-neutral detection rules",
+"cost": "Free",
+"when": "M11+",
+"url": "https://github.com/SigmaHQ/sigma"
+},
+{
+"name": "Atomic Red Team",
+"use": "Small tests per technique for purple teaming",
+"cost": "Free",
+"when": "M11+",
+"url": "https://github.com/redcanaryco/atomic-red-team"
+},
+{
+"name": "Palantir ADS framework",
+"use": "How to document a detection properly",
+"cost": "Free",
+"when": "M11",
+"url": "https://github.com/palantir/alerting-detection-strategy-framework"
+},
+{
+"name": "Wazuh documentation",
+"use": "Free SIEM/XDR for your lab",
+"cost": "Free",
+"when": "M9+",
+"url": "https://documentation.wazuh.com/"
+},
+{
+"name": "Elastic Security",
+"use": "Alternative SIEM stack with detection rules",
+"cost": "Free tier",
+"when": "M9+",
+"url": "https://www.elastic.co/security"
+},
+{
+"name": "Splunk BOTS datasets",
+"use": "Realistic security data for query practice",
+"cost": "Free",
+"when": "M9",
+"url": "https://github.com/splunk/botsv3"
+},
+{
+"name": "Must Learn KQL",
+"use": "KQL from zero, free series",
+"cost": "Free",
+"when": "M9, M14",
+"url": "https://github.com/rod-trent/MustLearnKQL"
+},
+{
+"name": "NIST SP 800-61r3",
+"use": "Current incident-response guidance",
+"cost": "Free",
+"when": "M11",
+"url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+},
+{
+"name": "Velociraptor",
+"use": "Endpoint visibility and triage collection",
+"cost": "Free",
+"when": "M11+",
+"url": "https://docs.velociraptor.app/"
+},
+{
+"name": "Eric Zimmerman tools",
+"use": "The Windows forensic toolkit",
+"cost": "Free",
+"when": "M15",
+"url": "https://ericzimmerman.github.io/"
+},
+{
+"name": "13Cubed",
+"use": "The best free Windows forensics teaching",
+"cost": "Free",
+"when": "M15",
+"url": "https://www.youtube.com/@13Cubed"
+},
+{
+"name": "Volatility 3",
+"use": "Memory forensics",
+"cost": "Free",
+"when": "M15",
+"url": "https://github.com/volatilityfoundation/volatility3"
+},
+{
+"name": "NIST CFReDS",
+"use": "Reference forensic images",
+"cost": "Free",
+"when": "M15",
+"url": "https://cfreds.nist.gov/"
+},
+{
+"name": "The DFIR Report",
+"use": "Real intrusions with timelines and detections",
+"cost": "Free",
+"when": "M11+",
+"url": "https://thedfirreport.com/"
+},
+{
+"name": "Red Canary Threat DetectionReport",
+"use": "t Which techniques actually matter each year",
+"cost": "Free",
+"when": "M11+",
+"url": "https://redcanary.com/threat-detection-report/"
+},
+{
+"name": "MITRE ATT&CK CTI training",
+"use": "Free four-hour intelligence course",
+"cost": "Free",
+"when": "M15",
+"url": "https://attack.mitre.org/resources/learn-more-about-attack/training/cti/"
+},
+{
+"name": "MISP",
+"use": "Threat-intelligence sharing platform",
+"cost": "Free",
+"when": "M15",
+"url": "https://www.misp-project.org/"
+},
+{
+"name": "abuse.ch",
+"use": "MalwareBazaar, URLhaus, ThreatFox feeds",
+"cost": "Free",
+"when": "M15–M16",
+"url": "https://abuse.ch/"
+},
+{
+"name": "FIRST TLP 2.0",
+"use": "How to label and share intelligence",
+"cost": "Free",
+"when": "M15",
+"url": "https://www.first.org/tlp/"
+},
+{
+"name": "SANS Internet Storm Center",
+"use": "Daily practitioner diaries",
+"cost": "Free",
+"when": "Always",
+"url": "https://isc.sans.edu/"
+}
+]
+},
+{
+"title": "Offensive security and Active Directory",
+"items": [
+{
+"name": "HackTricks",
+"use": "The offensive encyclopedia — verify before trusting",
+"cost": "Free",
+"when": "M10+",
+"url": "https://book.hacktricks.wiki/"
+},
+{
+"name": "PayloadsAllTheThings",
+"use": "Technique and payload reference",
+"cost": "Free",
+"when": "M8+",
+"url": "https://github.com/swisskyrepo/PayloadsAllTheThings"
+},
+{
+"name": "GTFOBins",
+"use": "Linux living-off-the-land binaries",
+"cost": "Free",
+"when": "M10+",
+"url": "https://gtfobins.github.io/"
+},
+{
+"name": "LOLBAS",
+"use": "Windows living-off-the-land binaries",
+"cost": "Free",
+"when": "M10+",
+"url": "https://lolbas-project.github.io/"
+},
+{
+"name": "The Hacker Recipes",
+"use": "Active Directory attacks explained cleanly",
+"cost": "Free",
+"when": "M7+",
+"url": "https://www.thehacker.recipes/"
+},
+{
+"name": "adsecurity.org",
+"use": "Deep Active Directory security reference",
+"cost": "Free",
+"when": "M7+",
+"url": "https://adsecurity.org/"
+},
+{
+"name": "GOAD",
+"use": "Vulnerable AD lab, automated",
+"cost": "Free",
+"when": "M7, M10",
+"url": "https://github.com/Orange-Cyberdefense/GOAD"
+},
+{
+"name": "BloodHound CE",
+"use": "Attack-path analysis for AD and Entra ID",
+"cost": "Free",
+"when": "M7+",
+"url": "https://github.com/SpecterOps/BloodHound"
+},
+{
+"name": "Impacket",
+"use": "The protocol toolkit every AD tester uses",
+"cost": "Free",
+"when": "M10+",
+"url": "https://github.com/fortra/impacket"
+},
+{
+"name": "NetExec",
+"use": "Network enumeration and exploitation at scale",
+"cost": "Free",
+"when": "M10+",
+"url": "https://github.com/Pennyw0rth/NetExec"
+},
+{
+"name": "CVSS v4.0",
+"use": "Severity scoring done correctly",
+"cost": "Free",
+"when": "M10+",
+"url": "https://www.first.org/cvss/v4-0/"
+},
+{
+"name": "EPSS",
+"use": "Exploitation likelihood for prioritization",
+"cost": "Free",
+"when": "M10+",
+"url": "https://www.first.org/epss/"
+},
+{
+"name": "CISA KEV catalog",
+"use": "What is actually being exploited",
+"cost": "Free",
+"when": "M10+",
+"url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}
+]
+},
+{
+"title": "Cloud, containers, DevSecOps and application security",
+"items": [
+{
+"name": "flAWS",
+"use": "The classic AWS attack-and-learn walkthrough",
+"cost": "Free",
+"when": "M13",
+"url": "http://flaws.cloud/"
+},
+{
+"name": "flAWS2",
+"use": "Attacker and defender tracks",
+"cost": "Free",
+"when": "M13",
+"url": "http://flaws2.cloud/"
+},
+{
+"name": "CloudGoat",
+"use": "Deployable vulnerable AWS scenarios",
+"cost": "Free",
+"when": "M13",
+"url": "https://github.com/RhinoSecurityLabs/cloudgoat"
+},
+{
+"name": "The Big IAM Challenge",
+"use": "IAM policy reasoning under pressure",
+"cost": "Free",
+"when": "M13",
+"url": "https://bigiamchallenge.com/"
+},
+{
+"name": "Hacking the Cloud",
+"use": "Offensive cloud techniques with defences",
+"cost": "Free",
+"when": "M13–M14",
+"url": "https://hackingthe.cloud/"
+},
+{
+"name": "Pwned Labs",
+"use": "Realistic cloud security labs",
+"cost": "Free + paid",
+"when": "M13–M19",
+"url": "https://pwnedlabs.io/"
+},
+{
+"name": "AWS Skill Builder",
+"use": "Official AWS training, free tier",
+"cost": "Free + paid",
+"when": "M13",
+"url": "https://skillbuilder.aws/"
+},
+{
+"name": "AWS Security ReferenceArchitecture",
+"use": "e How a secure AWS estate is structured",
+"cost": "Free",
+"when": "M13–M14",
+"url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html"
+},
+{
+"name": "Prowler",
+"use": "Open-source cloud posture assessment",
+"cost": "Free",
+"when": "M14+",
+"url": "https://github.com/prowler-cloud/prowler"
+},
+{
+"name": "Microsoft Entra docs",
+"use": "Cloud identity, Conditional Access, logs",
+"cost": "Free",
+"when": "M7, M14",
+"url": "https://learn.microsoft.com/entra/"
+},
+{
+"name": "Datadog Security Labs",
+"use": "High-quality cloud attack research",
+"cost": "Free",
+"when": "M14+",
+"url": "https://securitylabs.datadoghq.com/"
+},
+{
+"name": "Kubernetes security checklist",
+"use": "Official hardening baseline",
+"cost": "Free",
+"when": "M19",
+"url": "https://kubernetes.io/docs/concepts/security/security-checklist/"
+},
+{
+"name": "Kubernetes Goat",
+"use": "Hands-on cluster attack scenarios",
+"cost": "Free",
+"when": "M19",
+"url": "https://madhuakula.com/kubernetes-goat/"
+},
+{
+"name": "Falco",
+"use": "Runtime detection for containers",
+"cost": "Free",
+"when": "M19",
+"url": "https://falco.org/"
+},
+{
+"name": "Kyverno",
+"use": "Policy as code for Kubernetes",
+"cost": "Free",
+"when": "M19",
+"url": "https://kyverno.io/"
+},
+{
+"name": "Trivy",
+"use": "Vulnerability, IaC and secret scanning",
+"cost": "Free",
+"when": "M17+",
+"url": "https://trivy.dev/"
+},
+{
+"name": "Semgrep",
+"use": "Static analysis with writable custom rules",
+"cost": "Free + paid",
+"when": "M17+",
+"url": "https://semgrep.dev/docs"
+},
+{
+"name": "OWASP ASVS",
+"use": "Security requirements, not opinions",
+"cost": "Free",
+"when": "M17+",
+"url": "https://owasp.org/www-project-application-security-verification-standard/"
+},
+{
+"name": "OWASP Top 10 CI/CD SecurityRisks",
+"use": "s Pipeline attack surface",
+"cost": "Free",
+"when": "M17",
+"url": "https://owasp.org/www-project-top-10-ci-cd-security-risks/"
+},
+{
+"name": "CI/CD Goat",
+"use": "Deliberately vulnerable pipeline",
+"cost": "Free",
+"when": "M17",
+"url": "https://github.com/cider-security-research/cicd-goat"
+},
+{
+"name": "SLSA",
+"use": "Supply-chain integrity levels",
+"cost": "Free",
+"when": "M17",
+"url": "https://slsa.dev/"
+},
+{
+"name": "Sigstore",
+"use": "Signing and verifying artifacts",
+"cost": "Free",
+"when": "M17",
+"url": "https://www.sigstore.dev/"
+},
+{
+"name": "GitHub Actions hardening",
+"use": "Least-privilege CI configuration",
+"cost": "Free",
+"when": "M17",
+"url": "https://docs.github.com/actions/security-guides/security-hardening-for-github-actions"
+},
+{
+"name": "Threat Modeling Manifesto",
+"use": "How to think about threat modeling",
+"cost": "Free",
+"when": "M17",
+"url": "https://www.threatmodelingmanifesto.org/"
+},
+{
+"name": "OWASP Threat Dragon",
+"use": "Free threat-modeling tool",
+"cost": "Free",
+"when": "M17",
+"url": "https://owasp.org/www-project-threat-dragon/"
+}
+]
+},
+{
+"title": "GRC, frameworks and standards",
+"items": [
+{
+"name": "NIST CybersecurityFramework 2.0",
+"use": "0 The map of the whole discipline",
+"cost": "Free",
+"when": "M1, M12",
+"url": "https://www.nist.gov/cyberframework"
+},
+{
+"name": "NIST SP 800-30r1",
+"use": "Risk assessment methodology",
+"cost": "Free",
+"when": "M12",
+"url": "https://csrc.nist.gov/pubs/sp/800/30/r1/final"
+},
+{
+"name": "NIST SP 800-53r5",
+"use": "Control catalogue used everywhere",
+"cost": "Free",
+"when": "M12+",
+"url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final"
+},
+{
+"name": "NIST SP 800-207 (Zero Trust)",
+"use": "Architecture principles",
+"cost": "Free",
+"when": "M19",
+"url": "https://csrc.nist.gov/pubs/sp/800/207/final"
+},
+{
+"name": "CIS Controls",
+"use": "The best free prioritized baseline (IG1)",
+"cost": "Free",
+"when": "M12+",
+"url": "https://www.cisecurity.org/controls"
+},
+{
+"name": "CIS Benchmarks",
+"use": "Hardening standards per platform",
+"cost": "Free",
+"when": "M3+",
+"url": "https://www.cisecurity.org/cis-benchmarks"
+},
+{
+"name": "CISA tabletop exercisepackages",
+"use": "s Ready-made exercises you can run",
+"cost": "Free",
+"when": "M12",
+"url": "https://www.cisa.gov/resources-tools/services/cisa-tabletop-exercise-packages"
+},
+{
+"name": "CISA Zero Trust MaturityModel",
+"use": "l Practical maturity framing",
+"cost": "Free",
+"when": "M19",
+"url": "https://www.cisa.gov/zero-trust-maturity-model"
+},
+{
+"name": "ENISA publications",
+"use": "European threat landscape and guidance",
+"cost": "Free",
+"when": "M12+",
+"url": "https://www.enisa.europa.eu/publications"
+},
+{
+"name": "ISO/IEC 27001",
+"use": "The certifiable management standard",
+"cost": "Paid",
+"when": "M12, M21+",
+"url": "https://www.iso.org/standard/27001"
+}
+]
+},
+{
+"title": "AI security",
+"items": [
+{
+"name": "OWASP GenAI Security Project",
+"use": "LLM Top 10, Agentic Top 10, agentic security guidance",
+"cost": "Free",
+"when": "M18+",
+"url": "https://genai.owasp.org/"
+},
+{
+"name": "MITRE ATLAS",
+"use": "Adversary techniques against AI systems",
+"cost": "Free",
+"when": "M18+",
+"url": "https://atlas.mitre.org/"
+},
+{
+"name": "NIST AI Risk ManagementFramework",
+"use": "k Governance vocabulary regulators use",
+"cost": "Free",
+"when": "M18+",
+"url": "https://www.nist.gov/itl/ai-risk-management-framework"
+},
+{
+"name": "Google SAIF",
+"use": "Practical control framework for AI systems",
+"cost": "Free",
+"when": "M18+",
+"url": "https://saif.google/"
+},
+{
+"name": "PortSwigger — Web LLMattacks",
+"use": "s Prompt injection in real web contexts",
+"cost": "Free",
+"when": "M8, M18",
+"url": "https://portswigger.net/web-security/llm-attacks"
+},
+{
+"name": "Gandalf (Lakera)",
+"use": "Fast intuition for prompt injection",
+"cost": "Free",
+"when": "M18",
+"url": "https://gandalf.lakera.ai/"
+},
+{
+"name": "Crucible (Dreadnode)",
+"use": "AI security challenges",
+"cost": "Free",
+"when": "M18",
+"url": "https://crucible.dreadnode.io/"
+},
+{
+"name": "garak",
+"use": "LLM vulnerability scanner",
+"cost": "Free",
+"when": "M18+",
+"url": "https://github.com/NVIDIA/garak"
+},
+{
+"name": "PyRIT",
+"use": "Automated AI risk identification toolkit",
+"cost": "Free",
+"when": "M18+",
+"url": "https://github.com/Azure/PyRIT"
+},
+{
+"name": "promptfoo",
+"use": "Evaluations and red-team suites as code",
+"cost": "Free + paid",
+"when": "M18+",
+"url": "https://www.promptfoo.dev/"
+},
+{
+"name": "Ollama",
+"use": "Local models for sensitive data",
+"cost": "Free",
+"when": "M14+",
+"url": "https://ollama.com/"
+},
+{
+"name": "Simon Willison on promptinjection",
+"use": "n The clearest running analysis of the problem",
+"cost": "Free",
+"when": "M18+",
+"url": "https://simonwillison.net/tags/prompt-injection/"
+},
+{
+"name": "Embrace The Red",
+"use": "Practical AI attack research with proofs of concept",
+"cost": "Free",
+"when": "M18+",
+"url": "https://embracethered.com/blog/"
+},
+{
+"name": "EU AI Act (official text)",
+"use": "The regulation itself",
+"cost": "Free",
+"when": "M18, M21+",
+"url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+}
+]
+},
+{
+"title": "Staying current",
+"items": [
+{
+"name": "CISA advisories",
+"use": "Authoritative alerts and guidance",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://www.cisa.gov/news-events/cybersecurity-advisories"
+},
+{
+"name": "Google Threat Intelligenceblog",
+"use": "g Incident and actor research",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://cloud.google.com/blog/topics/threat-intelligence"
+},
+{
+"name": "Microsoft Security blog",
+"use": "Identity, cloud and threat research",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://www.microsoft.com/en-us/security/blog/"
+},
+{
+"name": "Unit 42",
+"use": "Malware and campaign analysis",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://unit42.paloaltonetworks.com/"
+},
+{
+"name": "Cisco Talos",
+"use": "Vulnerability and threat research",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://blog.talosintelligence.com/"
+},
+{
+"name": "Elastic Security Labs",
+"use": "Detection-focused research",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://www.elastic.co/security-labs"
+},
+{
+"name": "tl;dr sec",
+"use": "The best weekly AppSec/security newsletter",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://tldrsec.com/"
+},
+{
+"name": "Detection Engineering Weekly",
+"use": "Detection-focused newsletter",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://www.detectionengineering.net/"
+},
+{
+"name": "This Week in 4n6",
+"use": "DFIR news round-up",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://thisweekin4n6.com/"
+},
+{
+"name": "Verizon DBIR",
+"use": "Annual data on how breaches actually happen",
+"cost": "Free",
+"when": "Yearly",
+"url": "https://www.verizon.com/business/resources/reports/dbir/"
+},
+{
+"name": "Risky Business",
+"use": "The industry news podcast",
+"cost": "Free",
+"when": "Weekly",
+"url": "https://risky.biz/"
+},
+{
+"name": "Darknet Diaries",
+"use": "Narrative episodes — good for context and motivation",
+"cost": "Free",
+"when": "Anytime",
+"url": "https://darknetdiaries.com/"
+}
+]
+},
+{
+"title": "Career and learning tools",
+"items": [
+{
+"name": "Obsidian",
+"use": "Local markdown knowledge base",
+"cost": "Free",
+"when": "M1+",
+"url": "https://obsidian.md/"
+},
+{
+"name": "Anki",
+"use": "Spaced repetition for the things that must be instant",
+"cost": "Free",
+"when": "M1+",
+"url": "https://apps.ankiweb.net/"
+},
+{
+"name": "GitHub Pages",
+"use": "Free hosting for your portfolio site",
+"cost": "Free",
+"when": "M1+",
+"url": "https://pages.github.com/"
+},
+{
+"name": "draw.io",
+"use": "Architecture and network diagrams",
+"cost": "Free",
+"when": "M1+",
+"url": "https://app.diagrams.net/"
+},
+{
+"name": "HackerOne",
+"use": "Bug bounty and vulnerability disclosure programmes",
+"cost": "Free",
+"when": "M12+",
+"url": "https://www.hackerone.com/"
+},
+{
+"name": "YesWeHack",
+"use": "European/francophone bug bounty platform",
+"cost": "Free",
+"when": "M12+",
+"url": "https://www.yeswehack.com/"
+},
+{
+"name": "Intigriti",
+"use": "European bug bounty platform",
+"cost": "Free",
+"when": "M12+",
+"url": "https://www.intigriti.com/"
+},
+{
+"name": "OWASP chapters",
+"use": "Local meetups and speaking opportunities",
+"cost": "Free",
+"when": "M4+",
+"url": "https://owasp.org/chapters/"
+},
+{
+"name": "NIST NICE Framework",
+"use": "Role and skill taxonomy for CV mapping",
+"cost": "Free",
+"when": "M12+",
+"url": "https://www.nist.gov/itl/applied-cybersecurity/nice/nice-framework-resource-center"
+}
+]
+}
+]

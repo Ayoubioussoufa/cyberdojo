@@ -1,0 +1,29 @@
+{
+  "name": "cyberdojo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "npx --yes serve@14.2.4 out -l 3100",
+    "typecheck": "tsc --noEmit",
+    "test:shell": "tsx scripts/check-shell.ts",
+    "test:missions": "tsx scripts/check-missions.ts",
+    "test:content": "tsx scripts/check-content.ts",
+    "test:drills": "tsx scripts/check-drills.ts",
+    "test": "pnpm test:shell && pnpm test:missions && pnpm test:drills && pnpm test:content"
+  },
+  "dependencies": {
+    "marked": "15.0.12",
+    "next": "16.2.10",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}
