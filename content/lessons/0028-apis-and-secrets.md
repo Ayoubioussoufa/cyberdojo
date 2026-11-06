@@ -41,6 +41,13 @@ Three things here are professional habits:
 - **`raise_for_status()`.** It turns HTTP errors into exceptions rather than silently using bad data.
 - **The key comes from the environment,** never from the code.
 
+?? Why add `timeout=10` to a request?
++ A stuck server can't hang it
+- It limits the user to ten
+- It retries the request ten times
+- It encrypts requests for ten seconds
+=> Without a timeout, your tool may wait forever.
+
 ## Secrets: the rule with no exceptions
 
 ::: law Never commit a key
@@ -101,6 +108,13 @@ Compute a hash with the standard library:
 import hashlib
 print(hashlib.sha256(open("sample.bin", "rb").read()).hexdigest())
 ```
+
+?? What's safest to do with a suspicious company file?
++ Searching for the file's hash
+- Uploading it to public scanners
+- Emailing it to every colleague
+- Opening it on your laptop
+=> A hash reveals nothing about the contents. An upload may share them with the world.
 
 ## Build enrich
 

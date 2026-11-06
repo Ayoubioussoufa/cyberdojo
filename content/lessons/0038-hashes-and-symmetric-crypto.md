@@ -34,6 +34,13 @@ Encoding is not security. If there's no key, it isn't protecting anything.
 
 @drill crypto-kind
 
+?? Does Base64 protect data?
++ No, as anyone can reverse it
+- Yes, as it scrambles the data
+- Yes, as only servers can decode
+- No, as it only handles numbers
+=> With no key, it's a change of format and nothing more.
+
 ## Hashes
 
 A **cryptographic hash** turns any input into a fixed-size fingerprint:
@@ -76,6 +83,13 @@ ct = AESGCM(key).encrypt(nonce, b"secret", None)
 ```
 
 Notice that this uses the well-reviewed [`cryptography`](https://cryptography.io/) library. You're combining trusted parts, not inventing any.
+
+?? Why is AES-GCM the normal choice?
++ It also detects any tampering
+- It never needs a key
+- It runs without any nonce
+- It can't ever be misused
+=> Authenticated encryption protects integrity as well as secrecy.
 
 ## How it fails
 

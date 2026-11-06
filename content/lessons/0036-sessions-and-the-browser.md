@@ -28,6 +28,13 @@ HTTP has no memory. Each request stands alone, so how does a site know you're st
 
 So that cookie **is** your login. Whoever holds it is you, with no password needed. Protecting it is the point of everything below.
 
+?? Why is a session cookie so valuable?
++ Whoever holds it is logged in
+- It contains the user's real password
+- It can only be used once
+- It stores the server's private key
+=> The cookie stands in for the login, so stealing it skips the password.
+
 ## Cookie flags
 
 ```http
@@ -59,6 +66,13 @@ The [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/ch
 
 A **JWT** has three parts, `header.payload.signature`, each Base64URL-encoded. **The payload isn't encrypted**: anyone can read it. Paste one into [jwt.io](https://jwt.io/). The signature only proves it hasn't been changed. The rules are in [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519).
 
+?? Is a JWT's payload secret?
++ No, anyone can read it
+- Yes, it's always strongly encrypted
+- Yes, only browsers read it
+- No, it's never sent anywhere
+=> It's only encoded. The signature proves that it wasn't changed.
+
 ## Same-origin policy
 
 Imagine you're logged in to your bank, and you open `evil.example` in another tab. Why can't its JavaScript read your balance?
@@ -75,6 +89,13 @@ Because of the [same-origin policy](https://developer.mozilla.org/en-US/docs/Web
 ::: trap The policy stops reading, not sending
 A page on `evil.example` can still **send** a request to your bank, and your browser may attach the cookie. It just can't read the reply. That gap is what CSRF exploits, and `SameSite` cookies narrow it.
 :::
+
+?? Do `https://api.shop.example` and `https://shop.example` share an origin?
++ No, because the host differs
+- Yes, because both use HTTPS
+- Yes, because they share domains
+- No, because the port differs
+=> Scheme, host and port must all match exactly.
 
 ## CORS
 

@@ -75,6 +75,13 @@ def parse(path: str) -> tuple[Counter, int]:
 
 `errors="replace"` matters: logs can contain any bytes, including attacker-controlled ones. `failures.most_common(5)` then gives the top five. Same logic as your pipeline, but now it can be tested and extended.
 
+?? Why open a log with `errors="replace"`?
++ Logs can contain any bytes
+- It replaces all the passwords
+- It makes reading files faster
+- It fixes spelling in logs
+=> Attackers control some of what's logged, so bad bytes mustn't crash your parser.
+
 ## Structured output
 
 Tools should talk in structured formats so that other tools can use them.
@@ -89,6 +96,13 @@ with open("report.csv", "w", newline="") as f:
     w.writerow(["ip", "failures"])
     w.writerows(failures.most_common())
 ```
+
+?? Why give a tool a JSON output mode?
++ Other tools can read it
+- It's more secure than text
+- It makes logs much smaller
+- Humans can't read plain text
+=> Structured output is what lets small tools work together.
 
 ## A real command-line interface
 

@@ -28,6 +28,13 @@ sudo systemctl disable --now apache2                    stop it and keep it off
 
 `disable --now` stops the service and prevents it from starting at boot. Each service you remove is a piece of attack surface gone.
 
+?? What does `systemctl disable --now apache2` do?
++ Stops it now, and at boot
+- Deletes its files from the disk
+- Restarts it with a safer configuration
+- Hides it from the process list
+=> It stops the service, and keeps it off after a reboot.
+
 ## Know where the evidence is
 
 ```
@@ -37,6 +44,13 @@ tail -f /var/log/auth.log                  logins, live
 ```
 
 Logins and `sudo` use go to `/var/log/auth.log` on Ubuntu. Attackers try to clear logs, so serious environments ship them to another machine straight away. That idea returns in Month 9.
+
+?? Why do serious teams send logs to another machine?
++ Attackers try to clear local logs
+- Logs run faster on other machines
+- Linux can't store logs on disk
+- It stops attackers from logging in
+=> An attacker with root can edit local logs. Copies elsewhere survive.
 
 ## Scheduled jobs
 
@@ -81,6 +95,13 @@ Keep your current session open while you test a new login from a second terminal
 
 On Ubuntu, files in `/etc/ssh/sshd_config.d/` can override the main file, so verify the effective settings with `sudo sshd -T | grep -i permitrootlogin`.
 
+?? Why keep your session open while you test a new login?
++ You can still fix a mistake
+- SSH needs two sessions to start
+- It makes the new settings apply
+- Closing it deletes the configuration file
+=> If the new settings lock you out, the open session is your way back in.
+
 ## The host firewall
 
 ```
@@ -92,6 +113,13 @@ sudo ufw status verbose
 
 Allow SSH **before** enabling it. `ufw` is a friendly layer over the kernel's [nftables](https://wiki.nftables.org/).
 
+?? Why allow SSH before running `ufw enable`?
++ Otherwise you'd lock yourself out
+- Otherwise ufw refuses to start
+- Otherwise SSH loses its keys
+- Otherwise all logs get deleted
+=> Default deny applies at once, including to your own connection.
+
 ## Benchmarks: not your opinion
 
 A **CIS Benchmark** is a consensus list of hundreds of settings for one product. You don't need them all. The roadmap asks you to implement a subset and to record why. Download the free PDF for Ubuntu from [CIS](https://www.cisecurity.org/cis-benchmarks).
@@ -99,6 +127,13 @@ A **CIS Benchmark** is a consensus list of hundreds of settings for one product.
 ```
 sudo lynis audit system       a scored audit, with suggestions
 ```
+
+?? What's a CIS Benchmark?
++ An agreed list of secure settings
+- A speed test for your server
+- A law that every company follows
+- A scanner that fixes everything automatically
+=> It's expert consensus for one product, and you choose a sensible subset.
 
 ## Finish P01
 

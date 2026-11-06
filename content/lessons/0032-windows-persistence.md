@@ -56,6 +56,13 @@ schtasks /delete /tn "Updater" /f
 
 Notepad is harmless, but the mechanism is real. That's what the roadmap means by creating persistence on purpose.
 
+?? Why plant harmless persistence yourself?
++ You learn exactly what it leaves
+- It makes the machine run faster
+- It's required by Windows each month
+- It removes any real malware present
+=> Doing it once teaches you what to look for, in a way that reading can't.
+
 ## What makes an entry suspicious
 
 - It runs from a user-writable path: `AppData`, `Temp`, `ProgramData`, `Public`.

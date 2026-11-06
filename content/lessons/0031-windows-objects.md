@@ -33,6 +33,13 @@ Download the free evaluation images of [Windows 11 Enterprise](https://www.micro
 | Procmon | Every file, registry and process event, live |
 | TCPView | Network connections per process |
 
+?? Which tool shows what starts automatically on Windows?
++ Autoruns, which lists startup items
+- TCPView, which lists network connections
+- Procmon, which records live events
+- Notepad, which edits plain text
+=> Autoruns is your first stop when hunting persistence.
+
 ## Processes that should look a certain way
 
 Windows has a predictable tree, and malware often mimics it. `services.exe` starts services, `svchost.exe` hosts them, and `lsass.exe` handles logins and holds credential material. Each normal system process has an expected parent, location and count.
@@ -45,9 +52,23 @@ Windows has a predictable tree, and malware often mimics it. `services.exe` star
 
 The SANS [Hunt Evil poster](https://www.sans.org/posters/hunt-evil/) lists these. Print it.
 
+?? Which of these is a red flag?
++ `svchost.exe` running from a user's folder
+- `svchost.exe` running from the `System32` folder
+- `lsass.exe` running once on the machine
+- `services.exe` starting a normal Windows service
+=> The real one lives in `System32`. Location gives away many impostors.
+
 ## Services and scheduled tasks
 
 A **service** is a background program, often running as the very powerful `SYSTEM` account. A **scheduled task** runs at a time or event. Both are favourite persistence spots, and both are logged when created.
+
+?? Why do attackers like Windows services?
++ They often run as powerful `SYSTEM`
+- They can't be seen by anyone
+- They only run on Linux machines
+- They delete logs all by themselves
+=> A service survives reboots, and it often has the highest rights. It's also logged when created.
 
 ## The registry
 
@@ -60,9 +81,23 @@ The **registry** is Windows' database of settings, arranged in **hives**, a bit 
 
 Values under `...\CurrentVersion\Run` start programs at login, which makes them a classic persistence location. You'll hunt those next lesson.
 
+?? What does `HKLM` hold?
++ Settings for the whole machine
+- Settings for one user only
+- A folder of system logs
+- A list of open ports
+=> `HKCU` holds the current user's settings.
+
 ## NTFS
 
 Beyond what Linux has, NTFS has a master file table (the **MFT**) recording every file, and **alternate data streams**: extra data attached to a file that Explorer doesn't show. Windows uses one to mark downloaded files as coming from the internet, and attackers can hide data in them. See both in Month 15.
+
+?? What's an alternate data stream?
++ Extra data attached to a file
+- A second copy of Windows itself
+- A network connection between two folders
+- A log of all deleted files
+=> Explorer doesn't show them, so they're a place to hide things.
 
 ## Identity: SIDs and tokens
 

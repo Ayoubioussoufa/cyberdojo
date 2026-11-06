@@ -7,7 +7,7 @@ builds: read and craft raw HTTP requests by hand
 source: MDN, An overview of HTTP | https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview
 words: HTTP request, status code, reverse proxy
 ---
-The web is the largest attack surface there is. This month you learn how it works by building it correctly. In Month 8 you'll break it. If you skip this, web hacking becomes a list of tricks you don't really understand.
+The web is the largest attack surface there is. This month you learn how it works by building it correctly. In Month 8 you'll learn how it fails, and how to fix it. If you skip this, web hacking becomes a list of tricks you don't really understand.
 
 @term HTTP request = A message from a client asking a server to do something.
 @term HTTP response = A server's reply, with a status code, headers and usually a body.
@@ -60,6 +60,13 @@ username=ana&password=hunter2            body
 Every part of that request is under the sender's control: the method, the headers, the cookies, the body. Your browser's forms are only one way of sending it. Tools like `curl` and Burp can send anything. Nearly all of web security follows from that one fact.
 :::
 
+?? Which part of a request does the sender control?
++ All of it, headers included
+- Only the body of a form
+- Only the web address itself
+- None, as browsers control it
+=> Tools can send anything, which is why the server must never trust the client.
+
 ## Methods
 
 | Method | Purpose | Has a body? |
@@ -72,6 +79,13 @@ Every part of that request is under the sender's control: the method, the header
 | `OPTIONS` | Ask what's allowed | No |
 
 GET should never change anything. Values in a URL also end up in logs and browser history, so secrets never belong there.
+
+?? Why shouldn't secrets go in a URL?
++ URLs end up in logs and history
+- URLs can't contain letters and numbers
+- GET requests are always encrypted twice
+- Browsers refuse to load such addresses
+=> Even over HTTPS, a URL gets written to server logs and browser history.
 
 ## Status codes
 
@@ -100,6 +114,13 @@ Real sites have layers, and each one writes its own logs:
 @flow Browser > CDN or WAF > Reverse proxy > App server > Database
 
 A **reverse proxy** like nginx terminates TLS and passes requests to the app. One catch: the app often sees the proxy's IP, so the real client's IP arrives in a header like `X-Forwarded-For`, which a client can forge if the proxy isn't set up carefully.
+
+?? Why can `X-Forwarded-For` mislead an investigator?
++ A client can forge that header
+- It only shows your own address
+- It's encrypted, so nobody reads it
+- Proxies always delete it from logs
+=> Trust it only if your own proxy sets it, and strips what clients send.
 
 ## Try it
 

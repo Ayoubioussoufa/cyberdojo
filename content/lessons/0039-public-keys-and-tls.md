@@ -28,9 +28,23 @@ With a **key pair**, what one key does, only the other can undo.
 
 Public-key operations are slow, so real systems use them only to get started, and then switch to fast symmetric encryption.
 
+?? To send Ana a secret, which key do you use?
++ Ana's public key
+- Ana's private key
+- Your public key
+- Your password hash
+=> Anyone can encrypt with her public key, and only her private key opens it.
+
 ## Key exchange
 
 Diffie-Hellman lets two parties create a shared secret while an eavesdropper watches everything. It's like mixing paint: each side keeps a private colour and swaps mixtures, and it's easy to mix but very hard to unmix. Modern TLS uses an elliptic-curve version, with a fresh key for each session. That gives **forward secrecy**: if a server's key is stolen next year, today's recorded traffic stays safe.
+
+?? What does forward secrecy protect?
++ Recorded traffic, if a key leaks later
+- Passwords that are stored on the server
+- Files that are saved on a laptop
+- Certificates that have gone out of date
+=> Each session has its own key, so a later theft can't unlock old recordings.
 
 ## Digital signatures
 
@@ -68,16 +82,12 @@ It proves the server controls that **name**. It does **not** prove the operator 
 
 [TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446) makes a secure channel in a single round trip:
 
-```
-Client                                      Server
-  │── ClientHello ─────────────────────────▶│
-  │   versions, ciphers, key share, name    │
-  │◀── ServerHello + key share ─────────────│
-  │◀── Certificate, CertificateVerify,      │  (already encrypted)
-  │    Finished ────────────────────────────│
-  │── Finished ────────────────────────────▶│
-  │═══════ encrypted application data ═════ │
-```
+@seq Client | Server
+Client > Server: ClientHello, my key share
+Server > Client: ServerHello, its key share
+Server > Client: Certificate, signature, Finished
+Client > Server: Finished
+Client > Server: Encrypted application data
 
 1. **ClientHello:** "Here's what I support, and my half of the key exchange."
 2. **ServerHello:** the server sends its half. Both now derive the same keys.
@@ -92,6 +102,13 @@ openssl s_client -connect example.com:443 -servername example.com </dev/null
 ```
 Find the certificate chain, the protocol and the cipher. Then capture a handshake in Wireshark and find the ClientHello.
 :::
+
+?? What gives TLS its proof of who you're talking to?
++ The server's certificate
+- The client's cookie
+- The TCP handshake
+- The DNS answer
+=> The server signs the handshake with the key that matches its certificate.
 
 ## Post-quantum, briefly
 

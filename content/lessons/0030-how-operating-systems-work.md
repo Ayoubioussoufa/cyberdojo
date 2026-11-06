@@ -31,9 +31,23 @@ A program crosses over only through a **system call**: a controlled gate where t
 If malicious code reaches kernel mode, it can hide from everything above it. That's why a kernel driver is so dangerous, and why loading one needs high privilege.
 :::
 
+?? How does a program get something done in kernel mode?
++ Through a system call, which is checked
+- By writing directly to the hardware itself
+- By asking another user for their password
+- By restarting the computer in safe mode
+=> System calls are the controlled gate. That's where the kernel checks permissions.
+
 ## Processes and threads
 
 A **process** is a container: its memory, its open handles, its security identity. A **thread** is what actually runs. A process has one or more. Think of the process as a kitchen and the threads as cooks sharing it.
+
+?? What actually runs on the CPU?
++ A thread, inside a process
+- A file, inside a folder
+- A handle, inside a key
+- A user, inside a group
+=> A process is the container, and threads do the work.
 
 ## Virtual memory
 
@@ -53,6 +67,13 @@ Here's the security payoff: address `0x1000` in your browser and `0x1000` in you
 Operating systems offer legitimate ways to reach across, used by debuggers. With enough privilege, a process can open another with a **handle**, then write into its memory and start a thread there. That's **process injection**. ATT&CK files it as [T1055](https://attack.mitre.org/techniques/T1055/). Malware does this to hide inside a trusted process, or to steal credentials from one.
 
 Sysmon can record this: **event ID 8** logs CreateRemoteThread, and **event ID 10** logs one process accessing another. You'll use both this month.
+
+?? Why would malware inject itself into a trusted process?
++ To hide inside something that looks normal
+- To make that program run much faster
+- To install a new version of Windows
+- To free up more memory for users
+=> Activity from a trusted process draws far less attention.
 
 ## Handles and DLLs
 

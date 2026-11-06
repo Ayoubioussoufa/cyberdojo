@@ -50,6 +50,13 @@ PowerShell has an execution policy that limits running scripts. Microsoft is exp
 
 So don't rely on it. The controls that matter are logging, and [application control](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol).
 
+?? Why isn't execution policy a real control?
++ Users can simply bypass it
+- It only applies on Linux
+- It slows PowerShell too much
+- It was removed from Windows
+=> Microsoft says so itself. Rely on logging and application control.
+
 ## Script block logging
 
 Attackers obfuscate commands, but PowerShell has to decode them before it runs them. **Script block logging** records the decoded code as **event 4104**. Enable it by Group Policy, then look:
@@ -61,6 +68,13 @@ Get-WinEvent -FilterHashtable @{
 ```
 
 This is why PowerShell is so loud on a well-configured host, and why attackers try to run older versions or disable logging.
+
+?? Why does event 4104 work against obfuscated scripts?
++ PowerShell must decode before running it
+- Attackers can't use Base64 any more
+- Windows blocks all encoded commands now
+- Event 4104 decrypts all your files
+=> Whatever the disguise, the decoded code gets logged.
 
 ## Reading an attacker's one-liner
 
@@ -90,6 +104,13 @@ Decode it with [CyberChef](https://gchq.github.io/CyberChef/) or in PowerShell:
 ## Remoting
 
 `Enter-PSSession -ComputerName SRV1` opens a remote shell, and `Invoke-Command` runs on many machines. Admins use it, and so do attackers moving laterally. It uses WinRM, on ports 5985 and 5986.
+
+?? Which ports does WinRM use?
++ 5985 and 5986
+- 22 and 23
+- 80 and 443
+- 3389 and 445
+=> 22 is SSH, 80 and 443 are web, and 3389 is RDP.
 
 ## Your triage script
 

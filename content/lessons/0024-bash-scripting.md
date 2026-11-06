@@ -34,6 +34,13 @@ The next line is a safety net, and you should use it in every script:
 | `-u` | Stop on an unset variable, which is usually a typo |
 | `-o pipefail` | A pipeline fails if any stage fails, not just the last |
 
+?? What does `set -e` do?
++ It stops the script on failure
+- It encrypts the script on disk
+- It runs the script as root
+- It hides errors from the screen
+=> Without it, a script carries on after a failed command, and may do damage.
+
 ## Variables and quoting
 
 ```bash
@@ -78,6 +85,13 @@ if [[ "$count" -gt 10 ]]; then echo "many failures"; fi
 | `-z "$x"` | The string is empty |
 | `"$a" == "$b"` | Strings are equal |
 | `"$a" -gt "$b"` | Number a is greater |
+
+?? Which exit code means success?
++ Zero, and anything else means failure
+- One, and zero means the opposite
+- Any positive number below one hundred
+- Only the word OK in text
+=> `if` tests that number, which is why `grep -q` works inside an `if`.
 
 ## Loops and functions
 

@@ -30,6 +30,13 @@ print(f"Hello {name}, you have {attempts} attempts left.")
 
 Run it with `python3 hello.py`. The `f` before the quotes lets you put values inside `{}`.
 
+?? What does the `f` in `f"Hello {name}"` do?
++ It puts values inside the text
+- It saves the text to files
+- It makes the text run faster
+- It fixes any spelling in text
+=> It's an f-string: anything in `{}` gets filled in.
+
 ## The types you'll use constantly
 
 ```python
@@ -65,6 +72,13 @@ for ip, n in hits.items():
         print(f"{ip} is fine")
 ```
 
+?? What does indentation do in Python?
++ It groups code into blocks
+- It only makes code nicer
+- It sets the file's size
+- It marks lines as comments
+=> Those spaces are the structure. Wrong indentation changes what the program does.
+
 ## Functions
 
 A **function** names a piece of logic so that you can test and reuse it. Put logic in functions from the start.
@@ -81,6 +95,13 @@ print(is_weak("hunter2"))    # True
 
 The `: str` and `-> bool` are type hints: they don't change behaviour, but they document intent and tools can check them. The triple-quoted line is a docstring.
 
+?? Why put logic in functions from the start?
++ You can test and reuse it
+- Python refuses code outside of them
+- Functions always run much faster here
+- They hide code from other people
+=> Small named pieces are what make testing possible.
+
 ## Handling errors
 
 Real data is messy. **Exceptions** let you handle problems rather than crash:
@@ -94,6 +115,13 @@ except FileNotFoundError:
 ```
 
 `with open(...)` closes the file for you, even if something fails.
+
+?? What do `try` and `except` let you do?
++ Handle a problem without crashing
+- Prevent every error from happening
+- Hide the code from attackers
+- Run code twice at once
+=> Real data is messy, so a good tool expects problems and handles them.
 
 ## Virtual environments
 

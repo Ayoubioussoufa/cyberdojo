@@ -34,6 +34,13 @@ id | name  | role                  id | user_id | total
 
 `id` is each table's **primary key**. `orders.user_id` is a **foreign key**, pointing at a user.
 
+?? What's a foreign key?
++ A column pointing at another table
+- A password from another country's server
+- A key that encrypts the table
+- A column that's always left empty
+=> `orders.user_id` points at a row in `users`.
+
 ## The queries you need
 
 ```sql
@@ -74,6 +81,13 @@ HAVING SUM(total) > 50;
 An **index** is like a book's index: it makes lookups fast. Without one, the database scans the whole table.
 
 A **transaction** groups changes so that they all happen or none do: move money from A to B, and never lose it halfway.
+
+?? What does a transaction guarantee?
++ All the changes happen, or none
+- Changes happen faster than without one
+- Data is encrypted on the disk
+- Queries never need an index again
+=> Money can't vanish halfway through a transfer.
 
 ## Parameterised queries: the most important thing here
 

@@ -63,6 +63,13 @@ toolkit/
 
 Work in branches and open pull requests, even alone. Add a [GitHub Actions](https://docs.github.com/en/actions) workflow that runs your tests on every push: that's **CI**, and the green badge is visible proof.
 
+?? What does CI do for your project?
++ Runs your tests on every push
+- Writes your tests for you automatically
+- Stores your passwords in the cloud
+- Deletes any branches you've finished with
+=> A green tick means that the tests passed on a clean machine.
+
 ## Containers in five minutes
 
 A **container** isn't a virtual machine. A VM has a whole operating system. A container is an isolated process sharing the host's kernel, so it starts in moments. An **image** is the template, and a container is a running instance of it.

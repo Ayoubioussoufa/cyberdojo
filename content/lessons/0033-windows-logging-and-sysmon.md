@@ -71,6 +71,13 @@ Sysmon64.exe -accepteula -i sysmonconfig.xml
 Logs appear in Event Viewer under **Applications and Services Logs → Microsoft → Windows → Sysmon → Operational**. Then generate events, and find each one: run `notepad` (ID 1), run `curl https://example.com` (IDs 3 and 22), create a file (ID 11), add a Run key (ID 13).
 :::
 
+?? What does Sysmon add that default logs lack?
++ Command lines, hashes and parent processes
+- Automatic blocking of all known malware
+- A backup of every file changed
+- A faster way to start Windows
+=> It records detail. It doesn't block anything.
+
 ## Querying from the command line
 
 Clicking through Event Viewer doesn't scale. `Get-WinEvent` is the tool:
