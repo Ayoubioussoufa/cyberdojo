@@ -32,6 +32,13 @@ sudo tcpdump -i eth0 -w out.pcap   save a capture to a file
 
 `traceroute` uses a neat trick: it sends packets that expire after 1 hop, then 2, and so on, and each router that drops one sends back an **ICMP** error, revealing itself. Remember `ping` can be blocked: no reply doesn't prove a host is down.
 
+?? `ping` gets no reply from a server. What can you conclude?
++ Nothing certain, as ICMP is very often blocked
+- The server is definitely switched off right now
+- Your own network cable must be unplugged again
+- The server has been hacked by an attacker
+=> Many hosts and firewalls drop ping. Try another way before you decide that it's down.
+
 ## Reading Wireshark
 
 Wireshark has three panes: the packet list, the decoded layers of the selected packet, and the raw bytes. You'll recognise the layers: Ethernet, then IP, then TCP, then HTTP. That's encapsulation, visible.

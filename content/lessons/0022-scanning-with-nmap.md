@@ -31,6 +31,13 @@ It's the TCP handshake from lesson 18, used as a question.
 
 The default scan as root, `-sS`, is a **SYN scan**: on SYN-ACK, Nmap sends RST instead of finishing the handshake. It's fast. It's also still visible to any decent monitoring.
 
+?? In a SYN scan, what does a closed port send back?
++ RST, which means that nothing's listening there
+- SYN-ACK, which means that a service answered
+- Nothing, because closed ports stay totally silent
+- FIN, which means the service has finished
+=> A closed port answers RST. Silence usually means that a firewall dropped the probe.
+
 ## A method, not a command
 
 ```

@@ -7,7 +7,7 @@ builds: read any ls -l line and fix permission problems with chmod
 source: chmod(1) manual page | https://man7.org/linux/man-pages/man1/chmod.1.html
 words: owner, group, least privilege
 ---
-In lesson 3 you learned that the kernel checks every request. Now you'll see exactly what it checks. This is the most asked-about topic in junior technical interviews, and the base of everything you'll do with privilege escalation in Month 10.
+In lesson 3 you learned that the kernel checks every request. Now you'll see exactly what it checks. This is the most asked-about topic in junior technical interviews, and the base of everything you'll audit for privilege escalation in Month 10.
 
 @term user = An identity on the system. The kernel knows it by a number, the UID.
 @term UID = User ID, the number that the kernel uses to identify a user.
@@ -32,6 +32,13 @@ One account is special. **root** has UID 0, and the kernel lets it bypass the us
 ::: why Names don't matter, numbers do
 The kernel only sees numbers. Any account with UID 0 *is* root, whatever it's called. Adding a second UID 0 account is a classic backdoor, and your Month 3 audit script will hunt for it.
 :::
+
+?? An account named `backup` has UID 0. What can it do?
++ Everything root can, as kernels only see numbers
+- Only backups, because of the name it's given
+- Nothing yet, until someone adds it to `sudo`
+- Read files, but it can never change them
+=> UID 0 is what makes root. The name is only a label for people.
 
 ## Reading a permission line
 
@@ -59,6 +66,13 @@ Three classes of people, three possible rights:
 ::: trap Directories are different
 To delete a file, you need write permission on the **directory**, not on the file. A file you can't write to can still be deleted by anyone who can write to its folder. That surprises people, and it matters.
 :::
+
+?? In `-rwxr-x---`, what can a member of the group do?
++ Read and run it, but not change it
+- Read, change and run it, like the owner
+- Nothing at all, as it's a private file
+- Run it, but they can't ever read it
+=> The middle three letters are for the group: `r-x`. So they can read and run it, with no `w`.
 
 ## How the kernel decides
 
@@ -89,7 +103,10 @@ Each right has a value: **r = 4, w = 2, x = 1**. Add them up for each class.
 | `r--` | 4 | 4 |
 | `---` | 0 | 0 |
 
-So `rwxr-x---` is **750**: owner 7, group 5, others 0. A few numbers appear everywhere: **644** for ordinary files, **755** for programs and directories, **600** for secrets, **700** for private directories.
+So `rwxr-x---` is **750**: owner 7, group 5, others 0.
+
+@perm rwxr-x---
+ A few numbers appear everywhere: **644** for ordinary files, **755** for programs and directories, **600** for secrets, **700** for private directories.
 
 ```
 chmod 640 report.txt      set exactly rw-r-----
@@ -103,6 +120,13 @@ Only a file's owner or root can change its permissions. To change the owner, you
 @drill rwx-octal
 
 @drill octal-rwx
+
+?? What's the permission string for mode 640?
++ `rw-r-----`
+- `rwxr-----`
+- `rw-rw----`
+- `r--r-----`
+=> 6 is `rw-` for the owner, 4 is `r--` for the group, and 0 is `---` for others.
 
 ## Least privilege
 

@@ -28,6 +28,13 @@ Servers don't have a pretty window showing what happened. They have text files, 
 | `tail -f file` | Keep showing new lines as they arrive | Watch a log live, on a real machine |
 | `wc -l file` | Count lines | How big is this? |
 
+?? A log has 2 million lines. How do you check its format quickly?
++ `head -n 20 file`
+- `sort -r file`
+- `wc -l file`
+- `grep -c x file`
+=> `head` shows the first lines without printing millions of them. `cat` would flood your screen.
+
 ## The manual: your first primary source
 
 Every standard command has a **manual page**. Type `man grep`. It's dense, and you don't need to read it all: look at the name, the synopsis, and the option you're after.
@@ -35,6 +42,13 @@ Every standard command has a **manual page**. Type `man grep`. It's dense, and y
 ::: key Read the manual before you guess
 The roadmap's first practical skill is "read man pages instead of guessing". It matters more than any single command, because it's how you verify AI too. If an AI suggests a flag, `man` tells you whether it exists.
 :::
+
+?? An AI suggests `grep --deep-scan`. How do you check that the flag exists?
++ Look for it in `man grep`
+- Ask the same AI if sure
+- Run it on a production server
+- Search for it on social media
+=> The manual is the primary source for what a command can do. An AI can't verify itself.
 
 ## grep: search inside files
 

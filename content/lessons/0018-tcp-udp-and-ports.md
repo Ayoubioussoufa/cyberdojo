@@ -29,16 +29,21 @@ See your own with `ss -tuln`, which lists what's listening.
 
 @drill ports
 
+?? What's an ephemeral port?
++ A temporary high port that a client picks
+- A permanent port that a web server uses
+- A port that firewalls always block by default
+- A port that only works with UDP traffic
+=> Servers listen on well-known ports, and clients use a random high port for each connection.
+
 ## TCP: a phone call
 
 **TCP** behaves like a phone call. You connect first, everything arrives in order, and lost pieces are sent again. Before any data moves, the two sides perform the handshake:
 
-```
-Client                         Server
-  │  ── SYN  seq=100        ──▶  │   "Can we talk?"
-  │  ◀─ SYN-ACK seq=300 ack=101  │   "Yes. Can you hear me?"
-  │  ── ACK  ack=301        ──▶  │   "Yes."
-```
+@seq Client | Server
+Client > Server: SYN: "Can we talk?"
+Server > Client: SYN-ACK: "Yes. Can you hear me?"
+Client > Server: ACK: "Yes."
 
 Why three steps? Each side must prove it can both send and receive, and each picks a starting sequence number.
 
@@ -72,6 +77,13 @@ An open port answers SYN with SYN-ACK. A closed port answers with RST. A filtere
 | Speed | More overhead | Lighter |
 | Examples | HTTP, SSH, SMTP | DNS, NTP, VoIP, QUIC |
 | Spoofing the source | Hard | Easy |
+
+?? Why does DNS mostly use UDP?
++ A small question and answer need no handshake
+- UDP encrypts all the names you look up
+- TCP can't carry names over ten letters long
+- UDP guarantees that each answer arrives in order
+=> One small packet each way is quick. If it's lost, the client simply asks again.
 
 ## Why UDP matters to a defender
 

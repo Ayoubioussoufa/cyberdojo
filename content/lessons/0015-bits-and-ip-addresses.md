@@ -34,6 +34,13 @@ With all eight bits on you get 255, so a byte holds 0 to 255. That's why you nev
 
 @drill binary
 
+?? What's the largest number that one byte can hold?
++ 255, when all eight bits are on
+- 256, because bytes count upwards from one
+- 128, the value of the highest bit
+- 1024, because computers love powers of two
+=> 128+64+32+16+8+4+2+1 = 255. Counting zero, that's 256 possible values.
+
 ## What an IPv4 address is
 
 An **IPv4 address** is a 32-bit number. Humans write it as four bytes in decimal, separated by dots:
@@ -46,6 +53,13 @@ An **IPv4 address** is a 32-bit number. Humans write it as four bytes in decimal
 Think of it like a phone number: the first part says which network, and the last part says which device. How many bits belong to each part changes from network to network. That's what subnetting is about in the next lesson.
 
 A **packet** carries a source and a destination address, like an envelope. Routers read the destination and pass it along, hop by hop.
+
+?? How many bits are in an IPv4 address?
++ 32, written as four bytes
+- 8, written as one byte
+- 48, written in hexadecimal here
+- 128, written with colons here
+=> Four bytes of eight bits. 48 bits is a MAC address, and 128 bits is IPv6.
 
 ## Public and private addresses
 
@@ -64,7 +78,7 @@ A few others you'll see:
 | Address | Meaning |
 |---|---|
 | `127.0.0.1` | Loopback: this machine, talking to itself |
-| `169.254.x.x` | Link-local: no address could be obtained. In clouds, `169.254.169.254` is the metadata service, which you'll attack in Month 13 |
+| `169.254.x.x` | Link-local: no address could be obtained. In clouds, `169.254.169.254` is the metadata service, which you'll learn to protect in Month 13 |
 | `192.0.2.x`, `198.51.100.x`, `203.0.113.x` | [Reserved for documentation](https://www.rfc-editor.org/rfc/rfc5737), which is why this course uses them |
 
 ?? A log shows a login from `192.168.1.50`. What can you conclude?

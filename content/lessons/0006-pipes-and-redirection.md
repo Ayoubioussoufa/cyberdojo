@@ -28,6 +28,13 @@ grep "Failed password" auth.log | wc -l
 
 `grep` keeps the matching lines, and `wc -l` counts them. Neither knows about the other.
 
+?? What does the `|` symbol do?
++ It feeds one program's output into the next
+- It saves one program's output to a file
+- It runs two programs on separate computers instead
+- It stops a program that runs too long
+=> That's the pipe. Each tool does one job, and the pipe joins them.
+
 ## The tools you'll join
 
 | Tool | Job | Example |
@@ -51,6 +58,13 @@ Oct 27 03:14:15 web1 sshd[811]: Failed password for root from 203.0.113.7 port 4
 ```
 
 Count the words, separated by spaces: `Oct` is field 1, and the IP is field **11**. So `awk '{print $11}'` pulls it out.
+
+?? In the `auth.log` line above, why does `awk '{print $11}'` give the IP address?
++ It's the eleventh word, counting from `Oct`
+- `awk` always knows where the addresses are
+- Field 11 is always the last field
+- `$11` is a special name for addresses
+=> `awk` splits a line on spaces, and it numbers the pieces. If the format changes, the number changes too, so look at the line first.
 
 ## Build the pipeline, one step at a time
 

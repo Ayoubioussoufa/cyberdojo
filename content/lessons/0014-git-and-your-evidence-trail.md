@@ -39,6 +39,13 @@ git push
 First create the empty repository on [GitHub](https://github.com/new). For pushing, GitHub requires [an SSH key or a token](https://docs.github.com/en/get-started/git-basics/about-remote-repositories), not your password. You already know how to make a key.
 :::
 
+?? What's the difference between `git commit` and `git push`?
++ Commit saves locally, and push publishes it
+- Commit publishes it, and push saves locally
+- They're two names for the same action
+- Commit deletes files, and push restores them
+=> A commit is a snapshot on your machine. Nothing reaches GitHub until you push.
+
 ## Branches and pull requests
 
 A **branch** lets you work without touching the main line, and a **pull request** asks to merge it. On a team that's where review happens. The roadmap asks you to do this even alone, so that you know the flow.
@@ -81,9 +88,23 @@ Deleting a password in a later commit doesn't remove it: it's still in the histo
 
 Create the vault from [the learning system](/guides/j1-the-learning-system/) and use the [lab note template](/guides/n1-templates/) from today. Write notes **during** a lab, not after.
 
+?? When should you write your lab notes?
++ During the lab, while it's still happening
+- A week later, when you've had time
+- Only when something goes badly wrong there
+- Never, because commands stay in your history
+=> Notes written afterwards leave out the mistakes, and those are what teach you most.
+
 ## Your first write-up
 
 The month's portfolio output is write-up #1, "What Bandit taught me about Linux", with no level spoilers. Use the [write-up template](/guides/n1-templates/), and keep it short. A finished 400 words beats an unfinished 2,000.
+
+?? Which rule applies to a write-up of a wargame?
++ Share what you learned, with no level spoilers
+- Publish each password so that readers can check
+- Copy the fullest walkthrough that you can find
+- Keep writing until it's at least 5,000 words
+=> OverTheWire's rules forbid publishing credentials, and a short finished piece beats a long unfinished one.
 
 ## The Month 1 gate
 

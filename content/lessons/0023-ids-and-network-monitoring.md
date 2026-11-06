@@ -23,6 +23,13 @@ A firewall decides what passes. It doesn't tell you much about what's happening 
 
 An **IDS** watches a copy of the traffic and alerts. An **IPS** sits in the path and can drop packets. An IPS can stop attacks, but a bad rule can also block real business traffic. That's why many teams start in detect-only mode.
 
+?? What can an IPS do that an IDS can't?
++ Block traffic, as it sits in the path
+- Read encrypted traffic, without needing any key material
+- Run on a computer that has no network
+- Replace the need for logging on every server
+=> An IDS only watches a copy. An IPS can drop packets, so a bad rule can also block real work.
+
 ## Two tools, two philosophies
 
 | | Suricata | Zeek |
@@ -32,6 +39,13 @@ An **IDS** watches a copy of the traffic and alerts. An **IPS** sits in the path
 | Best for | "Has this known bad thing happened?" | "What did this host do last Tuesday?" |
 
 They're complementary: signatures catch the known, and Zeek's records let you investigate the unknown afterwards.
+
+?? You want to know what a host did last Tuesday. Which suits that better?
++ Zeek, because it records what really happened
+- Suricata, because it only matches known signatures
+- Neither, because networks can't ever be recorded
+- Both are useless without an internet connection
+=> Zeek keeps structured records of activity, so you can investigate afterwards. Suricata tells you when a rule matched.
 
 ## Reading a Suricata rule
 
@@ -47,6 +61,13 @@ alert tcp any any -> $HOME_NET 22 (msg:"SSH connection to lab"; flags:S; sid:100
 ```
 
 The [rules documentation](https://docs.suricata.io/en/latest/rules/intro.html) covers the rest. You'll write detections for a living from Month 11.
+
+?? In a Suricata rule, what does `$HOME_NET` stand for?
++ The networks that you have defined as yours
+- The address of the person who wrote it
+- The folder where the rules are all stored
+- The name of the attacker's own home network
+=> It's a variable from the configuration, so that one rule works on many sites.
 
 ## The four outcomes
 
@@ -80,9 +101,23 @@ False positives waste people's time until they ignore alerts. False negatives ar
 
 @term beaconing = Malware contacting its controller at regular intervals.
 
+?? One source touches 500 ports in a minute, with little data. What's that?
++ A port scan, as the table describes
+- Beaconing, as the table describes it there
+- Exfiltration, as the table describes it there
+- A normal backup job running on schedule
+=> Many ports, many RSTs and little data make a scan. Exfiltration moves large amounts of data out.
+
 ## Encryption changes the game
 
 Most traffic today is TLS, so an IDS can't read the contents. It relies on metadata: who talked to whom, how much, how often, and TLS fingerprints. That's why endpoint logs (Month 5) and network data work best together.
+
+?? Why do network data and endpoint logs work best together?
++ Encryption hides content, and hosts see inside
+- Endpoints can't record anything about any processes
+- Networks already record everything that programs do
+- Encrypted traffic is always blocked by firewalls
+=> The network shows who talked to whom. The host shows which program did it, and what it did.
 
 ## Your lab
 

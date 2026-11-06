@@ -41,11 +41,18 @@ Good news: there's a huge legal playground, and this course uses it.
 | The terminal in this course | It's a simulation in your own browser |
 | Your own virtual machines | You own them |
 | Practice platforms like [OverTheWire](https://overthewire.org/wargames/) and [TryHackMe](https://tryhackme.com/) | They exist to be attacked, under their rules |
-| Bug bounty programmes (Month 12+) | The company gives written permission, within a stated **scope** |
+| Bug bounty programmes, when you're ready | The company gives written permission, within a stated **scope** |
 
 Each has rules. The [OverTheWire rules](https://overthewire.org/rules/) ask you not to spoil the game for others, and not to publish credentials. [Hack The Box](https://www.hackthebox.com/) forbids public write-ups of active machines. Breaking a platform's rules can get you banned, and in a bug bounty, going out of scope means you're no longer authorised.
 
 @term bug bounty = A programme where a company invites people to find flaws in stated systems, under written rules, often for a reward.
+
+?? A bug bounty says that only `shop.example` is in scope. You notice a flaw on `admin.example`. What's your position?
++ You're not authorised here, so stop right there
+- It's fine, as they run a bounty programme
+- It's fine, as long as you report it
+- You're covered, since both belong to one company
+=> Permission covers only what the scope names. Outside it, you're in the same position as anyone else.
 
 ## Four safety habits
 

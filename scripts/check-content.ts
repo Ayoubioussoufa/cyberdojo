@@ -53,7 +53,7 @@ const DEEP_FROM = 46;
 let thin = 0;
 for (const d of lessons()) {
   const parts = fs.readFileSync(path.join("content/lessons", `${d.meta.slug}.md`), "utf8").split(/^## /m).slice(1);
-  const empty = parts.filter((p) => !/^(\?[?!] |@range )/m.test(p)).map((p) => p.split("\n")[0]);
+  const empty = parts.filter((p) => !/^(\?[?!] |@range )/m.test(p) && !/^What you can do now/.test(p)).map((p) => p.split("\n")[0]);
   if (d.meta.number >= DEEP_FROM) for (const e of empty) fail(`${d.meta.slug}: section with no question: ${e}`);
   else thin += empty.length;
   if (d.meta.number >= DEEP_FROM && d.text.split(/\s+/).length < 550) fail(`${d.meta.slug}: only ${d.text.split(/\s+/).length} words`);

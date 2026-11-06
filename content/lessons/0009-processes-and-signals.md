@@ -34,6 +34,13 @@ Every process also has a **parent**, shown by `ps -ef` in the PPID column. That 
 **Who** runs it (USER)? **Where** is the program on disk? **What** started it (parent)? **What** is it doing (CPU, network)? That's the start of every host investigation.
 :::
 
+?? Which of these makes a process most suspicious?
++ It runs from a hidden `/tmp` folder
+- It has a process number above 1000
+- It belongs to `root` on a server
+- It uses a little memory while running
+=> Real programs live in places such as `/usr/bin`. A hidden folder in a place that anyone can write to is a strong warning sign.
+
 ## Signals
 
 You stop a process by sending it a **signal**, a small message delivered by the kernel. The full list is in [signal(7)](https://man7.org/linux/man-pages/man7/signal.7.html). You'll use two:

@@ -27,6 +27,13 @@ A **hypervisor** is a program that pretends to be a computer. It gives each **gu
 - **Snapshots.** Save the state, try something dangerous, and restore it in seconds.
 - **Variety.** Run Linux, Windows and a firewall on one laptop.
 
+?? Why are snapshots so useful for security practice?
++ You can undo anything in a few seconds
+- They make the virtual machine run much faster
+- They stop malware from being able to run
+- They copy the whole machine to the internet
+=> Saving a state and restoring it means that you can try dangerous things without fear.
+
 ## Choosing a network mode
 
 This is the setting that keeps you safe. It decides what your VM can reach.

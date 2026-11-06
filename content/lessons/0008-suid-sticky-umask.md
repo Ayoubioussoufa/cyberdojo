@@ -42,7 +42,7 @@ find / -perm -4000 -type f 2>/dev/null
 
 @term GTFOBins = A public list of ordinary Unix programs that can be abused if given extra privileges.
 
-You'll find mostly normal ones, like `passwd`, `sudo` and `mount`. The interesting ones are unusual: something in `/usr/local/bin` or `/opt`. The community list [GTFOBins](https://gtfobins.github.io/) shows how ordinary programs can be abused when they have this bit. You'll use it in Month 10.
+You'll find mostly normal ones, like `passwd`, `sudo` and `mount`. The interesting ones are unusual: something in `/usr/local/bin` or `/opt`. The community list [GTFOBins](https://gtfobins.github.io/) shows how ordinary programs can be abused when they have this bit. You'll use it in Month 10, when you audit for this kind of thing.
 
 ?? `find` lists `/usr/bin/passwd` as SUID root. Is that a vulnerability?
 + No, it needs root for one narrow, careful job
@@ -70,6 +70,13 @@ drwxrwxrwt 12 root root 4096 Oct 27 09:00 /tmp
 | Sticky | 1000 | `t` in others | Only the owner can delete files inside |
 
 A capital `S` or `T` means the bit is set but the execute bit underneath isn't.
+
+?? Why does `/tmp` have the sticky bit set?
++ So that users can't delete each other's files
+- So that files stay there after a reboot
+- So that only root is able to write
+- So that programs always run as root there
+=> Everyone can write to `/tmp`, and write access to a folder normally allows deleting. The sticky bit limits that to a file's owner.
 
 ## umask: the default for new files
 

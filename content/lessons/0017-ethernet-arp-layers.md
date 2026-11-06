@@ -30,6 +30,12 @@ Networking would be impossible to reason about without layers. Each one solves o
 | Internet | 3 | Which machine, across networks | IP, ICMP | IP addresses |
 | Link | 2, 1 | The next hop on this wire | Ethernet, Wi-Fi | MAC addresses |
 
+@stack
+Application | HTTP, DNS, SSH | your data
+Transport | TCP, UDP | adds ports
+Internet | IP | adds addresses
+Link | Ethernet, Wi-Fi | adds MAC addresses
+
 When you send data, each layer wraps it with its own header. This is **encapsulation**, like putting a letter in an envelope, then in a bigger envelope. Each router opens only as far as it needs to.
 
 @flow HTTP request > TCP header added > IP header added > Ethernet frame sent
@@ -37,6 +43,13 @@ When you send data, each layer wraps it with its own header. This is **encapsula
 People say "layer 3" or "layer 7" all the time, using OSI numbers: layer 2 means switching, layer 3 means routing, layer 4 means ports, layer 7 means applications.
 
 @drill layers
+
+?? Which layer's address changes at each hop?
++ The Link layer's MAC addresses
+- The Internet layer's IP addresses
+- The Transport layer's port numbers
+- The Application layer's web addresses
+=> A frame only travels one hop, so routers build a new one each time. The IP addresses stay the same.
 
 ## MAC addresses and switches
 
@@ -65,6 +78,13 @@ Who has 192.168.1.1? Tell 192.168.1.50.         broadcast
 ```
 
 Your laptop stores the answer in a cache. See yours with `ip neigh`.
+
+?? Why does a laptop need ARP before talking to its router?
++ It knows the IP, but needs the MAC
+- It knows the MAC, but needs the IP
+- It needs a password to join the network
+- It needs the router to assign a port
+=> Frames on the local wire are addressed by MAC, so an IP address alone isn't enough.
 
 ## ARP spoofing
 

@@ -39,6 +39,13 @@ You don't need to memorise this. But you'll visit `/etc`, `/var/log`, `/home` an
 `/tmp` can be written by every user, so attackers often drop their tools there. `/var/log` is where the evidence is, so attackers often try to clear it. Knowing the map tells you where to look.
 :::
 
+?? On a compromised Linux server, where would you look first for evidence?
++ In `/var/log`, where the system's logs live
+- In `/usr/bin`, where the programs are kept
+- In `/home`, which holds only personal photos
+- In `/etc`, which only holds empty folders
+=> Logs record what happened, which is why attackers often try to clear them.
+
 ## Where am I, and what's here?
 
 Your shell always stands in one directory, the **working directory**. Three commands do most of the work:
@@ -57,6 +64,13 @@ ls -la /var/log
 │   └────── options: -l long format, -a show all
 └────────── the command
 ```
+
+?? In `ls -la /var/log`, what's the argument?
++ `/var/log`, the folder listed
+- `ls`, the program itself
+- `-la`, two output options
+- `-l`, one output option
+=> `ls` is the command, and `-la` holds two options. The argument says what to work on.
 
 ## Two ways to give an address
 
@@ -91,6 +105,13 @@ Any name starting with a dot is hidden from plain `ls`. That's a convention, not
 ::: tip Two habits that make you fast
 Press **Tab** to complete names: you'll type less and make fewer typos. Press **↑** to bring back earlier commands. Professionals do both constantly.
 :::
+
+?? Does putting a dot at the start of a file's name protect it?
++ No, it only hides it from plain `ls`
+- Yes, only root can open such files then
+- Yes, because the kernel encrypts all those files
+- No, because dots aren't allowed in Linux names
+=> It's a display convention, not a security feature. Anyone can read it, if its permissions allow.
 
 ## Names with spaces
 

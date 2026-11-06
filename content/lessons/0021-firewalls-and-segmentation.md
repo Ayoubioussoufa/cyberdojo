@@ -49,6 +49,13 @@ List what's allowed, and block everything else. The opposite, allowing everythin
 
 NAT isn't a security feature, though it hides internal addresses as a side effect. **Port forwarding** goes the other way: "traffic to my public IP on 443 goes to this internal server". Every forward is a hole through your defences, so each one is a decision.
 
+?? Why is each port forward a decision worth recording?
++ It's a hole through your firewall, on purpose
+- It makes the whole network run more slowly
+- It turns off NAT for your other devices
+- It changes your public address every single day
+=> A forward exposes an inside service to the outside. Each one needs a reason and an owner.
+
 ## Segmentation
 
 Divide your network into zones by trust, and force traffic between them through a firewall.
@@ -77,6 +84,13 @@ If the web server in the DMZ gets hacked, the attacker still has to get through 
 A **VPN** creates an encrypted tunnel, so a remote device acts as if it's on the network. [WireGuard](https://www.wireguard.com/) and IPsec are the common protocols. Remember the trade-off: once connected, you're inside. Zero trust, in Month 19, is the response to that.
 
 A **proxy** makes web requests for users, so it can filter and log them. Proxy logs are a key data source in Month 9.
+
+?? What's the main risk once someone has connected by VPN?
++ They're inside, and may reach far too much
+- Their traffic can be read by anyone nearby
+- Their password is sent over the internet unencrypted
+- Their laptop stops receiving any more security updates
+=> A VPN protects the connection, but it can give wide network access. That's why zero trust grants narrowly.
 
 ## Your lab: the start of P01
 

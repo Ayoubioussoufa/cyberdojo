@@ -51,6 +51,13 @@ Your **attack surface** is everything an attacker can touch: every open network 
 
 Reducing it is often the cheapest security you can buy. Turn off the service nobody uses, and every future bug in it stops mattering.
 
+?? Which action reduces an attack surface most directly?
++ Switching off a service that nobody uses
+- Buying a larger and more powerful server
+- Writing a longer password policy for staff
+- Adding more log storage to the SIEM
+=> A service that isn't running can't be attacked, and all its future bugs stop mattering.
+
 ## Defence in depth
 
 No single control is perfect, so you layer them. A medieval castle had a moat, walls, a keep and guards, and getting past one didn't win the battle.

@@ -31,6 +31,13 @@ A **port** is like a door number on a building: the address finds the machine, a
 From Kali, connect to your Ubuntu VM: `ssh yourname@192.168.56.x`. The first time, SSH shows a fingerprint and asks whether you trust this machine. That's how it detects impostors later. Answer `yes`, then log in.
 :::
 
+?? In `ssh -p 2220 ana@10.0.0.5`, what does `2220` choose?
++ Which service on that machine you connect to
+- How many seconds the connection stays open for
+- How many users can log in at once
+- Which account you're going to log in as
+=> The address finds the machine, and the port finds the service. `ana` is the account.
+
 ## Passwords versus keys
 
 A password travels to the server and can be guessed. You saw the attacks in `auth.log`. Keys work differently, using a **key pair**:

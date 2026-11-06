@@ -20,11 +20,9 @@ Subnetting looks like maths, but it's closer to a card trick: learn one move and
 
 An address has a **network part** and a **host part**. The number after the slash says how many bits are network bits.
 
-```
-192.168.1.10/24
-11000000.10101000.00000001.00001010
-└───── 24 network bits ───┘└ 8 host ┘
-```
+Here's `192.168.1.10/24`, bit by bit:
+
+@bits 24 192.168.1.10
 
 With 8 host bits there are 2⁸ = 256 addresses. The first and last are reserved: the first is the **network address**, and the last is the **broadcast address**. That leaves 254 for devices.
 
@@ -41,6 +39,17 @@ With 8 host bits there are 2⁸ = 256 addresses. The first and last are reserved
 | /30 | 255.255.255.252 | 4 | 2 |
 
 **The rule:** addresses = 2^(32 − slash), and usable hosts = that minus 2.
+
+A longer slash means more network bits and fewer hosts. Here's a /26, with only 6 host bits:
+
+@bits 26 192.168.1.77
+
+?? In `10.1.2.3/8`, how many bits identify the network?
++ 8, as the slash says
+- 24, as the rest do
+- 32, as all bits do
+- 3, as the last does
+=> The number after the slash counts the network bits. The other 24 identify hosts.
 
 ## The one move: block size
 
@@ -97,3 +106,11 @@ Ask an AI for 20 subnetting problems with answers. Solve them yourself, check th
 :::
 
 ?! Explain to a friend why a /24 has 254 usable addresses and not 256.
+
+?? A cloud firewall rule allows SSH from `0.0.0.0/0`. What does that mean?
++ Anyone on the internet can try connecting
+- Nobody at all is able to connect
+- Only your own machine may connect here
+- Only other cloud machines may connect here
+=> `/0` means zero fixed bits, so it matches every address. On SSH, that's a classic misconfiguration.
+

@@ -82,7 +82,7 @@ Knowing *what* to protect leads straight to *how*. When you log in to anything, 
 Think of a hotel. Showing your passport at reception is authentication. Your key card opening only your own room is authorization. The door's record of when it was opened is accounting.
 
 ::: why
-Mixing these up causes real breaches. Many web apps check that you're logged in (authentication) and forget to check that the invoice you asked for is really yours (authorization). In Month 8 you'll exploit exactly that mistake, called an IDOR.
+Mixing these up causes real breaches. Many web apps check that you're logged in (authentication) and forget to check that the invoice you asked for is really yours (authorization). In Month 8 you'll learn to find and fix exactly that mistake, called an IDOR.
 :::
 
 ?? A website lets any logged-in user open any other user's invoice by changing a number in the URL. What's missing?

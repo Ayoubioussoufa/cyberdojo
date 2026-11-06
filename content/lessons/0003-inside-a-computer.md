@@ -34,6 +34,13 @@ Picture a restaurant kitchen:
 
 Forensic investigators care about this difference. Evidence in RAM vanishes when a machine is switched off, so pulling the plug can destroy proof. You'll come back to this in Month 15.
 
+?? Why might an investigator avoid switching off a suspicious computer?
++ Evidence held in RAM would be lost forever
+- The disk would be wiped by the shutdown
+- The CPU keeps a list of all attackers
+- Switching it off is against the law everywhere
+=> RAM forgets everything without power, and it may hold the only trace of what was running. The disk keeps its data.
+
 ## The operating system: the manager
 
 Dozens of programs want the CPU at the same moment. Without a manager, one program could read another's memory, or wipe the disk. The **operating system** is that manager, and its heart is the **kernel**.
@@ -43,6 +50,12 @@ The kernel makes one rule that everything in security depends on:
 ::: key
 Programs can't touch the hardware directly. They have to ask the kernel, and the kernel checks whether they're allowed. Most of security is about that check.
 :::
+
+@stack
+You | type commands and click |
+Programs | a browser, the shell, `whoami` | each one runs as a process
+Kernel | checks every request | the gatekeeper
+Hardware | CPU, RAM and disk | only the kernel touches this
 
 Whenever a program wants to open a file, it makes a request. The kernel looks at who's asking and says yes or no. When you see `Permission denied` in a few lessons, that's the kernel's voice.
 
@@ -61,11 +74,25 @@ Every process has a number (its PID), its own private memory, and an **identity*
 
 @term PID (process ID) = The number the kernel gives each running process.
 
+?? You open the same browser twice. How many programs and processes is that?
++ One program on disk, and two running processes
+- Two programs on disk, and one running process
+- One program on disk, and one running process
+- Two programs on disk, and two running processes
+=> The file on disk is one program. Each time it runs, the kernel creates a separate process, with its own memory.
+
 ## Files and folders
 
 Everything on disk is a **file**, and files live in **directories**, which is simply the technical name for folders. Directories can hold more directories, forming a tree. You'll walk that tree in the next lesson.
 
 Now that you've met files, processes and permissions, here's how they connect. Attackers want to run their own **process**, as a powerful **user**, to read or change **files**. Defenders try to stop that, and keep a record when it happens.
+
+?? What are attackers usually trying to do, in terms of these ideas?
++ Run a process as a powerful user
+- Make the CPU run a lot faster
+- Move all the folders onto another disk
+- Delete the shell from every single computer
+=> Identity decides what the kernel allows, so running code as a powerful user gets them nearly everything.
 
 ## The shell: talking to the kernel
 

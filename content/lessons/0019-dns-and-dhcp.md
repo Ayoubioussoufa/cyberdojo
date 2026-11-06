@@ -24,6 +24,12 @@ DNS is a giant distributed phone book, organised as a tree. Your computer asks a
 
 @flow Your device > Resolver > Root server > .com server > Authoritative server > Answer back and cached
 
+@seq Device | Resolver | DNS servers
+Device > Resolver: Where's example.com?
+Resolver > DNS servers: Root, then .com, then the domain
+DNS servers > Resolver: 93.184.216.34
+Resolver > Device: 93.184.216.34, cached
+
 1. Your device checks its own cache, then asks the resolver.
 2. The resolver asks a root server: "where's `.com`?"
 3. It asks the `.com` server: "where's `example.com`?"
@@ -64,11 +70,22 @@ Check how long the `ANSWER` is cached, in seconds, and run it twice to watch the
 
 When you connect to Wi-Fi, how do you get an address? **DHCP**. The exchange has [four steps](https://www.rfc-editor.org/rfc/rfc2131), often remembered as DORA:
 
-@flow Discover: anyone there? > Offer: use this address > Request: I'll take it > Ack: it's yours
+@seq New device | DHCP server
+New device > DHCP server: Discover: anyone there?
+DHCP server > New device: Offer: use this address
+New device > DHCP server: Request: I'll take it
+DHCP server > New device: Ack: it's yours
 
 It gives you an IP address, a subnet mask, your default **gateway** and your DNS server. Notice the risk: a rogue DHCP server can tell victims to use the attacker's gateway or DNS, like ARP spoofing but wider. Managed switches counter it with DHCP snooping.
 
 DHCP logs also matter in investigations: they tell you which device held an IP at a particular time.
+
+?? Why is a rogue DHCP server dangerous?
++ It can give victims the attacker's own gateway address
+- It can turn off every switch on the network
+- It can read the passwords stored on each laptop
+- It can make DNS records expire everywhere at once
+=> Whoever gives you your gateway and DNS server can see or redirect your traffic.
 
 ## How DNS is abused
 
