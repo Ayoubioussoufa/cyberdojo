@@ -28,7 +28,7 @@ const Segments = memo(function Segments({ segments, brief }: { segments: Segment
       if (s.kind === "drill") return <LazyDrill key={i} id={s.id} />;
       if (s.kind === "range") return <LazyRange key={i} id={s.id} />;
       if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
-      if (s.kind === "step") return <ProjectStep key={s.n} slug={brief.slug} step={s} walkthrough={render(s.body)} after={render(s.after)} />;
+      if (s.kind === "step") return <ProjectStep key={`step-${s.n}`} slug={brief.slug} step={s} walkthrough={render(s.body)} after={render(s.after)} />;
       return <HelpBadge key={i} tool={s.tool} level={s.level} />;
     });
   return <>{render(segments)}</>;

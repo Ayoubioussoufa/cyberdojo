@@ -36,7 +36,7 @@ export default async function Page({ params }: Props) {
   const i = PROJECTS.findIndex((x) => x.id === id);
   const near = (x?: (typeof PROJECTS)[number]) => (x ? { slug: x.id, title: `${x.id}: ${x.title}` } : null);
   const intro = (
-    <div className="project-intro">
+    <div key="intro" className="project-intro">
       <ProjectMeter ids={doc.checks.map((c) => c.id)} />
       {doc.meta.tested && <p className="tested"><strong>How this page was checked:</strong> {doc.meta.tested}</p>}
       <h2>The tools, and how much help you'll get</h2>
@@ -54,7 +54,7 @@ export default async function Page({ params }: Props) {
     </div>
   );
   const outro = (
-    <section className="prose-page">
+    <section key="outro" className="prose-page">
       <h2>Publishing it</h2>
       {p.deliverables && <p><strong>What you'll have:</strong> {p.deliverables}</p>}
       {p.presentation && <p><strong>How to present it:</strong> {p.presentation}</p>}
