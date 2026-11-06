@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { Subnav } from "@/components/Subnav";
 
 export const metadata: Metadata = { title: "Library" };

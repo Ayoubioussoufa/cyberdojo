@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { PathView } from "@/components/PathView";
 import { buildPath } from "@/lib/path";
 

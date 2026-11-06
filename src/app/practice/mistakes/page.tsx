@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { Mistakes } from "@/components/Mistakes";
 
 export const metadata: Metadata = { title: "Your mistakes" };

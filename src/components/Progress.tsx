@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
+import { useAccount } from "@/lib/account";
 import { BELTS } from "@/data/path";
 import { currentBelt, isDone, skillBars, streak, type PathStep } from "@/lib/pathState";
 import { today, useStore } from "@/lib/progress";
@@ -40,6 +41,15 @@ function Calendar({ days }: { days: Record<string, number> }) {
   );
 }
 
+const DOJO_FLAGS = 54;
+
+/** Guests should know where their work lives before they lose it. */
+function SaveNote() {
+  const { ready, user } = useAccount();
+  if (!ready || user) return null;
+  return <p className="auth-note">This progress is saved in this browser only. <Link href="/signin/?next=/skills/">Create an account</Link> to keep it safe and use it on any device.</p>;
+}
+
 export function ProgressBoard({ path }: { path: PathStep[] }) {
   const store = useStore();
   const b = currentBelt(path, store);
@@ -72,10 +82,12 @@ export function ProgressBoard({ path }: { path: PathStep[] }) {
         ) : <p className="meta">You've earned every belt.</p>}
       </section>
 
+      <SaveNote />
       <section className="stat-tiles">
         <div className="card"><strong>{count("lesson")}</strong><span>lessons</span></div>
         <div className="card"><strong>{count("project")}</strong><span>project parts</span></div>
         <div className="card"><strong>{count("machine")}</strong><span>machines</span></div>
+        <div className="card"><strong>{Object.keys(store.missions).filter((id) => id.startsWith("dojo-")).length}/{DOJO_FLAGS}</strong><span>dojo flags</span></div>
         <div className="card"><strong>{count("gate")}</strong><span>exit gates</span></div>
         <div className="card"><strong>{streak(store.days, today())}</strong><span>day streak</span></div>
         <div className="card"><strong>{asked.length ? `${Math.round((right / asked.length) * 100)}%` : "–"}</strong><span>right first try</span></div>

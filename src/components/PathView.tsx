@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { HoverLink } from "./HoverLink";
 import { MONTHS, PHASES, phaseOf } from "@/lib/data";
 import { KIND_LABEL, finishDate, isDone, nextStep, partDone, type PathStep } from "@/lib/pathState";

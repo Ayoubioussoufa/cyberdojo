@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { useStore } from "@/lib/progress";
 import type { DocMeta } from "@/lib/types";
 

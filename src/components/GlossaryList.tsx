@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { useEffect, useState } from "react";
 import type { Term } from "@/lib/types";
 

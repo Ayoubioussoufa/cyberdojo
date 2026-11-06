@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { CopyButton } from "./Copy";
 import type { Month } from "@/lib/data";
 import { setGate, useStore } from "@/lib/progress";

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { finishDate, type PathStep } from "@/lib/pathState";
 import { setPlan, today, useStore } from "@/lib/progress";
 

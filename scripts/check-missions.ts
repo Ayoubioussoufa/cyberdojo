@@ -9,6 +9,10 @@ const COMPUTED = new Set(["detect-3", "eval-1", "eval-2", "trail-3", "dojo-audit
 let bad = 0;
 let runs = 0;
 
+// The Progress page and the Practice hub quote this number.
+const dojoFlags = Object.entries(RANGES).filter(([id]) => id.startsWith("dojo-")).reduce((n, [, r]) => n + r.missions.length, 0);
+if (dojoFlags !== 54) { bad++; console.log(`✗ the dojo has ${dojoFlags} challenges: update DOJO_FLAGS in Progress.tsx and the blurb in practice/page.tsx`); }
+
 // Lessons load ladders through this map, so a ladder missing here shows as "missing" in the browser.
 const mapped = new Set(Object.keys(RANGE_FAMILY));
 for (const id of Object.keys(RANGES)) if (!mapped.has(id)) { bad++; console.log(`✗ ${id}: add it to RANGE_FAMILY in lazy.ts`); }

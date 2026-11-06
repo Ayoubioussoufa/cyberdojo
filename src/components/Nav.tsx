@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Search } from "./Search";
 import { useAccount } from "@/lib/account";
 
 const LINKS = [
@@ -50,7 +51,7 @@ export function Nav() {
               <path d="m8.6 12 2.4 2.4 4.4-4.6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
-          CyberDojo
+          <span className="brand-word">CyberDojo</span>
         </Link>
         <nav className={`nav-links${open ? " open" : ""}`} aria-label="Main">
           {LINKS.map((l) => (
@@ -60,6 +61,7 @@ export function Nav() {
           ))}
         </nav>
         <div className="nav-tools">
+          <Search />
           {ready && (user
             ? <Link href="/account/" className="nav-user" title="Your account">{user.username}</Link>
             : <Link href="/signin/" className="nav-signin">Sign in</Link>)}

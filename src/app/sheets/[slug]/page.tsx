@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { notFound } from "next/navigation";
 import { Html } from "@/components/Html";
 import { PrintButton } from "@/components/PrintButton";

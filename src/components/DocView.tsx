@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { memo } from "react";
 import { CopyButton } from "./Copy";
 import { LazyDrill, LazyRange } from "./Lazy";

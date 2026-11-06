@@ -5,6 +5,7 @@
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
+import { request } from "node:http";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -85,7 +86,7 @@ async function unit() {
 async function http() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cyberdojo-auth-"));
   const file = path.join(dir, "test.db");
-  const server = spawn("node_modules/.bin/next", ["start", "-p", String(PORT)], { env: { ...process.env, CYBERDOJO_DB: file, NODE_ENV: "production", INSECURE_COOKIES: "1", SIGNUP_LIMIT: "12" }, stdio: "pipe" });
+  const server = spawn("node_modules/.bin/next", ["start", "-p", String(PORT)], { env: { ...process.env, CYBERDOJO_DB: file, NODE_ENV: "production", SIGNUP_LIMIT: "12" }, stdio: "pipe" });
   let log = "";
   server.stderr.on("data", (d: Buffer) => (log += d.toString()));
   try {
@@ -109,6 +110,17 @@ async function http() {
     const made = await ana("POST", "/api/auth/signup/", { username: "ana", password: pw });
     ok(made.status === 201, "sign-up works", made.json);
     ok(/httponly/i.test(made.setCookie ?? "") && /samesite=lax/i.test(made.setCookie ?? ""), "session cookie is HttpOnly and SameSite", made.setCookie);
+    ok(!/secure/i.test(made.setCookie ?? ""), "on this computer the cookie works over plain http", made.setCookie);
+    const liveCookie = await new Promise<string>((done) => {
+      // fetch() won't set Host, so this one goes through node:http.
+      const body = JSON.stringify({ username: "onlinehost", password: pw });
+      const req = request({ port: PORT, path: "/api/auth/signup/", method: "POST", headers: { host: "cyberdojo.example", origin: "https://cyberdojo.example", "content-type": "application/json", "content-length": Buffer.byteLength(body) } }, (res) => {
+        res.resume();
+        done(res.headers["set-cookie"]?.[0] ?? "");
+      });
+      req.end(body);
+    });
+    ok(/^__Host-cyberdojo=/.test(liveCookie) && /;\s*secure/i.test(liveCookie), "on a real hostname the cookie is __Host- and Secure", liveCookie);
     ok((await omar("POST", "/api/auth/signup/", { username: "ANA", password: pw })).status === 409, "usernames ignore case");
     ok((await omar("POST", "/api/auth/signup/", { username: "omar", password: pw })).status === 201, "second user signs up");
 

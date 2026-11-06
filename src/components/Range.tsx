@@ -182,6 +182,7 @@ function RangeView({ range }: { range: RangeSet }) {
   const firstOpen = missions.findIndex((m) => !store.missions[m.id]);
   const [choice, setChoice] = useState<number | null>(null);
   const [hints, setHints] = useState(0);
+  const [won, setWon] = useState<string | null>(null);
   const at = choice ?? (firstOpen < 0 ? 0 : firstOpen);
   const mission = missions[at];
 
@@ -217,11 +218,13 @@ function RangeView({ range }: { range: RangeSet }) {
         onPass={() => {
           // Stay on this mission so its debrief shows; "Next mission" moves on.
           setChoice(at);
+          setWon(mission.id);
           setMission(mission.id);
         }}
       />
       {passed ? (
         <div className="why ok mission-win">
+          <span className={`hanko${won === mission.id ? " just" : ""}`} aria-hidden="true" lang="ja">合格</span>
           <strong>Mission complete.</strong> <span className="noterms">{inlineCode(mission.debrief)}</span>
           {at < missions.length - 1 && (
             <div className="why-actions">

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { BeltChip } from "./Progress";
 import { KIND_LABEL, currentBelt, isDone, nextStep, streak, weekPlan, type PathStep } from "@/lib/pathState";
 import { today, useStore } from "@/lib/progress";
@@ -21,13 +21,24 @@ export function Home({ path }: { path: PathStep[] }) {
     <div className="page">
       {!started && (
         <section className="hero">
-          <p className="kicker">From absolute zero to job-ready defender</p>
+          <div>
           <h1>Learn cybersecurity by doing it, one small win at a time.</h1>
           <p className="lede">No experience needed. Everything is explained from scratch, practised in a real terminal right here in your browser, and checked at once. When you're stuck, one button sends it all to your AI tutor.</p>
           <p className="hero-actions">
             <Link className="btn primary lg" href="/start/">See how it works, in 2 minutes</Link>
             {next && <Link className="btn lg" href={next.href}>Skip, and start learning</Link>}
           </p>
+          </div>
+          <div className="hero-term" aria-label="An example from the course: finding an attacker's address in a log, then submitting a flag">
+            <p><span className="p">ana@lab:~$</span> grep &apos;Failed password&apos; auth.log | wc -l</p>
+            <p>214</p>
+            <p className="gap"><span className="p">ana@lab:~$</span> grep Failed auth.log | awk &apos;{"{print $(NF-3)}"}&apos; \</p>
+            <p>    | sort | uniq -c | sort -rn | head -2</p>
+            <p>    187 203.0.113.7</p>
+            <p>      9 198.51.100.23</p>
+            <p className="gap"><span className="p">ana@lab:~$</span> submit CD{"{"}7kqm2xw9ph{"}"}</p>
+            <p className="g">Flag captured. One stitch closer to your yellow belt.</p>
+          </div>
         </section>
       )}
 

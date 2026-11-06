@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { ProjectMeter } from "@/components/ProjectParts";
 import { TOOLS } from "@/data/tools";
 import { projects } from "@/lib/content";

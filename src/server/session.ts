@@ -3,15 +3,25 @@
  * Reading the database therefore gives nobody a usable session.
  */
 import { createHash, randomBytes } from "node:crypto";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { db } from "./db";
 
 const DAY = 86_400_000;
 const LIFETIME = 30 * DAY;
 
-const secure = () => process.env.NODE_ENV === "production" && process.env.INSECURE_COOKIES !== "1";
+/**
+ * Secure everywhere except on this computer: browsers refuse a Secure cookie
+ * over plain http://localhost, and `pnpm start` has no certificate. A wrong Host
+ * header can only weaken the sender's own cookie, so trusting it here is safe.
+ */
+async function secure() {
+  const host = (await headers()).get("host") ?? "";
+  const local = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(host);
+  return process.env.NODE_ENV === "production" && !local;
+}
+
 /** __Host- makes the browser refuse the cookie unless it is Secure and bound to this exact host. */
-const cookieName = () => (secure() ? "__Host-cyberdojo" : "cyberdojo");
+const cookieName = async () => ((await secure()) ? "__Host-cyberdojo" : "cyberdojo");
 
 const digest = (token: string) => createHash("sha256").update(token).digest("hex");
 
@@ -22,7 +32,7 @@ export interface User {
 }
 
 async function setCookie(token: string, expires: number) {
-  (await cookies()).set(cookieName(), token, { httpOnly: true, secure: secure(), sameSite: "lax", path: "/", expires: new Date(expires) });
+  (await cookies()).set(await cookieName(), token, { httpOnly: true, secure: await secure(), sameSite: "lax", path: "/", expires: new Date(expires) });
 }
 
 export async function startSession(userId: string) {
@@ -35,7 +45,7 @@ export async function startSession(userId: string) {
 }
 
 export async function currentUser(): Promise<User | null> {
-  const token = (await cookies()).get(cookieName())?.value;
+  const token = (await cookies()).get(await cookieName())?.value;
   if (!token) return null;
   const now = Date.now();
   const row = db()
@@ -52,9 +62,10 @@ export async function currentUser(): Promise<User | null> {
 
 export async function endSession() {
   const jar = await cookies();
-  const token = jar.get(cookieName())?.value;
+  const name = await cookieName();
+  const token = jar.get(name)?.value;
   if (token) db().prepare("DELETE FROM sessions WHERE token_hash = ?").run(digest(token));
-  jar.delete(cookieName());
+  jar.delete(name);
 }
 
 /** After a password change: every session goes, including any on a stolen device. */

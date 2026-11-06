@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { notFound } from "next/navigation";
 import { CaseFilePlayer } from "@/components/CaseFile";
 import { CASES, CASE_MAP } from "@/lib/cases";

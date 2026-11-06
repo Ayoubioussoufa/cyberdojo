@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { Pace } from "@/components/Pace";
 import { SiteMap } from "@/components/SiteMap";
 import { buildPath } from "@/lib/path";

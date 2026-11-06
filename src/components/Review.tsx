@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { useEffect, useMemo, useState } from "react";
 import { CopyButton } from "./Copy";
 import { INTERVALS, reviewed, today, useStore } from "@/lib/progress";

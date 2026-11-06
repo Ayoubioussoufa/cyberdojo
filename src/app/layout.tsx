@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import "@fontsource-variable/atkinson-hyperlegible-next/wght.css";
+import "@fontsource-variable/bricolage-grotesque/wght.css";
+import "@fontsource-variable/jetbrains-mono/wght.css";
 import "./globals.css";
 import { AccountStart } from "@/components/AccountStart";
 import { Nav } from "@/components/Nav";
@@ -10,8 +13,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfaf6" },
-    { media: "(prefers-color-scheme: dark)", color: "#14161a" },
+    { media: "(prefers-color-scheme: light)", color: "#eceff5" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1430" },
   ],
 };
 
@@ -29,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <main id="main">{children}</main>
         <footer className="foot">
-          <span>CyberDojo</span> · Build, break, defend, document. Only test what you own or have written permission to test.
+          <span>CyberDojo</span>. Only test what you own or have written permission to test.
         </footer>
       </body>
     </html>

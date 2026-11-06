@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { TOOLS } from "@/data/tools";
 import { setCheck, useSlice, useStore } from "@/lib/progress";
 import { HELP_TEXT } from "@/data/help";

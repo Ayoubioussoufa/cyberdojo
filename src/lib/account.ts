@@ -205,7 +205,13 @@ async function enter(path: string, body: { username: string; password: string })
       put(DIRTY, null);
     }
     set({ user: out.user, ready: true });
-    await pull(out.user);
+    try {
+      await pull(out.user);
+    } catch {
+      // Say so now. Otherwise the page reads "signed in" and nothing ever saves.
+      set({ user: null });
+      return "You're in, but this browser didn't keep the session. Allow cookies for this site and try again.";
+    }
     return null;
   } catch {
     return "The server didn't answer. Check your connection and try again.";

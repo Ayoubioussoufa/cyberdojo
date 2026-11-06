@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { signIn, signUp, useAccount } from "@/lib/account";

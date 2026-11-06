@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { notFound } from "next/navigation";
 import { LazyDrill, LazyRange } from "@/components/Lazy";
 import { DRILLS, DRILL_LIST } from "@/lib/drills";

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { DocRows } from "@/components/Lists";
 import { lessonMetas } from "@/lib/content";
 import { MONTHS, PHASES, phaseOf } from "@/lib/data";

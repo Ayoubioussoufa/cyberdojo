@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { DrillGroups, PracticeTop } from "@/components/PracticeHub";
 import { LazyRange } from "@/components/Lazy";
 import { Subnav } from "@/components/Subnav";
@@ -16,7 +16,7 @@ const MODES = [
   { href: "/practice/flaws/", title: "Spot the flaw", blurb: "Real code, with one dangerous line." },
   { href: "/practice/build/", title: "Command builder", blurb: "Assemble a command, and run it for real." },
   { href: "/practice/order/", title: "Put it in order", blurb: "Attacks, handshakes and responses, step by step." },
-  { href: "/dojo/", title: "Dojo", blurb: "55 flag challenges: pipes, HTTP, SQL, encodings, XOR, access control." },
+  { href: "/dojo/", title: "Dojo", blurb: "54 flag challenges: pipes, HTTP, SQL, encodings, XOR, access control." },
   { href: "/machines/", title: "Machines", blurb: "A whole target, from first look to proven fix." },
 ];
 

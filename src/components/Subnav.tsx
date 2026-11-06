@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/HoverLink";
 import { usePathname } from "next/navigation";
 
 const GROUPS = {
