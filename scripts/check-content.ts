@@ -56,6 +56,26 @@ for (const d of lessons()) {
 if (thin) console.log(`note: ${thin} sections in lessons 1–${DEEP_FROM - 1} have no question yet`);
 
 const slugs = new Set([...docs, ...sheets()].map((d) => d.meta.slug));
+
+// The subnet table is arithmetic, so it must match the arithmetic.
+const subnet = fs.readFileSync("content/reference/subnetting.md", "utf8");
+let prefixes = 0;
+for (const m of subnet.matchAll(/^\| \/(\d+) \| `([\d.]+)` \| `([\d.]+)` \| ([\d,]+) \| ([\d,]+) \|/gm)) {
+  const p = Number(m[1]);
+  const mask = p === 0 ? 0 : (0xffffffff << (32 - p)) >>> 0;
+  const dotted = (n: number) => [24, 16, 8, 0].map((s) => (n >>> s) & 255).join(".");
+  const total = 2 ** (32 - p);
+  const usable = p <= 30 ? total - 2 : p === 31 ? 2 : 1;
+  prefixes++;
+  if (m[2] !== dotted(mask) || m[3] !== dotted(~mask >>> 0) || Number((m[4] as string).replace(/,/g, "")) !== total || Number((m[5] as string).replace(/,/g, "")) !== usable) fail(`subnetting: wrong row for /${p}`);
+}
+if (prefixes !== 25) fail(`subnetting: expected 25 prefixes, found ${prefixes}`);
+
+// Every Sysmon ID on Microsoft's page, as read in Nov 2026, must be on the sheet.
+const sysmon = fs.readFileSync("content/reference/sysmon-ids.md", "utf8");
+for (const id of [...Array.from({ length: 29 }, (_, i) => i + 1), 255]) {
+  if (!new RegExp(`^\\| \\**${id}\\** \\|`, "m").test(sysmon)) fail(`sysmon sheet: ID ${id} is missing`);
+}
 for (const d of [...docs, ...sheets()]) {
   const html = d.segments.map((s) => (s.kind === "html" ? s.html : "")).join("");
   for (const m of html.matchAll(/href="\/(courses|guides|machines|sheets)\/([^/"#]+)/g)) {

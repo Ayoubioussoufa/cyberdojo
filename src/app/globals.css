@@ -389,8 +389,49 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .review-start { text-align: left; }
 .review-start .btn { margin-top: 8px; }
 
+/* Machines */
+.machine-grid { margin-bottom: 28px; }
+.machine-card { display: flex; flex-direction: column; gap: 2px; }
+.machine-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.machine-progress, .machine-meta { font-family: var(--sans); font-size: 13px; color: var(--muted); }
+.machine-card .muted { flex: 1; }
+
+/* Cheat sheets */
+.sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.sheet-head h1 { font-size: clamp(30px, 5vw, 42px); margin: 6px 0 10px; }
+.sheet-head .lede { margin: 0; }
+.sheet-print { flex: none; margin-top: 8px; }
+.sheet-body { columns: 2 22rem; column-gap: 40px; }
+.sheet-body h2 { font-size: 19px; margin: 0 0 8px; padding-top: 20px; break-after: avoid; }
+.sheet-body .table-wrap { margin: 0 0 8px; break-inside: avoid; }
+.sheet-body table { font-size: 14px; width: 100%; }
+.sheet-body td, .sheet-body th { padding: 5px 8px; }
+.sheet-body td code { white-space: nowrap; }
+.sheet-body p { font-size: 15px; break-inside: avoid; }
+.sheet-body .callout { break-inside: avoid; margin-top: 16px; }
+.sheet-source { margin-top: 28px; }
+
 @media print {
-  .nav, .rail, .mobile-copy, .foot, .pager, .finish-actions, .pre-copy { display: none !important; }
+  @page { size: A4; margin: 11mm; }
+  .nav, .rail, .mobile-copy, .foot, .pager, .finish-actions, .pre-copy, .sheet-print { display: none !important; }
+  :root, :root[data-theme="dark"] {
+    --bg: #fff; --surface: #fff; --sunk: #f4f4f4; --ink: #000; --muted: #444; --rule: #bbb; --rule-strong: #999;
+    --accent: #0f6e6e; --link: #000; --code-bg: #f1f1f1; --shadow: none; color-scheme: light;
+  }
   body { background: #fff; color: #000; font-size: 12pt; }
+  a { color: inherit; text-decoration: none; }
   .doc-grid { display: block; padding: 0; }
+  .page { max-width: none; padding: 0; margin: 0; }
+  .sheet-head { margin-bottom: 4mm; }
+  .sheet-head h1 { font-size: 18pt; margin: 0 0 1mm; }
+  .sheet-head .lede { font-size: 9pt; }
+  .sheet-head .kicker { display: none; }
+  .sheet-body { columns: 2; column-gap: 6mm; column-rule: 0.2mm solid #ccc; }
+  .sheet-body h2 { font-size: 10.5pt; padding-top: 2.5mm; margin: 0 0 1mm; }
+  .sheet-body table { font-size: 8pt; }
+  .sheet-body td, .sheet-body th { padding: 0.5mm 1.2mm; }
+  .sheet-body code { font-size: 7.5pt; background: none; padding: 0; }
+  .sheet-body p, .sheet-body .callout p { font-size: 8pt; margin: 1mm 0; }
+  .sheet-body .callout { padding: 1.5mm 2mm; margin-top: 2mm; }
+  .sheet-source { font-size: 7.5pt; margin-top: 3mm; }
 }
