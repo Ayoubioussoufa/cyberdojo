@@ -10,13 +10,17 @@ After 24 months at 12–15 hours a week you'll be a **strong junior**, not a sen
 You'll be able to:
 
 - Investigate an alert end to end across Windows, Linux and cloud telemetry, and write a verdict with evidence.
-- Compromise a small enterprise lab, detect the same activity, and explain both sides.
+- Map the attack paths in a small enterprise lab, detect that activity, and explain both sides.
 - Build and secure infrastructure as code, and defend the design choices.
 - Review code and applications for the vulnerability classes that actually appear in production, and fix them.
 - Run a risk assessment and translate findings into a prioritised, costed plan.
 - Assess and harden an AI application, a skill most working professionals lack.
 - Produce written deliverables that a manager, an engineer and an auditor can each use.
 - Learn a new tool quickly, because you understand the systems underneath.
+
+::: law If you're aiming for penetration testing
+This site teaches testing from the defender's side: how attacks work, how to find the weakness, and how to prove the fix. The hands-on attacking itself is practised on legal training platforms, such as [PortSwigger's Web Security Academy](https://portswigger.net/web-security) and Hack The Box. The [platforms guide](/guides/e1-platforms/) says when. Add those hours if you choose track B.
+:::
 
 **What you won't be:** an expert reverse engineer, a red-team operator, a security architect or a seasoned incident commander. Those come from years of production exposure. You'll have the foundation that makes them achievable in three to five years, plus, unusually for a junior, the evidence to prove it.
 
@@ -43,14 +47,14 @@ Tick only with evidence: every box should link to a repository, a report, a reco
 
 - Build and rebuild a segmented lab with Windows, Linux, firewall and SIEM from scripts.
 - Investigate a host from logs, memory and disk and produce a defensible timeline.
-- Compromise a small AD environment and detect it in your own SIEM.
+- Audit a small AD lab for attack paths, and detect abuse of them in your own SIEM.
 - Write and test detections, and honestly measure coverage and false positives.
-- Find, exploit and fix the main web vulnerability classes in your own code.
+- Find, test and fix the main web vulnerability classes in your own code.
 - Build cloud infrastructure as code, then detect and respond to an attack on it.
 - Build a CI/CD pipeline with gates, SBOM, signing and policy enforcement.
 - Red-team an LLM application and harden it with measured results.
 - Run a risk assessment and produce a prioritised remediation roadmap.
-- Write professional pentest, incident, intelligence and risk reports.
+- Write professional assessment, incident, intelligence and risk reports.
 
 ### Tools
 

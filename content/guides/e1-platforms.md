@@ -5,11 +5,13 @@ group: Practice and projects
 minutes: 10
 source: OverTheWire, the free starting point | https://overthewire.org/wargames/
 ---
+@term HTB = Hack The Box: a training platform with legal practice machines.
+@term CISA = The US Cybersecurity and Infrastructure Security Agency. It publishes advisories and the KEV list of flaws being exploited.
 ::: key The rule that prevents two wasted years
 One platform per objective at a time, finished before the next. Platform-hopping feels productive and teaches almost nothing. A completed path with written notes beats four half-finished subscriptions, every time.
 :::
 
-Prices are approximate as of September 2026. Confirm before paying.
+Prices are approximate as of September 2026. Confirm before paying. In the tables below, M6 means Month 6 of your roadmap, and M6–M8 means Months 6 to 8.
 
 | Platform | What to actually do | When | Cost | Common mistake |
 |---|---|---|---|---|
@@ -34,7 +36,6 @@ Prices are approximate as of September 2026. Confirm before paying.
 | Repos to read | Atomic Red Team, SigmaHQ, Elastic detection-rules, Impacket, BloodHound, Prowler, capa rules | M11+ | Free | Never opening the source of tools you depend on |
 
 @term CTF (capture the flag) = A security competition where you solve challenges to find hidden text strings called flags.
-@term VDP (vulnerability disclosure programme) = A company's official channel for reporting flaws, usually without payment.
 
 ## If money is tight
 

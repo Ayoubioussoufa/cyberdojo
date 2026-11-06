@@ -134,7 +134,7 @@ pip install requests
 pip freeze > requirements.txt
 ```
 
-Add `.venv/` to `.gitignore`. Never install random packages system-wide, and remember the warning from the AI guide: [check that a package exists and who publishes it](/guides/d3-using-ai-well/) before you install it.
+Add `.venv/` to `.gitignore`. Never install random packages system-wide, and remember the warning from the Handbook's AI guide: [check that a package exists and who publishes it](/guides/d3-using-ai-well/) before you install it.
 
 ?? Why use a virtual environment for each project?
 + Each project keeps its own separate package versions

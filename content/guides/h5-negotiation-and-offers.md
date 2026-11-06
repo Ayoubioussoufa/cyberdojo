@@ -5,6 +5,7 @@ group: Career
 minutes: 6
 source: DGSSI, Morocco's national cybersecurity authority | https://www.dgssi.gov.ma/
 ---
+@term CERT (computer emergency response team) = A team that handles security incidents, often for a whole country or sector.
 ## The Moroccan and francophone market
 
 If that's where you're looking:

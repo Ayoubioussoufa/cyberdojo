@@ -5,6 +5,10 @@ group: Habits
 minutes: 5
 source: CISA Known Exploited Vulnerabilities catalog | https://www.cisa.gov/known-exploited-vulnerabilities-catalog
 ---
+@term DBIR = Verizon's Data Breach Investigations Report: a yearly study of real breaches.
+@term ENISA = The European Union's cybersecurity agency.
+@term RFC = Request for Comments: the documents that define internet standards, such as TCP and TLS.
+@term SANS = A training organisation that also runs the free Internet Storm Center diaries.
 Cybersecurity changes fast in the shallow layer and slowly in the deep one. Knowing which is which keeps 30 minutes a week sufficient.
 
 | Durable (5–10+ years) | Medium (2–5 years) | Fast (months) |

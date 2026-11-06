@@ -5,7 +5,7 @@ group: Working with AI
 minutes: 10
 source: OWASP Top 10 for LLM Applications, on why output needs verifying | https://genai.owasp.org/llm-top-10/
 ---
-You'll use AI every day of your career. The aim is to get faster without getting weaker.
+You'll use AI every day of your career. The aim is to get faster without getting weaker. In the tables below, M6 means Month 6 of your roadmap, and M6–M8 means Months 6 to 8.
 
 ## The rules
 
@@ -80,7 +80,7 @@ This course's source roadmap, written in September 2026, pointed to Ubuntu Serve
 ## AI + security project ideas
 
 - A retrieval assistant over ATT&CK and your runbooks, with mandatory citations and a 50-question evaluation.
-- A cloud audit-log narrator, evaluated against ground truth from your own P10 attacks.
+- A cloud audit-log narrator, evaluated against what you know really happened in your own P10 lab.
 - A detection-rule generator whose test harness rejects anything that doesn't fire or floods false positives.
 - An MCP server security review checklist and scanner, a genuinely under-served area.
 - A phishing triage classifier compared with an LLM baseline and a human baseline.

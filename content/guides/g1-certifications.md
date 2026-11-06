@@ -5,7 +5,12 @@ group: Career
 minutes: 12
 source: Always confirm prices and versions on the issuer's page. Example, CompTIA Security+ | https://www.comptia.org/certifications/security
 ---
-Certificates open doors. They don't make anyone good. All prices and validity periods are approximate as of September 2026 and move constantly: confirm on the official page and ask for student pricing.
+@term MCQ = Multiple-choice questions: an exam where you pick answers from a list.
+@term OSCP = Offensive Security Certified Professional: a well-known 24-hour practical penetration-testing exam.
+@term BSCP = Burp Suite Certified Practitioner: PortSwigger's practical web security exam.
+@term GIAC = A long-established certification body, linked to SANS training. Respected, but expensive.
+@term HR filter = A requirement that recruiters use to shortlist CVs, often before anyone technical reads them.
+Certificates open doors. They don't make anyone good. In the tables below, M6 means Month 6 of your roadmap, and M6–M8 means Months 6 to 8. All prices and validity periods are approximate as of September 2026 and move constantly: confirm on the official page and ask for student pricing.
 
 ## Five rules that prevent expensive mistakes
 

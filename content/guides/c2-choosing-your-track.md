@@ -39,6 +39,10 @@ Multiply each score by its weight and compare. If two paths land within 10%, cho
 
 The seven tracks are: **A** SOC/IR, **B** Red team, **C** Cloud, **D** AppSec/DevSecOps, **E** Security and detection engineering, **F** AI security, **G** GRC.
 
+::: tip Track B needs extra practice elsewhere
+This site covers penetration testing from the defender's side. If you lean towards track B, you'll do the hands-on attack practice on legal training platforms. The [platforms guide](/guides/e1-platforms/) lists them, and the [certifications guide](/guides/g1-certifications/) lists the exams.
+:::
+
 ## Signals, as hypotheses, not horoscopes
 
 | You love… | Consider |

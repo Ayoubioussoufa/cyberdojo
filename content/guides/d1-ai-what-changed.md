@@ -5,6 +5,7 @@ group: Working with AI
 minutes: 12
 source: Verify the claims here yourself; that's the point. Start with the OWASP GenAI Security Project | https://genai.owasp.org/
 ---
+@term EMEA = Europe, the Middle East and Africa, as one business region.
 The roadmap calls this its most important part. Your career decisions depend on separating signal from marketing. This is a snapshot from September 2026, and it will age, so treat every specific claim as something to verify.
 
 ## What actually changed

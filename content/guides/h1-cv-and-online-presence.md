@@ -5,7 +5,7 @@ group: Career
 minutes: 8
 source: GitHub Pages, free hosting for your portfolio site | https://pages.github.com/
 ---
-Being good is necessary and not sufficient. This guide and the next three cover how to turn skill into offers.
+Being good is necessary and not sufficient. This guide and the next three cover how to turn skill into offers. In the tables below, M6 means Month 6 of your roadmap, and M6–M8 means Months 6 to 8.
 
 ## Career actions by month
 

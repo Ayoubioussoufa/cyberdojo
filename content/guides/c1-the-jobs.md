@@ -5,6 +5,8 @@ group: Choosing a path
 minutes: 20
 source: NIST NICE Framework, the official map of cybersecurity work roles | https://niccs.cisa.gov/workforce-development/nice-framework
 ---
+@term NOC (network operations centre) = The team that keeps a network running. It's a common stepping stone into a SOC.
+@term IR (incident response) = Taking over when an attack is confirmed: containing it, removing it, recovering and reporting.
 Read this at the Month 12 midpoint and again before the Month 18 commitment. Nobody chooses a specialization from a description: they choose it from experience. Months 9–18 are deliberately a tasting menu.
 
 - **Paths cluster.** Blue: SOC → IR → DFIR → detection → CTI. Red: pentest → red team → AppSec. Builder: security engineering → cloud → DevSecOps → architecture. Governance: GRC → risk → audit → AI governance. Moving inside a cluster is easy. Moving across takes about a year.
