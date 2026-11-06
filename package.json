@@ -11,7 +11,7 @@
     "test:missions": "tsx scripts/check-missions.ts",
     "test:content": "tsx scripts/check-content.ts",
     "test:drills": "tsx scripts/check-drills.ts",
-    "test": "pnpm test:shell && pnpm test:missions && pnpm test:drills && pnpm test:content"
+    "test": "pnpm test:shell && pnpm test:missions && pnpm test:drills && pnpm test:content && pnpm build"
   },
   "dependencies": {
     "marked": "15.0.12",
