@@ -21,7 +21,11 @@ export default async function Page({ params }: Props) {
   return (
     <div className="page narrow">
       <p className="back"><Link href="/practice/">← All practice</Link></p>
-      {DRILLS[drill] ? <LazyDrill id={drill} roundSize={12} /> : <LazyRange id={drill} />}
+      <header className="page-head">
+        <h1>{DRILLS[drill]?.title ?? RANGES[drill]?.title}</h1>
+        {DRILLS[drill] && <p className="lede">{DRILLS[drill].blurb}</p>}
+      </header>
+      {DRILLS[drill] ? <LazyDrill id={drill} roundSize={12} bare /> : <LazyRange id={drill} bare />}
     </div>
   );
 }

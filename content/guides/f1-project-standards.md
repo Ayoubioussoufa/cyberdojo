@@ -52,3 +52,11 @@ One substantial, track-aligned body of work, scoped to finish in eight weeks, do
 => Admitting what doesn't work shows you understand the work. It's the strongest credibility signal you can give.
 
 ?! Think of one real constraint you could give your capstone. Who might the stakeholder be?
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [GitHub Docs: About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
+- [Diátaxis: a framework for technical documentation](https://diataxis.fr/)
+- [Keep a Changelog](https://keepachangelog.com/)

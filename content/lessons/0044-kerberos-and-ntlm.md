@@ -104,3 +104,11 @@ Enable auditing, then log in and open a file share on the DC. Find 4768, 4769 an
 @drill event-ids
 
 ?! Explain Kerberos using your own analogy, then say exactly where Kerberoasting attacks it.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [RFC 4120: The Kerberos Network Authentication Service (V5)](https://www.rfc-editor.org/rfc/rfc4120)
+- [Microsoft Learn: Kerberos authentication overview](https://learn.microsoft.com/en-us/windows-server/security/kerberos/kerberos-authentication-overview)
+- [Microsoft Learn: NTLM overview](https://learn.microsoft.com/en-us/windows-server/security/kerberos/ntlm-overview)

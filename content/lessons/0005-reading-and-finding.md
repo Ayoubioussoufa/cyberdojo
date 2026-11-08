@@ -130,3 +130,10 @@ Now you see only results. You'll use this every day.
 ## What you can do now
 
 You can pull one line out of thousands and find any file on a disk. Next, you'll chain these tools together, and that's where the real power starts.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [find(1) manual page](https://man7.org/linux/man-pages/man1/find.1.html)
+- [OverTheWire Bandit, levels built on reading and finding files](https://overthewire.org/wargames/bandit/)

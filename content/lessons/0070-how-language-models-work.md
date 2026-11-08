@@ -134,3 +134,10 @@ You can run a small model on your own laptop with [Ollama](https://ollama.com/),
 | Output | Is it treated as untrusted when it's shown or used? |
 
 ?! Explain to a friend, in your own words, why a language model isn't a database of facts, and what that means for trusting its answers.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [3Blue1Brown: neural networks and transformers, visually](https://www.3blue1brown.com/topics/neural-networks)
+- [Vaswani et al., Attention Is All You Need (2017)](https://arxiv.org/abs/1706.03762)

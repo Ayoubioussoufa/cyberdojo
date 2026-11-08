@@ -78,3 +78,10 @@ Buy nothing until Month 5 if you're unsure.
 - **Weak laptop?** Use browser-based machines like TryHackMe AttackBox or HTB Pwnbox, a smaller AD lab (one domain controller, one client) and cloud labs with a budget alarm.
 
 ?! Which of the seven principles do you expect to be hardest for you personally, and what will you do about it?
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [NIST Cybersecurity Framework 2.0](https://www.nist.gov/cyberframework)
+- [MITRE ATT&CK](https://attack.mitre.org/)

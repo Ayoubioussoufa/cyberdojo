@@ -71,3 +71,10 @@ Read this at the Month 12 midpoint and again before the Month 18 commitment. Nob
 => It's rarely a first job. People usually reach it from SOC, IR or CTI with a public body of work.
 
 ?! Which two paths sound most like you today, and why? Keep your answer: you'll compare it with real experience at Month 12.
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [NICE Framework: the official map of cybersecurity work roles](https://niccs.cisa.gov/workforce-development/nice-framework)
+- [CyberSeek career pathway: roles, salaries and transitions](https://www.cyberseek.org/pathway.html)

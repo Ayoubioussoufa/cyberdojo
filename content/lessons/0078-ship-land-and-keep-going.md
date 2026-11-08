@@ -88,3 +88,10 @@ Your field changes every month. The tools an analyst uses in five years may look
 Pick one of the [seven plans](/guides/l1-after-24-months/). Keep the habits: build something, break something, write it down, publish it, help someone else. Run a **retrospective** on the two years: what worked, what didn't, and what you'd tell yourself on day one.
 
 ?! Write three professional goals, with dates, for the 12 months after this roadmap.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [CyberSeek career pathway](https://www.cyberseek.org/pathway.html)
+- [NICE Framework](https://niccs.cisa.gov/workforce-development/nice-framework)

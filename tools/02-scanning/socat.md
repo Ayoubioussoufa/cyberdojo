@@ -3,7 +3,7 @@ title: socat
 summary: Relays data between two endpoints of almost any kind.
 side: both
 use: own
-docs: https://www.dest-unreach.org/socat/doc/socat.html
+docs: https://manpages.debian.org/socat
 kali: socat
 alt: netcat
 ---

@@ -3,7 +3,7 @@ title: net, ipconfig and the net recon family
 summary: Everyday Windows commands attackers run first to understand where they've landed.
 side: both
 use: know
-docs: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/net-commands
+docs: https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/net-commands-on-operating-systems
 aka: net, tasklist, systeminfo
 alt: wmic, sysmon
 ---

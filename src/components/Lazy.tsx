@@ -24,10 +24,10 @@ function WhenNear({ label, children }: { label: string; children: React.ReactNod
   return <div ref={spot}>{near ? children : <Waiting label={label} />}</div>;
 }
 
-export const LazyDrill = ({ id, roundSize }: { id: string; roundSize?: number }) => (
-  <WhenNear label="Exercises"><Drill id={id} {...(roundSize ? { roundSize } : {})} /></WhenNear>
+export const LazyDrill = ({ id, roundSize, bare }: { id: string; roundSize?: number; bare?: boolean }) => (
+  <WhenNear label="Exercises"><Drill id={id} bare={bare} {...(roundSize ? { roundSize } : {})} /></WhenNear>
 );
 
-export const LazyRange = ({ id }: { id: string }) => (
-  <WhenNear label="Terminal"><Range id={id} /></WhenNear>
+export const LazyRange = ({ id, bare }: { id: string; bare?: boolean }) => (
+  <WhenNear label="Terminal"><Range id={id} bare={bare} /></WhenNear>
 );

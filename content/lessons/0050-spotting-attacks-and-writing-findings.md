@@ -128,3 +128,9 @@ Solve the PortSwigger labs at their pace, with notes per flaw in your own words.
 :::
 
 ?! Write a finding for a flaw you've studied this month, using the structure above.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [OWASP Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)

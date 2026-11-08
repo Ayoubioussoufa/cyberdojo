@@ -138,3 +138,10 @@ Authorization needs tests, because nothing crashes when a check is missing. Make
 => Access control bugs only appear across two identities. Testing with one account proves nothing.
 
 ?! Explain IDOR to a developer in two minutes: what it is, why scanners miss it, and how to fix it.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [OWASP Insecure Direct Object Reference Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html)
+- [OWASP Cross-Site Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)

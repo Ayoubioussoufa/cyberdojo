@@ -10,7 +10,8 @@ import { freshSeed } from "@/lib/rng";
 const ROUND = 8;
 
 /** A round of exercises: no repeats, and each answer is explained. */
-export function Drill({ id, roundSize = ROUND }: { id: string; roundSize?: number }) {
+/** `bare` drops the title and blurb, for a page that already shows them in its own header. */
+export function Drill({ id, roundSize = ROUND, bare = false }: { id: string; roundSize?: number; bare?: boolean }) {
   const drill = DRILLS[id];
   const store = useStore();
   const [round, setRound] = useState<{ n: number; exercises: Exercise[] } | null>(null);
@@ -25,8 +26,8 @@ export function Drill({ id, roundSize = ROUND }: { id: string; roundSize?: numbe
   return (
     <section className="drill">
       <span className="band">Practice, {drill.deck ? `${drill.deck} questions in rotation` : "new numbers every round"}</span>
-      <h3 className="noterms">{drill.title}</h3>
-      <p className="muted noterms">{drill.blurb}</p>
+      {!bare && <h3 className="noterms">{drill.title}</h3>}
+      {!bare && <p className="muted noterms">{drill.blurb}</p>}
       {round ? (
         <Player key={round.n} source={id} exercises={round.exercises} onFinish={(r) => roundDone(id, r, round.exercises.length)} onAgain={start} />
       ) : (

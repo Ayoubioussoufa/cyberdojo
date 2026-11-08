@@ -88,3 +88,9 @@ Answer each one aloud first, then in writing. When you've done a block, use the 
 ### Behavioural
 
 ?! Tell me about something you built, and what went wrong. (A specific project, the decision you got wrong, how you found out, what you changed, what you now do differently: concrete, no blaming.)
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Grace Nolan's security engineering interview notes](https://github.com/gracenolan/Notes)

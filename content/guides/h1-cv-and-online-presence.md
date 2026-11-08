@@ -48,3 +48,9 @@ Being good is necessary and not sufficient. This guide and the next three cover 
 | **Write-ups** | One a month, 800–1,500 words: the problem, what you tried, what failed, the evidence, what you'd change. Several interview invitations will come from these |
 
 ?! Write a first draft of your LinkedIn headline for the role you're leaning towards today.
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [GitHub Docs: managing your profile README](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme)

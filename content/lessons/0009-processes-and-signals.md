@@ -90,3 +90,10 @@ In a real incident, killing a process destroys what it held in memory, possibly 
 ## What you can do now
 
 You can look at a machine and tell what's running, what's suspicious, and how to stop it. The next two lessons step back from the terminal and give you the language of the whole field.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [ps(1) manual page](https://man7.org/linux/man-pages/man1/ps.1.html)
+- [proc(5): the /proc filesystem, where every process is visible](https://man7.org/linux/man-pages/man5/proc.5.html)

@@ -116,3 +116,10 @@ If your target employers filter on a baseline certificate, Months 6–8 are the 
 Use [the review page](/review/) as your 50-question self-test. Re-score yourself on the [skill matrix](/skills/).
 
 ?! A developer says "we hash passwords with SHA-256, so we're fine". Write your reply: what's wrong, and exactly what should they do?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [NIST SP 800-63B: authentication and password rules](https://pages.nist.gov/800-63-4/sp800-63b.html)
+- [RFC 9106: Argon2](https://www.rfc-editor.org/rfc/rfc9106)

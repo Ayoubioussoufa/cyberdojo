@@ -148,3 +148,10 @@ Everything above serves one principle: **give each person and program exactly th
 ## What you can do now
 
 You can read any `ls -l` line, reason as the kernel does, and fix permissions. Next come the special bits that attackers hunt for first.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [credentials(7): user and group IDs, explained by the manual](https://man7.org/linux/man-pages/man7/credentials.7.html)
+- [ArchWiki: File permissions and attributes](https://wiki.archlinux.org/title/File_permissions_and_attributes)

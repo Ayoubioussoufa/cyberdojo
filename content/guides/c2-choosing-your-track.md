@@ -69,3 +69,10 @@ This site covers penetration testing from the defender's side. If you lean towar
 => The first job is the hardest to get, so market access breaks the tie. The second job is much easier to choose.
 
 ?! Why is an energy log more reliable than asking yourself what you're interested in?
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [SANS cybersecurity skills roadmap](https://www.sans.org/cyber-security-skills-roadmap/)
+- [CyberSeek career pathway](https://www.cyberseek.org/pathway.html)

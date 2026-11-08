@@ -131,3 +131,9 @@ The shell splits what you type on spaces, so `cat my file.txt` means two files, 
 ## What you can do now
 
 You can walk any Linux machine. Next: finding one line in a million.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [hier(7), the manual page that describes every top-level directory](https://man7.org/linux/man-pages/man7/hier.7.html)

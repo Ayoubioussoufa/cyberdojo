@@ -115,3 +115,11 @@ An audit run once goes stale. Script these checks, as you did in Month 3, run th
 => The change between two runs is the signal. A new SUID file nobody can explain deserves attention.
 
 ?! Write your own Linux privilege audit checklist: ten checks, each with a command, and what a bad result looks like.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [GTFOBins: Unix binaries that can be abused, to audit for](https://gtfobins.github.io/)
+- [LOLBAS: the Windows equivalent](https://lolbas-project.github.io/)
+- [MITRE ATT&CK, Privilege Escalation tactic](https://attack.mitre.org/tactics/TA0004/)

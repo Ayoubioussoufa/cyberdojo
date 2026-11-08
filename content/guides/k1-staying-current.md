@@ -50,3 +50,11 @@ Cybersecurity changes fast in the shallow layer and slowly in the deep one. Know
 => Repetition isn't confirmation. Go up the hierarchy to the primary source, and check the date.
 
 ?! Set up your routine: name the exact sources you'll read and when.
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [tl;dr sec, a weekly security newsletter](https://tldrsec.com/)
+- [SANS NewsBites](https://www.sans.org/newsletters/newsbites/)
+- [Risky Business, a weekly security news podcast](https://risky.biz/)

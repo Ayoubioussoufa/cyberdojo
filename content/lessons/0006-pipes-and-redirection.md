@@ -130,3 +130,10 @@ The shell empties the file before the command even starts. `sort log.txt > log.t
 ## What you can do now
 
 That pipeline is a real exit-gate skill, and it works in interviews too. If you can explain each stage, you've understood more than many people who only copy it.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [The Art of Command Line, a one-page tour of the shell](https://github.com/jlevy/the-art-of-command-line)
+- [Bash manual: Redirections](https://www.gnu.org/software/bash/manual/html_node/Redirections.html)

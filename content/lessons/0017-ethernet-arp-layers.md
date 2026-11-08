@@ -118,3 +118,10 @@ ARP spoofing on a network you don't own, including a café or university Wi-Fi, 
 A **VLAN** splits one physical switch into several virtual ones. Guests, staff and servers can share hardware but not a network, and traffic between them has to pass through a router or firewall where it can be checked. You'll build this kind of segmentation in Month 3.
 
 ?! In Wireshark, how would you recognise ARP spoofing? Describe what you'd look for.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Wireshark wiki: ARP, with sample captures](https://wiki.wireshark.org/AddressResolutionProtocol)
+- [MITRE ATT&CK T1557.002, ARP cache poisoning, with detections](https://attack.mitre.org/techniques/T1557/002/)

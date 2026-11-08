@@ -120,3 +120,11 @@ Work through a real-looking report, from reading the headers to scoping.
 @range phish
 
 ?! Write a short phishing triage playbook: six steps another analyst could follow.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [RFC 7208: SPF](https://www.rfc-editor.org/rfc/rfc7208)
+- [RFC 6376: DKIM signatures](https://www.rfc-editor.org/rfc/rfc6376)
+- [RFC 7489: DMARC](https://www.rfc-editor.org/rfc/rfc7489)

@@ -92,3 +92,9 @@ The people who go furthest aren't the ones who knew the most at 24 months. They'
 => Overclaiming is the fastest way to fail an interview. Those senior skills come from years of production exposure.
 
 ?! In two sentences, write the honest statement of what you want to be able to say about yourself at Month 24.
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [CyberSeek career pathway](https://www.cyberseek.org/pathway.html)

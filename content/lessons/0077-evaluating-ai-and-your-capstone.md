@@ -105,3 +105,9 @@ An evaluation also tells you where an assistant may act alone. High-confidence, 
 => Approval fatigue turns a control into a formality. It's alert fatigue again, so keep requests rare and meaningful.
 
 ?! Name a task from your own track that an AI assistant could help with. What would your ground truth be?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Google ML Crash Course: accuracy, precision and recall](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall)

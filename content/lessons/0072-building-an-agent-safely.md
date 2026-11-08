@@ -186,3 +186,10 @@ Extend this into a support assistant with one lookup tool and one action tool, t
 :::
 
 ?! Pick an action from your own life, such as paying a bill. If an agent did it, which rules from this lesson would you require, and why?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Anthropic, Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
+- [OWASP Top 10 for LLM Applications](https://genai.owasp.org/llm-top-10/)

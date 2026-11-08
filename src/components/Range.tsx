@@ -158,7 +158,8 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
 }
 
 /** A ladder of missions in one terminal. */
-export function Range({ id }: { id: string }) {
+/** `bare` drops the title, for a page that already shows it in its own header. */
+export function Range({ id, bare = false }: { id: string; bare?: boolean }) {
   const [loaded, setLoaded] = useState<{ id: string; range: RangeSet | null } | null>(null);
   useEffect(() => {
     let live = true;
@@ -171,12 +172,12 @@ export function Range({ id }: { id: string }) {
   }, [id]);
   if (!loaded || loaded.id !== id) return <RangeSkeleton />;
   if (!loaded.range) return <p className="muted">Mission set {id} is missing.</p>;
-  return <RangeView range={loaded.range} />;
+  return <RangeView range={loaded.range} bare={bare} />;
 }
 
 export const RangeSkeleton = () => <section className="range range-wait" aria-busy="true" aria-label="Loading the terminal" />;
 
-function RangeView({ range }: { range: RangeSet }) {
+function RangeView({ range, bare }: { range: RangeSet; bare: boolean }) {
   const store = useStore();
   const missions = range.missions;
   const firstOpen = missions.findIndex((m) => !store.missions[m.id]);
@@ -197,7 +198,7 @@ function RangeView({ range }: { range: RangeSet }) {
     <section className="range">
       <div className="range-head">
         <span className="band">Hands on, graded automatically</span>
-        <h3 className="noterms">{range.title}</h3>
+        {!bare && <h3 className="noterms">{range.title}</h3>}
         <ol className="range-steps" aria-label="Missions">
           {missions.map((m, i) => (
             <li key={m.id}>

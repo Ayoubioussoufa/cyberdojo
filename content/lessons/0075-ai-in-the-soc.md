@@ -116,3 +116,10 @@ Routine Tier 1 work is shrinking, as the [AI guide](/guides/d1-ai-what-changed/)
 => When drafting is cheap, judgement is what's scarce. That's why fundamentals and verification pay off.
 
 ?! Design an assistant for one task in your track. What tools would it have, what could it never do, and how would you measure it?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [NCSC and partners: Guidelines for secure AI system development](https://www.ncsc.gov.uk/collection/guidelines-secure-ai-system-development)
+- [OWASP GenAI Security Project](https://genai.owasp.org/)

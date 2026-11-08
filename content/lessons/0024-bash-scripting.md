@@ -142,3 +142,9 @@ Ask an LLM to review your script for bugs and injection risks, then run ShellChe
 :::
 
 ?! Why is a checker that greps the raw `sshd_config` for "PermitRootLogin no" unreliable? How would you fix it?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html)

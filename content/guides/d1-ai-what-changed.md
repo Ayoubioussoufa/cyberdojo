@@ -81,3 +81,10 @@ Entry-level work is the most automatable work, so the classic "learn on the job 
 => Authorization carries legal accountability, and that can't be delegated to a model.
 
 ?! The roadmap says fundamentals matter more with AI, not less. Explain why in your own words.
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
+- [OWASP GenAI Security Project](https://genai.owasp.org/)

@@ -923,3 +923,4 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 .fc-term { font-family: var(--display); font-stretch: 82%; font-weight: 640; font-size: 24px; }
 .status-tip { display: block !important; line-height: 1.5; }
 .status-tip a { margin-left: 4px; font-weight: 600; }
+.fc-options select, .fc-dir { min-width: 0; width: 100%; }

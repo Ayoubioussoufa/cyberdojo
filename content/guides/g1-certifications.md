@@ -101,3 +101,11 @@ Download the official objectives and turn them into a checklist. Score yourself 
 => More candidates fail on documentation than on access. Sharing exam content also breaks every certification agreement.
 
 ?! Which one line of the sequence table fits you today? What would make you change it?
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [ISC2 Certified in Cybersecurity (CC)](https://www.isc2.org/certifications/cc)
+- [CompTIA Security+](https://www.comptia.org/certifications/security)
+- [GIAC certifications, by SANS](https://www.giac.org/)

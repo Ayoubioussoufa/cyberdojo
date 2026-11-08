@@ -68,3 +68,9 @@ The unguided session on Thursday, and the Sunday review: what I learned, what's 
 => Three to five hours a week keeps the habit and the notes alive. University comes first, and the degree is part of the strategy.
 
 ?! Sketch your real week. Which fixed slot will be your unguided session?
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [The Learning Scientists: spaced practice](https://www.learningscientists.org/downloadable-materials)

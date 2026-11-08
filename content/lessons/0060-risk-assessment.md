@@ -130,3 +130,10 @@ Use three sentences: what could happen, how likely and how much, and what you ne
 > Attackers could guess staff passwords on our portal, because it has no limit on login attempts. We've seen this in our sector, and a takeover could expose customer orders. Rate limiting costs two days of development, and I recommend doing it this sprint.
 
 ?! Translate this into three sentences for a director: "The portal has no rate limiting on login."
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [NIST SP 800-37 Rev. 2: the Risk Management Framework](https://csrc.nist.gov/pubs/sp/800/37/r2/final)
+- [The FAIR Institute: quantitative risk analysis](https://www.fairinstitute.org/)

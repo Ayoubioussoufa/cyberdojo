@@ -141,3 +141,10 @@ Then open your browser's DevTools (F12), go to the Network tab, and load any sit
 => One server can host many sites, so the `Host` header says which one. It's required in HTTP/1.1.
 
 ?! Why can't a server trust the `User-Agent` header? What does that imply for any security check based on it?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [RFC 9110: HTTP Semantics, the standard itself](https://www.rfc-editor.org/rfc/rfc9110)
+- [High Performance Browser Networking, free online book](https://hpbn.co/)

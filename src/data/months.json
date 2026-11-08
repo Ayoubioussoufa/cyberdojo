@@ -988,8 +988,8 @@
     "url": "https://github.com/RhinoSecurityLabs/cloudgoat"
    },
    {
-    "text": "The Big IAM Challenge — IAM policy reasoning under pressure.",
-    "url": "https://bigiamchallenge.com/"
+    "text": "IAM Vulnerable — IAM privilege-escalation paths, built in your own AWS account.",
+    "url": "https://github.com/BishopFox/iam-vulnerable"
    }
   ],
   "tools": "AWS CLI, Terraform, IAM Access Analyzer + policy simulator, Pacu, Prowler, CloudTrail, GuardDuty, Athena.",

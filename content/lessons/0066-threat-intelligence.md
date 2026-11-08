@@ -133,3 +133,9 @@ Choose a campaign with several public reports. Map behaviours to ATT&CK, citing 
 :::
 
 ?! Write one intelligence requirement that your imaginary company would really care about.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [David Bianco, The Pyramid of Pain](https://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html)

@@ -140,3 +140,10 @@ Deploy [Wazuh](https://documentation.wazuh.com/) and onboard Windows with Sysmon
 :::
 
 ?! Name the log you'd check first for each: a suspicious login, a malicious domain lookup, a deleted cloud bucket. Explain why.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [NIST SP 800-92: Guide to Computer Security Log Management](https://csrc.nist.gov/pubs/sp/800/92/final)
+- [Sigma: a common format for detection rules](https://sigmahq.io/)

@@ -61,3 +61,10 @@ Send a short thank-you afterwards saying what you changed because of the convers
 => Apply at 60–70% match. Let them decide, not you.
 
 ?! Write a three-paragraph cold email for a real company near you, using the structure above.
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [BSides: community-run security conferences](https://www.securitybsides.com/)
+- [WiCyS, Women in CyberSecurity](https://www.wicys.org/)

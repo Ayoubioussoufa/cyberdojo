@@ -30,3 +30,10 @@ Writing is the actual work product of most security jobs. Templates for each are
 => The first part is what the evidence shows. The second is marked as a judgment, so a reader can weigh it.
 
 ?! Rewrite this for a non-technical manager: "CVE-2021-44228 on the app server allows unauthenticated RCE via JNDI lookup."
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Google's free technical writing courses](https://developers.google.com/tech-writing)
+- [0xdf's write-ups, a model of clear technical writing](https://0xdf.gitlab.io/)

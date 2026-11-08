@@ -137,3 +137,10 @@ Use your Month 6 application. Add a vulnerable query on a branch, write a test t
 :::
 
 ?! Explain to a developer, in three sentences, why parameters stop SQL injection when filtering doesn't.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [OWASP Cross Site Scripting Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+- [OWASP OS Command Injection Defense Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html)

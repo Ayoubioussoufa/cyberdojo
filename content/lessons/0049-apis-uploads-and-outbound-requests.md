@@ -120,3 +120,10 @@ obj = Order(**json.loads(body))
 => Python's own documentation warns about this. Use a plain data format for anything untrusted.
 
 ?! Write a ten-line hardening checklist for an API you might build.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [OWASP File Upload Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html)
+- [OWASP Server-Side Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)

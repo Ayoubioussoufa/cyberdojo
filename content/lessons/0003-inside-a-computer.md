@@ -128,3 +128,11 @@ Click inside the black box, type a command and press Enter. Nothing you do can b
 You've run real commands and captured your first flag. And you have a picture that the rest of the course builds on: hardware underneath, a kernel that checks every request, processes running as users, and files on disk.
 
 Next, you'll learn to move around that filesystem as easily as you move around your phone.
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [CS50x, Harvard's free introduction to computer science](https://cs50.harvard.edu/x/)
+- [Operating Systems: Three Easy Pieces, a free textbook](https://pages.cs.wisc.edu/~remzi/OSTEP/)
+- [Nand2Tetris: build a computer from logic gates up](https://www.nand2tetris.org/)

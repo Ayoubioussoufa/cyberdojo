@@ -100,3 +100,10 @@ Run a scan while watching with Wireshark or your IDS. A port scan is a single so
 @drill ports
 
 ?! Scan your Ubuntu VM. Paste the result and, for each port, answer: should it be open, and why?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Nmap reference guide (the man page, online)](https://nmap.org/book/man.html)
+- [Nmap book: port scanning techniques](https://nmap.org/book/man-port-scanning-techniques.html)

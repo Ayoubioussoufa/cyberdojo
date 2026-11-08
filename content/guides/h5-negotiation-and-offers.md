@@ -42,3 +42,9 @@ Widen geographically (remote, francophone Europe), widen role titles, and consid
 => Consultancies, banks and telecoms there hire heavily for governance, and a bilingual candidate with a real risk register stands out.
 
 ?! List five employers near you and note which of them hire juniors, and for what.
+
+## Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Haseeb Qureshi, Ten rules for negotiating a job offer](https://haseebq.com/my-ten-rules-for-negotiating-a-job-offer/)

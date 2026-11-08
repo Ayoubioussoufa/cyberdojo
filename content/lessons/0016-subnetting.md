@@ -114,3 +114,9 @@ Ask an AI for 20 subnetting problems with answers. Solve them yourself, check th
 - Only other cloud machines may connect here
 => `/0` means zero fixed bits, so it matches every address. On SSH, that's a classic misconfiguration.
 
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [RFC 4632: Classless Inter-domain Routing (CIDR)](https://www.rfc-editor.org/rfc/rfc4632)
+- [RFC 1918: the private address ranges](https://www.rfc-editor.org/rfc/rfc1918)

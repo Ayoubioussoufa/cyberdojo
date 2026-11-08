@@ -192,3 +192,10 @@ The defences are mostly engineering. Control your training data, retrain and re-
 => The model didn't change, and the input did. Evasion is why classifiers need backup from behaviour-based detection.
 
 ?! Improve the classifier: add a feature, such as the URL's length or its count of digits, or better training data. What changed, and how would you know it helped in the real world?
+
+### Go further
+
+Primary sources and the best free material on this topic, all checked in November 2026:
+
+- [Google Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course)
+- [Axelsson, The base-rate fallacy and the difficulty of intrusion detection (2000)](https://doi.org/10.1145/357830.357849)
