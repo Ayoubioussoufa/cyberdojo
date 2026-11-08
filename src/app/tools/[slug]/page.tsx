@@ -29,7 +29,7 @@ export default async function Page({ params }: Props) {
       segments={[toolContext(doc), ...doc.segments]}
       toc={doc.toc}
       terms={termsFor(doc)}
-      kicker={`Tools · ${cat?.title ?? ""}`}
+      kicker={`Tool guide: ${cat?.title ?? ""}`}
       prev={near(all[i - 1])}
       next={near(all[i + 1])}
       base="/tools/"

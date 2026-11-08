@@ -24,7 +24,7 @@ export function Drill({ id, roundSize = ROUND }: { id: string; roundSize?: numbe
   };
   return (
     <section className="drill">
-      <span className="band">Practice · {drill.deck ? `${drill.deck} questions in rotation` : "new numbers every round"}</span>
+      <span className="band">Practice, {drill.deck ? `${drill.deck} questions in rotation` : "new numbers every round"}</span>
       <h3 className="noterms">{drill.title}</h3>
       <p className="muted noterms">{drill.blurb}</p>
       {round ? (
@@ -32,7 +32,7 @@ export function Drill({ id, roundSize = ROUND }: { id: string; roundSize?: numbe
       ) : (
         <>
           <button type="button" className="btn primary" onClick={start}>Start a round of {size}</button>
-          {best && <p className="meta drill-best">Best round: {Math.round(best.best * 100)}% · played {best.plays} time{best.plays === 1 ? "" : "s"}</p>}
+          {best && <p className="meta drill-best">Best round: {Math.round(best.best * 100)}%, played {best.plays} time{best.plays === 1 ? "" : "s"}</p>}
         </>
       )}
     </section>

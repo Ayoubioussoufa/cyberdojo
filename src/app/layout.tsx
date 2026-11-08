@@ -1,24 +1,24 @@
 import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/atkinson-hyperlegible-next/wght.css";
-import "@fontsource-variable/bricolage-grotesque/wght.css";
-import "@fontsource-variable/jetbrains-mono/wght.css";
+import "@fontsource-variable/martian-mono/wdth.css";
 import "./globals.css";
 import { AccountStart } from "@/components/AccountStart";
 import { Nav } from "@/components/Nav";
+import { Prompt } from "@/components/Prompt";
 
 export const metadata: Metadata = {
-  title: { default: "CyberDojo", template: "%s · CyberDojo" },
+  title: { default: "CyberDojo", template: "%s | CyberDojo" },
   description: "Cybersecurity from absolute zero to job-ready: a 24-month course with a step-by-step roadmap, lessons, projects and a browser terminal.",
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#eceff5" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e1430" },
+    { media: "(prefers-color-scheme: light)", color: "#0c1218" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c1218" },
   ],
 };
 
-const THEME = `try{var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
+const THEME = `try{var t=localStorage.getItem("theme");if(t!=="light")t="dark";document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -30,9 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a className="skip" href="#main">Skip to content</a>
         <AccountStart />
         <Nav />
+        <Prompt />
         <main id="main">{children}</main>
         <footer className="foot">
-          <span>CyberDojo</span>. Only test what you own or have written permission to test.
+          <span>cyberdojo</span>: only test what you own, or what you have written permission to test.
         </footer>
       </body>
     </html>

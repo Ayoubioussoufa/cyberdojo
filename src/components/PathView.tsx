@@ -40,7 +40,7 @@ export function PathView({ path }: { path: PathStep[] }) {
       <section className="card here">
         {next ? (
           <>
-            <p className="band">You are here · {next.month === 0 ? "Day zero" : `Month ${next.month}`} · {KIND_LABEL[next.kind]}</p>
+            <p className="band">You are here, {next.month === 0 ? "Day zero" : `Month ${next.month}`}, {KIND_LABEL[next.kind]}</p>
             <h2>{next.title}</h2>
             <p className="muted">{next.note}</p>
             <Link className="btn primary lg" href={next.href}>{doneCount === 0 ? "Take the first step" : "Do this next"}</Link>
@@ -56,7 +56,7 @@ export function PathView({ path }: { path: PathStep[] }) {
         )}
         <div className="here-foot">
           <span className="meter" aria-hidden="true"><i style={{ width: `${(doneCount / path.length) * 100}%` }} /></span>
-          <span className="meta">{doneCount} of {path.length} steps{store.plan ? ` · at ${store.plan.hours} hours a week, you'd finish around ${finishDate(path, store, store.plan.hours)}` : ""}</span>
+          <span className="meta">{doneCount} of {path.length} steps{store.plan ? `, at ${store.plan.hours} hours a week, you'd finish around ${finishDate(path, store, store.plan.hours)}` : ""}</span>
         </div>
       </section>
 

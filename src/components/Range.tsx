@@ -126,7 +126,7 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
     <div className="term-wrap">
       <div className="term-bar">
         <span className="term-dots" aria-hidden="true"><i /><i /><i /></span>
-        <span className="term-title">simulated Linux · nothing here can break</span>
+        <span className="term-title">simulated Linux, nothing here can break</span>
         <button type="button" className="term-reset" onClick={() => setSeed((s) => s + 1)}>Reset</button>
       </div>
       <div className="term" ref={screen} onClick={() => { if (!window.getSelection()?.toString()) input.current?.focus(); }}>
@@ -150,7 +150,7 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
         </form>
       </div>
       <div className="term-foot">
-        <span className="term-keys"><code>submit your-answer</code> hands it in · <kbd>Tab</kbd> completes · <kbd>↑</kbd> recalls · <code>man ls</code> explains · <code>help</code> lists</span>
+        <span className="term-keys"><code>submit your-answer</code> hands it in, <kbd>Tab</kbd> completes, <kbd>↑</kbd> recalls, <code>man ls</code> explains, <code>help</code> lists</span>
         <CopyButton className="link-btn on-dark" label="Stuck? Copy for my AI" done="Copied" build={() => missionMessage(mission.title, mission.brief, world.current?.shell.history ?? [], lastOut.current)} />
       </div>
     </div>
@@ -196,7 +196,7 @@ function RangeView({ range }: { range: RangeSet }) {
   return (
     <section className="range">
       <div className="range-head">
-        <span className="band">Hands on · graded automatically</span>
+        <span className="band">Hands on, graded automatically</span>
         <h3 className="noterms">{range.title}</h3>
         <ol className="range-steps" aria-label="Missions">
           {missions.map((m, i) => (

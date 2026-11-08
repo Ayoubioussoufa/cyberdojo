@@ -29,7 +29,7 @@ export default async function Page({ params }: Props) {
       segments={[moduleContext(doc), ...trainPanel(doc), ...doc.segments, ...toolGuides(doc)]}
       toc={doc.toc}
       terms={termsFor(doc)}
-      kicker={`${domain?.title ?? "Module"} · ${doc.meta.level ?? ""}`}
+      kicker={`${domain?.title ?? "Module"}, ${doc.meta.level ?? ""} level`}
       prev={near(all[i - 1])}
       next={near(all[i + 1])}
       base="/modules/"

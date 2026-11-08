@@ -286,7 +286,7 @@ export function Player({ source, exercises, onFinish, onAgain, retry }: { source
   return (
     <div>
       <div className="drill-bar" aria-hidden="true"><span style={{ width: `${((at + (out ? 1 : 0)) / exercises.length) * 100}%` }} /></div>
-      <p className="drill-count">Question {at + 1} of {exercises.length} · {right} right</p>
+      <p className="drill-count">Question {at + 1} of {exercises.length}, {right} right</p>
       <p className="qcard-prompt mono-pre noterms">{inline(ex.prompt)}</p>
       {ex.kind === "choice" && <Choice key={at} ex={ex} done={out} onAnswer={answered} />}
       {ex.kind === "input" && <TypeIn key={at} ex={ex} done={out} onAnswer={answered} />}

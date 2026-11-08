@@ -55,7 +55,7 @@ function Score({ brief }: { brief: DocBrief }) {
   const { answered, right } = useTally(brief);
   return (
     <p className="score">
-      {brief.questions.length ? `${answered} of ${brief.questions.length} answered · ${right} right` : "No multiple-choice questions on this page"}
+      {brief.questions.length ? `${answered} of ${brief.questions.length} answered, ${right} right` : "No multiple-choice questions on this page"}
     </p>
   );
 }
@@ -85,7 +85,7 @@ function Finish({ meta, brief, after, copy }: { meta: DocMeta; brief: DocBrief; 
       )}
       {after && (
         <Link href={after.href} className="card link-card next-step">
-          <span className="band">Next on your roadmap · {KIND_LABEL[after.kind]}</span>
+          <span className="band">Next on your roadmap, {KIND_LABEL[after.kind]}</span>
           <span className="next-title">{after.title}</span>
           <span className="muted">{after.note}</span>
         </Link>
@@ -123,8 +123,8 @@ export function DocView({
           <h1>{meta.title}</h1>
           <p className="lede">{meta.summary}</p>
           <p className="meta">
-            {meta.hours ? `About ${meta.hours} hours` : `${meta.minutes} min`}{meta.questions ? ` · ${meta.questions} questions` : ""}
-            {meta.builds ? <> · You will: {meta.builds}</> : null}
+            {meta.hours ? `About ${meta.hours} hours` : `${meta.minutes} min`}{meta.questions ? `, ${meta.questions} questions` : ""}
+            {meta.builds ? <>. You will: {meta.builds}</> : null}
           </p>
           {meta.source && (
             <p className="source">

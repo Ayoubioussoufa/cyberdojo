@@ -11,10 +11,7 @@ importers:
       '@fontsource-variable/atkinson-hyperlegible-next':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/bricolage-grotesque':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource-variable/jetbrains-mono':
+      '@fontsource-variable/martian-mono':
         specifier: ^5.3.0
         version: 5.3.0
       marked:
@@ -210,11 +207,8 @@ packages:
   '@fontsource-variable/atkinson-hyperlegible-next@5.3.0':
     resolution: {integrity: sha512-UnLzNUy1RWoLDfydAatP4NaRm99X/WbQEph7q/PymJnCFIOOwKOx3pBmp5ys8trO0dM+CKGuJgeZP9fAR4mQpA==}
 
-  '@fontsource-variable/bricolage-grotesque@5.3.0':
-    resolution: {integrity: sha512-TLi9Q4hJjS2UvoTMRSS2nHu6c4R56lAw60NR9QYtVRCHn0XtsFpiEhNffZ8Glsoxu6wEEwLKBP8lb94J52PNBA==}
-
-  '@fontsource-variable/jetbrains-mono@5.3.0':
-    resolution: {integrity: sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==}
+  '@fontsource-variable/martian-mono@5.3.0':
+    resolution: {integrity: sha512-0wVODx9ILwNnaYC4XCuSaFRYtj1Prd89MRVaSuv2ng6zLiQkS4SepaWEPefs7vqCZS8sbEOA8jb/4F5KNMnGdg==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -645,9 +639,7 @@ snapshots:
 
   '@fontsource-variable/atkinson-hyperlegible-next@5.3.0': {}
 
-  '@fontsource-variable/bricolage-grotesque@5.3.0': {}
-
-  '@fontsource-variable/jetbrains-mono@5.3.0': {}
+  '@fontsource-variable/martian-mono@5.3.0': {}
 
   '@img/colour@1.1.0':
     optional: true

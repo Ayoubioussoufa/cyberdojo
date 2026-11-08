@@ -10,7 +10,7 @@ export default function Page() {
   return (
     <div className="page narrow prose-page tour">
       <header className="page-head">
-        <p className="kicker">Start here · 2 minutes</p>
+        <p className="kicker">Start here, 2 minutes</p>
         <h1>How CyberDojo works</h1>
         <p className="lede">This site takes you from zero to a job in cybersecurity. It's big, but you only ever need to look at one thing: your next step.</p>
       </header>

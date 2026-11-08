@@ -29,7 +29,7 @@ export default async function Page({ params }: Props) {
       segments={[...trainPanel(doc), ...doc.segments, ...toolGuides(doc), ...deeperModules(doc)]}
       toc={doc.toc}
       terms={termsFor(doc)}
-      kicker={`Lesson ${doc.meta.number} · ${m === 0 ? "Day zero" : `Month ${m}`}`}
+      kicker={`Lesson ${doc.meta.number}, ${m === 0 ? "Day zero" : `Month ${m}`}`}
       prev={near(all[i - 1])}
       next={near(all[i + 1])}
       base="/courses/"

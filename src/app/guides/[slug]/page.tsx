@@ -25,7 +25,7 @@ export default async function Page({ params }: Props) {
       segments={doc.segments}
       toc={doc.toc}
       terms={termsFor(doc)}
-      kicker={`Handbook · ${doc.meta.group ?? "Guide"}`}
+      kicker={`Handbook: ${doc.meta.group ?? "Guide"}`}
       prev={null}
       next={null}
       base="/guides/"

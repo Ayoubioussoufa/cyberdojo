@@ -12,7 +12,7 @@ export function Gates({ month }: { month: Month }) {
   const n = gates.filter((_, i) => store.gates[`m${month.n}-${i}`]).length;
   return (
     <section className="card gate">
-      <p className="band">Exit gate · {n} of {gates.length}</p>
+      <p className="band">Exit gate, {n} of {gates.length}</p>
       <p className="muted">Tick a box only when you can do it unaided: no notes, no AI. If you can't yet, that's information, not failure. Use the buffer days.</p>
       <ul className="checks">
         {gates.map((g, i) => {
@@ -44,7 +44,7 @@ export function MonthGrid({ months, counts }: { months: Month[]; counts: Record<
           <Link key={m.n} href={`/roadmap/${m.n}/`} className={`card month${passed ? " passed" : ""}`}>
             <span className="month-n">{passed ? "✓" : String(m.n).padStart(2, "0")}</span>
             <span className="month-title">{m.title}</span>
-            <span className="meta">{counts[m.n] ? `${counts[m.n]} lessons · ` : ""}gate {n}/{gates.length}</span>
+            <span className="meta">{counts[m.n] ? `${counts[m.n]} lessons, ` : ""}gate {n}/{gates.length}</span>
           </Link>
         );
       })}

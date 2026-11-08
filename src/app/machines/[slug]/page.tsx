@@ -28,7 +28,7 @@ export default async function Page({ params }: Props) {
       segments={doc.segments}
       toc={doc.toc}
       terms={termsFor(doc)}
-      kicker={`Machine · ${doc.meta.level ?? "Practice"}`}
+      kicker={`Machine, ${doc.meta.level ?? "Practice"}`}
       prev={near(all[i - 1])}
       next={near(all[i + 1])}
       base="/machines/"

@@ -17,7 +17,7 @@ export default function Page() {
       <div className="grid3">
         {[...CASES].sort((a, b) => a.month - b.month).map((c) => (
           <Link key={c.id} href={`/practice/cases/${c.id}/`} className="card link-card">
-            <span className="phase-n">Month {c.month} · {c.role}</span>
+            <span className="phase-n">Month {c.month}, {c.role}</span>
             <h3>{c.title}</h3>
             <p className="muted">{c.blurb}</p>
             <span className="meta">About {c.minutes} minutes</span>

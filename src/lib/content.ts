@@ -604,7 +604,7 @@ export function findDoc(slug: string): Doc | undefined {
 }
 const hrefOf = (d: Doc) => `${d.meta.kind === "lesson" ? "/courses/" : "/modules/"}${d.meta.slug}/`;
 const linkTo = (d: Doc) => `<a href="${hrefOf(d)}">${esc(d.meta.title)}</a>`;
-const linkLine = (label: string, docs: Doc[]) => (docs.length ? `<p><span>${label}</span> ${docs.map(linkTo).join(" · ")}</p>` : "");
+const linkLine = (label: string, docs: Doc[]) => (docs.length ? `<p><span>${label}</span> ${docs.map(linkTo).join(", ")}</p>` : "");
 const SIDES: Record<string, string> = { attack: "Mostly the attacker's view", defence: "Mostly the defender's view", both: "Attack and defence" };
 
 /** The panel at the top of a module: where it fits, what to read first, its other half. */
@@ -617,7 +617,7 @@ export function moduleContext(doc: Doc): Segment {
     m.series ? `<p><span>Series</span> ${esc(m.series)}</p>` : "",
     linkLine("Read first", need),
     linkLine("The other side", pair),
-    techniques.length ? `<p><span>ATT&amp;CK</span> ${techniques.join(" · ")}</p>` : "",
+    techniques.length ? `<p><span>ATT&amp;CK</span> ${techniques.join(", ")}</p>` : "",
     m.side ? `<p><span>View</span> ${SIDES[m.side] ?? esc(m.side)}</p>` : "",
   ].join("");
   return { kind: "html", html: `<div class="module-context noterms">${html}</div>\n` };
@@ -642,7 +642,7 @@ export function toolGuides(doc: Doc): Segment[] {
   const hits = toolDocs().filter((t) => toolPattern(t)?.test(doc.text));
   if (!hits.length) return [];
   const links = hits.map((t) => `<a href="/tools/${t.meta.slug}/">${esc(t.meta.title)}</a>`);
-  return [{ kind: "html", html: `<div class="module-context noterms"><p><span>Tool guides</span> ${links.join(" · ")}</p></div>\n` }];
+  return [{ kind: "html", html: `<div class="module-context noterms"><p><span>Tool guides</span> ${links.join(", ")}</p></div>\n` }];
 }
 
 /** Every page that uses a tool, for the panel on the tool's own page. */
@@ -672,8 +672,8 @@ export function toolContext(doc: Doc): Segment {
     m.side ? `<p><span>View</span> ${SIDES[m.side] ?? esc(m.side)}</p>` : "",
     m.docs ? `<p><span>Official docs</span> <a href="${esc(m.docs)}" target="_blank" rel="noreferrer">${esc(m.docs.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a></p>` : "",
     m.kali ? `<p><span>Kali package</span> <code>${esc(m.kali)}</code></p>` : "",
-    near.length ? `<p><span>Similar tools</span> ${near.join(" · ")}</p>` : "",
-    used.length ? `<p><span>Used in</span> ${used.join(" · ")}</p>` : "",
+    near.length ? `<p><span>Similar tools</span> ${near.join(", ")}</p>` : "",
+    used.length ? `<p><span>Used in</span> ${used.join(", ")}</p>` : "",
   ].join("");
   return { kind: "html", html: `<div class="module-context noterms">${html}</div>\n` };
 }

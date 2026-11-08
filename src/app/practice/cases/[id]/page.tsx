@@ -22,7 +22,7 @@ export default async function Page({ params }: Props) {
     <div className="page narrow">
       <p className="back"><Link href="/practice/cases/">← All cases</Link></p>
       <header className="page-head">
-        <p className="kicker">Case file · {c.role}</p>
+        <p className="kicker">Case file: {c.role}</p>
         <h1>{c.title}</h1>
         <p className="lede">{c.blurb}</p>
       </header>

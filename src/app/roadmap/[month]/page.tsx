@@ -44,7 +44,7 @@ export default async function Page({ params }: Props) {
   return (
     <div className="page narrow prose-page">
       <header className="page-head">
-        <p className="kicker">Month {n} · {phase?.title}</p>
+        <p className="kicker">Month {n}: {phase?.title}</p>
         <h1>{m.title}</h1>
         <p className="lede">{m.goal}</p>
         <p className="meta">{m.hours}</p>

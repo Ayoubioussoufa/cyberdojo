@@ -70,7 +70,7 @@ export default async function Page({ params }: Props) {
       segments={doc.segments}
       toc={doc.toc}
       terms={termsFor(doc)}
-      kicker={`Project ${p.id}${p.when ? ` · ${p.when}` : ""}`}
+      kicker={`Project ${p.id}${p.when ? `, ${p.when}` : ""}`}
       prev={near(PROJECTS[i - 1])}
       next={near(PROJECTS[i + 1])}
       base="/projects/"

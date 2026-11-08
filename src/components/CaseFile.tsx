@@ -47,7 +47,7 @@ export function CaseFilePlayer({ id }: { id: string }) {
       <section className={`case-end ${node.end}`}>
         <p className="band">{END_LABEL[node.end]}</p>
         <p className="case-text">{inline(fill(node.text))}</p>
-        <p className="case-score"><strong>{stars} of 3 stars</strong> · {score} of about {max} points</p>
+        <p className="case-score"><strong>{stars} of 3 stars</strong>, {score} of about {max} points</p>
         <h3 className="noterms">What an expert would have done</h3>
         <p>{inline(fill(file.debrief))}</p>
         <h3 className="noterms">Your decisions</h3>
