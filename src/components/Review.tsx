@@ -16,7 +16,7 @@ interface Item {
 export function Review() {
   const store = useStore();
   const [items, setItems] = useState<Item[]>([]);
-  const tracked = Object.keys(store.srs).length;
+  const tracked = Object.keys(store.srs).filter((k) => !k.startsWith("fc:")).length;
   // 400 KB of questions, so they load only for someone who has answered one.
   useEffect(() => {
     if (tracked === 0 || items.length) return;

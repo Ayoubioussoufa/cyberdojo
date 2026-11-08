@@ -18,6 +18,7 @@ const MODES = [
   { href: "/practice/order/", title: "Put it in order", blurb: "Attacks, handshakes and responses, step by step." },
   { href: "/dojo/", title: "Dojo", blurb: "54 flag challenges: pipes, HTTP, SQL, encodings, XOR, access control." },
   { href: "/machines/", title: "Machines", blurb: "A whole target, from first look to proven fix." },
+  { href: "/practice/flashcards/", title: "Flashcards", blurb: "Every glossary term you've studied, as spaced recall cards." },
 ];
 
 export default function Page() {

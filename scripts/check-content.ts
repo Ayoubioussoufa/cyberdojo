@@ -12,6 +12,7 @@ import { buildPath } from "../src/lib/path";
 import type { HelpLevel, StepSegment } from "../src/lib/types";
 import { RANGES } from "../src/lib/missions";
 import { AD_DEFENCE, ELSEWHERE, TRAIN, type TrainLink } from "../src/data/train";
+import { TIPS } from "../src/data/tips";
 
 let bad = 0;
 const fail = (msg: string) => {
@@ -300,6 +301,17 @@ for (const e of ELSEWHERE) {
   checkLinks(e.title, e.links);
 }
 checkLinks("AD defence", AD_DEFENCE);
+
+// Tips of the day: every link must reach a real page, and no tip is repeated.
+const APP_PAGES = new Set(["/practice/mix/", "/practice/mistakes/", "/practice/flashcards/", "/review/"]);
+const tipTexts = new Set<string>();
+for (const t of TIPS) {
+  if (tipTexts.has(t.text)) fail(`tips: duplicate tip "${t.text.slice(0, 40)}"`);
+  tipTexts.add(t.text);
+  if (t.text.length > 170) fail(`tips: too long for one glance: "${t.text.slice(0, 40)}"`);
+  const m = /^\/(guides|sheets|modules|courses)\/([^/]+)\/$/.exec(t.href);
+  if (m ? !slugs.has(m[2] as string) : !APP_PAGES.has(t.href)) fail(`tips: broken link ${t.href}`);
+}
 
 const seen = new Set<string>();
 for (const t of glossary()) {

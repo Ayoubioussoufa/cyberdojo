@@ -8,6 +8,7 @@ const GROUPS = {
     { href: "/practice/", label: "Exercises" },
     { href: "/machines/", label: "Machines" },
     { href: "/review/", label: "Daily review" },
+    { href: "/practice/flashcards/", label: "Flashcards" },
   ],
   library: [
     { href: "/library/", label: "All" },

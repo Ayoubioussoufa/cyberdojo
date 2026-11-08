@@ -17,6 +17,7 @@ export const PLACEMENT: Record<number, { before?: Placed[]; after?: Placed[] }> 
     ],
     after: [
       { ref: "guide:j1-the-learning-system", why: "Set up your notes now, before you've anything to lose." },
+      { ref: "guide:s1-how-memory-works", why: "Learn how memory works before you start filling it: it changes how you study every lesson." },
       { ref: "guide:i1-weekly-schedules", why: "Put real hours in your calendar before Month 1 begins." },
       { ref: "guide:d3-using-ai-well", why: "Learn the rules for your AI tutor before you start leaning on it." },
     ],
@@ -26,11 +27,15 @@ export const PLACEMENT: Record<number, { before?: Placed[]; after?: Placed[] }> 
     after: [
       { ref: "guide:f1-project-standards", why: "Read this once before your first project: it says what \"finished\" means." },
       { ref: "guide:n1-templates", why: "Copy the note templates that you'll fill in from now on." },
+      { ref: "guide:s2-memorising-what-must-be-instant", why: "Ports and commands are piling up, so start flashcards for the facts that must be instant." },
       { ref: "project:P01:1", why: "You've built a lab and learned Linux, so use them for something real." },
     ],
   },
   2: {
-    before: [{ ref: "guide:h3-write-ups-and-reports", why: "Your first written case is coming, so learn what makes one good." }],
+    before: [
+      { ref: "guide:s3-studying-hands-on", why: "Labs get longer from here, so learn how to get stuck well and keep a lab notebook." },
+      { ref: "guide:h3-write-ups-and-reports", why: "Your first written case is coming, so learn what makes one good." },
+    ],
     after: [{ ref: "project:P02:1", why: "You can read packets now. Solve your first real case." }],
   },
   3: {
@@ -40,7 +45,10 @@ export const PLACEMENT: Record<number, { before?: Placed[]; after?: Placed[] }> 
       { ref: "machine:lantern", why: "Everything you've learned so far, joined up on one machine." },
     ],
   },
-  4: { after: [{ ref: "project:P03:1", why: "You can code now, so build tools that you'll keep using." }] },
+  4: {
+    before: [{ ref: "guide:s4-staying-in-it", why: "The first excitement fades around now. Set up the habits that carry you through two years." }],
+    after: [{ ref: "project:P03:1", why: "You can code now, so build tools that you'll keep using." }],
+  },
   5: {
     after: [
       { ref: "project:P03:2", why: "Add the Windows skills you've just learned to your toolkit." },
