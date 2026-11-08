@@ -32,9 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <Prompt />
         <main id="main">{children}</main>
-        <footer className="foot">
-          <span>cyberdojo</span>: only test what you own, or what you have written permission to test.
-        </footer>
       </body>
     </html>
   );
