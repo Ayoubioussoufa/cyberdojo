@@ -4,4 +4,9 @@ out/
 .shell-test-*
 *.tsbuildinfo
 next-env.d.ts
-data/
+/data/
+
+# Keep the design skill in the repo, even though .claude/ is ignored globally.
+!/.claude/
+/.claude/*
+!/.claude/skills/
