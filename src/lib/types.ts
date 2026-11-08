@@ -82,7 +82,7 @@ export interface Term {
   href: string;
 }
 
-export type DocKind = "lesson" | "guide" | "machine" | "sheet" | "project";
+export type DocKind = "lesson" | "guide" | "machine" | "sheet" | "project" | "module" | "tool";
 
 export interface DocMeta {
   slug: string;
@@ -97,8 +97,32 @@ export interface DocMeta {
   source?: { label: string; url: string };
   words: string[];
   group?: string;
-  /** Machines: how hard it is. */
+  /** Machines: how hard it is. Modules: foundation, intermediate or advanced. */
   level?: string;
+  /** Modules: the domain folder's number, such as "01". */
+  domain?: string;
+  /** Modules: which side of the fight it mostly teaches. */
+  side?: string;
+  /** Modules: ATT&CK technique IDs. */
+  attack?: string[];
+  /** Modules: slugs to read first, lessons or modules. */
+  needs?: string[];
+  /** Modules: the matching attack or defence modules. Must link both ways. */
+  pair?: string[];
+  /** Modules: the wider topic when one was split, such as "Active Directory attacks, part 2 of 4". */
+  series?: string;
+  /** Tools: the folder it sits in, such as "01-recon-osint". */
+  category?: string;
+  /** Tools: open, own or know. See src/data/toolcats.ts. */
+  use?: string;
+  /** Tools: official documentation. */
+  docs?: string;
+  /** Tools: other names people search for. */
+  aka?: string[];
+  /** Tools: similar tools. */
+  alt?: string[];
+  /** Tools: the Kali package, when it has one. */
+  kali?: string;
   /** Projects: how the steps split across the roadmap. */
   parts?: { from: number; to: number; hours: number }[];
   /** Projects: rough total hours. */

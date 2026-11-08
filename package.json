@@ -12,7 +12,11 @@
     "test:missions": "tsx scripts/check-missions.ts",
     "test:content": "tsx scripts/check-content.ts",
     "test:drills": "tsx scripts/check-drills.ts",
-    "test": "pnpm test:shell && pnpm test:sim && pnpm test:missions && pnpm test:drills && pnpm test:content && pnpm build && pnpm test:auth",
+    "audit:coverage": "tsx scripts/coverage/audit.ts",
+    "test:coverage": "tsx scripts/coverage/audit.ts --check",
+    "audit:tools": "tsx scripts/tools/index.ts",
+    "test:tools": "tsx scripts/tools/index.ts --check",
+    "test": "pnpm test:shell && pnpm test:sim && pnpm test:missions && pnpm test:drills && pnpm test:content && pnpm test:coverage && pnpm test:tools && pnpm build && pnpm test:auth",
     "user:reset": "tsx scripts/reset-password.ts",
     "test:auth": "tsx scripts/check-auth.ts"
   },

@@ -813,3 +813,34 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 
 #doc-body a { overflow-wrap: anywhere; }
 .pyr-note { overflow-wrap: anywhere; }
+
+/* ── modules: where a page fits ── */
+.module-context { margin: 0 0 28px; padding: 14px 16px; border: 1px solid var(--rule-strong); border-radius: 8px; background: var(--surface); }
+.module-context p { margin: 0; padding: 3px 0; overflow-wrap: anywhere; }
+.module-context span { display: inline-block; min-width: 110px; font-weight: 700; }
+.module-domain { margin-top: 40px; scroll-margin-top: 90px; }
+.module-domain > h2 { margin-bottom: 4px; }
+.module-list { list-style: none; margin: 14px 0 0; padding: 0; }
+.module-list li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid var(--rule); }
+.module-list a { font-weight: 600; }
+.module-list .muted { flex-basis: 100%; }
+.module-level { font-size: 14px; color: var(--muted); }
+
+/* ── tools ── */
+.tool-tier { color: var(--ink); }
+.tool-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 8px; }
+.tool-filter input { flex: 1 1 220px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--rule-strong); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; }
+.tool-filter select { min-height: 44px; padding: 8px; border: 1px solid var(--rule-strong); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; }
+.tool-az { list-style: none; margin: 16px 0 0; padding: 0; columns: 3 200px; column-gap: 24px; }
+.tool-az li { padding: 3px 0; break-inside: avoid; overflow-wrap: anywhere; scroll-margin-top: 90px; }
+.tool-az li:target { background: var(--sunk); border-radius: 4px; }
+
+/* ── links out to legal training platforms ── */
+.train-panel { margin: 0 0 28px; padding: 14px 16px; border: 1px solid var(--rule-strong); border-left: 4px solid var(--accent, var(--rule-strong)); border-radius: 8px; background: var(--surface); }
+.train-panel p { margin: 0 0 6px; }
+.train-panel .train-head { font-weight: 700; }
+.train-panel ul, .train-links { margin: 6px 0 0; padding-left: 20px; }
+.train-panel li, .train-links li { padding: 2px 0; overflow-wrap: anywhere; }
+.module-list .train-links { flex-basis: 100%; }
+.module-list .train-links { list-style: disc; }
+.module-list .train-links li { display: list-item; border-top: 0; padding: 2px 0; }

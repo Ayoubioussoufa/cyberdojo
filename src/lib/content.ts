@@ -24,15 +24,25 @@
  * Lessons sort by file name, and the number in that name is the lesson number.
  * Machines (content/machines) are lessons built around one simulated box;
  * sheets (content/reference) are printable reference pages.
+ *
+ * Modules live outside content/, in modules/<NN-domain>/<MM-name>.md, and their
+ * slug is NN-MM-name. They are the master's-level reference that sits beside the
+ * 24-month roadmap. scripts/check-content.ts enforces their seven-part template.
+ *
+ * Tools live in tools/<NN-category>/<slug>.md: one page per tool, in four parts.
+ * Their `use` field decides how much they may show. See src/data/toolcats.ts.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { Marked } from "marked";
 import { bitsHtml, permHtml, pyramidHtml, seqSvg, stackHtml } from "./diagrams";
 import { TOOLS } from "@/data/tools";
+import { TRAIN, type TrainLink } from "@/data/train";
 import type { Check, Doc, DocBrief, DocLink, DocMeta, HelpLevel, Question, Segment, StepSegment, Term, TocEntry, ToolUse, Written } from "./types";
 
 const ROOT = path.join(process.cwd(), "content");
+const MODULES = path.join(process.cwd(), "modules");
+const TOOL_PAGES = path.join(process.cwd(), "tools");
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -381,9 +391,43 @@ function parseBody(slug: string, title: string, body: string, href: string) {
   return { segments, questions, written, terms, toc, text, checks, tools };
 }
 
-type DocDir = "lessons" | "guides" | "machines" | "reference" | "projects";
-const KIND = { lessons: "lesson", guides: "guide", machines: "machine", reference: "sheet", projects: "project" } as const;
-const BASE = { lessons: "/courses/", guides: "/guides/", machines: "/machines/", reference: "/sheets/", projects: "/projects/" } as const;
+type DocDir = "lessons" | "guides" | "machines" | "reference" | "projects" | "modules" | "tools";
+const KIND = { lessons: "lesson", guides: "guide", machines: "machine", reference: "sheet", projects: "project", modules: "module", tools: "tool" } as const;
+const BASE = { lessons: "/courses/", guides: "/guides/", machines: "/machines/", reference: "/sheets/", projects: "/projects/", modules: "/modules/", tools: "/tools/" } as const;
+
+const fileOf = (kindDir: DocDir, file: string) =>
+  kindDir === "modules" ? path.join(MODULES, file) : kindDir === "tools" ? path.join(TOOL_PAGES, file) : path.join(ROOT, kindDir, file);
+
+/** "01-networking/07-netcat.md" has the slug "01-07-netcat". */
+const moduleSlug = (file: string) => {
+  const [dir, name] = file.replace(/\.md$/, "").split("/") as [string, string];
+  return `${dir.slice(0, 2)}-${name}`;
+};
+const list = (s?: string) => (s ? s.split(",").map((w) => w.trim()).filter(Boolean) : []);
+
+function toolFiles(): string[] {
+  try {
+    return fs
+      .readdirSync(TOOL_PAGES)
+      .filter((d) => /^\d\d-/.test(d))
+      .sort()
+      .flatMap((d) => fs.readdirSync(path.join(TOOL_PAGES, d)).filter((f) => f.endsWith(".md") && f !== "README.md").sort().map((f) => `${d}/${f}`));
+  } catch {
+    return [];
+  }
+}
+
+function moduleFiles(): string[] {
+  try {
+    return fs
+      .readdirSync(MODULES)
+      .filter((d) => /^\d\d-/.test(d))
+      .sort()
+      .flatMap((d) => fs.readdirSync(path.join(MODULES, d)).filter((f) => /^\d\d-.*\.md$/.test(f)).sort().map((f) => `${d}/${f}`));
+  } catch {
+    return [];
+  }
+}
 
 function readDir(kind: DocDir): string[] {
   const dir = path.join(ROOT, kind);
@@ -395,8 +439,10 @@ function readDir(kind: DocDir): string[] {
 }
 
 function load(kindDir: DocDir, file: string): Doc {
-  const raw = fs.readFileSync(path.join(ROOT, kindDir, file), "utf8");
-  const slug = file.replace(/\.md$/, "");
+  const raw = fs.readFileSync(fileOf(kindDir, file), "utf8");
+  const isModule = kindDir === "modules";
+  const isTool = kindDir === "tools";
+  const slug = isModule ? moduleSlug(file) : isTool ? path.basename(file, ".md") : file.replace(/\.md$/, "");
   const { front, body } = splitFront(raw, file);
   const kind = KIND[kindDir];
   const title = front.title ?? slug;
@@ -405,7 +451,7 @@ function load(kindDir: DocDir, file: string): Doc {
   const meta: DocMeta = {
     slug,
     kind,
-    number: Number(/^\d+/.exec(slug)?.[0] ?? 0),
+    number: isModule ? Number(slug.slice(3, 5)) : Number(/^\d+/.exec(slug)?.[0] ?? 0),
     title,
     summary: front.summary ?? "",
     month: Number(front.month ?? 0),
@@ -416,6 +462,23 @@ function load(kindDir: DocDir, file: string): Doc {
   if (front.builds) meta.builds = front.builds;
   if (front.group) meta.group = front.group;
   if (front.level) meta.level = front.level;
+  if (isTool) {
+    meta.category = path.dirname(file);
+    if (front.side) meta.side = front.side;
+    if (front.use) meta.use = front.use;
+    if (front.docs) meta.docs = front.docs;
+    if (front.kali) meta.kali = front.kali;
+    meta.aka = list(front.aka);
+    meta.alt = list(front.alt);
+  }
+  if (isModule) {
+    meta.domain = slug.slice(0, 2);
+    meta.attack = list(front.attack);
+    meta.needs = list(front.needs);
+    meta.pair = list(front.pair);
+    if (front.side) meta.side = front.side;
+    if (front.series) meta.series = front.series;
+  }
   if (front.hours) meta.hours = Number(front.hours);
   if (front.tested) meta.tested = front.tested;
   if (front.parts) {
@@ -435,6 +498,8 @@ interface Library {
   machines: Doc[];
   sheets: Doc[];
   projects: Doc[];
+  modules: Doc[];
+  tools: Doc[];
 }
 
 /**
@@ -459,7 +524,7 @@ const memo = ((globalThis as { __cyberdojoContent?: ContentCache }).__cyberdojoC
 });
 
 function cached(kindDir: DocDir, file: string): Doc {
-  const at = path.join(ROOT, kindDir, file);
+  const at = fileOf(kindDir, file);
   const { mtimeMs, size } = fs.statSync(at);
   const stamp = `${mtimeMs}:${size}`;
   const hit = memo.files.get(at);
@@ -483,6 +548,8 @@ function all(): Library {
     machines: readDir("machines").map((f) => cached("machines", f)),
     sheets: readDir("reference").map((f) => cached("reference", f)),
     projects: readDir("projects").map((f) => cached("projects", f)),
+    modules: moduleFiles().map((f) => cached("modules", f)),
+    tools: toolFiles().map((f) => cached("tools", f)),
   };
   const same = before && (Object.keys(next) as (keyof Library)[]).every((k) => next[k].length === before[k].length && next[k].every((d, i) => d === before[k][i]));
   if (same) return before;
@@ -497,6 +564,10 @@ export const guides = () => all().guides;
 export const machines = () => all().machines;
 export const sheets = () => all().sheets;
 export const projects = () => all().projects;
+export const modules = () => all().modules;
+export const getModule = (slug: string) => modules().find((d) => d.meta.slug === slug);
+export const toolDocs = () => all().tools;
+export const getToolDoc = (slug: string) => toolDocs().find((d) => d.meta.slug === slug);
 export const getProject = (slug: string) => projects().find((d) => d.meta.slug === slug);
 export const getMachine = (slug: string) => machines().find((d) => d.meta.slug === slug);
 export const getSheet = (slug: string) => sheets().find((d) => d.meta.slug === slug);
@@ -508,7 +579,7 @@ export const getGuide = (slug: string) => guides().find((d) => d.meta.slug === s
 export function glossary(): Term[] {
   const lib = all();
   if (memo.glossary) return memo.glossary;
-  const out = [...lib.lessons, ...lib.guides, ...lib.machines, ...lib.sheets, ...lib.projects].flatMap((d) => d.terms);
+  const out = [...lib.lessons, ...lib.guides, ...lib.machines, ...lib.sheets, ...lib.projects, ...lib.modules].flatMap((d) => d.terms);
   memo.glossary = out.sort((a, b) => a.term.toLowerCase().localeCompare(b.term.toLowerCase()));
   return memo.glossary;
 }
@@ -525,6 +596,113 @@ export function allQuestions(): { q: Question; title: string; href: string }[] {
     ...guides().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/guides/${d.meta.slug}/` }))),
     ...machines().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/machines/${d.meta.slug}/` }))),
   ];
+}
+
+/** A slug in a module's front matter: lessons start with four digits, modules with NN-MM. */
+export function findDoc(slug: string): Doc | undefined {
+  return /^\d{4}-/.test(slug) ? getLesson(slug) : getModule(slug);
+}
+const hrefOf = (d: Doc) => `${d.meta.kind === "lesson" ? "/courses/" : "/modules/"}${d.meta.slug}/`;
+const linkTo = (d: Doc) => `<a href="${hrefOf(d)}">${esc(d.meta.title)}</a>`;
+const linkLine = (label: string, docs: Doc[]) => (docs.length ? `<p><span>${label}</span> ${docs.map(linkTo).join(" · ")}</p>` : "");
+const SIDES: Record<string, string> = { attack: "Mostly the attacker's view", defence: "Mostly the defender's view", both: "Attack and defence" };
+
+/** The panel at the top of a module: where it fits, what to read first, its other half. */
+export function moduleContext(doc: Doc): Segment {
+  const m = doc.meta;
+  const need = (m.needs ?? []).flatMap((s) => findDoc(s) ?? []);
+  const pair = (m.pair ?? []).flatMap((s) => findDoc(s) ?? []);
+  const techniques = (m.attack ?? []).filter((t) => t !== "none").map((t) => `<a href="https://attack.mitre.org/techniques/${t.replace(".", "/")}/" target="_blank" rel="noreferrer">${esc(t)}</a>`);
+  const html = [
+    m.series ? `<p><span>Series</span> ${esc(m.series)}</p>` : "",
+    linkLine("Read first", need),
+    linkLine("The other side", pair),
+    techniques.length ? `<p><span>ATT&amp;CK</span> ${techniques.join(" · ")}</p>` : "",
+    m.side ? `<p><span>View</span> ${SIDES[m.side] ?? esc(m.side)}</p>` : "",
+  ].join("");
+  return { kind: "html", html: `<div class="module-context noterms">${html}</div>\n` };
+}
+
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** Tools named after ordinary words, which would link from every page that says "dig deeper". */
+const PLAIN_WORDS = new Set(["dig", "strings", "ping", "curl", "whois", "ssh", "sudo", "find", "age", "pass", "volatility", "autopsy", "responder", "sigma", "empire", "sliver", "tor", "reg", "net"]);
+const toolRe = new Map<string, RegExp | null>();
+/** Finds a tool's names in text, exact case. Only letters and digits count as a word edge, so `nc` won't match `sync`. */
+function toolPattern(d: Doc): RegExp | null {
+  const slug = d.meta.slug;
+  if (!toolRe.has(slug)) {
+    const names = [d.meta.title, ...(d.meta.aka ?? [])];
+    toolRe.set(slug, PLAIN_WORDS.has(slug) ? null : new RegExp(`(?<![A-Za-z0-9_-])(${names.map(escapeRe).join("|")})(?![A-Za-z0-9_-])`));
+  }
+  return toolRe.get(slug) ?? null;
+}
+
+/** Guides for the tools a page names, so a table row always leads somewhere. */
+export function toolGuides(doc: Doc): Segment[] {
+  const hits = toolDocs().filter((t) => toolPattern(t)?.test(doc.text));
+  if (!hits.length) return [];
+  const links = hits.map((t) => `<a href="/tools/${t.meta.slug}/">${esc(t.meta.title)}</a>`);
+  return [{ kind: "html", html: `<div class="module-context noterms"><p><span>Tool guides</span> ${links.join(" · ")}</p></div>\n` }];
+}
+
+/** Every page that uses a tool, for the panel on the tool's own page. */
+function usedIn(doc: Doc): { label: string; href: string }[] {
+  const re = toolPattern(doc);
+  if (!re) return [];
+  const lib = all();
+  const rows: [Doc[], string][] = [[lib.lessons, "/courses/"], [lib.modules, "/modules/"], [lib.projects, "/projects/"]];
+  return rows.flatMap(([docs, base]) => docs.filter((d) => re.test(d.text)).map((d) => ({ label: d.meta.title, href: `${base}${d.meta.slug}/` })));
+}
+
+const TIER: Record<string, string> = {
+  own: "Point this only at systems you own or have written permission to test.",
+  know: "This is an attack tool. This page explains it so that you can recognise and stop it. It shows no commands, and you should run it only in an authorised lab.",
+};
+
+/** The panel at the top of a tool's page. */
+export function toolContext(doc: Doc): Segment {
+  const m = doc.meta;
+  const near = (m.alt ?? []).map((name) => {
+    const hit = toolDocs().find((d) => d.meta.slug === name || d.meta.title.toLowerCase() === name.toLowerCase());
+    return hit ? `<a href="/tools/${hit.meta.slug}/">${esc(hit.meta.title)}</a>` : esc(name);
+  });
+  const used = usedIn(doc).slice(0, 12).map((u) => `<a href="${u.href}">${esc(u.label)}</a>`);
+  const html = [
+    m.use && TIER[m.use] ? `<p class="tool-tier"><span>Stay legal</span> ${esc(TIER[m.use] as string)}</p>` : "",
+    m.side ? `<p><span>View</span> ${SIDES[m.side] ?? esc(m.side)}</p>` : "",
+    m.docs ? `<p><span>Official docs</span> <a href="${esc(m.docs)}" target="_blank" rel="noreferrer">${esc(m.docs.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a></p>` : "",
+    m.kali ? `<p><span>Kali package</span> <code>${esc(m.kali)}</code></p>` : "",
+    near.length ? `<p><span>Similar tools</span> ${near.join(" · ")}</p>` : "",
+    used.length ? `<p><span>Used in</span> ${used.join(" · ")}</p>` : "",
+  ].join("");
+  return { kind: "html", html: `<div class="module-context noterms">${html}</div>\n` };
+}
+
+/** A list of outside training links, opened in a new tab. */
+export function trainList(links: TrainLink[]): string {
+  return `<ul>${links.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label)}</a></li>`).join("")}</ul>`;
+}
+
+/**
+ * Where to practise the attack this page explains from the defender's side.
+ * Sits right under the context panel, so it reads as part of the subject.
+ */
+export function trainPanel(doc: Doc): Segment[] {
+  const links = TRAIN[doc.meta.slug];
+  if (!links?.length) return [];
+  return [
+    {
+      kind: "html",
+      html: `<div class="train-panel noterms"><p class="train-head">Learn the attack hands-on</p><p>This page teaches the defender's side. To learn the attack itself, use these legal platforms, and only against their labs or a lab you own:</p>${trainList(links)}</div>\n`,
+    },
+  ];
+}
+
+/** Modules that build on a lesson, shown at its end. Nothing when there are none. */
+export function deeperModules(doc: Doc): Segment[] {
+  const found = modules().filter((d) => d.meta.needs?.includes(doc.meta.slug));
+  if (!found.length) return [];
+  return [{ kind: "html", html: `<div class="module-context noterms">${linkLine("Go deeper", found)}</div>\n` }];
 }
 
 /** Glossary entries whose name appears in this document, for hover definitions. */

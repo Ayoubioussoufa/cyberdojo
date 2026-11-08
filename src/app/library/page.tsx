@@ -6,6 +6,7 @@ export const metadata: Metadata = { title: "Library" };
 
 const SHELVES = [
   { href: "/guides/", title: "Handbook", text: "Advice about the journey: jobs, tracks, certifications, your CV, interviews and using AI well. The Roadmap brings you to each page at the right moment." },
+  { href: "/tools/", title: "Tools", text: "What each security tool does, how it works, how to run it, and what it looks like to a defender. Plus an A to Z of every tool." },
   { href: "/sheets/", title: "Cheat sheets", text: "Printable pages for Linux commands, ports, subnetting, Windows events and Sysmon." },
   { href: "/glossary/", title: "Glossary", text: "Every term in the course, in plain words, with a link to where it's taught." },
   { href: "/resources/", title: "Resources", text: "Books, sites, labs and communities, chosen and sorted." },

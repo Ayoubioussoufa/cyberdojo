@@ -15,4 +15,8 @@ A Master's student in cybersecurity, starting from zero in practical skills, wan
 - English course. Morocco and francophone markets matter for careers.
 
 ## Out of scope
-- Binary exploitation, advanced reverse engineering, hardware, OT/ICS, mobile, until after Month 24.
+- Working exploits, payloads and evasion recipes, in any part of the course. Hands-on offensive practice happens on legal platforms such as PortSwigger, pwn.college and Hack The Box.
+
+## Changed on 7 Nov 2026 (see learning record 0002)
+- `modules/` adds a Master's-level reference beside the roadmap. It may cover every domain of the field, including binary security, hardware, OT and mobile.
+- Attack-heavy topics are taught from the defender's side: root causes, mitigations and detection.

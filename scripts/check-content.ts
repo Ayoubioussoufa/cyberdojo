@@ -4,18 +4,21 @@ import path from "node:path";
 import { DRILLS } from "../src/lib/drills";
 import { PLACEMENT } from "../src/data/path";
 import { TOOLS } from "../src/data/tools";
-import { flatSegments, guides, lessons, glossary, machines, projects, sheets } from "../src/lib/content";
+import { DOMAINS } from "../src/data/domains";
+import { findDoc, flatSegments, guides, lessons, glossary, machines, modules, projects, sheets, toolDocs } from "../src/lib/content";
+import { TOOL_CATS } from "../src/data/toolcats";
 import { PROJECTS } from "../src/lib/data";
 import { buildPath } from "../src/lib/path";
 import type { HelpLevel, StepSegment } from "../src/lib/types";
 import { RANGES } from "../src/lib/missions";
+import { AD_DEFENCE, ELSEWHERE, TRAIN, type TrainLink } from "../src/data/train";
 
 let bad = 0;
 const fail = (msg: string) => {
   bad++;
   console.log(`✗ ${msg}`);
 };
-const docs = [...lessons(), ...guides(), ...machines(), ...projects()];
+const docs = [...lessons(), ...guides(), ...machines(), ...projects(), ...modules(), ...toolDocs()];
 const words = (s: string) => s.trim().split(/\s+/).length;
 const plain = (s: string) => s.replace(/`/g, "");
 let questions = 0;
@@ -23,7 +26,7 @@ let questions = 0;
 for (const d of docs) {
   const name = d.meta.slug;
   if (!d.meta.summary) fail(`${name}: no summary`);
-  if (d.meta.kind === "lesson" && !d.meta.source) fail(`${name}: no primary source`);
+  if ((d.meta.kind === "lesson" || d.meta.kind === "module") && !d.meta.source) fail(`${name}: no primary source`);
   for (const q of d.questions) {
     questions++;
     const opts = q.options.map(plain);
@@ -70,6 +73,118 @@ for (const d of lessons()) {
 if (thin) console.log(`note: ${thin} sections in lessons 1–${DEEP_FROM - 1} have no question yet`);
 
 const slugs = new Set([...docs, ...sheets()].map((d) => d.meta.slug));
+
+// Modules: the same seven parts in every one, links that work both ways, a
+// legal notice on every exercise, and no attack recipes. Understanding and
+// detection are the point, so a working payload here is a bug.
+const TEMPLATE = ["Concept", "Threat model", "Tools", "Defence", "Pitfalls", "Exercise", "Further reading"];
+const LEVELS = ["foundation", "intermediate", "advanced"];
+const SIDES = ["attack", "defence", "both"];
+const RECIPES: [RegExp, string][] = [
+  [/\/dev\/tcp\//, "a bash network redirect"],
+  [/\bbash -i\b/, "an interactive shell one-liner"],
+  [/\bnc\b[^\n]*\s-[a-z]*[eE]\s/, "netcat program execution"],
+  [/\bncat\b[^\n]*--(exec|sh-exec)/, "ncat program execution"],
+  [/\bsocat\b[^\n]*(EXEC|SYSTEM):/i, "socat program execution"],
+  [/\bmkfifo\b/, "a named-pipe shell"],
+  [/msfvenom|msfconsole/, "Metasploit commands"],
+  [/sekurlsa::|lsadump::|kerberos::golden/i, "Mimikatz commands"],
+  [/Invoke-(Mimikatz|Kerberoast|Shellcode)/i, "offensive PowerShell"],
+  [/AmsiScanBuffer|amsiInitFailed/i, "an AMSI bypass"],
+  [/--os-shell|--os-pwn/, "sqlmap shell flags"],
+  [/\bOR\s+['"]?1['"]?\s*=\s*['"]?1/i, "an injection payload"],
+  [/<script>\s*alert/i, "an XSS payload"],
+  [/\\x[0-9a-f]{2}\\x[0-9a-f]{2}\\x[0-9a-f]{2}\\x[0-9a-f]{2}/i, "byte-string shellcode"],
+];
+const moduleText = (slug: string) => {
+  const domain = DOMAINS.find((x) => x.id === slug.slice(0, 2));
+  if (!domain) return null;
+  const file = path.join("modules", domain.folder, `${slug.slice(3)}.md`);
+  return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null;
+};
+for (const d of modules()) {
+  const at = d.meta.slug;
+  const raw = moduleText(at);
+  if (!raw) {
+    fail(`${at}: its domain has no folder in src/data/domains.ts`);
+    continue;
+  }
+  const heads = d.toc.map((t) => t.text);
+  if (heads.join("|") !== TEMPLATE.join("|")) fail(`${at}: sections must be ${TEMPLATE.join(", ")}, found ${heads.join(", ")}`);
+  if (!LEVELS.includes(d.meta.level ?? "")) fail(`${at}: level must be one of ${LEVELS.join(", ")}`);
+  if (!SIDES.includes(d.meta.side ?? "")) fail(`${at}: side must be one of ${SIDES.join(", ")}`);
+  if (!d.meta.attack?.length) fail(`${at}: no ATT&CK technique. Use "attack: none" only where no technique fits`);
+  for (const t of d.meta.attack ?? []) if (t !== "none" && !/^T\d{4}(\.\d{3})?$/.test(t)) fail(`${at}: bad ATT&CK ID ${t}`);
+  if (d.text.split(/\s+/).length < 600) fail(`${at}: only ${d.text.split(/\s+/).length} words`);
+  if (d.questions.length < 2) fail(`${at}: needs at least two multiple-choice questions`);
+  if (d.written.length < 1) fail(`${at}: needs at least one written question`);
+  const part = (name: string) => raw.split(/^## /m).find((p) => p.startsWith(name)) ?? "";
+  if (!/^::: law/m.test(part("Exercise"))) fail(`${at}: the exercise has no ::: law notice scoping it to a lab`);
+  if ((part("Further reading").match(/\]\(https?:/g) ?? []).length < 2) fail(`${at}: needs at least two references`);
+  for (const [re, what] of RECIPES) if (re.test(raw)) fail(`${at}: contains ${what}`);
+  for (const s of [...(d.meta.needs ?? []), ...(d.meta.pair ?? [])]) if (!findDoc(s)) fail(`${at}: links to ${s}, which doesn't exist`);
+  for (const s of d.meta.pair ?? []) {
+    const other = findDoc(s);
+    if (other?.meta.kind === "module" && !other.meta.pair?.includes(at)) fail(`${at}: pairs with ${s}, but not the other way round`);
+  }
+  if (d.meta.pair?.includes(at)) fail(`${at}: pairs with itself`);
+}
+// Prerequisites must be a map, not a loop.
+const visiting = new Set<string>();
+const clear = new Set<string>();
+const walk = (slug: string, trail: string[]) => {
+  if (clear.has(slug)) return;
+  if (visiting.has(slug)) return fail(`modules: prerequisites loop: ${[...trail, slug].join(" > ")}`);
+  visiting.add(slug);
+  for (const n of findDoc(slug)?.meta.needs ?? []) walk(n, [...trail, slug]);
+  visiting.delete(slug);
+  clear.add(slug);
+};
+for (const d of modules()) walk(d.meta.slug, []);
+
+// Tool guides. The `use` field sets how much a page may show. Attack tools get
+// no commands at all, and the rest may only aim at a lab or the reserved domains.
+const TOOL_PARTS: Record<string, string[]> = {
+  open: ["What it's for", "How it works", "Try it", "What defenders see"],
+  own: ["What it's for", "How it works", "Try it", "What defenders see"],
+  know: ["What it's for", "How it works", "Practise safely", "What defenders see"],
+};
+const SAFE_HOST = /^(example\.(com|org|net)|[a-z0-9.-]*\.example\.(com|org|net)|scanme\.nmap\.org|ghcr\.io|docker\.io|github\.com|.*\.(local|lab|test|internal))$/;
+const toolSeen = new Map<string, string>();
+for (const d of toolDocs()) {
+  const m = d.meta;
+  const at = `tools/${m.category}/${m.slug}`;
+  const raw = fs.readFileSync(`${at}.md`, "utf8");
+  const parts = TOOL_PARTS[m.use ?? ""];
+  if (!parts) {
+    fail(`${at}: use must be open, own or know`);
+    continue;
+  }
+  const heads = d.toc.map((t) => t.text);
+  if (heads.join("|") !== parts.join("|")) fail(`${at}: sections must be ${parts.join(", ")}, found ${heads.join(", ")}`);
+  if (!TOOL_CATS.some((c) => c.folder === m.category)) fail(`${at}: folder isn't in src/data/toolcats.ts`);
+  if (!SIDES.includes(m.side ?? "")) fail(`${at}: side must be attack, defence or both`);
+  if (!/^https:\/\//.test(m.docs ?? "")) fail(`${at}: needs an https docs link`);
+  if (!m.summary.endsWith(".") || m.summary.length > 130) fail(`${at}: summary must be one sentence under 130 characters`);
+  if (d.text.split(/\s+/).length < 110) fail(`${at}: too short`);
+  if (!/^\?! /m.test(raw)) fail(`${at}: needs a written question`);
+  for (const [re, what] of RECIPES) if (re.test(raw)) fail(`${at}: contains ${what}`);
+  if (m.use === "know") {
+    if (raw.includes("\`\`\`")) fail(`${at}: an attack tool's page must not show commands`);
+    if (/\`[^\`\n]*\s--?[a-zA-Z][^\`\n]*\`/.test(raw)) fail(`${at}: an attack tool's page must not show flags`);
+  }
+  if (m.use === "own" && !raw.includes("::: law")) fail(`${at}: needs a legal notice`);
+  for (const block of raw.matchAll(/\`\`\`[a-z]*\n([\s\S]*?)\`\`\`/g)) {
+    for (const h of (block[1] as string).matchAll(/\b(?:[a-z0-9-]+\.)+(?:com|org|net|io|ai|co)\b/gi)) {
+      if (!SAFE_HOST.test(h[0].toLowerCase()) && m.use === "own") fail(`${at}: command aims at ${h[0]}`);
+    }
+  }
+  for (const n of [m.title, ...(m.aka ?? [])]) {
+    const k = n.toLowerCase();
+    if (toolSeen.has(k)) fail(`${at}: name "${n}" is also used by ${toolSeen.get(k)}`);
+    toolSeen.set(k, at);
+  }
+}
 
 // Projects: every step ends in a checkpoint, and help fades tool by tool.
 const RANK: Record<HelpLevel, number> = { guided: 0, recall: 1, solo: 2 };
@@ -155,10 +270,36 @@ for (const id of [...Array.from({ length: 29 }, (_, i) => i + 1), 255]) {
 }
 for (const d of [...docs, ...sheets()]) {
   const html = flatSegments(d.segments).map((s) => (s.kind === "html" ? s.html : "")).join("");
-  for (const m of html.matchAll(/href="\/(courses|guides|machines|sheets)\/([^/"#]+)/g)) {
+  for (const m of html.matchAll(/href="\/(courses|guides|machines|sheets|modules|tools)\/([^/"#]+)/g)) {
     if (!slugs.has(m[2] as string)) fail(`${d.meta.slug}: broken internal link /${m[1]}/${m[2]}`);
   }
 }
+
+// Links out to legal training platforms, shown under each attack subject.
+// Only labs that serve themselves over plain http (flaws.cloud) may skip https.
+const PLAIN_HTTP = new Set(["flaws.cloud", "flaws2.cloud"]);
+const checkLinks = (where: string, links: TrainLink[]) => {
+  if (!links.length) fail(`train: ${where} has no links`);
+  const urls = new Set<string>();
+  for (const l of links) {
+    const u = new URL(l.url);
+    if (u.protocol !== "https:" && !PLAIN_HTTP.has(u.hostname)) fail(`train: ${where}: ${l.url} is not https`);
+    if (urls.has(l.url)) fail(`train: ${where}: ${l.url} listed twice`);
+    urls.add(l.url);
+    if (!l.label.trim()) fail(`train: ${where}: empty label`);
+  }
+};
+for (const [slug, links] of Object.entries(TRAIN)) {
+  if (!findDoc(slug)) fail(`train: ${slug} is not a module or lesson`);
+  checkLinks(slug, links);
+}
+for (const e of ELSEWHERE) {
+  if (!DOMAINS.some((d) => d.id === e.domain)) fail(`train: ${e.title}: unknown domain ${e.domain}`);
+  if (modules().some((m) => m.meta.title === e.title)) fail(`train: ${e.title} now has a module: move its links to TRAIN`);
+  for (const l of e.lessons) if (!findDoc(l)) fail(`train: ${e.title}: unknown lesson ${l}`);
+  checkLinks(e.title, e.links);
+}
+checkLinks("AD defence", AD_DEFENCE);
 
 const seen = new Set<string>();
 for (const t of glossary()) {
