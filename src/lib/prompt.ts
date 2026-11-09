@@ -48,6 +48,44 @@ export const SECTIONS: Target[] = [
   section("Account", "/account/", "profile"),
 ];
 
+/** French labels and names, by href. The English label stays a name, so "practice" still works in French. */
+const FR: Record<string, string[]> = {
+  "/": ["Accueil", "aujourd'hui", "maison"],
+  "/roadmap/": ["Parcours", "feuille de route", "programme"],
+  "/start/": ["Comment fonctionne ce site", "commencer", "démarrer", "visite"],
+  "/courses/": ["Leçons", "lecons", "cours"],
+  "/modules/": ["Modules"],
+  "/tools/": ["Outils"],
+  "/tools/all/": ["Les outils de A à Z", "tous les outils", "a a z"],
+  "/dojo/": ["Dojo", "défis", "defis"],
+  "/practice/": ["Pratique", "exercices", "entraînement"],
+  "/review/": ["Révision du jour", "révision", "revision", "réviser"],
+  "/practice/flashcards/": ["Cartes mémoire", "cartes"],
+  "/practice/labs/": ["Labs pratiques", "labs", "plateformes", "attaques"],
+  "/practice/mistakes/": ["Vos erreurs", "erreurs"],
+  "/practice/mix/": ["Le mélange du jour", "mélange", "melange"],
+  "/practice/cases/": ["Dossiers", "cas"],
+  "/machines/": ["Machines"],
+  "/projects/": ["Projets"],
+  "/library/": ["Bibliothèque", "bibliotheque"],
+  "/guides/": ["Manuel", "guides", "conseils"],
+  "/sheets/": ["Aide-mémoire", "fiches"],
+  "/glossary/": ["Glossaire", "termes", "vocabulaire"],
+  "/resources/": ["Ressources"],
+  "/skills/": ["Votre progression", "progrès", "progression", "compétences"],
+  "/signin/": ["Connexion", "se connecter", "créer un compte", "inscription"],
+  "/account/": ["Compte", "mon compte", "profil"],
+};
+
+/** The site's sections as the command line shows them in the page's language. */
+export function sectionsFor(lang: "en" | "fr"): Target[] {
+  if (lang === "en") return SECTIONS;
+  return SECTIONS.map((s) => {
+    const [label, ...names] = FR[s.href] ?? [];
+    return label ? { ...s, label, names: [s.label, ...(s.names ?? []), ...names] } : s;
+  });
+}
+
 /** Lowercase, no accents or punctuation: "Cheat-sheets " and "cheat sheets" are the same. */
 export const norm = (s: string) =>
   s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9+#]+/g, " ").trim();
@@ -115,8 +153,8 @@ export function resolvePath(cwd: string, arg: string): string {
 }
 
 /** Every page path the line knows, with its title when one is known. Parents are included, so "cd .." always works. */
-export function knownPaths(targets: Target[]): Map<string, string> {
-  const known = new Map<string, string>([["/", "Today"]]);
+export function knownPaths(targets: Target[], home = "Today"): Map<string, string> {
+  const known = new Map<string, string>([["/", home]]);
   for (const t of [...targets].sort((a, b) => b.tier - a.tier)) {
     if (!t.href.startsWith("/")) continue;
     const path = t.href.replace(/[?#].*$/, "");

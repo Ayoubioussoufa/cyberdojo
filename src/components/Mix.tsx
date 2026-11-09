@@ -7,12 +7,14 @@ import { deal } from "@/lib/drills/deal";
 import { nextStep, type PathStep } from "@/lib/pathState";
 import { roundDone, useStore } from "@/lib/progress";
 import { freshSeed, Rng } from "@/lib/rng";
+import { fill, plural, useLang } from "@/i18n/LangProvider";
 
 const SIZE = 10;
 
 /** Ten questions across everything she has reached. Mixing topics strengthens memory. */
 export function Mix({ path }: { path: PathStep[] }) {
   const store = useStore();
+  const { t } = useLang();
   const [round, setRound] = useState<{ n: number; exercises: Exercise[] } | null>(null);
   const month = nextStep(path, store)?.month ?? 24;
   const pool = DRILL_LIST.filter((d) => d.month <= Math.max(month, 1));
@@ -26,8 +28,8 @@ export function Mix({ path }: { path: PathStep[] }) {
     <Player key={round.n} source="mix" exercises={round.exercises} onFinish={(r) => roundDone("mix", r, round.exercises.length)} onAgain={start} />
   ) : (
     <div className="card">
-      <p className="muted">Ten questions from {pool.length} kinds of practice, up to where you've reached on your roadmap. It feels harder than practising one topic at a time. That's why it works: switching makes your brain retrieve, not repeat.</p>
-      <button type="button" className="btn primary lg" onClick={start}>Start today's mix</button>
+      <p className="muted">{fill(t.mix.text, { n: pool.length })}</p>
+      <button type="button" className="btn primary lg" onClick={start}>{t.mix.start}</button>
     </div>
   );
 }

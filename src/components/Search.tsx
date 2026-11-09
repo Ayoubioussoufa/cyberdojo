@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLang } from "@/i18n/LangProvider";
+import { localize } from "@/i18n/lang";
 
 interface Hit {
   title: string;
@@ -30,6 +32,7 @@ function rank(hit: Hit, words: string[]): number {
 
 export function Search() {
   const router = useRouter();
+  const { lang, t } = useLang();
   const box = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const [all, setAll] = useState<Hit[] | null>(null);
@@ -39,7 +42,7 @@ export function Search() {
   const open = () => {
     box.current?.showModal();
     input.current?.select();
-    if (!all) void fetch("/data/search.json").then((r) => r.json() as Promise<Hit[]>).then(setAll);
+    if (!all) void fetch(localize("/data/search.json", lang)).then((r) => r.json() as Promise<Hit[]>).then(setAll);
   };
   const close = () => box.current?.close();
 
@@ -71,21 +74,21 @@ export function Search() {
     if (!hit) return;
     close();
     setQ("");
-    router.push(hit.href);
+    router.push(localize(hit.href, lang));
   };
 
   return (
     <>
-      <button type="button" className="search-open" onClick={open} aria-label="Search the course">
+      <button type="button" className="search-open" onClick={open} aria-label={t.search.open}>
         <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" /><path d="m20 20-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
         <kbd>Ctrl K</kbd>
       </button>
-      <dialog ref={box} className="palette" aria-label="Search the course" onClick={(e) => e.target === box.current && close()}>
+      <dialog ref={box} className="palette" aria-label={t.search.open} onClick={(e) => e.target === box.current && close()}>
         <input
           ref={input}
           value={q}
-          placeholder="Search lessons, challenges, terms…"
-          aria-label="Search"
+          placeholder={t.search.placeholder}
+          aria-label={t.search.label}
           autoComplete="off"
           spellCheck={false}
           onChange={(e) => {
@@ -108,15 +111,15 @@ export function Search() {
           <ul>
             {hits.map((h, i) => (
               <li key={`${h.kind}${h.href}${h.title}`}>
-                <a href={h.href} aria-selected={i === at} onClick={(e) => { e.preventDefault(); go(h); }} onMouseEnter={() => setAt(i)}>
+                <a href={localize(h.href, lang)} aria-selected={i === at} onClick={(e) => { e.preventDefault(); go(h); }} onMouseEnter={() => setAt(i)}>
                   <span>{h.title}</span>
-                  <span className="pal-kind">{h.kind}</span>
+                  <span className="pal-kind">{(t.kind as Record<string, string>)[h.kind] ?? h.kind}</span>
                   <span className="pal-sub">{h.sub}</span>
                 </a>
               </li>
             ))}
           </ul>
-        ) : <p className="pal-none">{all ? "Nothing matches that." : "Loading…"}</p>)}
+        ) : <p className="pal-none">{all ? t.search.none : t.common.loading}</p>)}
       </dialog>
     </>
   );

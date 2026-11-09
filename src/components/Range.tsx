@@ -1,5 +1,6 @@
 "use client";
 
+import { fill, useLang } from "@/i18n/LangProvider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CopyButton } from "./Copy";
 import type { Built, Mission, RangeSet } from "@/lib/missions/kit";
@@ -32,6 +33,7 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
   const screen = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const [prompt, setPrompt] = useState("");
+  const { lang, t } = useLang();
   const lastOut = useRef("");
 
   useEffect(() => {
@@ -63,7 +65,7 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
     setNav(null);
     if (sh.submitted.length && w.flag !== undefined && !sh.submitted.includes(w.flag)) {
       sh.submitted = [];
-      setLines((l) => [...l, { kind: "sys", text: "That's not the flag. Look closer." }]);
+      setLines((l) => [...l, { kind: "sys", text: t.range.notFlag }]);
     }
     if (!passed && mission.passed(w, cmd)) onPass();
   };
@@ -126,8 +128,8 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
     <div className="term-wrap">
       <div className="term-bar">
         <span className="term-dots" aria-hidden="true"><i /><i /><i /></span>
-        <span className="term-title">simulated Linux, nothing here can break</span>
-        <button type="button" className="term-reset" onClick={() => setSeed((s) => s + 1)}>Reset</button>
+        <span className="term-title">{t.range.title}</span>
+        <button type="button" className="term-reset" onClick={() => setSeed((s) => s + 1)}>{t.range.reset}</button>
       </div>
       <div className="term" ref={screen} onClick={() => { if (!window.getSelection()?.toString()) input.current?.focus(); }}>
         {lines.map((l, i) =>
@@ -146,12 +148,12 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
           }}
         >
           <label className="term-prompt" htmlFor={`in-${mission.id}`}>{prompt}</label>
-          <input id={`in-${mission.id}`} ref={input} value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={onKey} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} aria-label="Type a command" />
+          <input id={`in-${mission.id}`} ref={input} value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={onKey} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} aria-label={t.range.type} />
         </form>
       </div>
       <div className="term-foot">
-        <span className="term-keys"><code>submit your-answer</code> hands it in, <kbd>Tab</kbd> completes, <kbd>↑</kbd> recalls, <code>man ls</code> explains, <code>help</code> lists</span>
-        <CopyButton className="link-btn on-dark" label="Stuck? Copy for my AI" done="Copied" build={() => missionMessage(mission.title, mission.brief, world.current?.shell.history ?? [], lastOut.current)} />
+        <span className="term-keys"><code>{t.range.submitCmd}</code> {t.range.k1} <kbd>Tab</kbd> {t.range.k2} <kbd>↑</kbd> {t.range.k3} <code>man ls</code> {t.range.k4} <code>help</code> {t.range.k5}</span>
+        <CopyButton className="link-btn on-dark" label={t.range.stuck} done={t.common.copiedCap} build={() => missionMessage(mission.title, mission.brief, world.current?.shell.history ?? [], lastOut.current, lang)} />
       </div>
     </div>
   );
@@ -175,7 +177,7 @@ export function Range({ id, bare = false }: { id: string; bare?: boolean }) {
   return <RangeView range={loaded.range} bare={bare} />;
 }
 
-export const RangeSkeleton = () => <section className="range range-wait" aria-busy="true" aria-label="Loading the terminal" />;
+export const RangeSkeleton = () => <section className="range range-wait" aria-busy="true" aria-label={useLang().t.misc.loadingRange} />;
 
 function RangeView({ range, bare }: { range: RangeSet; bare: boolean }) {
   const store = useStore();
@@ -184,10 +186,12 @@ function RangeView({ range, bare }: { range: RangeSet; bare: boolean }) {
   const [choice, setChoice] = useState<number | null>(null);
   const [hints, setHints] = useState(0);
   const [won, setWon] = useState<string | null>(null);
+  const { lang, t } = useLang();
+  const R = t.range;
   const at = choice ?? (firstOpen < 0 ? 0 : firstOpen);
   const mission = missions[at];
 
-  if (!mission) return <p className="muted">This mission set is empty.</p>;
+  if (!mission) return <p className="muted">{R.empty}</p>;
   const passed = !!store.missions[mission.id];
   const go = (i: number) => {
     setChoice(i);
@@ -197,12 +201,12 @@ function RangeView({ range, bare }: { range: RangeSet; bare: boolean }) {
   return (
     <section className="range">
       <div className="range-head">
-        <span className="band">Hands on, graded automatically</span>
+        <span className="band">{R.band}</span>
         {!bare && <h3 className="noterms">{range.title}</h3>}
-        <ol className="range-steps" aria-label="Missions">
+        <ol className="range-steps" aria-label={R.missions}>
           {missions.map((m, i) => (
             <li key={m.id}>
-              <button type="button" className={`${i === at ? "on " : ""}${store.missions[m.id] ? "ok" : ""}`} onClick={() => go(i)} aria-label={`Mission ${i + 1}: ${m.title}`} aria-current={i === at}>
+              <button type="button" className={`${i === at ? "on " : ""}${store.missions[m.id] ? "ok" : ""}`} onClick={() => go(i)} aria-label={fill(R.mission, { n: i + 1, title: m.title })} aria-current={i === at}>
                 {store.missions[m.id] ? "✓" : i + 1}
               </button>
             </li>
@@ -210,8 +214,8 @@ function RangeView({ range, bare }: { range: RangeSet; bare: boolean }) {
         </ol>
       </div>
       <div className="mission">
-        <p className="mission-title noterms">Mission {at + 1}: {mission.title}</p>
-        <p className="mission-brief noterms">{inlineCode(mission.brief)}</p>
+        <p className="mission-title noterms">{fill(R.mission, { n: at + 1, title: mission.title })}</p>
+        <p className="mission-brief noterms" lang={lang === "en" ? undefined : "en"}>{inlineCode(mission.brief)}</p>
       </div>
       <Terminal
         mission={mission}
@@ -226,21 +230,21 @@ function RangeView({ range, bare }: { range: RangeSet; bare: boolean }) {
       {passed ? (
         <div className="why ok mission-win">
           <span className={`hanko${won === mission.id ? " just" : ""}`} aria-hidden="true" lang="ja">合格</span>
-          <strong>Mission complete.</strong> <span className="noterms">{inlineCode(mission.debrief)}</span>
+          <strong>{R.complete}</strong> <span className="noterms" lang={lang === "en" ? undefined : "en"}>{inlineCode(mission.debrief)}</span>
           {at < missions.length - 1 && (
             <div className="why-actions">
-              <button type="button" className="btn primary sm" onClick={() => go(at + 1)}>Next mission</button>
+              <button type="button" className="btn primary sm" onClick={() => go(at + 1)}>{R.next}</button>
             </div>
           )}
         </div>
       ) : (
         <div className="hints">
           {mission.hints.slice(0, hints).map((h, i) => (
-            <p key={i} className="noterms"><strong>Hint {i + 1}.</strong> {inlineCode(h)}</p>
+            <p key={i} className="noterms"><strong>{fill(R.hint, { n: i + 1 })}</strong> <span lang={lang === "en" ? undefined : "en"}>{inlineCode(h)}</span></p>
           ))}
           {hints < mission.hints.length && (
             <button type="button" className="link-btn" onClick={() => setHints(hints + 1)}>
-              {hints === 0 ? "Stuck for 5 minutes? Show a hint" : "Show another hint"}
+              {hints === 0 ? R.firstHint : R.moreHint}
             </button>
           )}
         </div>

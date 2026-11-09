@@ -73,6 +73,8 @@ export interface TocEntry {
 }
 
 export interface Term {
+  /** In a translation: the English term's name, so progress on it is shared. */
+  key?: string;
   term: string;
   aliases: string[];
   definition: string;
@@ -130,6 +132,8 @@ export interface DocMeta {
   /** Projects: what was really run while writing the page. */
   tested?: string;
   questions: number;
+  /** The language this copy is written in. On the French site, "en" means no translation yet. */
+  lang?: "en" | "fr";
 }
 
 export interface Doc {

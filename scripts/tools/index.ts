@@ -45,7 +45,7 @@ const md = [
   "",
   "<!-- Written by scripts/tools/index.ts. Edit the tool pages, then run pnpm audit:tools. -->",
   "",
-  `${guides.length} tool guides, plus an A to Z of ${list.length} names at [/tools/all/](../src/app/tools/all/page.tsx).`,
+  `${guides.length} tool guides, plus an A to Z of ${list.length} names at [/tools/all/](../src/app/[lang]/tools/all/page.tsx).`,
   "",
   "Every guide says what the tool is for and how it works, then what defenders see. How much it shows depends on its `use` field:",
   "",

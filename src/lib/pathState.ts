@@ -109,10 +109,10 @@ export function weekPlan(path: PathStep[], st: Store, hours: number) {
 }
 
 /** Rough finish date. The plan assumes about 1,300 hours in all. */
-export function finishDate(path: PathStep[], st: Store, hours: number, now = new Date()) {
+export function finishDate(path: PathStep[], st: Store, hours: number, now = new Date(), lang: "en" | "fr" = "en") {
   const share = path.length ? path.filter((s) => !isDone(s, st)).length / path.length : 1;
   const weeks = Math.ceil((1300 * share) / Math.max(hours, 1));
   const d = new Date(now);
   d.setDate(d.getDate() + weeks * 7);
-  return d.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  return d.toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { month: "long", year: "numeric" });
 }

@@ -33,3 +33,29 @@ export const TOOL_CATS: ToolCat[] = [
   { folder: "18-intel", title: "Threat intelligence and deception", blurb: "Sharing what you know, and setting traps." },
   { folder: "19-mobile-hardware", title: "Mobile, firmware and hardware", blurb: "Phones, embedded devices and radios." },
 ];
+
+/** French names and blurbs for the tool folders. */
+export const TOOL_CATS_FR: Record<string, { title: string; blurb: string }> = {
+  "01-recon-osint": { title: "Reconnaissance et OSINT", blurb: "Ce qu'Internet dit déjà d'une cible, le plus souvent la vôtre." },
+  "02-scanning": { title: "Scan et énumération", blurb: "Trouver les hôtes, les ports et les services." },
+  "03-traffic": { title: "Analyse du trafic et du réseau", blurb: "Voir ce qui passe vraiment sur le câble." },
+  "04-web": { title: "Tests d'applications web", blurb: "Proxys, découverte et scanners pour les applications web." },
+  "05-vulnerability": { title: "Scan de vulnérabilités et audit", blurb: "Trouver les failles connues et les réglages faibles." },
+  "06-passwords": { title: "Mots de passe et identifiants", blurb: "Comment les mots de passe sont attaqués, et comment auditer les vôtres." },
+  "07-wireless": { title: "Sans-fil, Bluetooth et radio", blurb: "Surveiller et tester ce qui passe dans les airs." },
+  "08-frameworks": { title: "Frameworks d'attaque et C2", blurb: "Des noms que vous croiserez dans les rapports, et comment les détecter." },
+  "09-active-directory": { title: "Outils Active Directory", blurb: "Ce que sont ces outils, et les traces qu'ils laissent." },
+  "10-built-in": { title: "Outils intégrés détournés par les attaquants", blurb: "Des programmes système ordinaires, et comment repérer leur mauvais usage." },
+  "11-hardening": { title: "Durcissement et audit des hôtes", blurb: "Vérifier et verrouiller Linux et Windows." },
+  "12-detection": { title: "Détection et supervision", blurb: "IDS, SIEM, EDR et outils de journaux." },
+  "13-forensics": { title: "Investigation et réponse à incident", blurb: "Collecter et lire les preuves." },
+  "14-reversing": { title: "Analyse de malwares et rétro-ingénierie", blurb: "Démonter des programmes sans risque." },
+  "15-cloud": { title: "Cloud et conteneurs", blurb: "Auditer les comptes cloud, les images et les clusters." },
+  "16-appsec": { title: "Code et chaîne d'approvisionnement", blurb: "Trouver les failles et les secrets dans ce que vous construisez." },
+  "17-crypto": { title: "Cryptographie et secrets", blurb: "Des outils de tous les jours pour les clés, TLS et l'encodage." },
+  "18-intel": { title: "Renseignement sur les menaces et leurres", blurb: "Partager ce que vous savez, et tendre des pièges." },
+  "19-mobile-hardware": { title: "Mobile, firmware et matériel", blurb: "Téléphones, systèmes embarqués et radios." },
+};
+
+/** A tool folder's title and blurb in the page's language. */
+export const catText = (c: ToolCat, lang: "en" | "fr") => (lang === "fr" ? (TOOL_CATS_FR[c.folder] ?? c) : c);

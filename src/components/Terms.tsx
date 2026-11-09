@@ -19,7 +19,8 @@ function underline(root: Element, terms: Term[]) {
   const exact = new Map<string, string>();
   for (const t of terms) for (const name of [t.term, ...t.aliases]) if (/[A-Z]{2}/.test(name)) exact.set(name.toLowerCase(), name);
   const names = [...byName.keys()].sort((a, b) => b.length - a.length).map(escapeRe);
-  const re = new RegExp(`(?<![A-Za-z0-9-])(?:${names.join("|")})(?![A-Za-z0-9-])`, "gi");
+  // Letters in any script count as a word edge, so French accents don't split words.
+  const re = new RegExp(`(?<![\\p{L}\\p{N}-])(?:${names.join("|")})(?![\\p{L}\\p{N}-])`, "giu");
 
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(n) {

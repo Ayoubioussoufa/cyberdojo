@@ -5,9 +5,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { INTERVALS, reviewed, today, useStore } from "@/lib/progress";
 import { freshSeed, Rng } from "@/lib/rng";
 import type { Term } from "@/lib/types";
+import { fill, plural, useLang } from "@/i18n/LangProvider";
+import { localize } from "@/i18n/lang";
 
 /** Flashcard ids share the spaced-review schedule with questions, under their own prefix. */
-export const cardId = (t: Term) => `fc:${t.term.toLowerCase()}`;
+/** Keyed by the English name, so a card keeps its schedule in both languages. */
+export const cardId = (t: Term) => `fc:${(t.key ?? t.term).toLowerCase()}`;
 const NEW_PER_SESSION = 10;
 const MAX_SESSION = 30;
 
@@ -15,7 +18,7 @@ type Direction = "recall-term" | "recall-meaning";
 type Phase = { kind: "ask" } | { kind: "shown"; typed: string; right: boolean | null };
 
 /** Lowercase, no punctuation or extra spaces, so "Kerberos " and "kerberos" match. */
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9+#]+/g, " ").trim();
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9+#]+/g, " ").trim();
 
 /** The definition with the term itself blanked out, so the front doesn't give the answer away. */
 function blank(t: Term): string {
@@ -29,6 +32,7 @@ function blank(t: Term): string {
 
 export function Flashcards() {
   const store = useStore();
+  const { lang, t: tr } = useLang();
   const [terms, setTerms] = useState<Term[]>([]);
   const [deck, setDeck] = useState("done");
   const [direction, setDirection] = useState<Direction>("recall-term");
@@ -41,13 +45,13 @@ export function Flashcards() {
 
   useEffect(() => {
     let live = true;
-    void fetch("/data/terms.json").then((r) => r.json() as Promise<Term[]>).then((all) => {
+    void fetch(localize("/data/terms.json", lang)).then((r) => r.json() as Promise<Term[]>).then((all) => {
       if (live) setTerms(all);
     });
     return () => {
       live = false;
     };
-  }, []);
+  }, [lang]);
 
   const docs = useMemo(() => {
     const seen = new Map<string, string>();
@@ -99,39 +103,39 @@ export function Flashcards() {
     setPhase({ kind: "shown", typed, right: ok });
   };
 
-  if (!terms.length) return <div className="card"><p className="muted">Loading the glossary…</p></div>;
+  if (!terms.length) return <div className="card"><p className="muted">{tr.cards.loading}</p></div>;
 
   if (!queue) {
     return (
       <div className="card fc-start">
-        <h2>{due.length} card{due.length === 1 ? "" : "s"} due, {Math.min(fresh.length, NEW_PER_SESSION)} new</h2>
+        <h2>{plural(lang, tr.cards.due, due.length)}, {plural(lang, tr.cards.new, Math.min(fresh.length, NEW_PER_SESSION))}</h2>
         <p className="muted">
           {tracked === 0
-            ? "Each card is a glossary term from a page you've studied. Recall it, check it, grade yourself honestly. Cards you know come back after longer and longer gaps."
-            : `${tracked} cards in rotation. A card you know comes back after ${INTERVALS.join(", ")} days; one you miss comes back tomorrow.`}
+            ? tr.cards.empty
+            : fill(tr.cards.rotation, { n: tracked, days: INTERVALS.join(", ") })}
         </p>
         <div className="fc-options">
           <label>
-            New cards from
+            {tr.cards.from}
             <select value={deck} onChange={(e) => setDeck(e.target.value)}>
-              <option value="done">Pages you've marked as done ({terms.filter((t) => store.done[t.doc]).length} terms)</option>
+              <option value="done">{fill(tr.cards.doneDeck, { n: terms.filter((t) => store.done[t.doc]).length })}</option>
               {docs.map(([slug, title]) => (
                 <option key={slug} value={slug}>{title}</option>
               ))}
             </select>
           </label>
           <fieldset className="fc-dir">
-            <legend>Direction</legend>
-            <label><input type="radio" name="dir" checked={direction === "recall-term"} onChange={() => setDirection("recall-term")} /> Read the meaning, type the term</label>
-            <label><input type="radio" name="dir" checked={direction === "recall-meaning"} onChange={() => setDirection("recall-meaning")} /> Read the term, recall the meaning</label>
+            <legend>{tr.cards.direction}</legend>
+            <label><input type="radio" name="dir" checked={direction === "recall-term"} onChange={() => setDirection("recall-term")} /> {tr.cards.toTerm}</label>
+            <label><input type="radio" name="dir" checked={direction === "recall-meaning"} onChange={() => setDirection("recall-meaning")} /> {tr.cards.toMeaning}</label>
           </fieldset>
         </div>
         {due.length + fresh.length > 0 ? (
-          <button type="button" className="btn primary lg" onClick={start}>Start {Math.min(due.length + Math.min(fresh.length, NEW_PER_SESSION), MAX_SESSION)} cards</button>
+          <button type="button" className="btn primary lg" onClick={start}>{fill(tr.cards.start, { n: Math.min(due.length + Math.min(fresh.length, NEW_PER_SESSION), MAX_SESSION) })}</button>
         ) : (
           <p className="muted">
-            {deck === "done" ? <>Nothing new yet: mark a lesson as done, or pick a page above. </> : <>Every card from this page is already in rotation. </>}
-            <Link href="/courses/">Go to the lessons</Link>
+            {deck === "done" ? tr.cards.nothingNew : tr.cards.allIn}{" "}
+            <Link href="/courses/">{tr.cards.toLessons}</Link>
           </p>
         )}
       </div>
@@ -141,11 +145,11 @@ export function Flashcards() {
   if (!card) {
     return (
       <div className="card fc-start">
-        <h2>Session done: {score.right} of {score.done} right</h2>
-        <p className="muted">Missed cards come back tomorrow. That&apos;s the point: the second try is where they stick.</p>
+        <h2>{fill(tr.cards.sessionDone, { right: score.right, total: score.done })}</h2>
+        <p className="muted">{tr.cards.missed}</p>
         <p className="hero-actions">
-          <button type="button" className="btn primary" onClick={() => setQueue(null)}>Back to the decks</button>
-          <Link className="btn" href="/review/">Review questions</Link>
+          <button type="button" className="btn primary" onClick={() => setQueue(null)}>{tr.cards.backDecks}</button>
+          <Link className="btn" href="/review/">{tr.cards.reviewQ}</Link>
         </p>
       </div>
     );
@@ -154,44 +158,44 @@ export function Flashcards() {
   const shown = phase.kind === "shown";
   return (
     <div className="card fc">
-      <p className="drill-count">Card {pos + 1} of {queue.length}, {score.right} right so far</p>
+      <p className="drill-count">{fill(tr.cards.count, { n: pos + 1, total: queue.length, right: score.right })}</p>
       <div className="drill-bar"><span style={{ width: `${(pos / queue.length) * 100}%` }} /></div>
       {direction === "recall-term" ? (
         <>
-          <p className="fc-ask">Which term means this?</p>
+          <p className="fc-ask">{tr.cards.which}</p>
           <p className="fc-front">{blank(card)}</p>
           {!shown && (
             <form className="drill-input" onSubmit={(e) => { e.preventDefault(); check(); }}>
-              <input value={typed} onChange={(e) => setTyped(e.target.value)} aria-label="The term" autoComplete="off" autoCapitalize="off" spellCheck={false} autoFocus placeholder="Type the term, or leave empty to reveal" />
-              <button type="submit" className="btn primary">Check</button>
+              <input value={typed} onChange={(e) => setTyped(e.target.value)} aria-label={tr.cards.term} autoComplete="off" autoCapitalize="off" spellCheck={false} autoFocus placeholder={tr.cards.typeHolder} />
+              <button type="submit" className="btn primary">{tr.cards.check}</button>
             </form>
           )}
         </>
       ) : (
         <>
-          <p className="fc-ask">Say what this means, out loud or on paper, then reveal.</p>
+          <p className="fc-ask">{tr.cards.say}</p>
           <p className="fc-front fc-term">{card.term}</p>
-          {!shown && <button type="button" className="btn primary" onClick={() => setPhase({ kind: "shown", typed: "", right: null })}>Reveal</button>}
+          {!shown && <button type="button" className="btn primary" onClick={() => setPhase({ kind: "shown", typed: "", right: null })}>{tr.cards.reveal}</button>}
         </>
       )}
       {phase.kind === "shown" && (
         <div className={`why ${phase.right === false ? "no" : phase.right ? "ok" : ""}`}>
-          {phase.right === true && <p><strong>Right.</strong></p>}
-          {phase.right === false && <p><strong>Not quite.</strong> You typed <span className="given">{phase.typed}</span>.</p>}
-          <p><strong>{card.term}</strong>{card.aliases.length ? ` (also ${card.aliases.join(", ")})` : ""}: {card.definition}</p>
-          <p className="muted">From <Link href={card.href}>{card.docTitle}</Link></p>
+          {phase.right === true && <p><strong>{tr.question.right}</strong></p>}
+          {phase.right === false && <p><strong>{tr.question.wrong}</strong> {tr.cards.typed} <span className="given">{phase.typed}</span>.</p>}
+          <p><strong>{card.term}</strong>{card.aliases.length ? ` (${fill(tr.cards.also, { names: card.aliases.join(", ") })})` : ""}: {card.definition}</p>
+          <p className="muted">{tr.cards.fromDoc} <Link href={card.href}>{card.docTitle}</Link></p>
           <div className="why-actions">
             {phase.right === true ? (
-              <button type="button" className="btn primary" onClick={() => grade(true)}>Next card</button>
+              <button type="button" className="btn primary" onClick={() => grade(true)}>{tr.cards.nextCard}</button>
             ) : phase.right === false ? (
               <>
-                <button type="button" className="link-btn" onClick={() => grade(true)}>It was a typo, count it right</button>
-                <button type="button" className="btn primary" onClick={() => grade(false)}>Next card</button>
+                <button type="button" className="link-btn" onClick={() => grade(true)}>{tr.cards.typo}</button>
+                <button type="button" className="btn primary" onClick={() => grade(false)}>{tr.cards.nextCard}</button>
               </>
             ) : (
               <>
-                <button type="button" className="btn" onClick={() => grade(false)}>I didn&apos;t know it</button>
-                <button type="button" className="btn primary" onClick={() => grade(true)}>I knew it</button>
+                <button type="button" className="btn" onClick={() => grade(false)}>{tr.cards.didnt}</button>
+                <button type="button" className="btn primary" onClick={() => grade(true)}>{tr.cards.knew}</button>
               </>
             )}
           </div>

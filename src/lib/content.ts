@@ -31,6 +31,15 @@
  *
  * Tools live in tools/<NN-category>/<slug>.md: one page per tool, in four parts.
  * Their `use` field decides how much they may show. See src/data/toolcats.ts.
+ *
+ * French: content/fr/ mirrors the paths above (content/fr/lessons/0001-x.md,
+ * content/fr/modules/01-networking/01-x.md, content/fr/tools/02-scanning/nmap.md).
+ * A French file needs only the front matter that changes (title, summary,
+ * builds, words); the rest comes from the English file. It must keep the same
+ * questions in the same order, with the right option first and the options in
+ * the same order, so saved answers mean the same thing in both languages:
+ * scripts/check-i18n.ts enforces that. A page with no French file is served in
+ * English on the French site, marked `meta.lang = "en"`.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -38,11 +47,14 @@ import { Marked } from "marked";
 import { bitsHtml, permHtml, pyramidHtml, seqSvg, stackHtml } from "./diagrams";
 import { TOOLS } from "@/data/tools";
 import { TRAIN, type TrainLink } from "@/data/train";
+import type { Lang } from "@/i18n/lang";
+import { UI } from "@/i18n/ui";
 import type { Check, Doc, DocBrief, DocLink, DocMeta, HelpLevel, Question, Segment, StepSegment, Term, TocEntry, ToolUse, Written } from "./types";
 
 const ROOT = path.join(process.cwd(), "content");
 const MODULES = path.join(process.cwd(), "modules");
 const TOOL_PAGES = path.join(process.cwd(), "tools");
+const FRENCH = path.join(process.cwd(), "content", "fr");
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -164,7 +176,12 @@ function stepDocs(step: StepSegment, raw: string): DocLink[] {
 export const flatSegments = (list: Segment[]): Segment[] =>
   list.flatMap((s) => (s.kind === "step" ? [s, ...flatSegments(s.body), ...s.after] : [s]));
 
-function parseBody(slug: string, title: string, body: string, href: string) {
+/**
+ * `seeds` are the English prompts, in order: a French copy shuffles its options the
+ * same way, so a saved answer (an option position) means the same in both languages.
+ * `keys` are the English term names, in order, so a flashcard keeps its schedule too.
+ */
+function parseBody(slug: string, title: string, body: string, href: string, seeds: string[] = [], keys: string[] = []) {
   const toc: TocEntry[] = [];
   const marked = makeMarked(toc);
   const inline = (s: string) => marked.parseInline(s, { async: false }) as string;
@@ -287,7 +304,7 @@ function parseBody(slug: string, title: string, body: string, href: string) {
         i++;
       }
       if (right.length !== 1 || wrong.length < 2 || !why) throw new Error(`${slug}: malformed question "${prompt}"`);
-      const options = shuffled([...right, ...wrong], hash(prompt));
+      const options = shuffled([...right, ...wrong], hash(seeds[questions.length] ?? prompt));
       const q: Question = {
         id: `${slug}#${questions.length + 1}`,
         prompt,
@@ -353,7 +370,9 @@ function parseBody(slug: string, title: string, body: string, href: string) {
     }
     const term = /^@term\s+(.+?)(?:\s+\(([^)]*)\))?\s+=\s+(.+)$/.exec(line);
     if (term) {
+      const key = keys[terms.length];
       terms.push({
+        ...(key ? { key } : {}),
         term: term[1] as string,
         aliases: term[2] ? term[2].split(",").map((a) => a.trim()) : [],
         definition: term[3] as string,
@@ -395,8 +414,11 @@ type DocDir = "lessons" | "guides" | "machines" | "reference" | "projects" | "mo
 const KIND = { lessons: "lesson", guides: "guide", machines: "machine", reference: "sheet", projects: "project", modules: "module", tools: "tool" } as const;
 const BASE = { lessons: "/courses/", guides: "/guides/", machines: "/machines/", reference: "/sheets/", projects: "/projects/", modules: "/modules/", tools: "/tools/" } as const;
 
-const fileOf = (kindDir: DocDir, file: string) =>
+const englishFile = (kindDir: DocDir, file: string) =>
   kindDir === "modules" ? path.join(MODULES, file) : kindDir === "tools" ? path.join(TOOL_PAGES, file) : path.join(ROOT, kindDir, file);
+/** Where a document's French copy lives, whether or not it exists yet. */
+export const frenchFile = (kindDir: DocDir, file: string) => path.join(FRENCH, kindDir, file);
+const fileOf = (kindDir: DocDir, file: string, lang: Lang = "en") => (lang === "fr" ? frenchFile(kindDir, file) : englishFile(kindDir, file));
 
 /** "01-networking/07-netcat.md" has the slug "01-07-netcat". */
 const moduleSlug = (file: string) => {
@@ -438,15 +460,19 @@ function readDir(kind: DocDir): string[] {
   }
 }
 
-function load(kindDir: DocDir, file: string): Doc {
-  const raw = fs.readFileSync(fileOf(kindDir, file), "utf8");
+function load(kindDir: DocDir, file: string, lang: Lang = "en"): Doc {
+  const raw = fs.readFileSync(fileOf(kindDir, file, lang), "utf8");
   const isModule = kindDir === "modules";
   const isTool = kindDir === "tools";
   const slug = isModule ? moduleSlug(file) : isTool ? path.basename(file, ".md") : file.replace(/\.md$/, "");
-  const { front, body } = splitFront(raw, file);
+  const own = splitFront(raw, file);
+  // A French file inherits every front-matter field it doesn't set from the English one.
+  const front = lang === "en" ? own.front : { ...splitFront(fs.readFileSync(englishFile(kindDir, file), "utf8"), file).front, ...own.front };
+  const body = own.body;
   const kind = KIND[kindDir];
   const title = front.title ?? slug;
-  const parsed = parseBody(slug, title, body, `${BASE[kindDir]}${slug}/`);
+  const english = lang === "en" ? null : cached(kindDir, file);
+  const parsed = parseBody(slug, title, body, `${BASE[kindDir]}${slug}/`, english?.questions.map((q) => q.prompt), english?.terms.map((t) => t.term));
   const src = front.source?.split("|").map((s) => s.trim());
   const meta: DocMeta = {
     slug,
@@ -458,6 +484,7 @@ function load(kindDir: DocDir, file: string): Doc {
     minutes: Number(front.minutes ?? 20),
     words: front.words ? front.words.split(",").map((w) => w.trim()) : [],
     questions: parsed.questions.length,
+    lang,
   };
   if (front.builds) meta.builds = front.builds;
   if (front.group) meta.group = front.group;
@@ -510,78 +537,97 @@ interface Library {
  */
 interface ContentCache {
   files: Map<string, { stamp: string; doc: Doc }>;
-  library: Library | null;
-  checked: number;
-  glossary: Term[] | null;
+  library: Partial<Record<Lang, Library>>;
+  checked: Partial<Record<Lang, number>>;
+  glossary: Partial<Record<Lang, Term[]>>;
   terms: WeakMap<Doc, Term[]>;
+  /** English documents as the French site shows them: same content, French-site links. */
+  fallback: WeakMap<Doc, Doc>;
 }
-const memo = ((globalThis as { __cyberdojoContent?: ContentCache }).__cyberdojoContent ??= {
-  files: new Map(),
-  library: null,
-  checked: 0,
-  glossary: null,
-  terms: new WeakMap(),
-});
+const fresh = (): ContentCache => ({ files: new Map(), library: {}, checked: {}, glossary: {}, terms: new WeakMap(), fallback: new WeakMap() });
+const memo: ContentCache = ((globalThis as { __cyberdojoContent2?: ContentCache }).__cyberdojoContent2 ??= fresh());
 
-function cached(kindDir: DocDir, file: string): Doc {
-  const at = fileOf(kindDir, file);
+function cached(kindDir: DocDir, file: string, lang: Lang = "en"): Doc {
+  const at = fileOf(kindDir, file, lang);
   const { mtimeMs, size } = fs.statSync(at);
-  const stamp = `${mtimeMs}:${size}`;
+  // A French copy also depends on the English front matter it inherits.
+  const base = lang === "fr" ? fs.statSync(englishFile(kindDir, file)) : null;
+  const stamp = `${mtimeMs}:${size}${base ? `:${base.mtimeMs}` : ""}`;
   const hit = memo.files.get(at);
   if (hit?.stamp === stamp) return hit.doc;
-  const doc = load(kindDir, file);
+  const doc = lang === "fr" ? frenchSite(load(kindDir, file, lang)) : load(kindDir, file, lang);
   memo.files.set(at, { stamp, doc });
+  return doc;
+}
+
+/** Internal links in a document's HTML, rewritten for the French site. Outside links stay. */
+const frenchSite = (doc: Doc): Doc => JSON.parse(JSON.stringify(doc).replace(/href=\\"\/(?!\/|fr\/)/g, 'href=\\"/fr/')) as Doc;
+
+/** The French site's copy of a document: its own translation, or the English one with French-site links. */
+function french(kindDir: DocDir, file: string, english: Doc): Doc {
+  if (fs.existsSync(frenchFile(kindDir, file))) return cached(kindDir, file, "fr");
+  let doc = memo.fallback.get(english);
+  if (!doc) {
+    doc = frenchSite(english);
+    memo.fallback.set(english, doc);
+  }
   return doc;
 }
 
 /** One page asks for documents many times, so disk is checked at most this often. */
 const RECHECK_MS = 300;
 
-function all(): Library {
+function all(lang: Lang = "en"): Library {
   const now = Date.now();
-  if (memo.library && (process.env.NODE_ENV === "production" || now - memo.checked < RECHECK_MS)) return memo.library;
-  memo.checked = now;
-  const before = memo.library;
+  const before = memo.library[lang];
+  if (before && (process.env.NODE_ENV === "production" || now - (memo.checked[lang] ?? 0) < RECHECK_MS)) return before;
+  memo.checked[lang] = now;
+  const read = (kindDir: DocDir, files: string[]) =>
+    files.map((f) => {
+      const en = cached(kindDir, f);
+      return lang === "en" ? en : french(kindDir, f, en);
+    });
   const next: Library = {
-    lessons: readDir("lessons").map((f) => cached("lessons", f)),
-    guides: readDir("guides").map((f) => cached("guides", f)),
-    machines: readDir("machines").map((f) => cached("machines", f)),
-    sheets: readDir("reference").map((f) => cached("reference", f)),
-    projects: readDir("projects").map((f) => cached("projects", f)),
-    modules: moduleFiles().map((f) => cached("modules", f)),
-    tools: toolFiles().map((f) => cached("tools", f)),
+    lessons: read("lessons", readDir("lessons")),
+    guides: read("guides", readDir("guides")),
+    machines: read("machines", readDir("machines")),
+    sheets: read("reference", readDir("reference")),
+    projects: read("projects", readDir("projects")),
+    modules: read("modules", moduleFiles()),
+    tools: read("tools", toolFiles()),
   };
   const same = before && (Object.keys(next) as (keyof Library)[]).every((k) => next[k].length === before[k].length && next[k].every((d, i) => d === before[k][i]));
   if (same) return before;
-  memo.library = next;
-  memo.glossary = null;
-  memo.terms = new WeakMap();
+  memo.library[lang] = next;
+  delete memo.glossary[lang];
   return next;
 }
 
-export const lessons = () => all().lessons;
-export const guides = () => all().guides;
-export const machines = () => all().machines;
-export const sheets = () => all().sheets;
-export const projects = () => all().projects;
-export const modules = () => all().modules;
-export const getModule = (slug: string) => modules().find((d) => d.meta.slug === slug);
-export const toolDocs = () => all().tools;
-export const getToolDoc = (slug: string) => toolDocs().find((d) => d.meta.slug === slug);
-export const getProject = (slug: string) => projects().find((d) => d.meta.slug === slug);
-export const getMachine = (slug: string) => machines().find((d) => d.meta.slug === slug);
-export const getSheet = (slug: string) => sheets().find((d) => d.meta.slug === slug);
-export const lessonMetas = (): DocMeta[] => lessons().map((d) => d.meta);
-export const guideMetas = (): DocMeta[] => guides().map((d) => d.meta);
-export const getLesson = (slug: string) => lessons().find((d) => d.meta.slug === slug);
-export const getGuide = (slug: string) => guides().find((d) => d.meta.slug === slug);
+export const lessons = (lang: Lang = "en") => all(lang).lessons;
+export const guides = (lang: Lang = "en") => all(lang).guides;
+export const machines = (lang: Lang = "en") => all(lang).machines;
+export const sheets = (lang: Lang = "en") => all(lang).sheets;
+export const projects = (lang: Lang = "en") => all(lang).projects;
+export const modules = (lang: Lang = "en") => all(lang).modules;
+export const getModule = (slug: string, lang: Lang = "en") => modules(lang).find((d) => d.meta.slug === slug);
+export const toolDocs = (lang: Lang = "en") => all(lang).tools;
+export const getToolDoc = (slug: string, lang: Lang = "en") => toolDocs(lang).find((d) => d.meta.slug === slug);
+export const getProject = (slug: string, lang: Lang = "en") => projects(lang).find((d) => d.meta.slug === slug);
+export const getMachine = (slug: string, lang: Lang = "en") => machines(lang).find((d) => d.meta.slug === slug);
+export const getSheet = (slug: string, lang: Lang = "en") => sheets(lang).find((d) => d.meta.slug === slug);
+export const lessonMetas = (lang: Lang = "en"): DocMeta[] => lessons(lang).map((d) => d.meta);
+export const guideMetas = (lang: Lang = "en"): DocMeta[] => guides(lang).map((d) => d.meta);
+export const getLesson = (slug: string, lang: Lang = "en") => lessons(lang).find((d) => d.meta.slug === slug);
+export const getGuide = (slug: string, lang: Lang = "en") => guides(lang).find((d) => d.meta.slug === slug);
 
-export function glossary(): Term[] {
-  const lib = all();
-  if (memo.glossary) return memo.glossary;
+export function glossary(lang: Lang = "en"): Term[] {
+  const lib = all(lang);
+  const hit = memo.glossary[lang];
+  if (hit) return hit;
   const out = [...lib.lessons, ...lib.guides, ...lib.machines, ...lib.sheets, ...lib.projects, ...lib.modules].flatMap((d) => d.terms);
-  memo.glossary = out.sort((a, b) => a.term.toLowerCase().localeCompare(b.term.toLowerCase()));
-  return memo.glossary;
+  const sorted = out.sort((a, b) => a.term.toLowerCase().localeCompare(b.term.toLowerCase(), lang));
+  memo.glossary[lang] = sorted;
+  return sorted;
 }
 
 export function brief(doc: Doc): DocBrief {
@@ -590,37 +636,41 @@ export function brief(doc: Doc): DocBrief {
 }
 
 /** Every question, for spaced review. */
-export function allQuestions(): { q: Question; title: string; href: string }[] {
+export function allQuestions(lang: Lang = "en"): { q: Question; title: string; href: string }[] {
   return [
-    ...lessons().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/courses/${d.meta.slug}/` }))),
-    ...guides().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/guides/${d.meta.slug}/` }))),
-    ...machines().flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/machines/${d.meta.slug}/` }))),
+    ...lessons(lang).flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/courses/${d.meta.slug}/` }))),
+    ...guides(lang).flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/guides/${d.meta.slug}/` }))),
+    ...machines(lang).flatMap((d) => d.questions.map((q) => ({ q, title: d.meta.title, href: `/machines/${d.meta.slug}/` }))),
   ];
 }
 
 /** A slug in a module's front matter: lessons start with four digits, modules with NN-MM. */
-export function findDoc(slug: string): Doc | undefined {
-  return /^\d{4}-/.test(slug) ? getLesson(slug) : getModule(slug);
+export function findDoc(slug: string, lang: Lang = "en"): Doc | undefined {
+  return /^\d{4}-/.test(slug) ? getLesson(slug, lang) : getModule(slug, lang);
 }
 const hrefOf = (d: Doc) => `${d.meta.kind === "lesson" ? "/courses/" : "/modules/"}${d.meta.slug}/`;
 const linkTo = (d: Doc) => `<a href="${hrefOf(d)}">${esc(d.meta.title)}</a>`;
 const linkLine = (label: string, docs: Doc[]) => (docs.length ? `<p><span>${label}</span> ${docs.map(linkTo).join(", ")}</p>` : "");
-const SIDES: Record<string, string> = { attack: "Mostly the attacker's view", defence: "Mostly the defender's view", both: "Attack and defence" };
+const sideOf = (lang: Lang, side: string) => {
+  const p = UI[lang].panel;
+  return ({ attack: p.sideAttack, defence: p.sideDefence, both: p.sideBoth } as Record<string, string>)[side] ?? esc(side);
+};
 
 /** The panel at the top of a module: where it fits, what to read first, its other half. */
-export function moduleContext(doc: Doc): Segment {
+export function moduleContext(doc: Doc, lang: Lang = "en"): Segment {
   const m = doc.meta;
-  const need = (m.needs ?? []).flatMap((s) => findDoc(s) ?? []);
-  const pair = (m.pair ?? []).flatMap((s) => findDoc(s) ?? []);
+  const p = UI[lang].panel;
+  const need = (m.needs ?? []).flatMap((s) => findDoc(s, lang) ?? []);
+  const pair = (m.pair ?? []).flatMap((s) => findDoc(s, lang) ?? []);
   const techniques = (m.attack ?? []).filter((t) => t !== "none").map((t) => `<a href="https://attack.mitre.org/techniques/${t.replace(".", "/")}/" target="_blank" rel="noreferrer">${esc(t)}</a>`);
   const html = [
-    m.series ? `<p><span>Series</span> ${esc(m.series)}</p>` : "",
-    linkLine("Read first", need),
-    linkLine("The other side", pair),
+    m.series ? `<p><span>${p.series}</span> ${esc(m.series)}</p>` : "",
+    linkLine(p.readFirst, need),
+    linkLine(p.otherSide, pair),
     techniques.length ? `<p><span>ATT&amp;CK</span> ${techniques.join(", ")}</p>` : "",
-    m.side ? `<p><span>View</span> ${SIDES[m.side] ?? esc(m.side)}</p>` : "",
+    m.side ? `<p><span>${p.view}</span> ${sideOf(lang, m.side)}</p>` : "",
   ].join("");
-  return { kind: "html", html: `<div class="module-context noterms">${html}</div>\n` };
+  return { kind: "html", html: `<div class="module-context noterms">${lang === "fr" ? html.replace(/href="\/(?!\/)/g, 'href="/fr/') : html}</div>\n` };
 }
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -638,42 +688,40 @@ function toolPattern(d: Doc): RegExp | null {
 }
 
 /** Guides for the tools a page names, so a table row always leads somewhere. */
-export function toolGuides(doc: Doc): Segment[] {
+export function toolGuides(doc: Doc, lang: Lang = "en"): Segment[] {
   const hits = toolDocs().filter((t) => toolPattern(t)?.test(doc.text));
   if (!hits.length) return [];
-  const links = hits.map((t) => `<a href="/tools/${t.meta.slug}/">${esc(t.meta.title)}</a>`);
-  return [{ kind: "html", html: `<div class="module-context noterms"><p><span>Tool guides</span> ${links.join(", ")}</p></div>\n` }];
+  const links = hits.map((t) => `<a href="${lang === "fr" ? "/fr" : ""}/tools/${t.meta.slug}/">${esc(t.meta.title)}</a>`);
+  return [{ kind: "html", html: `<div class="module-context noterms"><p><span>${UI[lang].panel.toolGuides}</span> ${links.join(", ")}</p></div>\n` }];
 }
 
 /** Every page that uses a tool, for the panel on the tool's own page. */
-function usedIn(doc: Doc): { label: string; href: string }[] {
+function usedIn(doc: Doc, lang: Lang = "en"): { label: string; href: string }[] {
   const re = toolPattern(doc);
   if (!re) return [];
-  const lib = all();
+  const lib = all(lang);
   const rows: [Doc[], string][] = [[lib.lessons, "/courses/"], [lib.modules, "/modules/"], [lib.projects, "/projects/"]];
   return rows.flatMap(([docs, base]) => docs.filter((d) => re.test(d.text)).map((d) => ({ label: d.meta.title, href: `${base}${d.meta.slug}/` })));
 }
 
-const TIER: Record<string, string> = {
-  own: "Point this only at systems you own or have written permission to test.",
-  know: "This is an attack tool. This page explains it so that you can recognise and stop it. It shows no commands, and you should run it only in an authorised lab.",
-};
-
 /** The panel at the top of a tool's page. */
-export function toolContext(doc: Doc): Segment {
+export function toolContext(doc: Doc, lang: Lang = "en"): Segment {
   const m = doc.meta;
+  const p = UI[lang].panel;
+  const tier: Record<string, string> = { own: p.tierOwn, know: p.tierKnow };
+  const pre = lang === "fr" ? "/fr" : "";
   const near = (m.alt ?? []).map((name) => {
     const hit = toolDocs().find((d) => d.meta.slug === name || d.meta.title.toLowerCase() === name.toLowerCase());
-    return hit ? `<a href="/tools/${hit.meta.slug}/">${esc(hit.meta.title)}</a>` : esc(name);
+    return hit ? `<a href="${pre}/tools/${hit.meta.slug}/">${esc(hit.meta.title)}</a>` : esc(name);
   });
-  const used = usedIn(doc).slice(0, 12).map((u) => `<a href="${u.href}">${esc(u.label)}</a>`);
+  const used = usedIn(doc, lang).slice(0, 12).map((u) => `<a href="${pre}${u.href}">${esc(u.label)}</a>`);
   const html = [
-    m.use && TIER[m.use] ? `<p class="tool-tier"><span>Stay legal</span> ${esc(TIER[m.use] as string)}</p>` : "",
-    m.side ? `<p><span>View</span> ${SIDES[m.side] ?? esc(m.side)}</p>` : "",
-    m.docs ? `<p><span>Official docs</span> <a href="${esc(m.docs)}" target="_blank" rel="noreferrer">${esc(m.docs.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a></p>` : "",
-    m.kali ? `<p><span>Kali package</span> <code>${esc(m.kali)}</code></p>` : "",
-    near.length ? `<p><span>Similar tools</span> ${near.join(", ")}</p>` : "",
-    used.length ? `<p><span>Used in</span> ${used.join(", ")}</p>` : "",
+    m.use && tier[m.use] ? `<p class="tool-tier"><span>${p.stayLegal}</span> ${esc(tier[m.use] as string)}</p>` : "",
+    m.side ? `<p><span>${p.view}</span> ${sideOf(lang, m.side)}</p>` : "",
+    m.docs ? `<p><span>${p.officialDocs}</span> <a href="${esc(m.docs)}" target="_blank" rel="noreferrer">${esc(m.docs.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a></p>` : "",
+    m.kali ? `<p><span>${p.kali}</span> <code>${esc(m.kali)}</code></p>` : "",
+    near.length ? `<p><span>${p.similar}</span> ${near.join(", ")}</p>` : "",
+    used.length ? `<p><span>${p.usedIn}</span> ${used.join(", ")}</p>` : "",
   ].join("");
   return { kind: "html", html: `<div class="module-context noterms">${html}</div>\n` };
 }
@@ -683,18 +731,22 @@ export function trainList(links: TrainLink[]): string {
   return `<ul>${links.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label)}</a></li>`).join("")}</ul>`;
 }
 
-const PANELS = {
-  attack: { head: "Learn the attack hands-on", text: "This page teaches the defender's side. To learn the attack itself, use these legal platforms, and only against their labs or a lab you own:" },
-  practice: { head: "Practise it hands-on", text: "Courses and labs where you do this for real, on systems built for it:" },
-  tool: { head: "Practise with this tool", text: "Courses and labs that use this tool, or the job it does, on targets built for it. Point it at nothing else without written permission:" },
-  defenceTool: { head: "Practise with this tool", text: "Courses and labs that use this tool, or the job it does:" },
+const panels = (lang: Lang) => {
+  const p = UI[lang].panel;
+  return {
+    attack: { head: p.attackHead, text: p.attackText },
+    practice: { head: p.practiceHead, text: p.practiceText },
+    tool: { head: p.toolHead, text: p.toolText },
+    defenceTool: { head: p.toolHead, text: p.defenceToolText },
+  };
 };
 
 /** Which wording a page's panel takes. A tool's depends on whether it can hurt someone else's system. */
-function panelFor(key: string, side?: string) {
+function panelFor(key: string, side?: string, lang: Lang = "en") {
   const t = TRAIN[key];
   if (!t?.links.length) return null;
-  const words = side === undefined ? PANELS[t.kind] : side === "defence" ? PANELS.defenceTool : PANELS.tool;
+  const P = panels(lang);
+  const words = side === undefined ? P[t.kind] : side === "defence" ? P.defenceTool : P.tool;
   return { ...words, links: t.links };
 }
 
@@ -702,36 +754,37 @@ function panelFor(key: string, side?: string) {
  * The hands-on panel for any page with links out, or "" for one without.
  * Keys are the ones in TRAIN: a slug, a project id, "dojo:id" or "case:id".
  */
-export function trainHtml(key: string, side?: string): string {
-  const p = panelFor(key, side);
+export function trainHtml(key: string, side?: string, lang: Lang = "en"): string {
+  const p = panelFor(key, side, lang);
   if (!p) return "";
   return `<section class="train-panel noterms" id="hands-on" aria-labelledby="hands-on-head"><h2 class="train-head" id="hands-on-head">${p.head}</h2><p>${p.text}</p>${trainList(p.links)}</section>\n`;
 }
 
 /** The panel as a page segment. Lessons, modules and tools show it first; machines and projects last. */
-export function trainPanel(doc: Doc, key = doc.meta.slug): Segment[] {
-  const html = trainHtml(key, doc.meta.kind === "tool" ? (doc.meta.side ?? "both") : undefined);
+export function trainPanel(doc: Doc, key = doc.meta.slug, lang: Lang = "en"): Segment[] {
+  const html = trainHtml(key, doc.meta.kind === "tool" ? (doc.meta.side ?? "both") : undefined, lang);
   return html ? [{ kind: "html", html }] : [];
 }
 
 /** The page's contents with the panel in them, so the rail shows where the links are. */
-export function tocWith(doc: Doc, key = doc.meta.slug, at: "start" | "end" = "start"): TocEntry[] {
-  const p = panelFor(key, doc.meta.kind === "tool" ? (doc.meta.side ?? "both") : undefined);
+export function tocWith(doc: Doc, key = doc.meta.slug, at: "start" | "end" = "start", lang: Lang = "en"): TocEntry[] {
+  const p = panelFor(key, doc.meta.kind === "tool" ? (doc.meta.side ?? "both") : undefined, lang);
   if (!p) return doc.toc;
   const entry = { id: "hands-on", text: p.head };
   return at === "start" ? [entry, ...doc.toc] : [...doc.toc, entry];
 }
 
 /** Modules that build on a lesson, shown at its end. Nothing when there are none. */
-export function deeperModules(doc: Doc): Segment[] {
-  const found = modules().filter((d) => d.meta.needs?.includes(doc.meta.slug));
+export function deeperModules(doc: Doc, lang: Lang = "en"): Segment[] {
+  const found = modules(lang).filter((d) => d.meta.needs?.includes(doc.meta.slug));
   if (!found.length) return [];
-  return [{ kind: "html", html: `<div class="module-context noterms">${linkLine("Go deeper", found)}</div>\n` }];
+  const html = linkLine(UI[lang].panel.deeper, found);
+  return [{ kind: "html", html: `<div class="module-context noterms">${lang === "fr" ? html.replace(/href="\//g, 'href="/fr/') : html}</div>\n` }];
 }
 
 /** Glossary entries whose name appears in this document, for hover definitions. */
-export function termsFor(doc: Doc): Term[] {
-  const every = glossary();
+export function termsFor(doc: Doc, lang: Lang = "en"): Term[] {
+  const every = glossary(lang);
   const hit = memo.terms.get(doc);
   if (hit) return hit;
   const hay = doc.text.toLowerCase();

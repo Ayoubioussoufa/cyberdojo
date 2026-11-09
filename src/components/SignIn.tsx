@@ -6,6 +6,9 @@ import { useState } from "react";
 import { signIn, signUp, useAccount } from "@/lib/account";
 import { hasProgress } from "@/lib/merge";
 import { useStore } from "@/lib/progress";
+import { useLang } from "@/i18n/LangProvider";
+import { localize } from "@/i18n/lang";
+import { say } from "@/i18n/ui";
 
 /** Only paths on this site, so a crafted link can't send someone elsewhere after sign-in. */
 const safeNext = (search: string) => {
@@ -15,6 +18,7 @@ const safeNext = (search: string) => {
 
 export function SignIn() {
   const router = useRouter();
+  const { lang, t } = useLang();
   const { user } = useAccount();
   const store = useStore();
   const [mode, setMode] = useState<"in" | "up">("in");
@@ -26,9 +30,9 @@ export function SignIn() {
   if (user) {
     return (
       <section className="auth-card">
-        <h1>You're signed in</h1>
-        <p className="muted">Signed in as <strong>{user.username}</strong>. Your progress saves as you go.</p>
-        <Link className="btn primary" href="/">Back to training</Link>
+        <h1>{t.signin.inTitle}</h1>
+        <p className="muted">{t.signin.inAs} <strong>{user.username}</strong>. {t.signin.inSaves}</p>
+        <Link className="btn primary" href="/">{t.signin.back}</Link>
       </section>
     );
   }
@@ -40,33 +44,33 @@ export function SignIn() {
     const problem = await (mode === "in" ? signIn : signUp)(username.trim(), password);
     setBusy(false);
     if (problem) {
-      setError(problem);
+      setError(say(lang, problem));
       return;
     }
     setPassword("");
-    router.push(safeNext(window.location.search));
+    router.push(localize(safeNext(window.location.search), lang));
   };
 
   const up = mode === "up";
   return (
     <section className="auth-card">
-      <h1>{up ? "Create your account" : "Welcome back"}</h1>
-      <p className="muted">{up ? "Your belts, flags and answers follow you to any device." : "Pick up exactly where you stopped."}</p>
-      {hasProgress(store) && <p className="auth-note">The progress in this browser comes with you when you {up ? "create your account" : "sign in"}.</p>}
+      <h1>{up ? t.signin.upTitle : t.signin.welcome}</h1>
+      <p className="muted">{up ? t.signin.upLede : t.signin.inLede}</p>
+      {hasProgress(store) && <p className="auth-note">{up ? t.signin.noteUp : t.signin.noteIn}</p>}
       <form onSubmit={(e) => void submit(e)} className="auth-form">
-        <label htmlFor="auth-user">Username</label>
+        <label htmlFor="auth-user">{t.signin.username}</label>
         <input id="auth-user" name="username" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" autoCapitalize="none" spellCheck={false} required minLength={3} maxLength={32} />
-        <label htmlFor="auth-pass">Password</label>
+        <label htmlFor="auth-pass">{t.signin.password}</label>
         <input id="auth-pass" name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={up ? "new-password" : "current-password"} required minLength={up ? 12 : 1} maxLength={128} aria-describedby={up ? "auth-rule" : undefined} />
-        {up && <p id="auth-rule" className="auth-rule">At least 12 characters. A password manager is best. There's no email on your account, so a forgotten password can only be reset by whoever runs this site.</p>}
+        {up && <p id="auth-rule" className="auth-rule">{t.signin.rule}</p>}
         {error && <p className="auth-error" role="alert">{error}</p>}
-        <button type="submit" className="btn primary lg" disabled={busy}>{busy ? "One moment…" : up ? "Create account" : "Sign in"}</button>
+        <button type="submit" className="btn primary lg" disabled={busy}>{busy ? t.signin.busy : up ? t.signin.create : t.signin.submit}</button>
       </form>
       <p className="auth-swap">
-        {up ? "Already have an account?" : "New here?"}{" "}
-        <button type="button" className="link-btn" onClick={() => { setMode(up ? "in" : "up"); setError(""); }}>{up ? "Sign in" : "Create an account"}</button>
+        {up ? t.signin.haveOne : t.signin.newHere}{" "}
+        <button type="button" className="link-btn" onClick={() => { setMode(up ? "in" : "up"); setError(""); }}>{up ? t.signin.toIn : t.signin.toUp}</button>
       </p>
-      <p className="auth-guest"><Link href="/">Keep training as a guest</Link>. Your progress stays in this browser only.</p>
+      <p className="auth-guest"><Link href="/">{t.signin.guest}</Link>. {t.signin.guestNote}</p>
     </section>
   );
 }

@@ -5,6 +5,7 @@ import { CopyButton } from "./Copy";
 import type { Exercise } from "@/lib/drills";
 import { addMistake, clearMistake } from "@/lib/progress";
 import { drillMessage } from "@/lib/tutor";
+import { fill, useLang } from "@/i18n/LangProvider";
 
 export interface Outcome {
   right: boolean;
@@ -47,6 +48,7 @@ function Choice({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "choice"
 
 function TypeIn({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "input" }>; done: Outcome | null; onAnswer: (o: Outcome) => void }) {
   const [typed, setTyped] = useState("");
+  const { t } = useLang();
   return (
     <form
       className="drill-input"
@@ -56,8 +58,8 @@ function TypeIn({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "input" 
         if (t && !done) onAnswer({ right: ex.accept(t), given: t, answer: ex.answer });
       }}
     >
-      <input value={typed} disabled={!!done} onChange={(e) => setTyped(e.target.value)} placeholder={ex.placeholder} aria-label="Your answer" autoComplete="off" autoCapitalize="off" spellCheck={false} />
-      <button type="submit" className="btn" disabled={!!done || !typed.trim()}>Check</button>
+      <input value={typed} disabled={!!done} onChange={(e) => setTyped(e.target.value)} placeholder={ex.placeholder} aria-label={t.player.answer} autoComplete="off" autoCapitalize="off" spellCheck={false} />
+      <button type="submit" className="btn" disabled={!!done || !typed.trim()}>{t.cards.check}</button>
     </form>
   );
 }
@@ -91,22 +93,23 @@ function Spot({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "spot" }>;
 function Order({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "order" }>; done: Outcome | null; onAnswer: (o: Outcome) => void }) {
   const [shown] = useState(() => shuffleOnce(ex.items.length, ex.prompt));
   const [placed, setPlaced] = useState<number[]>([]);
+  const { t } = useLang();
   const finish = (seq: number[]) => {
     const right = seq.every((v, i) => v === i);
     onAnswer({ right, given: seq.map((i) => ex.items[i]).join(" → "), answer: ex.items.join(" → ") });
   };
   return (
     <div className="order">
-      <ol className="order-placed" aria-label="Your order">
+      <ol className="order-placed" aria-label={t.player.order}>
         {ex.items.map((_, i) => {
           const v = placed[i];
           const state = done && v !== undefined ? (v === i ? "right" : "wrong") : "";
           return (
             <li key={i} className={state}>
               <span className="spot-n" aria-hidden="true">{i + 1}</span>
-              {v === undefined ? <span className="muted">Tap a step below</span> : <span>{inline(ex.items[v] as string)}</span>}
+              {v === undefined ? <span className="muted">{t.player.tapStep}</span> : <span>{inline(ex.items[v] as string)}</span>}
               {v !== undefined && !done && (
-                <button type="button" className="link-btn" onClick={() => setPlaced(placed.filter((_, k) => k !== i))} aria-label="Remove this step">Undo</button>
+                <button type="button" className="link-btn" onClick={() => setPlaced(placed.filter((_, k) => k !== i))} aria-label={t.player.remove}>{t.player.undo}</button>
               )}
             </li>
           );
@@ -141,10 +144,11 @@ function Order({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "order" }
 
 function Multi({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "multi" }>; done: Outcome | null; onAnswer: (o: Outcome) => void }) {
   const [on, setOn] = useState<number[]>([]);
+  const { t } = useLang();
   const list = (ids: number[]) => ids.map((i) => ex.options[i]).join("; ");
   return (
     <div>
-      <p className="meta">Select every one that applies, then check.</p>
+      <p className="meta">{t.player.multi}</p>
       <div className="opts">
         {ex.options.map((o, i) => {
           const chosen = on.includes(i);
@@ -181,6 +185,7 @@ function Multi({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "multi" }
 function Build({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "build" }>; done: Outcome | null; onAnswer: (o: Outcome) => void }) {
   const [shown] = useState(() => shuffleOnce(ex.tokens.length, ex.prompt));
   const [placed, setPlaced] = useState<number[]>([]);
+  const { t } = useLang();
   const [output, setOutput] = useState<string | null>(null);
   const cmd = placed.map((i) => ex.tokens[i]).join(" ");
   const run = () => {
@@ -191,7 +196,7 @@ function Build({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "build" }
   };
   return (
     <div className="order">
-      <p className="build-line"><span className="term-prompt">$</span> <code>{cmd || "Tap the pieces below, in order"}</code></p>
+      <p className="build-line"><span className="term-prompt">$</span> <code>{cmd || t.player.tapPieces}</code></p>
       {!done && (
         <>
           <div className="order-pool">
@@ -200,8 +205,8 @@ function Build({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "build" }
             ))}
           </div>
           <div className="build-actions">
-            <button type="button" className="btn primary" disabled={placed.length === 0} onClick={run}>Run it</button>
-            <button type="button" className="link-btn" disabled={placed.length === 0} onClick={() => setPlaced(placed.slice(0, -1))}>Undo the last piece</button>
+            <button type="button" className="btn primary" disabled={placed.length === 0} onClick={run}>{t.player.run}</button>
+            <button type="button" className="link-btn" disabled={placed.length === 0} onClick={() => setPlaced(placed.slice(0, -1))}>{t.player.undoLast}</button>
           </div>
         </>
       )}
@@ -211,21 +216,22 @@ function Build({ ex, done, onAnswer }: { ex: Extract<Exercise, { kind: "build" }
 }
 
 function Why({ ex, out, onNext, last }: { ex: Exercise; out: Outcome; onNext: () => void; last: boolean }) {
+  const { lang, t } = useLang();
   return (
     <div className={`why ${out.right ? "ok" : "no"}`}>
       {out.right ? (
-        <p><strong>Right.</strong> {inline(ex.why)}</p>
+        <p><strong>{t.question.right}</strong> {inline(ex.why)}</p>
       ) : (
         <>
-          <p><strong>Not quite.</strong> You answered: <span className="given">{inline(out.given)}</span></p>
-          {out.whyNot && <p><strong>Why not:</strong> {inline(out.whyNot)}</p>}
-          {ex.kind !== "order" && <p><strong>Right answer:</strong> {inline(out.answer)}</p>}
-          <p><strong>Why:</strong> {inline(ex.why)}</p>
+          <p><strong>{t.question.wrong}</strong> {t.player.youAnswered} <span className="given">{inline(out.given)}</span></p>
+          {out.whyNot && <p><strong>{t.player.whyNot}</strong> {inline(out.whyNot)}</p>}
+          {ex.kind !== "order" && <p><strong>{t.mistakes.right}</strong> {inline(out.answer)}</p>}
+          <p><strong>{t.player.why}</strong> {inline(ex.why)}</p>
         </>
       )}
       <div className="why-actions">
-        {!out.right && <CopyButton className="link-btn" label="Ask my AI to teach this" done="Copied" build={() => drillMessage(ex.prompt, out.answer, out.given, ex.why)} />}
-        <button type="button" className="btn primary sm" onClick={onNext}>{last ? "See my score" : "Next"}</button>
+        {!out.right && <CopyButton className="link-btn" label={t.player.ask} done={t.common.copiedCap} build={() => drillMessage(ex.prompt, out.answer, out.given, ex.why, lang)} />}
+        <button type="button" className="btn primary sm" onClick={onNext}>{last ? t.player.score : t.common.next}</button>
       </div>
     </div>
   );
@@ -238,26 +244,27 @@ export function Player({ source, exercises, onFinish, onAgain, retry }: { source
   const [right, setRight] = useState(0);
   const [wrong, setWrong] = useState<{ ex: Exercise; out: Outcome }[]>([]);
   const [over, setOver] = useState(false);
+  const { t } = useLang();
   const ex = exercises[at];
 
   if (over || !ex) {
     const total = exercises.length;
     return (
       <div className="drill-over">
-        <p className="drill-score"><strong>{right} / {total}</strong> {right === total ? "A perfect round." : right >= total * 0.75 ? "Solid. Come back tomorrow and it will stick." : "Good: every miss below is something you've now seen properly."}</p>
+        <p className="drill-score"><strong>{right} / {total}</strong> {right === total ? t.player.perfect : right >= total * 0.75 ? t.player.solid : t.player.good}</p>
         {wrong.length > 0 && (
           <div className="missed">
-            <p className="band">What to look at again</p>
+            <p className="band">{t.player.again}</p>
             {wrong.map((w, i) => (
               <div key={i} className="missed-item">
                 <p className="mono-pre">{w.ex.prompt}</p>
-                <p><strong>Answer:</strong> {inline(w.out.answer)}</p>
+                <p><strong>{t.player.answerLabel}</strong> {inline(w.out.answer)}</p>
                 <p className="muted">{inline(w.ex.why)}</p>
               </div>
             ))}
           </div>
         )}
-        <button type="button" className="btn primary" onClick={onAgain}>Another round</button>
+        <button type="button" className="btn primary" onClick={onAgain}>{t.player.another}</button>
       </div>
     );
   }

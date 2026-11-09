@@ -6,6 +6,9 @@ import { CopyButton } from "./Copy";
 import { INTERVALS, reviewed, today, useStore } from "@/lib/progress";
 import { freshSeed, Rng } from "@/lib/rng";
 import type { Question } from "@/lib/types";
+import { fill, plural, useLang } from "@/i18n/LangProvider";
+import { localize } from "@/i18n/lang";
+import { questionMessage } from "@/lib/tutor";
 
 interface Item {
   q: Question;
@@ -15,19 +18,20 @@ interface Item {
 
 export function Review() {
   const store = useStore();
+  const { lang, t } = useLang();
   const [items, setItems] = useState<Item[]>([]);
   const tracked = Object.keys(store.srs).filter((k) => !k.startsWith("fc:")).length;
   // 400 KB of questions, so they load only for someone who has answered one.
   useEffect(() => {
     if (tracked === 0 || items.length) return;
     let live = true;
-    void fetch("/data/questions.json").then((r) => r.json() as Promise<Item[]>).then((all) => {
+    void fetch(localize("/data/questions.json", lang)).then((r) => r.json() as Promise<Item[]>).then((all) => {
       if (live) setItems(all);
     });
     return () => {
       live = false;
     };
-  }, [tracked, items.length]);
+  }, [tracked, items.length, lang]);
 
   const [session] = useState(today);
   const [pos, setPos] = useState(0);
@@ -50,20 +54,20 @@ export function Review() {
   if (!queue) {
     return (
       <div className="card review-start">
-        <p className="band">Today</p>
-        <h2>{dueNow.length} question{dueNow.length === 1 ? "" : "s"} due</h2>
-        <p className="muted">{tracked === 0 ? "Answer questions in a lesson and they'll appear here, spaced out so they stick." : `${tracked} questions in rotation. Right answers come back after ${INTERVALS.join(", ")} days. A wrong answer comes back tomorrow.`}</p>
-        {dueNow.length > 0 ? <button type="button" className="btn primary lg" onClick={start}>Start review</button> : <Link className="btn lg" href="/courses/">Go to the courses</Link>}
+        <p className="band">{t.review.today}</p>
+        <h2>{plural(lang, t.review.due, dueNow.length)}</h2>
+        <p className="muted">{tracked === 0 ? t.review.empty : fill(t.review.rotation, { n: tracked, days: INTERVALS.join(", ") })}</p>
+        {dueNow.length > 0 ? <button type="button" className="btn primary lg" onClick={start}>{t.review.start}</button> : <Link className="btn lg" href="/courses/">{t.review.toCourses}</Link>}
       </div>
     );
   }
   if (!item) {
     return (
       <div className="card review-start">
-        <p className="band">Done</p>
-        <h2>{right} of {queue.length} right</h2>
-        <p className="muted">Getting some wrong is how this works: effortful recall is what builds memory.</p>
-        <button type="button" className="btn lg" onClick={() => setQueue(null)}>Back</button>
+        <p className="band">{t.review.done}</p>
+        <h2>{fill(t.review.score, { right, total: queue.length })}</h2>
+        <p className="muted">{t.review.wrongOk}</p>
+        <button type="button" className="btn lg" onClick={() => setQueue(null)}>{t.review.back}</button>
       </div>
     );
   }
@@ -72,7 +76,7 @@ export function Review() {
   return (
     <section className="qcard review-q">
       <header className="qcard-head">
-        <span className="qcard-tag">{pos + 1} of {queue.length}</span>
+        <span className="qcard-tag">{fill(t.review.of, { n: pos + 1, total: queue.length })}</span>
         <Link className="link-btn" href={item.href}>{item.title}</Link>
       </header>
       <p className="qcard-prompt" dangerouslySetInnerHTML={{ __html: q.promptHtml }} />
@@ -96,10 +100,10 @@ export function Review() {
       </div>
       {shown && (
         <div className={`why ${picked === q.correct ? "ok" : "no"}`}>
-          <strong>{picked === q.correct ? "Right." : "Not quite."}</strong> <span dangerouslySetInnerHTML={{ __html: q.whyHtml }} />
+          <strong>{picked === q.correct ? t.question.right : t.question.wrong}</strong> <span dangerouslySetInnerHTML={{ __html: q.whyHtml }} />
           <div className="why-actions">
-            <CopyButton className="link-btn" label="Ask my AI about this" done="Copied" build={() => `You are my cybersecurity tutor. I'm a beginner, so assume nothing. Explain this question from scratch, why the right answer is right and why the others are wrong:\n\n${q.prompt}\n${q.options.map((o, i) => `${String.fromCharCode(65 + i)}) ${o}`).join("\n")}\n\nRight answer: ${q.options[q.correct]}\nMy answer: ${q.options[picked ?? 0]}`} />
-            <button type="button" className="btn primary sm" onClick={() => { setPos(pos + 1); setPicked(null); }}>Next</button>
+            <CopyButton className="link-btn" label={t.question.ask} done={t.common.copiedCap} build={() => questionMessage({ slug: "", kind: "lesson", title: item.title, summary: "", number: 0, words: [], questions: [], written: [] }, q, { ...store, picks: { ...store.picks, [q.id]: picked ?? 0 } }, lang)} />
+            <button type="button" className="btn primary sm" onClick={() => { setPos(pos + 1); setPicked(null); }}>{t.common.next}</button>
           </div>
         </div>
       )}

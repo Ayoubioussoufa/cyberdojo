@@ -5,9 +5,11 @@ import { CopyButton } from "./Copy";
 import { answer, getStore, useSlice } from "@/lib/progress";
 import { questionMessage } from "@/lib/tutor";
 import type { DocBrief, Question as Q } from "@/lib/types";
+import { fill, useLang } from "@/i18n/LangProvider";
 
 /** Inline check: pick, get told why at once, or send it to the AI tutor. */
 export function QuestionCard({ q, doc, n }: { q: Q; doc: DocBrief; n: number }) {
+  const { lang, t } = useLang();
   const saved = useSlice((s) => s.picks[q.id]);
   const [fresh, setFresh] = useState<number | null>(null);
   const [retry, setRetry] = useState(false);
@@ -21,10 +23,10 @@ export function QuestionCard({ q, doc, n }: { q: Q; doc: DocBrief; n: number }) 
   };
 
   return (
-    <section className="qcard" aria-label={`Check question ${n}`}>
+    <section className="qcard" aria-label={fill(t.question.label, { n })}>
       <header className="qcard-head">
-        <span className="qcard-tag">Check {n}</span>
-        <CopyButton className="link-btn" label="Ask my AI about this" done="Copied" build={() => questionMessage(doc, q, getStore())} />
+        <span className="qcard-tag">{fill(t.question.tag, { n })}</span>
+        <CopyButton className="link-btn" label={t.question.ask} done={t.common.copiedCap} build={() => questionMessage(doc, q, getStore(), lang)} />
       </header>
       <p className="qcard-prompt noterms" dangerouslySetInnerHTML={{ __html: q.promptHtml }} />
       <div className="opts">
@@ -40,7 +42,7 @@ export function QuestionCard({ q, doc, n }: { q: Q; doc: DocBrief; n: number }) 
       </div>
       {shown && (
         <div className={`why ${picked === q.correct ? "ok" : "no"}`}>
-          <strong>{picked === q.correct ? "Right." : "Not quite."}</strong>{" "}
+          <strong>{picked === q.correct ? t.question.right : t.question.wrong}</strong>{" "}
           <span dangerouslySetInnerHTML={{ __html: q.whyHtml }} />
           <button
             type="button"
@@ -50,7 +52,7 @@ export function QuestionCard({ q, doc, n }: { q: Q; doc: DocBrief; n: number }) 
               setRetry(true);
             }}
           >
-            Try again
+            {t.question.again}
           </button>
         </div>
       )}

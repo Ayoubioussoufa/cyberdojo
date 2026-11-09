@@ -2,31 +2,36 @@
 
 import Link from "@/components/HoverLink";
 import { usePathname } from "next/navigation";
+import { useLang } from "@/i18n/LangProvider";
+import { splitLang } from "@/i18n/lang";
+import type { Dict } from "@/i18n/ui";
 
-const GROUPS = {
+type Tab = { href: string; label: keyof Dict["subnav"] };
+const GROUPS: Record<"practice" | "library", Tab[]> = {
   practice: [
-    { href: "/practice/", label: "Exercises" },
-    { href: "/machines/", label: "Machines" },
-    { href: "/review/", label: "Daily review" },
-    { href: "/practice/flashcards/", label: "Flashcards" },
-    { href: "/practice/labs/", label: "Hands-on labs" },
+    { href: "/practice/", label: "exercises" },
+    { href: "/machines/", label: "machines" },
+    { href: "/review/", label: "review" },
+    { href: "/practice/flashcards/", label: "flashcards" },
+    { href: "/practice/labs/", label: "labs" },
   ],
   library: [
-    { href: "/library/", label: "All" },
-    { href: "/guides/", label: "Handbook" },
-    { href: "/sheets/", label: "Cheat sheets" },
-    { href: "/glossary/", label: "Glossary" },
-    { href: "/resources/", label: "Resources" },
+    { href: "/library/", label: "all" },
+    { href: "/guides/", label: "handbook" },
+    { href: "/sheets/", label: "sheets" },
+    { href: "/glossary/", label: "glossary" },
+    { href: "/resources/", label: "resources" },
   ],
 };
 
 /** Tabs inside Practice and Library. */
 export function Subnav({ group }: { group: keyof typeof GROUPS }) {
-  const path = usePathname();
+  const path = splitLang(usePathname()).path;
+  const { t } = useLang();
   return (
-    <nav className="subnav" aria-label={group === "practice" ? "Practice" : "Library"}>
+    <nav className="subnav" aria-label={t.subnav[group]}>
       {GROUPS[group].map((l) => (
-        <Link key={l.href} href={l.href} className={path === l.href ? "on" : ""} aria-current={path === l.href ? "page" : undefined}>{l.label}</Link>
+        <Link key={l.href} href={l.href} className={path === l.href ? "on" : ""} aria-current={path === l.href ? "page" : undefined}>{t.subnav[l.label]}</Link>
       ))}
     </nav>
   );

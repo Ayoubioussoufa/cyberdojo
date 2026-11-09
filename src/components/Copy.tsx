@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { copyText } from "@/lib/tutor";
+import { useLang } from "@/i18n/LangProvider";
 
 /** A button that copies a message built at click time, so it's always current. */
 export function CopyButton({
   build,
   label,
   className = "btn",
-  done = "Copied. Paste it into your AI",
+  done,
 }: {
   build: () => string;
   label: string;
@@ -16,6 +17,7 @@ export function CopyButton({
   done?: string;
 }) {
   const [state, setState] = useState<"idle" | "ok" | "fail">("idle");
+  const { t } = useLang();
   return (
     <button
       type="button"
@@ -26,7 +28,7 @@ export function CopyButton({
         window.setTimeout(() => setState("idle"), 2200);
       }}
     >
-      <span aria-live="polite">{state === "ok" ? done : state === "fail" ? "Couldn't copy" : label}</span>
+      <span aria-live="polite">{state === "ok" ? (done ?? t.copy.done) : state === "fail" ? t.copy.fail : label}</span>
     </button>
   );
 }

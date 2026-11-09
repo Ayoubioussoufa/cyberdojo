@@ -1,5 +1,6 @@
 "use client";
 
+import { fill, useLang } from "@/i18n/LangProvider";
 import { useState } from "react";
 import { Player } from "./Player";
 import { DRILLS, type Exercise } from "@/lib/drills";
@@ -18,6 +19,7 @@ export function Drill({ id, roundSize = ROUND, bare = false }: { id: string; rou
   if (!drill) return <p className="muted">Drill {id} is missing.</p>;
   const size = Math.min(roundSize, drill.deck ?? roundSize);
   const best = store.drills[id];
+  const { lang, t } = useLang();
   const start = () => {
     const d = deal(drill, size, freshSeed(), store.seen[id] ?? []);
     if (drill.deck) markSeen(id, d.rows, drill.deck);
@@ -25,9 +27,9 @@ export function Drill({ id, roundSize = ROUND, bare = false }: { id: string; rou
   };
   return (
     <section className="drill">
-      <span className="band">Practice, {drill.deck ? `${drill.deck} questions in rotation` : "new numbers every round"}</span>
-      {!bare && <h3 className="noterms">{drill.title}</h3>}
-      {!bare && <p className="muted noterms">{drill.blurb}</p>}
+      <span className="band">{drill.deck ? fill(t.player.deck, { n: drill.deck }) : t.player.fresh}</span>
+      {!bare && <h3 className="noterms" lang={lang === "en" ? undefined : "en"}>{drill.title}</h3>}
+      {!bare && <p className="muted noterms" lang={lang === "en" ? undefined : "en"}>{drill.blurb}</p>}
       {round ? (
         <Player key={round.n} source={id} exercises={round.exercises} onFinish={(r) => roundDone(id, r, round.exercises.length)} onAgain={start} />
       ) : (

@@ -1,5 +1,6 @@
 "use client";
 
+import { fill, useLang } from "@/i18n/LangProvider";
 import Link from "@/components/HoverLink";
 import { useStore } from "@/lib/progress";
 
@@ -11,29 +12,31 @@ interface Tile {
 }
 
 const GROUPS = [
-  { name: "Foundations", from: 0, to: 3 },
-  { name: "Code, Windows, web and crypto", from: 4, to: 8 },
-  { name: "Defending: SOC, detection and response", from: 9, to: 11 },
-  { name: "Risk and frameworks", from: 12, to: 12 },
-  { name: "Cloud, forensics and intelligence", from: 13, to: 16 },
-  { name: "AppSec, Kubernetes and AI", from: 17, to: 24 },
-];
+  { name: "g1", from: 0, to: 3 },
+  { name: "g2", from: 4, to: 8 },
+  { name: "g3", from: 9, to: 11 },
+  { name: "g4", from: 12, to: 12 },
+  { name: "g5", from: 13, to: 16 },
+  { name: "g6", from: 17, to: 24 },
+] as const;
 
 const Best = ({ id }: { id: string }) => {
   const store = useStore();
   const b = store.drills[id];
-  return b ? <span className="meta tile-best">Best {Math.round(b.best * 100)}%</span> : null;
+  const { t } = useLang();
+  return b ? <span className="meta tile-best">{fill(t.hub.best, { n: Math.round(b.best * 100) })}</span> : null;
 };
 
 export function DrillGroups({ drills }: { drills: Tile[] }) {
+  const { lang, t } = useLang();
   return (
     <>
       {GROUPS.map((g) => {
         const list = drills.filter((d) => d.month >= g.from && d.month <= g.to);
         return (
           <details key={g.name} className="drill-group">
-            <summary>{g.name} <span className="path-count">{list.length}</span></summary>
-            <div className="grid3">
+            <summary>{t.hub[g.name]} <span className="path-count">{list.length}</span></summary>
+            <div className="grid3" lang={lang === "en" ? undefined : "en"}>
               {list.map((d) => (
                 <Link key={d.id} href={`/practice/${d.id}/`} className="card link-card">
                   <h3>{d.title}</h3>
@@ -52,17 +55,18 @@ export function DrillGroups({ drills }: { drills: Tile[] }) {
 export function PracticeTop() {
   const store = useStore();
   const n = store.mistakes.length;
+  const { t } = useLang();
   return (
     <div className="mix-row">
       <Link href="/practice/mix/" className="card link-card mix-card">
-        <span className="band">Start here, most days</span>
-        <h2>Today's mix</h2>
-        <p className="muted">Ten mixed questions from everything you've reached. Ten minutes, and a different set each time.</p>
+        <span className="band">{t.hub.mixBand}</span>
+        <h2>{t.pages.mixTitle}</h2>
+        <p className="muted">{t.hub.mixText}</p>
       </Link>
       <Link href="/practice/mistakes/" className="card link-card">
-        <span className="band">Your mistakes</span>
-        <h2>{n ? `${n} to retry` : "None yet"}</h2>
-        <p className="muted">Anything you get wrong stays here, with its explanation, until you've got it right.</p>
+        <span className="band">{t.pages.mistakesTitle}</span>
+        <h2>{n ? fill(t.hub.toRetry, { n }) : t.hub.none}</h2>
+        <p className="muted">{t.hub.mistakesText}</p>
       </Link>
     </div>
   );

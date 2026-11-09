@@ -41,7 +41,8 @@ function walk(dir: string, out: string[] = []): string[] {
 
 function load(): Doc[] {
   const docs: Doc[] = [];
-  for (const file of walk("content").filter((f) => f.endsWith(".md"))) {
+  // content/fr holds translations of pages already counted in English.
+  for (const file of walk("content").filter((f) => f.endsWith(".md") && !f.startsWith(path.join("content", "fr")))) {
     const raw = fs.readFileSync(file, "utf8");
     const front = /^---\n([\s\S]*?)\n---\n/.exec(raw)?.[1] ?? "";
     const named = front.split("\n").filter((l) => /^(title|summary|words):/.test(l)).join("\n");

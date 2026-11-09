@@ -5,10 +5,11 @@ import { CopyButton } from "./Copy";
 import { CASE_MAP, type Choice } from "@/lib/cases";
 import { roundDone } from "@/lib/progress";
 import { freshSeed, Rng } from "@/lib/rng";
+import { useLang } from "@/i18n/LangProvider";
+import { fill as fillMsg } from "@/i18n/lang";
 
 const inline = (s: string) => s.split(/(`[^`]+`)/).map((p, i) => (p.startsWith("`") && p.length > 1 ? <code key={i}>{p.slice(1, -1)}</code> : p));
 
-const END_LABEL = { good: "Good outcome", mixed: "Mixed outcome", bad: "Bad outcome" };
 
 /** Plays one branching case. Details change each time, and paths differ. */
 export function CaseFilePlayer({ id }: { id: string }) {
@@ -26,11 +27,14 @@ export function CaseFilePlayer({ id }: { id: string }) {
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<Choice | null>(null);
   const [log, setLog] = useState<{ q: string; choice: string; note: string; score: number }[]>([]);
-  if (!file) return <p className="muted">Case {id} is missing.</p>;
+  const { lang, t } = useLang();
+  const C = t.caseFile;
+  const END_LABEL = { good: C.good, mixed: C.mixed, bad: C.bad };
+  if (!file) return <p className="muted">{fillMsg(C.missing, { id })}</p>;
 
   const fill = (s: string) => s.replace(/\{(\w+)\}/g, (_, k: string) => vars[k] ?? "");
   const node = file.nodes.find((n) => n.id === at);
-  if (!node) return <p className="muted">This case has a broken step.</p>;
+  if (!node) return <p className="muted">{C.broken}</p>;
   const max = 3 * 5;
 
   const restart = () => {
@@ -47,10 +51,10 @@ export function CaseFilePlayer({ id }: { id: string }) {
       <section className={`case-end ${node.end}`}>
         <p className="band">{END_LABEL[node.end]}</p>
         <p className="case-text">{inline(fill(node.text))}</p>
-        <p className="case-score"><strong>{stars} of 3 stars</strong>, {score} of about {max} points</p>
-        <h3 className="noterms">What an expert would have done</h3>
+        <p className="case-score"><strong>{fillMsg(C.stars, { n: stars })}</strong>, {fillMsg(C.points, { n: score, max })}</p>
+        <h3 className="noterms">{C.expert}</h3>
         <p>{inline(fill(file.debrief))}</p>
-        <h3 className="noterms">Your decisions</h3>
+        <h3 className="noterms">{C.decisions}</h3>
         <ol className="case-log">
           {log.map((l, i) => (
             <li key={i}>
@@ -60,8 +64,8 @@ export function CaseFilePlayer({ id }: { id: string }) {
           ))}
         </ol>
         <div className="why-actions">
-          <CopyButton className="link-btn" label="Ask my AI to go through this" done="Copied" build={() => `You are my cybersecurity tutor, and I'm a beginner. I just played a practice case called "${file.title}" as a ${file.role}. Go through my decisions, and teach me the reasoning behind each one. Then give me a similar situation to reason through.\n\n${log.map((l, i) => `${i + 1}. Situation: ${l.q}\n   I chose: ${l.choice}\n   Feedback: ${l.note}`).join("\n")}\n\nOutcome: ${END_LABEL[node.end ?? "mixed"]}`} />
-          <button type="button" className="btn primary sm" onClick={restart}>Play it again</button>
+          <CopyButton className="link-btn" label={C.ask} done={t.common.copiedCap} build={() => `${fillMsg(C.prompt, { title: file.title, role: file.role })}\n\n${log.map((l, i) => `${i + 1}. ${C.situation} ${l.q}\n   ${C.chose} ${l.choice}\n   ${C.feedback} ${l.note}`).join("\n")}\n\n${C.outcome} ${END_LABEL[node.end ?? "mixed"]}`} />
+          <button type="button" className="btn primary sm" onClick={restart}>{C.again}</button>
         </div>
       </section>
     );
@@ -81,10 +85,10 @@ export function CaseFilePlayer({ id }: { id: string }) {
   };
 
   return (
-    <section className="case">
+    <section className="case" lang={lang === "en" ? undefined : "en"}>
       <p className="case-text">{inline(fill(node.text))}</p>
       {node.evidence && <pre className="case-evidence">{fill(node.evidence)}</pre>}
-      <p className="case-ask">What do you do?</p>
+      <p className="case-ask">{C.what}</p>
       <div className="opts">
         {node.choices?.map((c, i) => {
           const on = picked === c;
@@ -99,8 +103,8 @@ export function CaseFilePlayer({ id }: { id: string }) {
       </div>
       {picked && (
         <div className={`why ${picked.score > 0 ? "ok" : picked.score < 0 ? "no" : ""}`}>
-          <p><strong>{picked.score > 0 ? "Good call." : picked.score < 0 ? "That will cost you." : "Hmm."}</strong> {inline(fill(picked.note))}</p>
-          <div className="why-actions"><button type="button" className="btn primary sm" onClick={go}>Continue</button></div>
+          <p><strong>{picked.score > 0 ? C.goodCall : picked.score < 0 ? C.cost : C.hmm}</strong> {inline(fill(picked.note))}</p>
+          <div className="why-actions"><button type="button" className="btn primary sm" onClick={go}>{t.dojoHub.continue}</button></div>
         </div>
       )}
     </section>

@@ -1,11 +1,13 @@
 "use client";
 
+import { fill, useLang } from "@/i18n/LangProvider";
 import { HoverLink } from "./HoverLink";
 import { useStore } from "@/lib/progress";
 import type { DocMeta } from "@/lib/types";
 
 export function DocRows({ docs, base }: { docs: DocMeta[]; base: string }) {
   const store = useStore();
+  const { t } = useLang();
   return (
     <ol className="rows">
       {docs.map((d) => {
@@ -18,7 +20,7 @@ export function DocRows({ docs, base }: { docs: DocMeta[]; base: string }) {
                 <span className="row-title">{d.title}</span>
                 <span className="row-sub">{d.summary}</span>
               </span>
-              <span className="row-meta">{d.minutes} min</span>
+              <span className="row-meta">{fill(t.common.min, { n: d.minutes })}</span>
             </HoverLink>
           </li>
         );

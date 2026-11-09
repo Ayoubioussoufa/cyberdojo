@@ -4,18 +4,20 @@ import Link from "@/components/HoverLink";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { changePassword, deleteAccount, signOut, useAccount } from "@/lib/account";
+import { fill, plural, useLang } from "@/i18n/LangProvider";
 import { exportStore } from "@/lib/progress";
 
-const LABEL = { idle: "Saved", saving: "Saving…", saved: "Saved", offline: "Not saved yet: can't reach the server" } as const;
+import { say } from "@/i18n/ui";
 
 function Password() {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const { lang, t } = useLang();
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const problem = await changePassword(current, next);
-    setMsg(problem ? { ok: false, text: problem } : { ok: true, text: "Password changed. Every other device has been signed out." });
+    setMsg(problem ? { ok: false, text: say(lang, problem) } : { ok: true, text: t.account.changed });
     if (!problem) {
       setCurrent("");
       setNext("");
@@ -23,15 +25,15 @@ function Password() {
   };
   return (
     <section className="acct-part">
-      <h2>Change your password</h2>
-      <p className="muted">Changing it signs out every other device, so it's also what to do if you think someone else got in.</p>
+      <h2>{t.account.changeTitle}</h2>
+      <p className="muted">{t.account.changeText}</p>
       <form className="auth-form" onSubmit={(e) => void submit(e)}>
-        <label htmlFor="pw-now">Current password</label>
+        <label htmlFor="pw-now">{t.account.current}</label>
         <input id="pw-now" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} autoComplete="current-password" required />
-        <label htmlFor="pw-new">New password</label>
+        <label htmlFor="pw-new">{t.account.new}</label>
         <input id="pw-new" type="password" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" required minLength={12} maxLength={128} />
         {msg && <p className={msg.ok ? "auth-ok" : "auth-error"} role="status">{msg.text}</p>}
-        <button type="submit" className="btn">Change password</button>
+        <button type="submit" className="btn">{t.account.change}</button>
       </form>
     </section>
   );
@@ -42,26 +44,27 @@ function Delete() {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { lang, t } = useLang();
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const problem = await deleteAccount(password);
-    if (problem) setError(problem);
-    else router.push("/");
+    if (problem) setError(say(lang, problem));
+    else router.push(lang === "fr" ? "/fr/" : "/");
   };
   return (
     <section className="acct-part">
-      <h2>Delete your account</h2>
-      <p className="muted">This erases your account and all your saved progress from the server. It can't be undone. Download a copy first if you want to keep it.</p>
+      <h2>{t.account.deleteTitle}</h2>
+      <p className="muted">{t.account.deleteText}</p>
       {!open ? (
-        <button type="button" className="btn danger" onClick={() => setOpen(true)}>Delete my account</button>
+        <button type="button" className="btn danger" onClick={() => setOpen(true)}>{t.account.deleteMine}</button>
       ) : (
         <form className="auth-form" onSubmit={(e) => void submit(e)}>
-          <label htmlFor="del-pw">Enter your password to confirm</label>
+          <label htmlFor="del-pw">{t.account.confirm}</label>
           <input id="del-pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
           {error && <p className="auth-error" role="alert">{error}</p>}
           <div className="acct-row">
-            <button type="submit" className="btn danger">Erase everything</button>
-            <button type="button" className="btn" onClick={() => setOpen(false)}>Keep my account</button>
+            <button type="submit" className="btn danger">{t.account.erase}</button>
+            <button type="button" className="btn" onClick={() => setOpen(false)}>{t.account.keep}</button>
           </div>
         </form>
       )}
@@ -73,14 +76,15 @@ export function Account() {
   const { ready, user, sync } = useAccount();
   const router = useRouter();
   const [error, setError] = useState("");
+  const { lang, t } = useLang();
 
-  if (!ready) return <p className="muted" aria-busy="true">Checking your account…</p>;
+  if (!ready) return <p className="muted" aria-busy="true">{t.account.checking}</p>;
   if (!user) {
     return (
       <header className="page-head">
-        <h1>You're training as a guest</h1>
-        <p className="lede">Your progress lives in this browser. An account keeps it safe and takes it to your other devices.</p>
-        <p><Link className="btn primary lg" href="/signin/?next=/account/">Sign in or create an account</Link></p>
+        <h1>{t.account.guestTitle}</h1>
+        <p className="lede">{t.account.guestText}</p>
+        <p><Link className="btn primary lg" href={`/signin/?next=${encodeURIComponent(lang === "fr" ? "/fr/account/" : "/account/")}`}>{t.account.signIn}</Link></p>
       </header>
     );
   }
@@ -95,22 +99,23 @@ export function Account() {
   };
   const leave = async () => {
     const problem = await signOut();
-    if (problem) setError(problem);
-    else router.push("/");
+    if (problem) setError(say(lang, problem));
+    else router.push(lang === "fr" ? "/fr/" : "/");
   };
+  const label = { idle: t.account.saved, saving: t.account.saving, saved: t.account.saved, offline: t.account.offline };
 
   return (
     <>
       <header className="page-head">
         <h1>{user.username}</h1>
-        <p className="lede">Training since {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}.</p>
+        <p className="lede">{fill(t.account.since, { date: new Date(user.createdAt).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { year: "numeric", month: "long", day: "numeric" }) })}</p>
       </header>
       <section className="acct-part">
-        <h2>Your progress</h2>
-        <p className="acct-sync" data-state={sync}>{LABEL[sync]}</p>
+        <h2>{t.account.progress}</h2>
+        <p className="acct-sync" data-state={sync}>{label[sync]}</p>
         <div className="acct-row">
-          <button type="button" className="btn" onClick={download}>Download a copy</button>
-          <button type="button" className="btn" onClick={() => void leave()}>Sign out</button>
+          <button type="button" className="btn" onClick={download}>{t.account.download}</button>
+          <button type="button" className="btn" onClick={() => void leave()}>{t.account.signOut}</button>
         </div>
         {error && <p className="auth-error" role="alert">{error}</p>}
       </section>

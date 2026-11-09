@@ -1,12 +1,18 @@
 "use client";
 
+import { useLang } from "@/i18n/LangProvider";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
 const Waiting = ({ label }: { label: string }) => <section className="range range-wait" aria-busy="true" aria-label={label} />;
 
-const Drill = dynamic(() => import("./Drill").then((m) => m.Drill), { ssr: false, loading: () => <Waiting label="Loading the exercises" /> });
-const Range = dynamic(() => import("./Range").then((m) => m.Range), { ssr: false, loading: () => <Waiting label="Loading the terminal" /> });
+const Loading = ({ what }: { what: "drill" | "range" }) => {
+  const { t } = useLang();
+  return <Waiting label={what === "drill" ? t.misc.loadingDrill : t.misc.loadingRange} />;
+};
+
+const Drill = dynamic(() => import("./Drill").then((m) => m.Drill), { ssr: false, loading: () => <Loading what="drill" /> });
+const Range = dynamic(() => import("./Range").then((m) => m.Range), { ssr: false, loading: () => <Loading what="range" /> });
 
 /** Keeps heavy parts out of the first load: their code arrives as the reader gets near. */
 function WhenNear({ label, children }: { label: string; children: React.ReactNode }) {
@@ -25,9 +31,9 @@ function WhenNear({ label, children }: { label: string; children: React.ReactNod
 }
 
 export const LazyDrill = ({ id, roundSize, bare }: { id: string; roundSize?: number; bare?: boolean }) => (
-  <WhenNear label="Exercises"><Drill id={id} bare={bare} {...(roundSize ? { roundSize } : {})} /></WhenNear>
+  <WhenNear label={useLang().t.misc.exercises}><Drill id={id} bare={bare} {...(roundSize ? { roundSize } : {})} /></WhenNear>
 );
 
 export const LazyRange = ({ id, bare }: { id: string; bare?: boolean }) => (
-  <WhenNear label="Terminal"><Range id={id} bare={bare} /></WhenNear>
+  <WhenNear label={useLang().t.misc.terminal}><Range id={id} bare={bare} /></WhenNear>
 );

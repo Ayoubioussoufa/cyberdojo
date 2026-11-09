@@ -2,7 +2,7 @@
 
 <!-- Written by scripts/tools/index.ts. Edit the tool pages, then run pnpm audit:tools. -->
 
-148 tool guides, plus an A to Z of 895 names at [/tools/all/](../src/app/tools/all/page.tsx).
+148 tool guides, plus an A to Z of 895 names at [/tools/all/](../src/app/[lang]/tools/all/page.tsx).
 
 Every guide says what the tool is for and how it works, then what defenders see. How much it shows depends on its `use` field:
 

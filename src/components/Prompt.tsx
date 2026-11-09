@@ -4,7 +4,10 @@ import Link from "@/components/HoverLink";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { signOut, useAccount } from "@/lib/account";
-import { SECTIONS, completions, isPath, knownPaths, listing, parse, rank, resolvePath, type Target } from "@/lib/prompt";
+import { sectionsFor, completions, isPath, knownPaths, listing, parse, rank, resolvePath, type Target } from "@/lib/prompt";
+import { fill, plural, useLang } from "@/i18n/LangProvider";
+import { localize, splitLang, type Lang } from "@/i18n/lang";
+import { say, type Dict } from "@/i18n/ui";
 
 interface Hit {
   title: string;
@@ -15,11 +18,13 @@ interface Hit {
 /** The whole course, from the search index. Fetched the first time someone focuses the line. */
 let course: Target[] | null = null;
 let loading: Promise<void> | null = null;
-function loadCourse(): Promise<void> {
-  loading ??= fetch("/data/search.json")
+/** One language per page load: the language switch reloads the page, so this cache never mixes them. */
+function loadCourse(lang: Lang, t: Dict): Promise<void> {
+  loading ??= fetch(localize("/data/search.json", lang))
     .then((r) => r.json() as Promise<Hit[]>)
     .then((hits) => {
-      course = hits.map((h) => ({ label: h.title, href: h.href, detail: h.kind, tier: 0 }));
+      const kinds = t.kind as Record<string, string>;
+      course = hits.map((h) => ({ label: h.title, href: h.href, detail: kinds[h.kind] ?? h.kind, tier: 0 }));
     })
     .catch(() => {
       loading = null;
@@ -29,8 +34,9 @@ function loadCourse(): Promise<void> {
 
 const clean = (s: string | null | undefined) => (s ?? "").replace(/\s+/g, " ").trim();
 
-/** Every link and heading you can see in the page itself, so you can type what you're looking at. */
-function onThisPage(): Target[] {
+/** Every link and heading you can see in the page itself, so you can type what you're looking at. Site paths come back without the /fr prefix. */
+function onThisPage(t: Dict): Target[] {
+  const here = t.prompt.onPage;
   const main = document.getElementById("main");
   if (!main) return [];
   const out: Target[] = [];
@@ -49,14 +55,15 @@ function onThisPage(): Target[] {
       const host = url.hostname.replace(/^www\./, "");
       out.push({ label, href: url.href, detail: `${host} ↗`, tier: 2 });
     } else if (url.pathname === location.pathname && url.hash) {
-      out.push({ label, href: url.hash, detail: "on this page", tier: 1 });
+      out.push({ label, href: url.hash, detail: here, tier: 1 });
     } else {
-      out.push({ label, href: url.pathname + url.search + url.hash, detail: `~${url.pathname}`, tier: 2 });
+      const site = splitLang(url.pathname).path;
+      out.push({ label, href: site + url.search + url.hash, detail: `~${site}`, tier: 2 });
     }
   }
   for (const h of main.querySelectorAll<HTMLElement>("h2[id], h3[id]")) {
     const label = clean(h.textContent);
-    if (label) out.push({ label, href: `#${h.id}`, detail: "on this page", tier: 1 });
+    if (label) out.push({ label, href: `#${h.id}`, detail: here, tier: 1 });
   }
   return out;
 }
@@ -69,16 +76,20 @@ type Out =
 
 const NONE: Out = { kind: "none" };
 
-const HELP: [string, string][] = [
-  ["practice, handbook, sign in", "Any part of the site, by its name."],
-  ["what you see on the page", "Any link or heading on this page. On Library, handbook opens the Handbook."],
-  ["nmap, kerberos, 0047", "Any lesson, module, tool, challenge or term in the course."],
-  ["cd ..   cd -   cd /tools/all", "Paths work as in a shell: up a level, back to the last page, anywhere."],
-  ["ls   ls /courses", "The links on this page, or the pages inside a folder."],
-  ["pwd   whoami   history   clear", "Where you are, who you are, what you typed, a clean line."],
-  ["Space   PgDn   PgUp   Home   End", "Scroll the page while the line is empty."],
-  ["Esc   Tab   /", "Esc hands the keys to the page, Tab walks through its links, / brings you back."],
-];
+/** The help rows: what to type, then what it does. The examples to type are the language's own. */
+const helpRows = (t: Dict): [string, string][] => {
+  const P = t.prompt;
+  return [
+    [P.h1ex, P.h1],
+    [P.h2ex, P.h2],
+    ["nmap, kerberos, 0047", P.h3],
+    ["cd ..   cd -   cd /tools/all", P.h4],
+    ["ls   ls /courses", P.h5],
+    ["pwd   whoami   history   clear", P.h6],
+    [P.h7ex, P.h7],
+    ["Esc   Tab   /", P.h8],
+  ];
+};
 
 const here = (to: string): Target => ({ label: to, href: to, detail: "", tier: 3 });
 
@@ -92,8 +103,11 @@ const keyboardFirst = () => matchMedia("(hover: hover) and (pointer: fine)").mat
  * focus on every page, so the whole site works without a mouse; / brings it back.
  */
 export function Prompt() {
-  const path = usePathname() ?? "/";
+  const path = splitLang(usePathname() ?? "/").path;
   const router = useRouter();
+  const { lang, t } = useLang();
+  const P = t.prompt;
+  const sections = sectionsFor(lang);
   const { ready, user } = useAccount();
   const parts = path.split("/").filter(Boolean);
   const name = ready && user ? user.username : "guest";
@@ -111,8 +125,8 @@ export function Prompt() {
   const last = useRef(path);
   const prev = useRef<string | null>(null);
 
-  const everything = () => [...SECTIONS, ...onThisPage(), ...(course ?? [])];
-  const known = () => knownPaths(everything());
+  const everything = () => [...sections, ...onThisPage(t), ...(course ?? [])];
+  const known = () => knownPaths(everything(), t.nav.today);
 
   /** The live list under the line while you type. */
   const suggest = (v: string): Out => {
@@ -133,7 +147,7 @@ export function Prompt() {
   const change = (v: string, fromHistory = false) => {
     // The course index loads on the first keystroke, not on focus: the line is focused on every page.
     if (!course) {
-      void loadCourse().then(() => {
+      void loadCourse(lang, t).then(() => {
         if (typed.current.trim()) setOut(suggest(typed.current));
       });
     }
@@ -176,24 +190,24 @@ export function Prompt() {
     if (!keyboardFirst()) input.current?.blur();
     if (/^https?:/.test(t.href)) window.open(t.href, "_blank", "noopener,noreferrer");
     else if (t.href.startsWith("#")) location.hash = t.href;
-    else if (t.href !== path) router.push(t.href);
+    else if (t.href !== path) router.push(localize(t.href, lang));
   };
 
   const cd = (arg: string) => {
     if (!arg || arg === "~") return go(here("/"));
-    if (arg === "-") return prev.current ? go(here(prev.current)) : show(["cd: no previous page yet"]);
+    if (arg === "-") return prev.current ? go(here(prev.current)) : show([P.noPrev]);
     const paths = known();
     const shown = out.kind === "list" && !out.note ? out.items[sel] : undefined;
     if (isPath(arg)) {
       const to = resolvePath(path, arg);
       // Before the course index arrives, trust the path rather than refuse a real page.
       if (paths.has(to) || !course) return go(here(to));
-      return shown ? go(shown) : show([`cd: ${arg}: no such page`]);
+      return shown ? go(shown) : show([fill(P.noPage, { arg })]);
     }
     const inside = resolvePath(path, arg);
     if (paths.has(inside)) return go(here(inside));
     const top = shown ?? rank(everything(), arg, 1)[0];
-    return top ? go(top) : show([`cd: ${arg}: no such page`]);
+    return top ? go(top) : show([fill(P.noPage, { arg })]);
   };
 
   const submit = () => {
@@ -212,32 +226,32 @@ export function Prompt() {
       case "pwd":
         return show([path === "/" ? "~" : `~${path.replace(/\/$/, "")}`]);
       case "whoami":
-        return show([ready && user ? user.username : "guest: you're not signed in. Type sign in to keep your progress on any device."]);
+        return show([ready && user ? user.username : P.guest]);
       case "history":
         return show(history.current.map((h, i) => `${String(i + 1).padStart(4)}  ${h}`));
       case "sudo":
-        return show([`${name} is not in the sudoers file. This incident will be reported.`]);
+        return show([fill(P.sudo, { name })]);
       case "clear":
         return reset();
       case "exit":
         reset();
         return input.current?.blur();
       case "logout":
-        if (!(ready && user)) return show(["logout: you're not signed in."]);
-        show(["Signing out…"]);
-        void signOut().then((problem) => show([problem ?? "Signed out."]));
+        if (!(ready && user)) return show([P.notIn]);
+        show([P.signingOut]);
+        void signOut().then((problem) => show([say(lang, problem ?? "Signed out.")]));
         return;
       case "ls": {
         if (cmd.arg) {
           const dir = resolvePath(path, cmd.arg);
           const items = listing(dir, known());
-          if (!items.length) return show([`ls: ${cmd.arg}: nothing inside, or no such folder`]);
-          return showList(items, `${items.length} page${items.length === 1 ? "" : "s"} in ${dir === "/" ? "~" : `~${dir}`}. ↑ ↓ to choose, Enter to open.`);
+          if (!items.length) return show([fill(P.lsNone, { arg: cmd.arg })]);
+          return showList(items, plural(lang, P.lsPages, items.length, { dir: dir === "/" ? "~" : `~${dir}` }));
         }
         const seen = new Set<string>();
-        const items = onThisPage().filter((t) => !seen.has(t.href) && seen.add(t.href));
-        if (!items.length) return show(["ls: no links on this page"]);
-        return showList(items, `${items.length} link${items.length === 1 ? "" : "s"} on this page. ↑ ↓ to choose, Enter to open.`);
+        const items = onThisPage(t).filter((x) => !seen.has(x.href) && seen.add(x.href));
+        if (!items.length) return show([P.lsEmpty]);
+        return showList(items, plural(lang, P.lsLinks, items.length));
       }
       case "cd":
         return cd(cmd.arg);
@@ -246,7 +260,7 @@ export function Prompt() {
         const shown = out.kind === "list" && !out.note ? out.items[sel] : undefined;
         const top = shown ?? rank(everything(), cmd.query, 1)[0];
         if (top) return go(top);
-        return show([`${cmd.query}: not found here or anywhere in the course. Type help to see what works.`]);
+        return show([fill(P.notFound, { q: cmd.query })]);
       }
     }
   };
@@ -348,11 +362,11 @@ export function Prompt() {
   const open = out.kind === "list";
   const announce =
     out.kind === "list"
-      ? (out.note ?? `${out.items.length} suggestion${out.items.length === 1 ? "" : "s"}, ${out.items[0]?.label} first`)
+      ? (out.note ?? plural(lang, P.suggestions, out.items.length, { first: out.items[0]?.label ?? "" }))
       : out.kind === "text"
         ? out.lines.join(". ")
         : out.kind === "help"
-          ? "Help is open under the command line."
+          ? P.helpOpen
           : "";
 
   return (
@@ -375,11 +389,11 @@ export function Prompt() {
             if (!(e.target as HTMLElement).closest("a, input")) input.current?.focus();
           }}
         >
-          <nav className="prompt-where" aria-label="Breadcrumb">
+          <nav className="prompt-where" aria-label={P.breadcrumb}>
             <span className="prompt-user" aria-hidden="true">{name}@cyberdojo</span>
             <span aria-hidden="true">:</span>
             <span className="prompt-path">
-              <Link href="/" aria-label="Home" aria-current={parts.length ? undefined : "page"}>~</Link>
+              <Link href="/" aria-label={P.home} aria-current={parts.length ? undefined : "page"}>~</Link>
               {parts.map((p, i) => (
                 <span key={i}>
                   <span aria-hidden="true">/</span>
@@ -398,12 +412,12 @@ export function Prompt() {
             onKeyDown={onKey}
             onFocus={onFocus}
             role="combobox"
-            aria-label="Command line. Type a page, a link on this page, or help, then press Enter."
+            aria-label={P.label}
             aria-expanded={open}
             aria-controls={listId}
             aria-autocomplete="list"
             aria-activedescendant={open && out.items[sel] ? `prompt-opt-${sel}` : undefined}
-            placeholder={narrow ? "type help" : "type where to go, or help"}
+            placeholder={narrow ? P.short : P.long}
             autoComplete="off"
             autoCapitalize="off"
             autoCorrect="off"
@@ -414,10 +428,10 @@ export function Prompt() {
         {out.kind === "list" && (
           <div className="prompt-out" onMouseDown={(e) => e.preventDefault()}>
             {out.note && <p className="prompt-note">{out.note}</p>}
-            <ul id={listId} role="listbox" aria-label="Where to go">
-              {out.items.map((t, i) => (
+            <ul id={listId} role="listbox" aria-label={P.where}>
+              {out.items.map((x, i) => (
                 <li
-                  key={`${t.href}${i}`}
+                  key={`${x.href}${i}`}
                   id={`prompt-opt-${i}`}
                   role="option"
                   aria-selected={i === sel}
@@ -427,12 +441,12 @@ export function Prompt() {
                     picked.current = true;
                   }}
                   onClick={() => {
-                    remember(value.trim() || t.label);
-                    go(t);
+                    remember(value.trim() || x.label);
+                    go(x);
                   }}
                 >
-                  <span className="prompt-opt-label">{t.label}</span>
-                  <span className="prompt-opt-detail">{t.detail}</span>
+                  <span className="prompt-opt-label">{x.label}</span>
+                  <span className="prompt-opt-detail">{x.detail}</span>
                 </li>
               ))}
             </ul>
@@ -445,16 +459,16 @@ export function Prompt() {
         )}
         {out.kind === "help" && (
           <div className="prompt-out" onMouseDown={(e) => e.preventDefault()}>
-            <p className="prompt-note">Type where you want to go, then press Enter.</p>
+            <p className="prompt-note">{P.helpTop}</p>
             <dl className="prompt-help">
-              {HELP.map(([ex, what]) => (
+              {helpRows(t).map(([ex, what]) => (
                 <div key={ex}>
                   <dt>{ex}</dt>
                   <dd>{what}</dd>
                 </div>
               ))}
             </dl>
-            <p className="prompt-note">Tab completes, ↑ ↓ choose, Esc closes. Press / on any page to come back here.</p>
+            <p className="prompt-note">{P.helpBottom}</p>
           </div>
         )}
         <p className="sr-only" role="status" aria-live="polite">{announce}</p>
