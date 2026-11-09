@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DocView } from "@/components/DocView";
 import { DOMAINS } from "@/data/domains";
-import { brief, getModule, moduleContext, modules, termsFor, toolGuides, trainPanel } from "@/lib/content";
+import { brief, getModule, moduleContext, modules, termsFor, tocWith, toolGuides, trainPanel } from "@/lib/content";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => modules().map((d) => ({ slug: d.meta.slug }));
@@ -27,7 +27,7 @@ export default async function Page({ params }: Props) {
       meta={doc.meta}
       brief={brief(doc)}
       segments={[moduleContext(doc), ...trainPanel(doc), ...doc.segments, ...toolGuides(doc)]}
-      toc={doc.toc}
+      toc={tocWith(doc)}
       terms={termsFor(doc)}
       kicker={`${domain?.title ?? "Module"}, ${doc.meta.level ?? ""} level`}
       prev={near(all[i - 1])}

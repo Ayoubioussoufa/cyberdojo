@@ -683,19 +683,43 @@ export function trainList(links: TrainLink[]): string {
   return `<ul>${links.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label)}</a></li>`).join("")}</ul>`;
 }
 
+const PANELS = {
+  attack: { head: "Learn the attack hands-on", text: "This page teaches the defender's side. To learn the attack itself, use these legal platforms, and only against their labs or a lab you own:" },
+  practice: { head: "Practise it hands-on", text: "Courses and labs where you do this for real, on systems built for it:" },
+  tool: { head: "Practise with this tool", text: "Courses and labs that use this tool, or the job it does, on targets built for it. Point it at nothing else without written permission:" },
+  defenceTool: { head: "Practise with this tool", text: "Courses and labs that use this tool, or the job it does:" },
+};
+
+/** Which wording a page's panel takes. A tool's depends on whether it can hurt someone else's system. */
+function panelFor(key: string, side?: string) {
+  const t = TRAIN[key];
+  if (!t?.links.length) return null;
+  const words = side === undefined ? PANELS[t.kind] : side === "defence" ? PANELS.defenceTool : PANELS.tool;
+  return { ...words, links: t.links };
+}
+
 /**
- * Where to practise the attack this page explains from the defender's side.
- * Sits right under the context panel, so it reads as part of the subject.
+ * The hands-on panel for any page with links out, or "" for one without.
+ * Keys are the ones in TRAIN: a slug, a project id, "dojo:id" or "case:id".
  */
-export function trainPanel(doc: Doc): Segment[] {
-  const links = TRAIN[doc.meta.slug];
-  if (!links?.length) return [];
-  return [
-    {
-      kind: "html",
-      html: `<div class="train-panel noterms"><p class="train-head">Learn the attack hands-on</p><p>This page teaches the defender's side. To learn the attack itself, use these legal platforms, and only against their labs or a lab you own:</p>${trainList(links)}</div>\n`,
-    },
-  ];
+export function trainHtml(key: string, side?: string): string {
+  const p = panelFor(key, side);
+  if (!p) return "";
+  return `<section class="train-panel noterms" id="hands-on" aria-labelledby="hands-on-head"><h2 class="train-head" id="hands-on-head">${p.head}</h2><p>${p.text}</p>${trainList(p.links)}</section>\n`;
+}
+
+/** The panel as a page segment. Lessons, modules and tools show it first; machines and projects last. */
+export function trainPanel(doc: Doc, key = doc.meta.slug): Segment[] {
+  const html = trainHtml(key, doc.meta.kind === "tool" ? (doc.meta.side ?? "both") : undefined);
+  return html ? [{ kind: "html", html }] : [];
+}
+
+/** The page's contents with the panel in them, so the rail shows where the links are. */
+export function tocWith(doc: Doc, key = doc.meta.slug, at: "start" | "end" = "start"): TocEntry[] {
+  const p = panelFor(key, doc.meta.kind === "tool" ? (doc.meta.side ?? "both") : undefined);
+  if (!p) return doc.toc;
+  const entry = { id: "hands-on", text: p.head };
+  return at === "start" ? [entry, ...doc.toc] : [...doc.toc, entry];
 }
 
 /** Modules that build on a lesson, shown at its end. Nothing when there are none. */

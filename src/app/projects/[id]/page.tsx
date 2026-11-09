@@ -5,7 +5,7 @@ import { DocView } from "@/components/DocView";
 import { HELP_TEXT } from "@/data/help";
 import { ProjectMeter } from "@/components/ProjectParts";
 import { TOOLS } from "@/data/tools";
-import { brief, getProject, projects, termsFor } from "@/lib/content";
+import { brief, getProject, projects, termsFor, tocWith, trainPanel } from "@/lib/content";
 import { PROJECTS } from "@/lib/data";
 import { stepAfter } from "@/lib/path";
 import type { HelpLevel } from "@/lib/types";
@@ -67,8 +67,8 @@ export default async function Page({ params }: Props) {
     <DocView
       meta={doc.meta}
       brief={brief(doc)}
-      segments={doc.segments}
-      toc={doc.toc}
+      segments={[...doc.segments, ...trainPanel(doc, id)]}
+      toc={tocWith(doc, id, "end")}
       terms={termsFor(doc)}
       kicker={`Project ${p.id}${p.when ? `, ${p.when}` : ""}`}
       prev={near(PROJECTS[i - 1])}

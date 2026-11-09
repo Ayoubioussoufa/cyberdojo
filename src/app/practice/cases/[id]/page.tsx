@@ -3,6 +3,8 @@ import Link from "@/components/HoverLink";
 import { notFound } from "next/navigation";
 import { CaseFilePlayer } from "@/components/CaseFile";
 import { CASES, CASE_MAP } from "@/lib/cases";
+import { Html } from "@/components/Html";
+import { trainHtml } from "@/lib/content";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => CASES.map((c) => ({ id: c.id }));
@@ -27,6 +29,7 @@ export default async function Page({ params }: Props) {
         <p className="lede">{c.blurb}</p>
       </header>
       <CaseFilePlayer id={id} />
+      {trainHtml(`case:${id}`) && <Html html={trainHtml(`case:${id}`)} />}
       <p className="page-links case-links"><Link href={`/courses/${c.lesson}/`}>The lesson behind this case</Link></p>
     </div>
   );

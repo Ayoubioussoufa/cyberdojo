@@ -5,6 +5,8 @@ import { LazyRange } from "@/components/Lazy";
 import { ModuleBelt } from "@/components/DojoHub";
 import { DOJO } from "@/data/dojo";
 import { RANGES } from "@/lib/missions";
+import { Html } from "@/components/Html";
+import { trainHtml } from "@/lib/content";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => DOJO.map((m) => ({ module: m.id }));
@@ -39,6 +41,7 @@ export default async function Page({ params }: Props) {
         {m.tools.map((t) => <li key={t}><code>{t}</code></li>)}
       </ul>
       <LazyRange id={m.range} />
+      {trainHtml(`dojo:${m.id}`) && <Html html={trainHtml(`dojo:${m.id}`)} />}
       <footer className="dojo-foot">
         {m.lesson && <p>Want the full explanation? Read <Link href={m.lesson.href}>{m.lesson.title}</Link>.</p>}
         <p className="muted">{m.credit.note} <a href={m.credit.href} target="_blank" rel="noreferrer">Try the original on pwn.college</a>.</p>

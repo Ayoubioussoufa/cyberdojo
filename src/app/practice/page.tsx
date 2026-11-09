@@ -19,6 +19,7 @@ const MODES = [
   { href: "/dojo/", title: "Dojo", blurb: "54 flag challenges: pipes, HTTP, SQL, encodings, XOR, access control." },
   { href: "/machines/", title: "Machines", blurb: "A whole target, from first look to proven fix." },
   { href: "/practice/flashcards/", title: "Flashcards", blurb: "Every glossary term you've studied, as spaced recall cards." },
+  { href: "/practice/labs/", title: "Hands-on labs", blurb: "Every attack and skill on this site, with the legal platforms where you practise it for real." },
 ];
 
 export default function Page() {

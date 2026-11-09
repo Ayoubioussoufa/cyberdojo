@@ -898,9 +898,9 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .tool-az li:target { background: var(--sunk); border-radius: var(--radius); }
 
 /* ── links out to legal training platforms ── */
-.train-panel { margin: 0 0 28px; padding: 12px 16px; border: 1px solid var(--rule); border-left: 3px solid var(--info); border-radius: 0 var(--radius) var(--radius) 0; background: var(--surface); }
+.train-panel { margin: 0 0 28px; padding: 12px 16px; border: 1px solid var(--rule); border-left: 3px solid var(--info); border-radius: 0 var(--radius) var(--radius) 0; background: var(--surface); scroll-margin-top: calc(var(--stick) + 16px); }
 .train-panel p { margin: 0 0 6px; }
-.train-panel .train-head { font-weight: 700; color: var(--info); }
+.train-panel .train-head { margin: 0 0 6px; padding: 0; border: 0; font-size: 16px; font-weight: 700; color: var(--info); }
 .train-panel ul, .train-links { margin: 6px 0 0; padding-left: 20px; }
 .train-panel li, .train-links li { padding: 2px 0; overflow-wrap: anywhere; }
 .module-list .train-links { flex-basis: 100%; }
@@ -960,3 +960,20 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 .status-tip { display: block !important; line-height: 1.5; }
 .status-tip a { margin-left: 4px; font-weight: 600; }
 .fc-options select, .fc-dir { min-width: 0; width: 100%; }
+
+/* ── hands-on labs index: every page, then where to practise it ── */
+.labs-platforms td:first-child { white-space: nowrap; font-weight: 600; }
+.labs-platforms td:last-child, .labs-platforms th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.labs-filter { display: grid; gap: 6px; margin: 8px 0 24px; max-width: 34rem; }
+.labs-filter label { font-weight: 600; }
+.labs-filter input { padding: 10px 12px; border: 1px solid var(--rule-strong); border-radius: var(--radius); background: var(--sunk); color: var(--ink); font: inherit; }
+.labs-group { margin: 0 0 32px; }
+.labs-group[hidden], .labs-list > li[hidden] { display: none; }
+.labs-group h3 { margin: 0 0 8px; font-size: 18px; }
+.labs-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.labs-list > li { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); gap: 4px 24px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.labs-page { margin: 0; font-weight: 600; }
+.labs-kind { margin-left: 8px; font-size: 13px; font-weight: 600; color: var(--bad); }
+.labs-out { margin: 0; padding-left: 18px; font-size: 15px; }
+.labs-out li { padding: 1px 0; overflow-wrap: anywhere; }
+@media (max-width: 720px) { .labs-list > li { grid-template-columns: minmax(0, 1fr); } }

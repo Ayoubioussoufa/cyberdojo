@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DocView } from "@/components/DocView";
 import { TOOL_CATS } from "@/data/toolcats";
-import { brief, getToolDoc, termsFor, toolContext, toolDocs } from "@/lib/content";
+import { brief, getToolDoc, termsFor, tocWith, toolContext, toolDocs, trainPanel } from "@/lib/content";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => toolDocs().map((d) => ({ slug: d.meta.slug }));
@@ -26,8 +26,8 @@ export default async function Page({ params }: Props) {
     <DocView
       meta={doc.meta}
       brief={brief(doc)}
-      segments={[toolContext(doc), ...doc.segments]}
-      toc={doc.toc}
+      segments={[toolContext(doc), ...trainPanel(doc), ...doc.segments]}
+      toc={tocWith(doc)}
       terms={termsFor(doc)}
       kicker={`Tool guide: ${cat?.title ?? ""}`}
       prev={near(all[i - 1])}

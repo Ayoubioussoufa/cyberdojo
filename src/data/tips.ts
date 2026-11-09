@@ -10,6 +10,7 @@ export interface Tip {
 }
 
 export const TIPS: Tip[] = [
+  { text: "Every attack on this site links to a legal lab where you can do it for real. Read the defender's page first, then do the lab, then come back and find your own traces.", href: "/practice/labs/", topic: "practice" },
   { topic: "memory", text: "Before opening today's lesson, write down what you remember from the last one. Two minutes of recall beats ten of rereading.", href: "/guides/s1-how-memory-works/" },
   { topic: "memory", text: "If a page feels familiar, test yourself before moving on. Familiarity is not memory.", href: "/guides/s1-how-memory-works/" },
   { topic: "memory", text: "Answer each in-lesson question before scrolling. A wrong guess followed by the explanation is still learning.", href: "/guides/s1-how-memory-works/" },

@@ -32,6 +32,7 @@ export const SECTIONS: Target[] = [
   section("Practice", "/practice/", "exercises", "drills"),
   section("Daily review", "/review/", "review"),
   section("Flashcards", "/practice/flashcards/", "cards"),
+  section("Hands-on labs", "/practice/labs/", "labs", "hands on", "attacks", "platforms", "htb", "hack the box"),
   section("Your mistakes", "/practice/mistakes/", "mistakes"),
   section("Today's mix", "/practice/mix/", "mix"),
   section("Case files", "/practice/cases/", "cases"),

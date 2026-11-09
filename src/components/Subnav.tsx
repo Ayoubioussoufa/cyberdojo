@@ -9,6 +9,7 @@ const GROUPS = {
     { href: "/machines/", label: "Machines" },
     { href: "/review/", label: "Daily review" },
     { href: "/practice/flashcards/", label: "Flashcards" },
+    { href: "/practice/labs/", label: "Hands-on labs" },
   ],
   library: [
     { href: "/library/", label: "All" },

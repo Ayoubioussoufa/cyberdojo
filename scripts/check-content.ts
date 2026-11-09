@@ -13,6 +13,8 @@ import type { HelpLevel, StepSegment } from "../src/lib/types";
 import { RANGES } from "../src/lib/missions";
 import { AD_DEFENCE, ELSEWHERE, TRAIN, type TrainLink } from "../src/data/train";
 import { TIPS } from "../src/data/tips";
+import { DOJO } from "../src/data/dojo";
+import { CASES } from "../src/lib/cases";
 
 let bad = 0;
 const fail = (msg: string) => {
@@ -290,9 +292,24 @@ const checkLinks = (where: string, links: TrainLink[]) => {
     if (!l.label.trim()) fail(`train: ${where}: empty label`);
   }
 };
-for (const [slug, links] of Object.entries(TRAIN)) {
-  if (!findDoc(slug)) fail(`train: ${slug} is not a module or lesson`);
-  checkLinks(slug, links);
+// Every key must be a page that renders the panel: a lesson, module, tool, machine, project, Dojo module or case file.
+const trainKeys = new Set<string>([
+  ...lessons().map((d) => d.meta.slug),
+  ...modules().map((d) => d.meta.slug),
+  ...toolDocs().map((d) => d.meta.slug),
+  ...machines().map((d) => d.meta.slug),
+  ...PROJECTS.map((p) => p.id),
+  ...DOJO.map((m) => `dojo:${m.id}`),
+  ...CASES.map((c) => `case:${c.id}`),
+]);
+for (const [key, t] of Object.entries(TRAIN)) {
+  if (!trainKeys.has(key)) fail(`train: ${key} is not a page that shows links`);
+  if (t.kind !== "attack" && t.kind !== "practice") fail(`train: ${key}: unknown kind ${String(t.kind)}`);
+  checkLinks(key, t.links);
+}
+// The attack subjects this site teaches from the defender's side must never lose their links.
+for (const d of modules()) {
+  if (/attack|injection|xss|ssrf|exploit|escalation|cracking|deserial|desync|evasion|malware|persistence/i.test(`${d.meta.slug} ${d.meta.title}`) && !TRAIN[d.meta.slug]) fail(`train: ${d.meta.slug} covers an attack and has no hands-on links`);
 }
 for (const e of ELSEWHERE) {
   if (!DOMAINS.some((d) => d.id === e.domain)) fail(`train: ${e.title}: unknown domain ${e.domain}`);
@@ -303,7 +320,7 @@ for (const e of ELSEWHERE) {
 checkLinks("AD defence", AD_DEFENCE);
 
 // Tips of the day: every link must reach a real page, and no tip is repeated.
-const APP_PAGES = new Set(["/practice/mix/", "/practice/mistakes/", "/practice/flashcards/", "/review/"]);
+const APP_PAGES = new Set(["/practice/mix/", "/practice/mistakes/", "/practice/flashcards/", "/practice/labs/", "/review/"]);
 const tipTexts = new Set<string>();
 for (const t of TIPS) {
   if (tipTexts.has(t.text)) fail(`tips: duplicate tip "${t.text.slice(0, 40)}"`);
