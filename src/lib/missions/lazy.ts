@@ -10,6 +10,7 @@ const FAMILIES: Record<string, () => Promise<Family>> = {
   advanced: () => import("./advanced").then((m) => m.MISSIONS_ADVANCED),
   machines: () => import("./machines").then((m) => m.MISSIONS_MACHINES),
   dojo: () => import("./dojo").then((m) => m.MISSIONS_DOJO),
+  break: () => import("./break").then((m) => m.MISSIONS_BREAK),
 };
 
 /** Which family holds each ladder. scripts/check-missions.ts fails if this goes stale. */
@@ -20,6 +21,7 @@ export const RANGE_FAMILY: Record<string, keyof typeof FAMILIES> = {
   iam: "advanced", trail: "advanced", forensics: "advanced", intel: "advanced", malware: "advanced", vuln: "advanced", appsec: "advanced", supply: "advanced", aiops: "advanced", k8s: "advanced", evals: "advanced",
   lantern: "machines", harbor: "machines", switchboard: "machines", parrot: "machines", keystone: "machines",
   "dojo-streams": "dojo", "dojo-permissions": "dojo", "dojo-data": "dojo", "dojo-sql": "dojo", "dojo-web": "dojo", "dojo-crypto": "dojo", "dojo-access": "dojo", "dojo-audit": "dojo",
+  "break-sqli": "break", "break-xss": "break", "break-traversal": "break", "break-cmdi": "break", "break-auth": "break", "break-ssrf": "break",
 };
 
 export async function loadRange(id: string): Promise<RangeSet | null> {

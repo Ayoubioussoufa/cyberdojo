@@ -84,7 +84,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 18 mentions in 10 docs, most in 0035-how-the-web-works, practice 56. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ● | ● | curl (tool) | 18 mentions in 10 docs, most in 0035-how-the-web-works, practice 107. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 1 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 6 mentions in 5 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 4 mentions in 2 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -320,18 +320,18 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ● | ● | Same-origin policy | 6 mentions in 1 docs, most in 0036-sessions-and-the-browser. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ● | ● | CORS | 7 mentions in 1 docs, most in 0036-sessions-and-the-browser. |  |
 | ●* | ● | Cookies and flags: Secure, HttpOnly, SameSite | 15 mentions in 5 docs, most in 0036-sessions-and-the-browser, practice 6. *Lesson 36, 'Cookie flags'.* | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
-| ◐ | ● | Security headers and CSP | 3 mentions in 2 docs, most in 0047-keeping-input-out-of-the-code. | [Browser defences and CSP](modules/04-web/01-browser-defences-and-csp.md) |
-| ●* | ● | Session management | 11 mentions in 6 docs, most in 0036-sessions-and-the-browser, practice 2. *Lesson 36, 'Sessions'.* | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
+| ◐ | ● | Security headers and CSP | 3 mentions in 2 docs, most in 0047-keeping-input-out-of-the-code, practice 2. | [Browser defences and CSP](modules/04-web/01-browser-defences-and-csp.md) |
+| ●* | ● | Session management | 11 mentions in 6 docs, most in 0036-sessions-and-the-browser, practice 6. *Lesson 36, 'Sessions'.* | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
 
 ### OWASP Top 10:2025
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | A01 Broken Access Control | 19 mentions in 8 docs, most in 0048-access-control-that-holds, practice 7. | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
+| ● | ● | A01 Broken Access Control | 19 mentions in 8 docs, most in 0048-access-control-that-holds, practice 9. | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
 | ◐* | ● | A02 Security Misconfiguration | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
 | ●* | ● | A03 Software Supply Chain Failures | 2 mentions in 2 docs, most in 0046-how-web-applications-fail. *Lesson 69 is about exactly this, under other words.* |  |
 | ●* | ● | A04 Cryptographic Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 38 to 40.* |  |
-| ● | ● | A05 Injection | 55 mentions in 18 docs, most in 0047-keeping-input-out-of-the-code, practice 18. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | A05 Injection | 55 mentions in 18 docs, most in 0047-keeping-input-out-of-the-code, practice 24. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ●* | ● | A06 Insecure Design | 2 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lesson 68.* |  |
 | ●* | ● | A07 Authentication Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 40 to 42.* |  |
 | ◐* | ● | A08 Software or Data Integrity Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
@@ -342,11 +342,11 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | SQL injection basics | 14 mentions in 6 docs, most in 0037-databases-and-sql, practice 7. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | SQL injection basics | 14 mentions in 6 docs, most in 0037-databases-and-sql, practice 18. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | SQLi variants: union, blind, time-based, second-order | None. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ◐ | sqlmap (tool) | None. *Named in the tools table, for labs. Not taught.* | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | NoSQL injection | None. *Section 'NoSQL'.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
-| ◐ | ● | OS command injection (CWE-78) | 5 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code, practice 4. | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
+| ◐ | ● | OS command injection (CWE-78) | 5 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code, practice 7. | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 | ○ | ● | Code injection (CWE-94) | 1 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code. *Section 'Code evaluation'.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 | ○ | ◐ | LDAP and XPath injection | None. *One table row each.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 | ○ | ● | XXE | 1 mentions in 1 docs, most in 0049-apis-uploads-and-outbound-requests. | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
@@ -356,7 +356,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | XSS: reflected, stored, DOM | 17 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 10. | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
+| ● | ● | XSS: reflected, stored, DOM | 17 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 21. | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
 | ◐ | ● | DOM XSS and sinks specifically | 3 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code. | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
 | ● | ● | CSRF and defences | 12 mentions in 2 docs, most in 0048-access-control-that-holds, practice 5. |  |
 | ○ | ● | Clickjacking | None. | [Client-side web security](modules/04-web/05-client-side-attacks.md) |
@@ -369,8 +369,8 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | SSRF (CWE-918) | 6 mentions in 3 docs, most in 0049-apis-uploads-and-outbound-requests, practice 7. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
-| ◐ | ● | Path traversal (CWE-22), LFI/RFI | 4 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code, practice 5. *Section on paths, from the code reviewer's side.* | [File handling security](modules/04-web/08-files-traversal-and-uploads.md) |
+| ◐ | ● | SSRF (CWE-918) | 6 mentions in 3 docs, most in 0049-apis-uploads-and-outbound-requests, practice 17. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ◐ | ● | Path traversal (CWE-22), LFI/RFI | 4 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code, practice 8. *Section on paths, from the code reviewer's side.* | [File handling security](modules/04-web/08-files-traversal-and-uploads.md) |
 | ◐ | ● | File upload flaws (CWE-434) | 4 mentions in 2 docs, most in 0049-apis-uploads-and-outbound-requests, practice 1. *Section 'Uploads'.* | [File handling security](modules/04-web/08-files-traversal-and-uploads.md) |
 | ◐ | ● | Insecure deserialization (CWE-502) | 3 mentions in 1 docs, most in 0049-apis-uploads-and-outbound-requests. | [Insecure deserialization](modules/04-web/09-deserialization.md) |
 | ○ | ● | HTTP request smuggling | None. | [HTTP desync and cache security](modules/04-web/10-desync-and-cache-attacks.md) |
@@ -405,9 +405,9 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | Parameterised queries | 10 mentions in 5 docs, most in 0037-databases-and-sql, practice 4. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
+| ●* | ● | Parameterised queries | 10 mentions in 5 docs, most in 0037-databases-and-sql, practice 7. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
 | ●* | ● | Output encoding | 7 mentions in 3 docs, most in h4-interviews, practice 5. *Lesson 47, 'XSS: encoding on output'.* |  |
-| ●* | ● | Input validation | 14 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 10. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ●* | ● | Input validation | 14 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 14. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 | ● | ● | OWASP ASVS | 11 mentions in 5 docs, most in 0068-threat-modeling-and-secure-sdlc. |  |
 | ●* | ● | SAST, DAST, IAST | 9 mentions in 2 docs, most in 0068-threat-modeling-and-secure-sdlc, practice 9. *Lesson 68, 'The pipeline of checks'.* |  |
 | ●* | ● | Semgrep (tool) | 21 mentions in 5 docs, most in P05, practice 1. *Walked through in project P05.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
@@ -511,7 +511,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Safe lab design for malware | 63 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
-| ●* | ● | Static triage: hashes, strings, imports, entropy | 11 mentions in 3 docs, most in 0067-safe-malware-triage, practice 2. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
+| ●* | ● | Static triage: hashes, strings, imports, entropy | 11 mentions in 3 docs, most in 0067-safe-malware-triage, practice 3. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ◐ | ● | Packers and unpacking | 11 mentions in 5 docs, most in 0067-safe-malware-triage. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
 | ● | ● | Dynamic analysis and sandboxes | 9 mentions in 4 docs, most in 0067-safe-malware-triage, practice 2. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ●* | ● | capa, FLOSS, PEStudio, Detect It Easy (tool) | 13 mentions in 3 docs, most in P13. *Walked through in project P13.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
@@ -715,7 +715,7 @@ Basis: Brief 10.
 | ●* | ● | AWS IAM: policies, roles, evaluation | 9 mentions in 5 docs, most in 0063-cloud-foundations-and-iam, practice 3. *Lesson 63, 'Reading a policy' and 'How AWS decides'.* | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ○ | ● | AWS privilege escalation paths | None. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ◐ | ● | AWS S3 exposure | 14 mentions in 3 docs, most in 0063-cloud-foundations-and-iam, practice 3. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
-| ◐ | ● | Instance metadata and IMDSv2 | 16 mentions in 6 docs, most in 0063-cloud-foundations-and-iam, practice 1. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ◐ | ● | Instance metadata and IMDSv2 | 16 mentions in 6 docs, most in 0063-cloud-foundations-and-iam, practice 15. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 | ● | ● | CloudTrail and GuardDuty | 29 mentions in 6 docs, most in 0064-cloud-detection-and-posture, practice 8. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ◐* | ● | Azure: Entra ID, RBAC, managed identity | 25 mentions in 11 docs, most in 0045-attacking-and-defending-identity. *Entra ID has a section. Azure RBAC is one table cell, and managed identities are absent.* | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | Azure logging and Defender for Cloud | 2 mentions in 1 docs, most in 0064-cloud-detection-and-posture. | [Azure security](modules/10-cloud/02-azure-security.md) |
@@ -823,7 +823,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ● | ● | Security policies, standards, procedures | 30 mentions in 12 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 9 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
-| ◐ | ● | Security metrics and reporting to a board | 31 mentions in 17 docs, most in P06, practice 18. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
+| ◐ | ● | Security metrics and reporting to a board | 31 mentions in 17 docs, most in P06, practice 19. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
 | ● | ● | Audit and evidence | 6 mentions in 2 docs, most in 0061-frameworks, practice 3. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 
 ### Regulation
@@ -947,7 +947,7 @@ Basis: Added: CyBOK Hardware, Cyber-Physical Systems, Physical Layer & Telecoms,
 | ○ | ● | ICS protocols: Modbus, DNP3 | None. | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
 | ○ | ● | IEC 62443 | None. *Named as the standard, with zones and conduits.* | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
 | ○ | ● | ATT&CK for ICS, Stuxnet, Industroyer | None. | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
-| ◐ | ● | Physical security | 5 mentions in 4 docs, most in P03. | [Physical security](modules/15-wireless-mobile-hardware-ot/09-physical-security.md) |
+| ◐ | ● | Physical security | 5 mentions in 4 docs, most in P03, practice 2. | [Physical security](modules/15-wireless-mobile-hardware-ot/09-physical-security.md) |
 
 ## 16 Human factors, privacy and research foundations
 

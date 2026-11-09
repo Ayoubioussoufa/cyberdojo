@@ -1,4 +1,5 @@
 import { dojoModules } from "@/data/fr/dojo";
+import { breakClasses } from "@/data/breakin";
 import { glossary, guides, lessons, machines, modules, projects, sheets, toolDocs } from "@/lib/content";
 import { LANGS, fill, isLang } from "@/i18n/lang";
 import { UI } from "@/i18n/ui";
@@ -32,6 +33,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ lang: stri
     ...(TOOL_INDEX as { name: string; slug: string; has?: boolean }[]).filter((t) => !t.has).map((t) => ({ title: t.name, sub: k.noGuide, kind: "Tool", href: `/tools/all/#${t.slug}` })),
     ...dojoModules(lang).map((m) => ({ title: m.title, sub: fill(k.learnTo, { skill: m.skill }), kind: "Dojo", href: `/dojo/${m.id}/` })),
     ...dojoModules(lang).flatMap((m) => (RANGES[m.range]?.missions ?? []).map((x) => ({ title: x.title, sub: m.title, kind: "Challenge", href: `/dojo/${m.id}/` }))),
+    ...breakClasses(lang).map((c) => ({ title: c.title, sub: c.tagline, kind: "Attack", href: `/break-in/${c.id}/` })),
+    ...breakClasses(lang).flatMap((c) => (RANGES[c.range]?.missions ?? []).map((x) => ({ title: x.title, sub: c.title, kind: "Attack", href: `/break-in/${c.id}/` }))),
     ...machines(lang).map((d) => ({ title: d.meta.title, sub: d.meta.summary, kind: "Machine", href: `/machines/${d.meta.slug}/` })),
     ...projects(lang).map((d) => ({ title: d.meta.title, sub: d.meta.summary, kind: "Project", href: `/projects/${d.meta.slug}/` })),
     ...guides(lang).map((d) => ({ title: d.meta.title, sub: d.meta.summary, kind: "Handbook", href: `/guides/${d.meta.slug}/` })),

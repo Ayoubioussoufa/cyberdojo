@@ -18,6 +18,7 @@ export default async function Page({ params }: LangParams) {
   const { t } = await strings(params);
   const p = t.practice;
   const MODES = [
+    { href: "/break-in/", title: t.breakin.h1, blurb: p.breakinBlurb },
     { href: "/practice/cases/", title: t.pages.casesTitle, blurb: fill(p.casesBlurb, { n: CASES.length }) },
     { href: "/practice/hunts/", title: p.hunts, blurb: p.huntsBlurb },
     { href: "/practice/flaws/", title: p.flaws, blurb: p.flawsBlurb },

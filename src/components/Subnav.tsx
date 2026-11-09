@@ -10,6 +10,7 @@ type Tab = { href: string; label: keyof Dict["subnav"] };
 const GROUPS: Record<"practice" | "library", Tab[]> = {
   practice: [
     { href: "/practice/", label: "exercises" },
+    { href: "/break-in/", label: "breakin" },
     { href: "/machines/", label: "machines" },
     { href: "/review/", label: "review" },
     { href: "/practice/flashcards/", label: "flashcards" },

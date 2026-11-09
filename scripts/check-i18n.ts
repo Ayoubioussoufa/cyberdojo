@@ -16,6 +16,7 @@ import { DOMAINS, DOMAINS_FR } from "../src/data/domains";
 import { TOOL_CATS, TOOL_CATS_FR } from "../src/data/toolcats";
 import { DOJO } from "../src/data/dojo";
 import { dojoModules } from "../src/data/fr/dojo";
+import { BREAK_IN, breakClasses } from "../src/data/breakin";
 import { SECTIONS, sectionsFor } from "../src/lib/prompt";
 import type { Doc } from "../src/lib/types";
 
@@ -170,6 +171,14 @@ dojoModules("fr").forEach((m, i) => {
   // "Permissions" is the same word in French.
   if (m.title === e?.title && m.title !== "Permissions") fail(`dojo ${m.id}: no French title`);
   if (m.intro.length !== e?.intro.length) fail(`dojo ${m.id}: intro has ${m.intro.length} paragraphs, English has ${e?.intro.length}`);
+});
+breakClasses("fr").forEach((c, i) => {
+  const e = BREAK_IN[i];
+  if (!e || c.id !== e.id) return fail(`break-in: French class ${i} out of step`);
+  if (c.title === e.title && c.id !== "xss") fail(`break-in ${c.id}: no French title`);
+  if (c.intro.length !== e.intro.length) fail(`break-in ${c.id}: intro has ${c.intro.length} paragraphs, English has ${e.intro.length}`);
+  if (c.defence === e.defence) fail(`break-in ${c.id}: defence not translated`);
+  if (c.learn.length !== e.learn.length) fail(`break-in ${c.id}: learn links differ`);
 });
 const frSections = sectionsFor("fr");
 SECTIONS.forEach((s, i) => frSections[i]?.label === s.label && s.label !== "Modules" && s.label !== "Dojo" && s.label !== "Machines" && fail(`prompt: no French name for ${s.href}`));
