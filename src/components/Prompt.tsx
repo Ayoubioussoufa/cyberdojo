@@ -76,14 +76,20 @@ const HELP: [string, string][] = [
   ["cd ..   cd -   cd /tools/all", "Paths work as in a shell: up a level, back to the last page, anywhere."],
   ["ls   ls /courses", "The links on this page, or the pages inside a folder."],
   ["pwd   whoami   history   clear", "Where you are, who you are, what you typed, a clean line."],
+  ["Space   PgDn   PgUp   Home   End", "Scroll the page while the line is empty."],
+  ["Esc   Tab   /", "Esc hands the keys to the page, Tab walks through its links, / brings you back."],
 ];
 
 const here = (to: string): Target => ({ label: to, href: to, detail: "", tier: 3 });
 
+/** A keyboard and a mouse, not a phone: only there does the line take the focus by itself, since on a phone it would open the keyboard on every page. */
+const keyboardFirst = () => matchMedia("(hover: hover) and (pointer: fine)").matches;
+
 /**
  * The site's breadcrumb, written as a shell prompt, and a command line you can type in.
  * Each directory in the path is a link back up the tree. Type a page name, anything you
- * can see on the page, or a shell command, then Enter. Press / anywhere to get here.
+ * can see on the page, or a shell command, then Enter. On a computer the line has the
+ * focus on every page, so the whole site works without a mouse; / brings it back.
  */
 export function Prompt() {
   const path = usePathname() ?? "/";
@@ -125,6 +131,12 @@ export function Prompt() {
   };
 
   const change = (v: string, fromHistory = false) => {
+    // The course index loads on the first keystroke, not on focus: the line is focused on every page.
+    if (!course) {
+      void loadCourse().then(() => {
+        if (typed.current.trim()) setOut(suggest(typed.current));
+      });
+    }
     setLine(v);
     if (!fromHistory) histAt.current = null;
     setOut(v.trim() ? suggest(v) : NONE);
@@ -158,10 +170,10 @@ export function Prompt() {
     setOut({ kind: "list", items, note });
   };
 
-  /** Leave for the target. Focus goes back to the page, so the keys scroll it again. */
+  /** Leave for the target. On a computer the line keeps the focus; on a phone it lets go, so the keyboard closes. */
   const go = (t: Target) => {
     reset();
-    input.current?.blur();
+    if (!keyboardFirst()) input.current?.blur();
     if (/^https?:/.test(t.href)) window.open(t.href, "_blank", "noopener,noreferrer");
     else if (t.href.startsWith("#")) location.hash = t.href;
     else if (t.href !== path) router.push(t.href);
@@ -241,6 +253,15 @@ export function Prompt() {
 
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
     const items = out.kind === "list" ? out.items : [];
+    // The line holds the focus on every page, so it scrolls the page too, with the keys a browser uses.
+    if (e.key === "PageDown" || e.key === "PageUp" || (!value && (e.key === " " || e.key === "Home" || e.key === "End"))) {
+      e.preventDefault();
+      const page = Math.max(120, innerHeight - 160);
+      if (e.key === "Home") scrollTo({ top: 0 });
+      else if (e.key === "End") scrollTo({ top: document.documentElement.scrollHeight });
+      else scrollBy({ top: e.key === "PageUp" || (e.key === " " && e.shiftKey) ? -page : page });
+      return;
+    }
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       const up = e.key === "ArrowUp";
       if (items.length && histAt.current === null) {
@@ -276,13 +297,21 @@ export function Prompt() {
     }
   };
 
-  // A new page: clear the line and remember where we came from, for "cd -".
+  // A new page, or a reload: clear the line, remember where we came from (for "cd -"), and take the focus.
   useEffect(() => {
     if (last.current !== path) {
       prev.current = last.current;
       last.current = path;
     }
     reset();
+    if (!keyboardFirst()) return;
+    // One frame later, so a page that focuses its own field first keeps it.
+    const id = requestAnimationFrame(() => {
+      const a = document.activeElement;
+      if (a && a !== document.body && document.getElementById("main")?.contains(a)) return;
+      input.current?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
@@ -313,14 +342,7 @@ export function Prompt() {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  const onFocus = () => {
-    setFocused(true);
-    if (!course) {
-      void loadCourse().then(() => {
-        if (typed.current.trim()) setOut(suggest(typed.current));
-      });
-    }
-  };
+  const onFocus = () => setFocused(true);
 
   const listId = "prompt-list";
   const open = out.kind === "list";

@@ -73,7 +73,9 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: 76px; }
+/* --stick: how much of the top the sticky bars cover. The nav alone is 52px; on a computer the prompt sticks under it. */
+:root { --stick: 52px; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--stick) + 24px); }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
@@ -164,6 +166,12 @@ small { font-size: 0.8em; }
   .prompt-out { left: 16px; width: calc(100% - 32px); }
   .prompt-help div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .prompt-opt-detail { max-width: 12ch; }
+}
+/* With a keyboard and a mouse the line holds the focus on every page, so it stays in view under the nav.
+   On a phone it scrolls away with the page: the screen is too short to give it up for good. */
+@media (hover: hover) and (pointer: fine) {
+  :root { --stick: 90px; }
+  .prompt { position: sticky; top: 53px; }
 }
 /* Phones zoom into any text box under 16px; this one is worth the extra size. */
 @media (pointer: coarse) { .prompt-input { font-size: 16px; } }
@@ -279,7 +287,7 @@ a.card:hover { border-color: var(--accent); }
 .source { font-family: var(--body); font-size: 14.5px; margin: 14px 0 0; padding: 8px 12px; border: 1px solid var(--rule); border-left: 3px solid var(--info); border-radius: var(--radius); }
 .source span { font-weight: 650; color: var(--ink); margin-right: 6px; }
 .rail { position: relative; }
-.rail-in { position: sticky; top: 80px; max-height: calc(100dvh - 100px); overflow-y: auto; font-family: var(--body); padding-bottom: 8px; }
+.rail-in { position: sticky; top: calc(var(--stick) + 28px); max-height: calc(100dvh - var(--stick) - 48px); overflow-y: auto; font-family: var(--body); padding-bottom: 8px; }
 .rail ol { list-style: none; margin: 8px 0 14px; padding: 0; border-left: 1px solid var(--rule); }
 .rail li a { display: block; padding: 4px 0 4px 12px; font-size: 13px; line-height: 1.35; color: var(--muted); text-decoration: none; }
 .rail li a:hover { color: var(--link); }
