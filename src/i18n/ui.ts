@@ -805,6 +805,7 @@ const TABLE = {
     cleared: ["cleared", "réussi"],
     classCleared: ["Cleared — every flag captured.", "Réussi — tous les drapeaux capturés."],
     foot: ["Want to run these attacks on real targets, legally? Every lesson and module links to a hands-on platform.", "Envie de lancer ces attaques sur de vraies cibles, légalement ? Chaque leçon et module renvoie à une plateforme pratique."],
+    elsewhere: ["A few attacks need a real browser or proxy that a single-request terminal can't honestly fake, such as request smuggling, CSRF, DOM-based XSS and race conditions. Practise those on a full lab:", "Quelques attaques exigent un vrai navigateur ou proxy qu'un terminal à requête unique ne peut pas honnêtement imiter, comme le request smuggling, le CSRF, le XSS basé sur le DOM et les conditions de course. Entraînez-vous dessus sur un vrai lab :"],
     footLink: ["See the hands-on labs", "Voir les labs pratiques"],
     allClasses: ["← All attack classes", "← Toutes les classes d'attaque"],
     defence: ["How to stop it", "Comment l'arrêter"],

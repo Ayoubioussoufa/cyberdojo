@@ -21,7 +21,7 @@ export const RANGE_FAMILY: Record<string, keyof typeof FAMILIES> = {
   iam: "advanced", trail: "advanced", forensics: "advanced", intel: "advanced", malware: "advanced", vuln: "advanced", appsec: "advanced", supply: "advanced", aiops: "advanced", k8s: "advanced", evals: "advanced",
   lantern: "machines", harbor: "machines", switchboard: "machines", parrot: "machines", keystone: "machines",
   "dojo-streams": "dojo", "dojo-permissions": "dojo", "dojo-data": "dojo", "dojo-sql": "dojo", "dojo-web": "dojo", "dojo-crypto": "dojo", "dojo-access": "dojo", "dojo-audit": "dojo",
-  "break-sqli": "break", "break-xss": "break", "break-traversal": "break", "break-cmdi": "break", "break-auth": "break", "break-ssrf": "break",
+  "break-sqli": "break", "break-nosql": "break", "break-xss": "break", "break-cmdi": "break", "break-ssti": "break", "break-xxe": "break", "break-traversal": "break", "break-upload": "break", "break-auth": "break", "break-massassign": "break", "break-jwt": "break", "break-deser": "break", "break-redirect": "break", "break-ssrf": "break",
 };
 
 export async function loadRange(id: string): Promise<RangeSet | null> {

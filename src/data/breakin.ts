@@ -125,6 +125,142 @@ export const BREAK_IN: BreakClass[] = [
       { href: "/modules/10-01-aws-attack-paths/", title: "AWS attack paths" },
     ],
   },
+  {
+    id: "nosql",
+    range: "break-nosql",
+    title: "NoSQL injection",
+    tagline: "send a query operator where the app expects a password",
+    owasp: "Injection",
+    intro: [
+      "Document databases take queries as structured objects, not strings. When an app drops your JSON values straight into that query without checking their type, you can send an operator like `{\"$ne\": null}` where it wanted a string. The operator matches anything, so the check passes.",
+      "You'll bypass a login by making the password 'not equal to null', which every real password is.",
+    ],
+    defence:
+      "Force every field to the type you expect before it reaches the query (`String(pass)`), reject credentials that aren't strings, and validate the body against a schema. It's the same rule as SQL injection: never let input decide the shape of a query.",
+    learn: [
+      { href: "/courses/0046-how-web-applications-fail/", title: "How web applications fail" },
+      { href: "/modules/04-03-injection-beyond-sql/", title: "Injection beyond SQL" },
+    ],
+  },
+  {
+    id: "ssti",
+    range: "break-ssti",
+    title: "Template injection",
+    tagline: "land inside the template and let the engine run your expression",
+    owasp: "Injection",
+    intro: [
+      "A page builds its template by pasting your input into the template source. So `{{ ... }}` you send is evaluated by the template engine instead of printed. `{{7*7}}` coming back as `49` is the classic sign that you're inside the template, not just filling it.",
+      "You'll prove the injection with arithmetic, read a variable the template can see, then slip past a filter that blocks one word.",
+    ],
+    defence:
+      "Pass user data as a value the engine escapes (`render(tpl, { name })`), never by building the template string from input. A sandboxed engine is a weak second line; real engines expose paths to objects, classes and the runtime, so keep input out of the template entirely.",
+    learn: [
+      { href: "/courses/0046-how-web-applications-fail/", title: "How web applications fail" },
+      { href: "/modules/04-03-injection-beyond-sql/", title: "Injection beyond SQL" },
+    ],
+  },
+  {
+    id: "xxe",
+    range: "break-xxe",
+    title: "XML external entity",
+    tagline: "declare an entity that is really a file, and let the parser fetch it",
+    owasp: "Injection",
+    intro: [
+      "An XML parser with external entities switched on will resolve a `<!ENTITY ... SYSTEM \"file://...\">` declaration by reading that file and dropping it into the document. When a server parses XML you send, that lets you read files off its disk.",
+      "You'll read `/etc/passwd`, then pull out the app's own secret key.",
+    ],
+    defence:
+      "Turn off DOCTYPE processing and external entities in the XML parser; for most libraries that's one or two settings. Never parse untrusted XML with a default, entity-resolving parser. File permissions and folder layout won't save you once entities resolve.",
+    learn: [
+      { href: "/courses/0049-apis-uploads-and-outbound-requests/", title: "APIs, uploads and outbound requests" },
+      { href: "/modules/04-03-injection-beyond-sql/", title: "Injection beyond SQL" },
+    ],
+  },
+  {
+    id: "upload",
+    range: "break-upload",
+    title: "Insecure file upload",
+    tagline: "slip a file past the check that still runs as code",
+    owasp: "Broken access control",
+    intro: [
+      "A server decides whether an upload is safe from its name, then serves it back and runs anything it treats as a script. When the check and the thing that executes disagree about what counts as a script, a file that passes the check can still run.",
+      "You'll bypass an extension blocklist with a type it forgot, then hide a `.php` behind a second extension.",
+    ],
+    defence:
+      "Allowlist the exact types you accept, generate your own filename, and serve uploads from a store that never executes them. Deciding safety by string-matching the extension is the wrong place to make the call; a blocklist always misses one the runtime still runs.",
+    learn: [
+      { href: "/courses/0049-apis-uploads-and-outbound-requests/", title: "APIs, uploads and outbound requests" },
+      { href: "/modules/04-08-files-traversal-and-uploads/", title: "Files, traversal and uploads" },
+    ],
+  },
+  {
+    id: "massassign",
+    range: "break-massassign",
+    title: "Mass assignment",
+    tagline: "send the field the form never showed you",
+    owasp: "Broken access control",
+    intro: [
+      "A server builds an object by copying every field you post onto it, including fields the form never displayed, like a role or an account balance. So you set what you were never offered.",
+      "You'll register an account and grant yourself the admin role the signup form doesn't mention.",
+    ],
+    defence:
+      "Bind only an explicit allowlist of fields (`{ username, password }`), never the whole request. Set sensitive fields like `role` server-side, and keep the model that accepts input separate from the one that holds privileges.",
+    learn: [
+      { href: "/courses/0046-how-web-applications-fail/", title: "How web applications fail" },
+      { href: "/modules/04-12-api-security-graphql-grpc/", title: "API security: GraphQL and gRPC" },
+    ],
+  },
+  {
+    id: "jwt",
+    range: "break-jwt",
+    title: "JWT forgery",
+    tagline: "write your own token when the server accepts alg:none",
+    owasp: "Broken access control",
+    intro: [
+      "A JSON Web Token is three base64url parts: a header saying how it's signed, a payload of claims, and a signature. A server that honours a header of `alg: none` trusts the payload with no signature at all, so you can write a token that says whatever you like.",
+      "You'll forge an unsigned token that claims you're the admin.",
+    ],
+    defence:
+      "Pin the expected algorithm in the verifier and reject `none` outright. Verify with a key the client never sees, and treat a token the client can rewrite as no authentication at all.",
+    learn: [
+      { href: "/courses/0045-attacking-and-defending-identity/", title: "Attacking and defending identity" },
+      { href: "/modules/04-06-authentication-and-jwt-attacks/", title: "Authentication and JWT attacks" },
+    ],
+  },
+  {
+    id: "deser",
+    range: "break-deser",
+    title: "Insecure deserialization",
+    tagline: "rebuild the trusted blob to say whatever you want",
+    owasp: "Software integrity",
+    intro: [
+      "A server stores state as a blob it hands you, then trusts whatever it decodes back, with no signature. So you rebuild the blob: a higher role, or a field that makes the server's loader do something it shouldn't.",
+      "You'll promote yourself by editing an unsigned session, then make a loader open a file by adding the fields it looks for.",
+    ],
+    defence:
+      "Sign serialized state with a server-only key and verify it before trusting a byte, or keep the state server-side and hand the client an opaque id. Never let deserialized data choose a type, a class, a path or a callback.",
+    learn: [
+      { href: "/courses/0046-how-web-applications-fail/", title: "How web applications fail" },
+      { href: "/modules/04-09-deserialization/", title: "Deserialization" },
+    ],
+  },
+  {
+    id: "redirect",
+    range: "break-redirect",
+    title: "Open redirect",
+    tagline: "turn a trusted link into a springboard to anywhere",
+    owasp: "Broken access control",
+    intro: [
+      "A server sends users wherever a `url` parameter says, with no check that the destination is one of its own pages. A link that looks like it goes to the trusted site can bounce a victim to a hostile one, carrying their trust, and sometimes a token, with them.",
+      "You'll make a login redirect send a victim off-site, and read what leaks when it does.",
+    ],
+    defence:
+      "Redirect only to a relative path on your own site, or match the destination against a strict allowlist of hosts. Never feed a user-supplied URL straight into the `Location` header; it is a gift to phishing.",
+    learn: [
+      { href: "/courses/0046-how-web-applications-fail/", title: "How web applications fail" },
+      { href: "/modules/04-05-client-side-attacks/", title: "Client-side attacks" },
+    ],
+  },
 ];
 
 /** French for the attack classes. The challenges themselves are in English for now. */
@@ -200,6 +336,102 @@ const BREAK_IN_FR: Record<string, { title: string; tagline: string; owasp: strin
     defence:
       "Mettez en liste blanche les hôtes exacts que la fonction peut joindre, résolvez le nom et bloquez le lien-local (`169.254.0.0/16`) et les plages privées, et exigez le mode durci du service de métadonnées. Traitez toute requête côté serveur vers une URL fournie par l'utilisateur comme dangereuse par défaut. Plus de détails au mois 13.",
     learnTitles: ["La SSRF en profondeur", "Chemins d'attaque AWS"],
+  },
+  nosql: {
+    title: "Injection NoSQL",
+    tagline: "envoyer un opérateur de requête là où l'app attend un mot de passe",
+    owasp: "Injection",
+    intro: [
+      "Les bases de données documentaires reçoivent les requêtes sous forme d'objets structurés, pas de chaînes. Quand une app insère vos valeurs JSON dans cette requête sans vérifier leur type, vous pouvez envoyer un opérateur comme `{\"$ne\": null}` là où elle attendait une chaîne. L'opérateur correspond à n'importe quoi, donc la vérification passe.",
+      "Vous contournerez une connexion en faisant que le mot de passe soit « différent de null », ce que tout vrai mot de passe est.",
+    ],
+    defence:
+      "Forcez chaque champ au type attendu avant qu'il n'atteigne la requête (`String(pass)`), refusez les identifiants qui ne sont pas des chaînes, et validez le corps avec un schéma. C'est la même règle que l'injection SQL : ne laissez jamais la saisie décider de la forme d'une requête.",
+    learnTitles: ["Comment les applications web échouent", "L'injection au-delà du SQL"],
+  },
+  ssti: {
+    title: "Injection de template",
+    tagline: "atterrir dans le template et laisser le moteur exécuter votre expression",
+    owasp: "Injection",
+    intro: [
+      "Une page construit son template en collant votre saisie dans la source du template. Donc un `{{ ... }}` que vous envoyez est évalué par le moteur de template, pas affiché. `{{7*7}}` qui revient en `49` est le signe classique que vous êtes dans le template, pas en train de le remplir.",
+      "Vous prouverez l'injection avec un calcul, lirez une variable que le template voit, puis déjouerez un filtre qui bloque un mot.",
+    ],
+    defence:
+      "Passez les données utilisateur comme une valeur que le moteur échappe (`render(tpl, { name })`), jamais en construisant la chaîne du template à partir de la saisie. Un moteur en bac à sable est une faible seconde ligne ; les vrais moteurs exposent des chemins vers les objets, les classes et le runtime, alors gardez la saisie hors du template.",
+    learnTitles: ["Comment les applications web échouent", "L'injection au-delà du SQL"],
+  },
+  xxe: {
+    title: "Entité externe XML",
+    tagline: "déclarer une entité qui est en fait un fichier, et laisser le parseur le chercher",
+    owasp: "Injection",
+    intro: [
+      "Un parseur XML avec les entités externes activées résout une déclaration `<!ENTITY ... SYSTEM \"file://...\">` en lisant ce fichier et en le glissant dans le document. Quand un serveur parse du XML que vous envoyez, cela vous laisse lire des fichiers sur son disque.",
+      "Vous lirez `/etc/passwd`, puis extrairez la clé secrète de l'application elle-même.",
+    ],
+    defence:
+      "Désactivez le traitement des DOCTYPE et des entités externes dans le parseur XML ; pour la plupart des bibliothèques, c'est un ou deux réglages. Ne parsez jamais du XML non fiable avec un parseur par défaut qui résout les entités. Ni les permissions ni la structure des dossiers ne vous sauveront une fois les entités résolues.",
+    learnTitles: ["APIs, envois et requêtes sortantes", "L'injection au-delà du SQL"],
+  },
+  upload: {
+    title: "Envoi de fichier non sécurisé",
+    tagline: "glisser un fichier qui passe la vérification mais s'exécute quand même",
+    owasp: "Contrôle d'accès rompu",
+    intro: [
+      "Un serveur décide si un envoi est sûr d'après son nom, puis le ressert et exécute tout ce qu'il considère comme un script. Quand la vérification et ce qui exécute le fichier ne s'accordent pas sur ce qui compte comme un script, un fichier qui passe la vérification peut quand même s'exécuter.",
+      "Vous contournerez une liste noire d'extensions avec un type qu'elle a oublié, puis cacherez un `.php` derrière une seconde extension.",
+    ],
+    defence:
+      "Mettez en liste blanche les types exacts que vous acceptez, générez vous-même le nom de fichier, et servez les envois depuis un stockage qui ne les exécute jamais. Décider de la sûreté en comparant l'extension est le mauvais endroit pour trancher ; une liste noire en oublie toujours un que le runtime exécute.",
+    learnTitles: ["APIs, envois et requêtes sortantes", "Fichiers, traversée et envois"],
+  },
+  massassign: {
+    title: "Affectation de masse",
+    tagline: "envoyer le champ que le formulaire ne vous a jamais montré",
+    owasp: "Contrôle d'accès rompu",
+    intro: [
+      "Un serveur construit un objet en copiant dessus chaque champ que vous envoyez, y compris des champs que le formulaire n'a jamais affichés, comme un rôle ou un solde de compte. Vous définissez donc ce qu'on ne vous a jamais proposé.",
+      "Vous créerez un compte et vous attribuerez le rôle admin que le formulaire d'inscription ne mentionne pas.",
+    ],
+    defence:
+      "Ne liez qu'une liste blanche explicite de champs (`{ username, password }`), jamais toute la requête. Définissez les champs sensibles comme `role` côté serveur, et séparez le modèle qui reçoit la saisie de celui qui porte les privilèges.",
+    learnTitles: ["Comment les applications web échouent", "Sécurité des API : GraphQL et gRPC"],
+  },
+  jwt: {
+    title: "Forgeage de JWT",
+    tagline: "écrire votre propre jeton quand le serveur accepte alg:none",
+    owasp: "Contrôle d'accès rompu",
+    intro: [
+      "Un JSON Web Token est fait de trois parties en base64url : un en-tête qui dit comment il est signé, une charge utile de revendications, et une signature. Un serveur qui respecte un en-tête `alg: none` fait confiance à la charge utile sans aucune signature, donc vous pouvez écrire un jeton qui dit ce que vous voulez.",
+      "Vous forgerez un jeton non signé qui prétend que vous êtes l'admin.",
+    ],
+    defence:
+      "Fixez l'algorithme attendu dans le vérificateur et refusez `none` d'emblée. Vérifiez avec une clé que le client ne voit jamais, et considérez un jeton que le client peut réécrire comme une absence d'authentification.",
+    learnTitles: ["Attaquer et défendre l'identité", "Authentification et attaques JWT"],
+  },
+  deser: {
+    title: "Désérialisation non sécurisée",
+    tagline: "reconstruire le blob de confiance pour qu'il dise ce que vous voulez",
+    owasp: "Intégrité du logiciel",
+    intro: [
+      "Un serveur stocke un état sous forme de blob qu'il vous remet, puis fait confiance à tout ce qu'il redécode, sans signature. Vous reconstruisez donc le blob : un rôle plus élevé, ou un champ qui fait faire au chargeur du serveur quelque chose qu'il ne devrait pas.",
+      "Vous vous promouvrez en modifiant une session non signée, puis ferez ouvrir un fichier à un chargeur en ajoutant les champs qu'il recherche.",
+    ],
+    defence:
+      "Signez l'état sérialisé avec une clé réservée au serveur et vérifiez-le avant de faire confiance au moindre octet, ou gardez l'état côté serveur et ne remettez au client qu'un identifiant opaque. Ne laissez jamais des données désérialisées choisir un type, une classe, un chemin ou une fonction de rappel.",
+    learnTitles: ["Comment les applications web échouent", "Désérialisation"],
+  },
+  redirect: {
+    title: "Redirection ouverte",
+    tagline: "transformer un lien de confiance en tremplin vers n'importe où",
+    owasp: "Contrôle d'accès rompu",
+    intro: [
+      "Un serveur envoie les utilisateurs là où le dit un paramètre `url`, sans vérifier que la destination est l'une de ses propres pages. Un lien qui semble aller vers le site de confiance peut renvoyer une victime vers un site hostile, en emportant sa confiance, et parfois un jeton, avec elle.",
+      "Vous ferez qu'une redirection de connexion envoie une victime hors du site, et lirez ce qui fuit alors.",
+    ],
+    defence:
+      "Ne redirigez que vers un chemin relatif de votre propre site, ou comparez la destination à une liste blanche stricte d'hôtes. N'injectez jamais une URL fournie par l'utilisateur directement dans l'en-tête `Location` ; c'est un cadeau pour l'hameçonnage.",
+    learnTitles: ["Comment les applications web échouent", "Attaques côté client"],
   },
 };
 

@@ -66,6 +66,7 @@ export function BreakInHub({ classes }: { classes: Cls[] }) {
         })}
       </div>
 
+      <p className="breakin-elsewhere muted">{t.breakin.elsewhere} <Link href="/practice/labs/">{t.breakin.footLink}</Link>.</p>
       <p className="dojo-credit muted">{t.breakin.foot} <Link href="/practice/labs/">{t.breakin.footLink}</Link>.</p>
     </>
   );
