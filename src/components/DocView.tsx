@@ -41,8 +41,8 @@ function useTally(brief: DocBrief) {
   return { answered, right };
 }
 
-function WordField({ slug, word }: { slug: string; word: string }) {
-  const key = `${slug}:${word}`;
+function WordField({ slug, word, saveAs }: { slug: string; word: string; saveAs: string }) {
+  const key = `${slug}:${saveAs}`;
   const value = useSlice((s) => s.words[key] ?? "");
   const { t } = useLang();
   return (
@@ -155,7 +155,7 @@ export function DocView({
           {meta.words.length > 0 && (
             <div className="words">
               <p className="words-title">{t.doc.defineTitle}</p>
-              {meta.words.map((w) => <WordField key={w} slug={meta.slug} word={w} />)}
+              {meta.words.map((w, i) => <WordField key={w} slug={meta.slug} word={w} saveAs={meta.wordKeys?.[i] ?? w} />)}
             </div>
           )}
           <Score brief={brief} />

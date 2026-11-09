@@ -144,6 +144,8 @@ for (const [en, fr] of libraries.flat()) {
   if (fr.meta.words.length !== en.meta.words.length) fail(`${name}: ${fr.meta.words.length} words to define, English has ${en.meta.words.length}`);
   if (!fr.meta.summary || fr.meta.summary === en.meta.summary) fail(`${name}: the summary isn't translated`);
   if (fr.meta.title === en.meta.title && en.meta.kind !== "tool") fail(`${name}: the title isn't translated`);
+  // Front matter isn't YAML: quotes would show on the page.
+  for (const [k, v] of Object.entries({ title: fr.meta.title, summary: fr.meta.summary })) if (/^["']/.test(v)) fail(`${name}: the ${k} starts with a quote`);
 }
 
 // 5. French data: keys that exist, and gates that keep their positions.

@@ -127,6 +127,16 @@ const CALLOUTS: Record<string, string> = {
   ai: "With your AI tutor",
   job: "On the job",
 };
+const CALLOUTS_FR: Record<string, string> = {
+  key: "L'idée à retenir",
+  tip: "Astuce",
+  trap: "Piège courant",
+  try: "À vous",
+  why: "Pourquoi c'est important",
+  law: "Restez dans la loi",
+  ai: "Avec votre tuteur IA",
+  job: "Sur le terrain",
+};
 
 function flowHtml(spec: string): string {
   const parts = spec.split(/\s+>\s+/).map((p) => p.trim());
@@ -181,7 +191,8 @@ export const flatSegments = (list: Segment[]): Segment[] =>
  * same way, so a saved answer (an option position) means the same in both languages.
  * `keys` are the English term names, in order, so a flashcard keeps its schedule too.
  */
-function parseBody(slug: string, title: string, body: string, href: string, seeds: string[] = [], keys: string[] = []) {
+function parseBody(slug: string, title: string, body: string, href: string, seeds: string[] = [], keys: string[] = [], lang: Lang = "en") {
+  const fr = lang === "fr";
   const toc: TocEntry[] = [];
   const marked = makeMarked(toc);
   const inline = (s: string) => marked.parseInline(s, { async: false }) as string;
@@ -347,19 +358,19 @@ function parseBody(slug: string, title: string, body: string, href: string, seed
       const rows: string[] = [];
       i++;
       while (i < lines.length && (lines[i] as string).trim() !== "") rows.push((lines[i++] as string).trim());
-      const html = block[1] === "seq" ? seqSvg(block[2] as string, rows) : block[1] === "stack" ? stackHtml(rows) : pyramidHtml(rows);
+      const html = block[1] === "seq" ? seqSvg(block[2] as string, rows, fr) : block[1] === "stack" ? stackHtml(rows) : pyramidHtml(rows);
       buf.push("", html, "");
       continue;
     }
     const bits = /^@bits\s+(\d+)\s+(\S+)/.exec(line);
     if (bits) {
-      buf.push("", bitsHtml(Number(bits[1]), bits[2] as string), "");
+      buf.push("", bitsHtml(Number(bits[1]), bits[2] as string, fr), "");
       i++;
       continue;
     }
     const perm = /^@perm\s+(\S+)/.exec(line);
     if (perm) {
-      buf.push("", permHtml(perm[1] as string), "");
+      buf.push("", permHtml(perm[1] as string, fr), "");
       i++;
       continue;
     }
@@ -387,7 +398,7 @@ function parseBody(slug: string, title: string, body: string, href: string, seed
     if (call) {
       const kind = call[1] as string;
       if (!CALLOUTS[kind]) throw new Error(`${slug}: unknown callout ${kind}`);
-      const label = call[2]?.trim() || CALLOUTS[kind];
+      const label = call[2]?.trim() || (fr ? CALLOUTS_FR[kind] : CALLOUTS[kind]);
       const inner: string[] = [];
       i++;
       while (i < lines.length && (lines[i] as string).trim() !== ":::") inner.push(lines[i++] as string);
@@ -472,7 +483,7 @@ function load(kindDir: DocDir, file: string, lang: Lang = "en"): Doc {
   const kind = KIND[kindDir];
   const title = front.title ?? slug;
   const english = lang === "en" ? null : cached(kindDir, file);
-  const parsed = parseBody(slug, title, body, `${BASE[kindDir]}${slug}/`, english?.questions.map((q) => q.prompt), english?.terms.map((t) => t.term));
+  const parsed = parseBody(slug, title, body, `${BASE[kindDir]}${slug}/`, english?.questions.map((q) => q.prompt), english?.terms.map((t) => t.term), lang);
   const src = front.source?.split("|").map((s) => s.trim());
   const meta: DocMeta = {
     slug,
@@ -486,6 +497,7 @@ function load(kindDir: DocDir, file: string, lang: Lang = "en"): Doc {
     questions: parsed.questions.length,
     lang,
   };
+  if (english) meta.wordKeys = english.meta.words;
   if (front.builds) meta.builds = front.builds;
   if (front.group) meta.group = front.group;
   if (front.level) meta.level = front.level;
@@ -632,7 +644,7 @@ export function glossary(lang: Lang = "en"): Term[] {
 
 export function brief(doc: Doc): DocBrief {
   const { slug, kind, title, summary, number, words } = doc.meta;
-  return { slug, kind, title, summary, number, words, questions: doc.questions, written: doc.written };
+  return { slug, kind, title, summary, number, words, wordKeys: doc.meta.wordKeys ?? words, questions: doc.questions, written: doc.written };
 }
 
 /** Every question, for spaced review. */

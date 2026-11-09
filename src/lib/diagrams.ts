@@ -15,7 +15,7 @@
  */
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-export function seqSvg(head: string, rows: string[]): string {
+export function seqSvg(head: string, rows: string[], fr = false): string {
   const names = head.split("|").map((s) => s.trim());
   const w = names.length > 2 ? 560 : 460;
   const pad = 62;
@@ -44,7 +44,7 @@ export function seqSvg(head: string, rows: string[]): string {
     out.push(`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" class="d-arrow"/><path d="M${x2} ${y} l${-dir * 9} -5 v10 z" class="d-head"/>`);
     out.push(`<text x="${(x(a) + x(b)) / 2}" y="${y - 8}" class="d-label" text-anchor="middle">${esc(text)}</text>`);
   });
-  const label = parsed.map((p) => `${names[p.a]} to ${names[p.b]}: ${p.text}`).join(". ");
+  const label = parsed.map((p) => (fr ? `${names[p.a]} vers ${names[p.b]} : ${p.text}` : `${names[p.a]} to ${names[p.b]}: ${p.text}`)).join(". ");
   return `<figure class="diagram noterms"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}">${out.join("")}</svg></figure>`;
 }
 
@@ -67,25 +67,29 @@ export function pyramidHtml(rows: string[]): string {
   return `<div class="pyramid noterms">${cells.join("")}</div>`;
 }
 
-export function bitsHtml(prefix: number, ip: string): string {
+export function bitsHtml(prefix: number, ip: string, fr = false): string {
   const octets = ip.split(".").map(Number);
   const bits = octets.map((o) => o.toString(2).padStart(8, "0")).join("");
   const cell = (b: string, i: number) => `<span class="${i < prefix ? "net" : "host"}">${b}</span>`;
   // Each byte stays whole, so that a narrow screen wraps between bytes.
   const cells = [0, 8, 16, 24].map((o) => `<span class="octet">${[...bits.slice(o, o + 8)].map((b, i) => cell(b, o + i)).join("")}</span>`);
-  return `<figure class="bits noterms" aria-label="${esc(ip)} with ${prefix} network bits and ${32 - prefix} host bits"><div class="bit-row">${cells.join("")}</div><figcaption><span class="net-key">Network: ${prefix} bits</span> <span class="host-key">Host: ${32 - prefix} bits</span></figcaption></figure>`;
+  const label = fr ? `${esc(ip)} avec ${prefix} bits de réseau et ${32 - prefix} bits d'hôte` : `${esc(ip)} with ${prefix} network bits and ${32 - prefix} host bits`;
+  const net = fr ? `Réseau : ${prefix} bits` : `Network: ${prefix} bits`;
+  const host = fr ? `Hôte : ${32 - prefix} bits` : `Host: ${32 - prefix} bits`;
+  return `<figure class="bits noterms" aria-label="${label}"><div class="bit-row">${cells.join("")}</div><figcaption><span class="net-key">${net}</span> <span class="host-key">${host}</span></figcaption></figure>`;
 }
 
-export function permHtml(mode: string): string {
+export function permHtml(mode: string, fr = false): string {
   if (!/^[rwx-]{9}$/.test(mode)) throw new Error(`bad @perm: ${mode}`);
+  const w = fr ? { owner: "Propriétaire", group: "Groupe", others: "Autres", read: "lire", write: "écrire", run: "exécuter", nothing: "rien" } : { owner: "Owner", group: "Group", others: "Others", read: "read", write: "write", run: "run", nothing: "nothing" };
   const groups = [
-    ["Owner", mode.slice(0, 3)],
-    ["Group", mode.slice(3, 6)],
-    ["Others", mode.slice(6, 9)],
+    [w.owner, mode.slice(0, 3)],
+    [w.group, mode.slice(3, 6)],
+    [w.others, mode.slice(6, 9)],
   ] as const;
   const digit = (t: string) => (t[0] === "r" ? 4 : 0) + (t[1] === "w" ? 2 : 0) + (t[2] === "x" ? 1 : 0);
   const cells = groups.map(([who, t]) => {
-    const parts = [t[0] === "r" ? "read" : "", t[1] === "w" ? "write" : "", t[2] === "x" ? "run" : ""].filter(Boolean).join(", ") || "nothing";
+    const parts = [t[0] === "r" ? w.read : "", t[1] === "w" ? w.write : "", t[2] === "x" ? w.run : ""].filter(Boolean).join(", ") || w.nothing;
     return `<div class="perm-cell"><span class="perm-who">${who}</span><code>${t}</code><span class="perm-num">${digit(t)}</span><span class="perm-can">${parts}</span></div>`;
   });
   return `<div class="perm noterms">${cells.join("")}</div>`;

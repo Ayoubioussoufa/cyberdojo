@@ -89,7 +89,7 @@ export function fullMessage(doc: DocBrief, store: Store, lang: Lang = "en"): str
     parts.push(`${say.written}\n${doc.written.map((w, i) => `W${i + 1}. ${w.prompt}\n${say.myAnswer}${store.written[w.id]?.trim() || say.blankWritten}`).join("\n\n")}`);
   }
   if (doc.words.length) {
-    parts.push(`${say.definitions}\n${doc.words.map((w) => `${w}: ${store.words[`${doc.slug}:${w}`]?.trim() || say.blankWord}`).join("\n")}`);
+    parts.push(`${say.definitions}\n${doc.words.map((w, i) => `${w}: ${store.words[`${doc.slug}:${doc.wordKeys[i] ?? w}`]?.trim() || say.blankWord}`).join("\n")}`);
   }
   return parts.join("\n\n");
 }

@@ -98,6 +98,8 @@ export interface DocMeta {
   builds?: string;
   source?: { label: string; url: string };
   words: string[];
+  /** In a translation: the English words, in order. Definitions are saved under these. */
+  wordKeys?: string[];
   group?: string;
   /** Machines: how hard it is. Modules: foundation, intermediate or advanced. */
   level?: string;
@@ -159,4 +161,6 @@ export interface DocBrief {
   questions: Question[];
   written: Written[];
   words: string[];
+  /** The keys the definitions are saved under: the English words. */
+  wordKeys: string[];
 }
