@@ -261,6 +261,91 @@ export const BREAK_IN: BreakClass[] = [
       { href: "/modules/04-05-client-side-attacks/", title: "Client-side attacks" },
     ],
   },
+  {
+    id: "ldap",
+    range: "break-ldap",
+    title: "LDAP injection",
+    tagline: "slip a wildcard into the directory's login filter",
+    owasp: "Injection",
+    intro: [
+      "Companies keep their accounts in a directory, and apps check a login by sending it a filter such as `(&(uid=NAME)(userPassword=PASS))`. When the app pastes your input straight into that filter, the characters the filter language gives meaning to, like `*` for any value, are yours to use.",
+      "You'll sign in as the admin without the password, then sign in without even knowing a username.",
+    ],
+    defence:
+      "Escape the filter's special characters (`*`, `(`, `)`, `\\` and NUL) in every value that comes from a user, or use a library call that builds the filter for you. Better still, look the user up first and check the password with a separate bind, so input never decides what the filter means.",
+    learn: [
+      { href: "/courses/0047-keeping-input-out-of-the-code/", title: "Keeping input out of the code" },
+      { href: "/modules/04-03-injection-beyond-sql/", title: "Injection beyond SQL" },
+    ],
+  },
+  {
+    id: "xpath",
+    range: "break-xpath",
+    title: "XPath injection",
+    tagline: "make an XML lookup true for every user",
+    owasp: "Injection",
+    intro: [
+      "Some apps keep data in XML and find a record with an XPath expression, such as `//user[name='YOU' and pass='YOU']`. If your input is pasted between those quotes, a quote of your own ends the value, and what follows is read as part of the expression.",
+      "You'll break out of the string and make the test pass for every user, which logs you in as the first one in the file.",
+    ],
+    defence:
+      "Use parameterised XPath: pass input as a variable the expression refers to, so it can only ever be a value. If the library can't do that, escape quotes and reject anything outside the characters a name needs. It is the SQL injection fix, applied to XML.",
+    learn: [
+      { href: "/courses/0047-keeping-input-out-of-the-code/", title: "Keeping input out of the code" },
+      { href: "/modules/04-03-injection-beyond-sql/", title: "Injection beyond SQL" },
+    ],
+  },
+  {
+    id: "crlf",
+    range: "break-crlf",
+    title: "Header injection",
+    tagline: "end the server's header and write one of your own",
+    owasp: "Injection",
+    intro: [
+      "An HTTP response is lines of text: each header ends with a carriage return and a line feed (CRLF). A server that copies your input into a header without removing line breaks lets you finish its header early and start a new one.",
+      "You'll use an encoded line break, `%0d%0a`, to add a cookie the server never meant to set.",
+    ],
+    defence:
+      "Reject or strip CR and LF in any value that reaches a header, and set headers through the framework's own functions, which refuse line breaks. Never build raw response text from input.",
+    learn: [
+      { href: "/courses/0035-how-the-web-works/", title: "How the web works" },
+      { href: "/modules/04-03-injection-beyond-sql/", title: "Injection beyond SQL" },
+    ],
+  },
+  {
+    id: "host",
+    range: "break-host",
+    title: "Host header injection",
+    tagline: "decide where the password-reset link points",
+    owasp: "Security misconfiguration",
+    intro: [
+      "Every request names the site it wants in a `Host` header, and the client writes that header. A server that builds links from it, a password-reset link for example, builds them from a value the sender chose.",
+      "You'll send a reset request with a `Host` of your own, and see the victim's link, with its secret token, point at your domain.",
+    ],
+    defence:
+      "Build absolute links from a hostname set in the server's configuration, never from the request. Reject requests whose `Host` isn't on an allowlist, and make the proxy in front do the same.",
+    learn: [
+      { href: "/courses/0035-how-the-web-works/", title: "How the web works" },
+      { href: "/modules/04-06-authentication-and-jwt-attacks/", title: "Authentication and JWT attacks" },
+    ],
+  },
+  {
+    id: "graphql",
+    range: "break-graphql",
+    title: "GraphQL introspection",
+    tagline: "ask the API to list the fields its app never shows",
+    owasp: "Security misconfiguration",
+    intro: [
+      "A GraphQL API can describe itself: an introspection query returns every type and field it offers. Left on in production, that hands a stranger the full map, including fields the app's own screens never call.",
+      "You'll read the schema, spot the field that doesn't belong, and query it directly.",
+    ],
+    defence:
+      "Turn introspection off in production, and check permission inside every resolver. A field the interface doesn't show is still one query away, so hiding it is not protecting it.",
+    learn: [
+      { href: "/courses/0049-apis-uploads-and-outbound-requests/", title: "APIs, uploads and outbound requests" },
+      { href: "/modules/04-12-api-security-graphql-grpc/", title: "API security: GraphQL and gRPC" },
+    ],
+  },
 ];
 
 /** French for the attack classes. The challenges themselves are in English for now. */
@@ -432,6 +517,66 @@ const BREAK_IN_FR: Record<string, { title: string; tagline: string; owasp: strin
     defence:
       "Ne redirigez que vers un chemin relatif de votre propre site, ou comparez la destination à une liste blanche stricte d'hôtes. N'injectez jamais une URL fournie par l'utilisateur directement dans l'en-tête `Location` ; c'est un cadeau pour l'hameçonnage.",
     learnTitles: ["Comment les applications web échouent", "Attaques côté client"],
+  },
+  ldap: {
+    title: "Injection LDAP",
+    tagline: "glisser un joker dans le filtre de connexion de l'annuaire",
+    owasp: "Injection",
+    intro: [
+      "Les entreprises gardent leurs comptes dans un annuaire, et les applications vérifient une connexion en lui envoyant un filtre comme `(&(uid=NOM)(userPassword=MDP))`. Quand l'application colle votre saisie telle quelle dans ce filtre, les caractères auxquels le langage du filtre donne un sens, comme `*` pour n'importe quelle valeur, sont à votre disposition.",
+      "Vous vous connecterez en tant qu'admin sans le mot de passe, puis sans même connaître un nom d'utilisateur.",
+    ],
+    defence:
+      "Échappez les caractères spéciaux du filtre (`*`, `(`, `)`, `\\` et NUL) dans toute valeur venant d'un utilisateur, ou utilisez une fonction de bibliothèque qui construit le filtre pour vous. Mieux encore : cherchez d'abord l'utilisateur, puis vérifiez le mot de passe par une liaison séparée, pour que la saisie ne décide jamais du sens du filtre.",
+    learnTitles: ["Garder la saisie hors du code", "L'injection au-delà du SQL"],
+  },
+  xpath: {
+    title: "Injection XPath",
+    tagline: "rendre une recherche XML vraie pour tous les utilisateurs",
+    owasp: "Injection",
+    intro: [
+      "Certaines applications gardent leurs données en XML et retrouvent un enregistrement avec une expression XPath, comme `//user[name='VOUS' and pass='VOUS']`. Si votre saisie est collée entre ces apostrophes, une apostrophe de votre part ferme la valeur, et ce qui suit est lu comme une partie de l'expression.",
+      "Vous sortirez de la chaîne et ferez réussir le test pour tous les utilisateurs, ce qui vous connecte en tant que premier du fichier.",
+    ],
+    defence:
+      "Utilisez du XPath paramétré : passez la saisie comme une variable à laquelle l'expression fait référence, pour qu'elle ne puisse être qu'une valeur. Si la bibliothèque ne le permet pas, échappez les apostrophes et refusez tout ce qui sort des caractères dont un nom a besoin. C'est le correctif de l'injection SQL, appliqué au XML.",
+    learnTitles: ["Garder la saisie hors du code", "L'injection au-delà du SQL"],
+  },
+  crlf: {
+    title: "Injection d'en-tête",
+    tagline: "terminer l'en-tête du serveur et écrire le vôtre",
+    owasp: "Injection",
+    intro: [
+      "Une réponse HTTP est faite de lignes de texte : chaque en-tête se termine par un retour chariot et un saut de ligne (CRLF). Un serveur qui copie votre saisie dans un en-tête sans retirer les sauts de ligne vous laisse finir son en-tête plus tôt et en commencer un nouveau.",
+      "Vous utiliserez un saut de ligne encodé, `%0d%0a`, pour ajouter un cookie que le serveur n'a jamais voulu poser.",
+    ],
+    defence:
+      "Refusez ou retirez CR et LF dans toute valeur qui atteint un en-tête, et posez les en-têtes avec les fonctions du framework, qui refusent les sauts de ligne. Ne construisez jamais le texte brut d'une réponse à partir d'une saisie.",
+    learnTitles: ["Comment fonctionne le web", "L'injection au-delà du SQL"],
+  },
+  host: {
+    title: "Injection de l'en-tête Host",
+    tagline: "décider où pointe le lien de réinitialisation du mot de passe",
+    owasp: "Mauvaise configuration de sécurité",
+    intro: [
+      "Chaque requête nomme le site qu'elle vise dans un en-tête `Host`, et c'est le client qui écrit cet en-tête. Un serveur qui s'en sert pour construire des liens, un lien de réinitialisation de mot de passe par exemple, les construit à partir d'une valeur choisie par l'expéditeur.",
+      "Vous enverrez une demande de réinitialisation avec votre propre `Host`, et verrez le lien de la victime, avec son jeton secret, pointer vers votre domaine.",
+    ],
+    defence:
+      "Construisez les liens absolus à partir d'un nom d'hôte fixé dans la configuration du serveur, jamais à partir de la requête. Refusez les requêtes dont le `Host` n'est pas dans une liste blanche, et faites faire de même au proxy placé devant.",
+    learnTitles: ["Comment fonctionne le web", "Authentification et attaques JWT"],
+  },
+  graphql: {
+    title: "Introspection GraphQL",
+    tagline: "demander à l'API la liste des champs que son application ne montre jamais",
+    owasp: "Mauvaise configuration de sécurité",
+    intro: [
+      "Une API GraphQL sait se décrire : une requête d'introspection renvoie tous les types et tous les champs qu'elle propose. Laissée active en production, elle donne à un inconnu la carte complète, y compris les champs que les écrans de l'application n'appellent jamais.",
+      "Vous lirez le schéma, repérerez le champ qui n'a rien à faire là, et l'interrogerez directement.",
+    ],
+    defence:
+      "Désactivez l'introspection en production, et vérifiez les droits dans chaque résolveur. Un champ que l'interface ne montre pas reste à une requête de distance : le cacher n'est pas le protéger.",
+    learnTitles: ["APIs, envois et requêtes sortantes", "Sécurité des API : GraphQL et gRPC"],
   },
 };
 

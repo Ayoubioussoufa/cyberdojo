@@ -53,7 +53,7 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | DNS resolution and record types | 13 mentions in 3 docs, most in 0019-dns-and-dhcp, practice 1. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
+| ● | ● | DNS resolution and record types | 13 mentions in 3 docs, most in 0019-dns-and-dhcp, practice 2. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ◐ | ● | dig, host, nslookup (tool) | 6 mentions in 4 docs, most in 0019-dns-and-dhcp. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ◐* | ● | DNS attacks: cache poisoning, hijacking | 2 mentions in 2 docs, most in 0017-ethernet-arp-layers. *Section 'Poisoning'. The word count credited the web cache module by mistake.* | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ◐ | ● | DNS tunnelling and exfiltration | 1 mentions in 1 docs, most in 0019-dns-and-dhcp, practice 1. *Section 'Tunnelling', with detection features.* | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
@@ -84,7 +84,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 18 mentions in 10 docs, most in 0035-how-the-web-works, practice 149. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ● | ● | curl (tool) | 18 mentions in 10 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 1 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 6 mentions in 5 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 4 mentions in 2 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -159,7 +159,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 |---|---|---|---|---|
 | ● | ● | SUID and SGID abuse | 29 mentions in 8 docs, most in 0008-suid-sticky-umask, practice 23. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ◐ | ● | sudo misconfiguration, GTFOBins | 11 mentions in 4 docs, most in 0057-auditing-for-privilege-escalation, practice 9. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
-| ◐ | ● | Cron, PATH and wildcard abuse | 4 mentions in 3 docs, most in 0025-hardening-linux, practice 2. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
+| ◐ | ● | Cron, PATH and wildcard abuse | 4 mentions in 3 docs, most in 0025-hardening-linux, practice 5. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ○ | ● | Kernel privilege escalation classes | None. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ○ | ● | The docker group as root | None. *Section 'Groups that equal root'.* | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ◐ | ● | Enumeration tools: LinPEAS, LinEnum, Lynis (tool) | 9 mentions in 2 docs, most in P01. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
@@ -202,7 +202,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 |---|---|---|---|---|
 | ● | ● | Domains, forests, OUs, trusts | 44 mentions in 8 docs, most in 0043-active-directory, practice 3. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
 | ● | ● | Group Policy | 24 mentions in 4 docs, most in 0043-active-directory. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
-| ◐ | ◐ | LDAP | 7 mentions in 3 docs, most in ports, practice 1. |  |
+| ◐ | ◐ | LDAP | 7 mentions in 3 docs, most in ports, practice 12. |  |
 | ● | ● | BloodHound and attack paths | 35 mentions in 8 docs, most in 0045-attacking-and-defending-identity, practice 1. |  |
 | ◐ | ◐ | Kerberoasting | 16 mentions in 7 docs, most in 0044-kerberos-and-ntlm, practice 3. |  |
 | ◐ | ◐ | AS-REP roasting | 5 mentions in 4 docs, most in 0044-kerberos-and-ntlm. |  |
@@ -331,7 +331,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ◐* | ● | A02 Security Misconfiguration | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
 | ●* | ● | A03 Software Supply Chain Failures | 2 mentions in 2 docs, most in 0046-how-web-applications-fail. *Lesson 69 is about exactly this, under other words.* |  |
 | ●* | ● | A04 Cryptographic Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 38 to 40.* |  |
-| ● | ● | A05 Injection | 55 mentions in 18 docs, most in 0047-keeping-input-out-of-the-code, practice 31. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | A05 Injection | 55 mentions in 18 docs, most in 0047-keeping-input-out-of-the-code, practice 45. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ●* | ● | A06 Insecure Design | 2 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lesson 68.* |  |
 | ●* | ● | A07 Authentication Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 40 to 42.* |  |
 | ◐* | ● | A08 Software or Data Integrity Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
@@ -342,13 +342,13 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | SQL injection basics | 14 mentions in 6 docs, most in 0037-databases-and-sql, practice 22. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | SQL injection basics | 14 mentions in 6 docs, most in 0037-databases-and-sql, practice 23. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | SQLi variants: union, blind, time-based, second-order | None. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ◐ | sqlmap (tool) | None. *Named in the tools table, for labs. Not taught.* | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | NoSQL injection | Practice only (3). *Section 'NoSQL'.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 | ◐ | ● | OS command injection (CWE-78) | 5 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code, practice 7. | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 | ○ | ● | Code injection (CWE-94) | 1 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code. *Section 'Code evaluation'.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
-| ○ | ◐ | LDAP and XPath injection | None. *One table row each.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
+| ○ | ◐ | LDAP and XPath injection | Practice only (6). *One table row each.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 | ○ | ● | XXE | 1 mentions in 1 docs, most in 0049-apis-uploads-and-outbound-requests, practice 17. | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 | ○ | ● | Server-side template injection | Practice only (12). *Section 'Templates'.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
 
@@ -387,7 +387,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ●* | ● | OWASP API Security Top 10 | 1 mentions in 1 docs, most in 0049-apis-uploads-and-outbound-requests. *Lesson 49, 'The API Top 10'.* |  |
 | ◐ | ● | JWT attacks: alg, key confusion, weak secrets | 3 mentions in 3 docs, most in 0036-sessions-and-the-browser, practice 4. | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
 | ● | ● | JWT structure | 13 mentions in 3 docs, most in 0036-sessions-and-the-browser, practice 9. | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
-| ○ | ● | GraphQL | None. | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
+| ○ | ● | GraphQL | Practice only (17). | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
 | ○ | ● | gRPC | None. | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
 
 ### Tooling workflow
@@ -405,9 +405,9 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | Parameterised queries | 10 mentions in 5 docs, most in 0037-databases-and-sql, practice 7. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
+| ●* | ● | Parameterised queries | 10 mentions in 5 docs, most in 0037-databases-and-sql, practice 10. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
 | ●* | ● | Output encoding | 7 mentions in 3 docs, most in h4-interviews, practice 5. *Lesson 47, 'XSS: encoding on output'.* |  |
-| ●* | ● | Input validation | 14 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 20. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ●* | ● | Input validation | 14 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 21. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 | ● | ● | OWASP ASVS | 11 mentions in 5 docs, most in 0068-threat-modeling-and-secure-sdlc. |  |
 | ●* | ● | SAST, DAST, IAST | 9 mentions in 2 docs, most in 0068-threat-modeling-and-secure-sdlc, practice 9. *Lesson 68, 'The pipeline of checks'.* |  |
 | ●* | ● | Semgrep (tool) | 21 mentions in 5 docs, most in P05, practice 1. *Walked through in project P05.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |

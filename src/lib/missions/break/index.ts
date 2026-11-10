@@ -14,6 +14,11 @@ import { JWT } from "./jwt";
 import { REDIRECT } from "./redirect";
 import { UPLOAD } from "./upload";
 import { MASSASSIGN } from "./massassign";
+import { LDAP } from "./ldap";
+import { XPATH } from "./xpath";
+import { CRLF } from "./crlf";
+import { HOST } from "./host";
+import { GRAPHQL } from "./graphql";
 
 export const MISSIONS_BREAK: Record<string, RangeSet> = {
   "break-sqli": { title: "SQL injection", missions: SQLI },
@@ -30,4 +35,9 @@ export const MISSIONS_BREAK: Record<string, RangeSet> = {
   "break-deser": { title: "Insecure deserialization", missions: DESER },
   "break-redirect": { title: "Open redirect", missions: REDIRECT },
   "break-ssrf": { title: "Server-side request forgery", missions: SSRF },
+  "break-ldap": { title: "LDAP injection", missions: LDAP },
+  "break-xpath": { title: "XPath injection", missions: XPATH },
+  "break-crlf": { title: "Header injection", missions: CRLF },
+  "break-host": { title: "Host header injection", missions: HOST },
+  "break-graphql": { title: "GraphQL introspection", missions: GRAPHQL },
 };
