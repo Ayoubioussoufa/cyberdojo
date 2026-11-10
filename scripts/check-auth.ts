@@ -86,7 +86,7 @@ async function unit() {
 async function http() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cyberdojo-auth-"));
   const file = path.join(dir, "test.db");
-  const server = spawn("node_modules/.bin/next", ["start", "-p", String(PORT)], { env: { ...process.env, CYBERDOJO_DB: file, NODE_ENV: "production", SIGNUP_LIMIT: "12" }, stdio: "pipe" });
+  const server = spawn("node_modules/.bin/next", ["start", "-p", String(PORT)], { env: { ...process.env, TURSO_DATABASE_URL: "", CYBERDOJO_DB: file, NODE_ENV: "production", SIGNUP_LIMIT: "12" }, stdio: "pipe" });
   let log = "";
   server.stderr.on("data", (d: Buffer) => (log += d.toString()));
   try {
