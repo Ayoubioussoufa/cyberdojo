@@ -998,3 +998,39 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 .labs-out { margin: 0; padding-left: 18px; font-size: 15px; }
 .labs-out li { padding: 1px 0; overflow-wrap: anywhere; }
 @media (max-width: 720px) { .labs-list > li { grid-template-columns: minmax(0, 1fr); } }
+
+/* Usage statistics (admin only). Amber marks the one selected period; bars are neutral data, not a call to act. */
+.adm-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+.adm-head h1 { margin-bottom: 6px; }
+.adm-head .muted { font-size: 15px; margin: 0; }
+.adm-range { display: flex; gap: 6px; }
+.adm-range .btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.adm-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+.adm-tile { display: flex; flex-direction: column; gap: 2px; padding: 16px 18px; background: var(--surface); font-family: var(--body); }
+.adm-tile strong { font: 600 30px/1.1 var(--display); font-stretch: 85%; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.adm-tile span { font-size: 15px; font-weight: 600; }
+.adm-tile small { font-size: 13px; color: var(--muted); }
+.adm-part { margin-top: 40px; }
+.adm-part h2 { font-size: 22px; margin-bottom: 12px; }
+.adm-part td, .adm-part tbody th { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.adm-part tbody th { font-weight: 600; text-align: left; }
+.adm-part tbody th a { display: inline-block; min-width: 11rem; overflow-wrap: anywhere; white-space: normal; }
+.adm-note { font-size: 15px; line-height: 1.5; max-width: var(--read); }
+.adm-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; }
+.adm-chart { margin: 0; padding: 14px 16px 10px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); }
+.adm-chart figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-family: var(--body); font-size: 14px; margin-bottom: 12px; }
+.adm-chart figcaption span, .adm-axis { color: var(--muted); font-size: 12.5px; }
+.adm-bars { display: flex; align-items: flex-end; gap: 2px; height: 110px; border-bottom: 1px solid var(--rule-strong); }
+.adm-bars i { flex: 1 1 0; min-width: 1px; background: var(--info); border-radius: 2px 2px 0 0; }
+.adm-bars i:hover { background: var(--ink); }
+.adm-axis { display: flex; justify-content: space-between; font-family: var(--mono); margin-top: 6px; }
+.adm-details { margin-top: 14px; }
+.adm-details summary { cursor: pointer; font-size: 15px; color: var(--link); margin-bottom: 10px; }
+.adm-splits { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 24px 32px; margin-top: 40px; }
+.adm-split h3 { font-size: 16.5px; margin-bottom: 8px; }
+.adm-split ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.adm-split li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-family: var(--body); font-size: 14.5px; }
+.adm-split li > span:first-child { overflow-wrap: anywhere; }
+.adm-split li b { font-variant-numeric: tabular-nums; }
+.adm-split .meter { grid-column: 1 / -1; }
+.adm-split .meter i { background: var(--info); }

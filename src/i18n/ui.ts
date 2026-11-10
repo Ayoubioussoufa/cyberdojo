@@ -233,6 +233,17 @@ const TABLE = {
     progress: ["Your progress", "Votre progression"],
     download: ["Download a copy", "Télécharger une copie"],
     signOut: ["Sign out", "Se déconnecter"],
+    statsTitle: ["Usage statistics", "Statistiques d'utilisation"],
+    statsText: [
+      "This site counts its own visits: which pages are opened and for how long, under a random number kept in this browser, and under your username while you're signed in. Whoever runs the site can see those figures. Nothing is sent to any other company, and no IP address is stored.",
+      "Ce site compte ses propres visites : quelles pages sont ouvertes et pendant combien de temps, sous un numéro aléatoire gardé dans ce navigateur, et sous votre nom d'utilisateur quand vous êtes connecté. La personne qui gère le site peut voir ces chiffres. Rien n'est envoyé à une autre société, et aucune adresse IP n'est enregistrée.",
+    ],
+    statsOn: ["This browser is counted.", "Ce navigateur est compté."],
+    statsOff: ["This browser isn't counted.", "Ce navigateur n'est pas compté."],
+    statsBrowser: ["Your browser asks sites not to track it, so it isn't counted.", "Votre navigateur demande aux sites de ne pas le suivre : il n'est donc pas compté."],
+    statsStop: ["Stop counting this browser", "Ne plus compter ce navigateur"],
+    statsStart: ["Count this browser again", "Compter de nouveau ce navigateur"],
+    adminLink: ["Open the usage statistics", "Ouvrir les statistiques d'utilisation"],
   },
   review: {
     today: ["Today", "Aujourd'hui"],
@@ -838,6 +849,17 @@ const TABLE = {
     onPage: ["On this page", "Sur cette page"],
     copyRail: ["Copy for my AI tutor", "Copier pour mon tuteur IA"],
     copyMobile: ["Copy for AI", "Copier pour l'IA"],
+    statsTitle: ["Usage statistics", "Statistiques d'utilisation"],
+    statsText: [
+      "This site counts its own visits: which pages are opened and for how long, under a random number kept in this browser, and under your username while you're signed in. Whoever runs the site can see those figures. Nothing is sent to any other company, and no IP address is stored.",
+      "Ce site compte ses propres visites : quelles pages sont ouvertes et pendant combien de temps, sous un numéro aléatoire gardé dans ce navigateur, et sous votre nom d'utilisateur quand vous êtes connecté. La personne qui gère le site peut voir ces chiffres. Rien n'est envoyé à une autre société, et aucune adresse IP n'est enregistrée.",
+    ],
+    statsOn: ["This browser is counted.", "Ce navigateur est compté."],
+    statsOff: ["This browser isn't counted.", "Ce navigateur n'est pas compté."],
+    statsBrowser: ["Your browser asks sites not to track it, so it isn't counted.", "Votre navigateur demande aux sites de ne pas le suivre : il n'est donc pas compté."],
+    statsStop: ["Stop counting this browser", "Ne plus compter ce navigateur"],
+    statsStart: ["Count this browser again", "Compter de nouveau ce navigateur"],
+    adminLink: ["Open the usage statistics", "Ouvrir les statistiques d'utilisation"],
   },
 } as const satisfies Record<string, Record<string, Pair>>;
 
@@ -852,6 +874,7 @@ const MESSAGES: Pair[] = [
   ["That request wasn't valid.", "Cette requête n'est pas valide."],
   ["Usernames use 3 to 32 letters, digits, dots, dashes or underscores.", "Un nom d'utilisateur compte 3 à 32 lettres, chiffres, points, tirets ou tirets bas."],
   ["Sign in first.", "Connectez-vous d'abord."],
+  ["Not found.", "Introuvable."],
   ["That password isn't right.", "Ce mot de passe est incorrect."],
   ["This request came from another site.", "Cette requête vient d'un autre site."],
   ["Your current password isn't right.", "Votre mot de passe actuel est incorrect."],

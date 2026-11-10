@@ -2,10 +2,11 @@
 
 import Link from "@/components/HoverLink";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { changePassword, deleteAccount, signOut, useAccount } from "@/lib/account";
 import { fill, plural, useLang } from "@/i18n/LangProvider";
 import { exportStore } from "@/lib/progress";
+import { browserRefuses, countingOff, setCounting } from "@/lib/track";
 
 import { say } from "@/i18n/ui";
 
@@ -72,8 +73,28 @@ function Delete() {
   );
 }
 
+/** Shown to guests too: they are counted as well, and can say no. */
+function Stats() {
+  const { t } = useLang();
+  // Read after mount: the pre-rendered page can't know what this browser chose.
+  const [state, setState] = useState<"on" | "off" | "browser" | null>(null);
+  useEffect(() => setState(browserRefuses() ? "browser" : countingOff() ? "off" : "on"), []);
+  const flip = () => {
+    setCounting(state === "off");
+    setState(state === "off" ? "on" : "off");
+  };
+  return (
+    <section className="acct-part">
+      <h2>{t.account.statsTitle}</h2>
+      <p className="muted">{t.account.statsText}</p>
+      {state && <p className="acct-sync" data-state={state === "on" ? "saved" : "saving"}>{state === "on" ? t.account.statsOn : state === "off" ? t.account.statsOff : t.account.statsBrowser}</p>}
+      {state && state !== "browser" && <button type="button" className="btn" onClick={flip}>{state === "on" ? t.account.statsStop : t.account.statsStart}</button>}
+    </section>
+  );
+}
+
 export function Account() {
-  const { ready, user, sync } = useAccount();
+  const { ready, user, admin, sync } = useAccount();
   const router = useRouter();
   const [error, setError] = useState("");
   const { lang, t } = useLang();
@@ -81,11 +102,14 @@ export function Account() {
   if (!ready) return <p className="muted" aria-busy="true">{t.account.checking}</p>;
   if (!user) {
     return (
-      <header className="page-head">
-        <h1>{t.account.guestTitle}</h1>
-        <p className="lede">{t.account.guestText}</p>
-        <p><Link className="btn primary lg" href={`/signin/?next=${encodeURIComponent(lang === "fr" ? "/fr/account/" : "/account/")}`}>{t.account.signIn}</Link></p>
-      </header>
+      <>
+        <header className="page-head">
+          <h1>{t.account.guestTitle}</h1>
+          <p className="lede">{t.account.guestText}</p>
+          <p><Link className="btn primary lg" href={`/signin/?next=${encodeURIComponent(lang === "fr" ? "/fr/account/" : "/account/")}`}>{t.account.signIn}</Link></p>
+        </header>
+        <Stats />
+      </>
     );
   }
 
@@ -109,6 +133,7 @@ export function Account() {
       <header className="page-head">
         <h1>{user.username}</h1>
         <p className="lede">{fill(t.account.since, { date: new Date(user.createdAt).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { year: "numeric", month: "long", day: "numeric" }) })}</p>
+        {admin && <p><Link className="btn" href="/admin/">{t.account.adminLink}</Link></p>}
       </header>
       <section className="acct-part">
         <h2>{t.account.progress}</h2>
@@ -120,6 +145,7 @@ export function Account() {
         {error && <p className="auth-error" role="alert">{error}</p>}
       </section>
       <Password />
+      <Stats />
       <Delete />
     </>
   );

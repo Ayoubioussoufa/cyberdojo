@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { clientIp, fail, forget, limited, note, sameOrigin, smallJson, text } from "@/server/http";
 import { hashPassword, needsRehash, verifyPassword, wasteTime } from "@/server/password";
+import { isAdmin } from "@/server/metrics";
 import { startSession } from "@/server/session";
 
 const WINDOW = 15 * 60_000;
@@ -33,5 +34,5 @@ export async function POST(req: Request) {
   forget(nameKey);
   if (needsRehash(user.hash)) conn.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(await hashPassword(password), user.id);
   await startSession(user.id);
-  return NextResponse.json({ user: { id: user.id, username: user.username, createdAt: user.createdAt } });
+  return NextResponse.json({ user: { id: user.id, username: user.username, createdAt: user.createdAt }, ...(isAdmin(user) ? { admin: true } : {}) });
 }

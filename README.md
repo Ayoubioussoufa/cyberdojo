@@ -116,4 +116,13 @@ graph LR
 
 Guests keep progress in the browser. An account keeps it on the server, in one SQLite file (`data/cyberdojo.db`, or `CYBERDOJO_DB`). Back that file up. Sign-up needs a username only, so a forgotten password is reset with `pnpm user:reset`.
 
+## Usage statistics
+
+The site counts its own visits, in the same SQLite file: no outside service, no IP address, no user agent. A browser gets a random number, kept in `localStorage`; it reports each page opened and the seconds the tab was visible and in use. The server groups those into visits (a visit ends after 30 minutes of silence) and never credits more time than really passed. Rows older than 400 days are deleted.
+
+- Name the admins in `CYBERDOJO_ADMINS` (usernames, comma-separated). They get a link on their account page to `/admin/`: accounts, visitors, average time per visit and per person, day-by-day charts, a line per account, the most-read pages. Everyone else gets a 404 from `/api/admin/stats/`.
+- Create the admin account **before** you set the variable on a public server, or whoever registers that username first becomes the admin.
+- People can switch counting off on the account page. Browsers that send Do Not Track or Global Privacy Control, and automated browsers, aren't counted at all, so the figures are a floor, not an exact count.
+- `src/server/metrics.ts` (recording and the report), `src/lib/track.ts` (the browser side), `scripts/check-metrics.ts` (`pnpm test:metrics`).
+
 To host it: run behind HTTPS (off `localhost`, session cookies are `Secure`, so plain HTTP can't sign in), keep `data/` on a persistent disk, run one instance, and set `TRUST_PROXY=1` only behind a proxy you control, or rate limits by IP can be spoofed. Serverless hosts such as Vercel don't fit: they have no persistent disk.

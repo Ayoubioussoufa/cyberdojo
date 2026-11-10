@@ -6,6 +6,7 @@ import "../globals.css";
 import { AccountStart } from "@/components/AccountStart";
 import { Nav } from "@/components/Nav";
 import { Prompt } from "@/components/Prompt";
+import { Track } from "@/components/Track";
 import { LangProvider } from "@/i18n/LangProvider";
 import { LANGS, isLang } from "@/i18n/lang";
 import { UI } from "@/i18n/ui";
@@ -44,6 +45,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         <LangProvider lang={lang} t={t}>
           <a className="skip" href="#main">{t.common.skip}</a>
           <AccountStart />
+          <Track />
           <Nav />
           <Prompt />
           <main id="main">{children}</main>

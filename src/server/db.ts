@@ -31,6 +31,30 @@ CREATE TABLE IF NOT EXISTS attempts (
   at  INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS attempts_key ON attempts(key, at);
+CREATE TABLE IF NOT EXISTS visits (
+  id         INTEGER PRIMARY KEY,
+  visitor    TEXT NOT NULL,
+  user_id    TEXT REFERENCES users(id) ON DELETE SET NULL,
+  day        TEXT NOT NULL,
+  started_at INTEGER NOT NULL,
+  last_at    INTEGER NOT NULL,
+  active_ms  INTEGER NOT NULL DEFAULT 0,
+  views      INTEGER NOT NULL DEFAULT 0,
+  lang       TEXT NOT NULL,
+  device     TEXT NOT NULL,
+  referrer   TEXT NOT NULL DEFAULT '',
+  entry      TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS visits_visitor ON visits(visitor, last_at);
+CREATE INDEX IF NOT EXISTS visits_day ON visits(day);
+CREATE INDEX IF NOT EXISTS visits_user ON visits(user_id);
+CREATE TABLE IF NOT EXISTS page_stats (
+  day       TEXT NOT NULL,
+  path      TEXT NOT NULL,
+  views     INTEGER NOT NULL DEFAULT 0,
+  active_ms INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (day, path)
+) WITHOUT ROWID;
 `;
 
 const slot = globalThis as { __cyberdojoDb?: DatabaseSync };

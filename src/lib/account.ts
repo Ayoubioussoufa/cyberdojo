@@ -26,6 +26,8 @@ export type Sync = "idle" | "saving" | "saved" | "offline";
 interface State {
   ready: boolean;
   user: User | null;
+  /** May open the usage statistics. The server decides again on every request. */
+  admin: boolean;
   sync: Sync;
 }
 
@@ -34,7 +36,7 @@ const DIRTY = "cyberdojo-dirty";
 const SAVE_AFTER_MS = 1500;
 const KEEPALIVE_LIMIT = 60_000;
 
-let state: State = { ready: false, user: null, sync: "idle" };
+let state: State = { ready: false, user: null, admin: false, sync: "idle" };
 let version = 0;
 let timer: ReturnType<typeof setTimeout> | null = null;
 let saving = false;
@@ -51,7 +53,7 @@ const subscribe = (fn: () => void) => {
     listeners.delete(fn);
   };
 };
-const SERVER: State = { ready: false, user: null, sync: "idle" };
+const SERVER: State = { ready: false, user: null, admin: false, sync: "idle" };
 export const useAccount = () => useSyncExternalStore(subscribe, () => state, () => SERVER);
 
 const get = (k: string) => {
@@ -91,7 +93,7 @@ async function save() {
       res = await send("PUT", "/api/progress/", { data: merged, version });
     }
     if (res.status === 401) {
-      set({ user: null, sync: "idle" });
+      set({ user: null, admin: false, sync: "idle" });
       return;
     }
     if (!res.ok) throw new Error(String(res.status));
@@ -184,8 +186,8 @@ export async function startAccount() {
   });
   try {
     const res = await send("GET", "/api/auth/me/");
-    const { user } = (await res.json()) as { user: User | null };
-    set({ user, ready: true });
+    const { user, admin } = (await res.json()) as { user: User | null; admin?: boolean };
+    set({ user, admin: admin === true, ready: true });
     if (user) await pull(user);
   } catch {
     // No server reachable: work as a guest on what this browser holds.
@@ -196,7 +198,7 @@ export async function startAccount() {
 async function enter(path: string, body: { username: string; password: string }): Promise<string | null> {
   try {
     const res = await send("POST", path, body);
-    const out = (await res.json()) as { user?: User; error?: string };
+    const out = (await res.json()) as { user?: User; admin?: boolean; error?: string };
     if (!res.ok || !out.user) return out.error ?? "That didn't work. Try again.";
     if (get(OWNER) !== null && get(OWNER) !== out.user.id) {
       // This browser still holds someone else's copy. It isn't theirs to inherit.
@@ -204,12 +206,12 @@ async function enter(path: string, body: { username: string; password: string })
       put(OWNER, null);
       put(DIRTY, null);
     }
-    set({ user: out.user, ready: true });
+    set({ user: out.user, admin: out.admin === true, ready: true });
     try {
       await pull(out.user);
     } catch {
       // Say so now. Otherwise the page reads "signed in" and nothing ever saves.
-      set({ user: null });
+      set({ user: null, admin: false });
       return "You're in, but this browser didn't keep the session. Allow cookies for this site and try again.";
     }
     return null;
@@ -228,7 +230,7 @@ function forgetHere() {
   put(OWNER, null);
   put(DIRTY, null);
   replaceStore(EMPTY_STORE);
-  set({ user: null, sync: "idle" });
+  set({ user: null, admin: false, sync: "idle" });
 }
 
 export async function signOut(): Promise<string | null> {

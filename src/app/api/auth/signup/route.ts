@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { clientIp, fail, limited, note, sameOrigin, smallJson, text } from "@/server/http";
 import { hashPassword, passwordProblem } from "@/server/password";
+import { isAdmin } from "@/server/metrics";
 import { startSession } from "@/server/session";
 
 const USERNAME = /^[A-Za-z0-9_.-]{3,32}$/;
@@ -28,5 +29,5 @@ export async function POST(req: Request) {
   conn.prepare("INSERT INTO users (id, username, password_hash, created_at) VALUES (?, ?, ?, ?)").run(id, username, hash, now);
   conn.prepare("INSERT INTO progress (user_id, data, version, updated_at) VALUES (?, '{}', 0, ?)").run(id, now);
   await startSession(id);
-  return NextResponse.json({ user: { id, username, createdAt: now } }, { status: 201 });
+  return NextResponse.json({ user: { id, username, createdAt: now }, ...(isAdmin({ username }) ? { admin: true } : {}) }, { status: 201 });
 }
