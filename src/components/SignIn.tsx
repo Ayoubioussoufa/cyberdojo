@@ -48,7 +48,8 @@ export function SignIn() {
       return;
     }
     setPassword("");
-    router.push(localize(safeNext(window.location.search), lang));
+    // A full load, not a client move: the router may hold redirects it was given while signed out.
+    window.location.assign(localize(safeNext(window.location.search), lang));
   };
 
   const up = mode === "up";

@@ -116,6 +116,10 @@ graph LR
 
 Guests keep progress in the browser. An account keeps it on the server, in a SQLite database reached through libSQL: the file `data/cyberdojo.db` on this computer (or `CYBERDOJO_DB`), or a hosted Turso database when `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` are set. Back it up. Sign-up needs a username only, so a forgotten password is reset with `pnpm user:reset` (run it with the two Turso variables set to act on the hosted database).
 
+## Members only
+
+Every page except `/signin/` needs a live session. `src/proxy.ts` checks the session cookie against the database (remembering a valid one for a minute) and sends anyone else to the sign-in page, with `?next=` holding the page they asked for. The page data under `/data/` is behind the same door. Static assets under `/_next/` are not: they hold the interface code, so treat nothing shipped to the browser as secret.
+
 ## Usage statistics
 
 The site counts its own visits, in the same SQLite file: no outside service, no IP address, no user agent. A browser gets a random number, kept in `localStorage`; it reports each page opened and the seconds the tab was visible and in use. The server groups those into visits (a visit ends after 30 minutes of silence) and never credits more time than really passed. Rows older than 400 days are deleted.

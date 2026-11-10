@@ -92,7 +92,7 @@ async function http() {
     const made = await boss("POST", "/api/auth/signup/", { username: "Boss", password: pw });
     ok(made.status === 201 && made.json.admin === true, "the named admin is recognised at sign-up", made.json);
     ok((await boss("GET", "/api/auth/me/")).json.admin === true, "and on later visits");
-    ok((await fetch(`${BASE}/admin/`)).status === 200, "the admin page shell is served");
+    ok((await boss("GET", "/admin/")).status === 200, "the admin page shell is served to a member");
 
     // What is refused.
     const send = (who: ReturnType<typeof client>, body: unknown, headers: Record<string, string> = {}) => who("POST", "/api/track/", body, headers);

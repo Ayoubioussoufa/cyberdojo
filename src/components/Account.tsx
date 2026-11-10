@@ -50,7 +50,7 @@ function Delete() {
     e.preventDefault();
     const problem = await deleteAccount(password);
     if (problem) setError(say(lang, problem));
-    else router.push(lang === "fr" ? "/fr/" : "/");
+    else window.location.assign(lang === "fr" ? "/fr/signin/" : "/signin/");
   };
   return (
     <section className="acct-part">
@@ -124,7 +124,7 @@ export function Account() {
   const leave = async () => {
     const problem = await signOut();
     if (problem) setError(say(lang, problem));
-    else router.push(lang === "fr" ? "/fr/" : "/");
+    else window.location.assign(lang === "fr" ? "/fr/signin/" : "/signin/");
   };
   const label = { idle: t.account.saved, saving: t.account.saving, saved: t.account.saved, offline: t.account.offline };
 

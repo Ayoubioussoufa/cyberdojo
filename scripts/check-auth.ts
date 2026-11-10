@@ -199,10 +199,21 @@ async function http() {
     ok(raw.prepare("SELECT COUNT(*) AS n FROM sessions s WHERE NOT EXISTS (SELECT 1 FROM users u WHERE u.id = s.user_id)").get()?.n === 0, "no orphaned sessions");
     raw.close();
 
-    const page = await fetch(`${BASE}/courses/0006-pipes-and-redirection/`);
+    // The front door: content is for members.
+    const lesson = "/courses/0006-pipes-and-redirection/";
+    const shut = await fetch(BASE + lesson, { redirect: "manual" });
+    ok(shut.status === 307 && shut.headers.get("location")?.endsWith(`/signin/?next=${encodeURIComponent(lesson)}`) === true, "a stranger asking for a lesson is sent to sign in", shut.headers.get("location"));
+    const shutFr = await fetch(`${BASE}/fr/dojo/`, { redirect: "manual" });
+    ok(shutFr.status === 307 && shutFr.headers.get("location")?.includes("/fr/signin/?next=%2Fdojo%2F") === true, "in French, to the French sign-in page", shutFr.headers.get("location"));
+    ok((await fetch(`${BASE}/data/questions.json`, { redirect: "manual" })).status === 307, "the question data is behind the door too");
+    ok((await fetch(BASE + lesson, { redirect: "manual", headers: { cookie: "cyberdojo=made-up-token" } })).status === 307, "a made-up cookie opens nothing");
+    ok((await fetch(BASE + lesson, { redirect: "manual", headers: { cookie: before } })).status === 307, "nor does a logged-out session");
+    ok((await fetch(`${BASE}/signin/`, { redirect: "manual" })).status === 200 && (await fetch(`${BASE}/fr/signin/`, { redirect: "manual" })).status === 200, "the sign-in page is open to all");
+    const member = { cookie: (await omar("GET", "/api/auth/me/")).cookie() };
+    const page = await fetch(BASE + lesson, { headers: member });
     ok(page.status === 200 && page.headers.get("x-frame-options") === "DENY" && page.headers.get("x-content-type-options") === "nosniff", "pages carry the security headers");
     ok(!page.headers.has("x-powered-by"), "the server doesn't advertise itself");
-    const data = await fetch(`${BASE}/data/questions.json`);
+    const data = await fetch(`${BASE}/data/questions.json`, { headers: member });
     ok(data.status === 200 && (((await data.json()) as unknown[]).length) > 300, "question data is served");
   } finally {
     server.kill();
