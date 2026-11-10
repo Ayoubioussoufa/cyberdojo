@@ -114,7 +114,7 @@ graph LR
 
 ## Accounts
 
-Guests keep progress in the browser. An account keeps it on the server, in one SQLite file (`data/cyberdojo.db`, or `CYBERDOJO_DB`). Back that file up. Sign-up needs a username only, so a forgotten password is reset with `pnpm user:reset`.
+Guests keep progress in the browser. An account keeps it on the server, in a SQLite database reached through libSQL: the file `data/cyberdojo.db` on this computer (or `CYBERDOJO_DB`), or a hosted Turso database when `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` are set. Back it up. Sign-up needs a username only, so a forgotten password is reset with `pnpm user:reset` (run it with the two Turso variables set to act on the hosted database).
 
 ## Usage statistics
 
@@ -125,4 +125,17 @@ The site counts its own visits, in the same SQLite file: no outside service, no 
 - People can switch counting off on the account page. Browsers that send Do Not Track or Global Privacy Control, and automated browsers, aren't counted at all, so the figures are a floor, not an exact count.
 - `src/server/metrics.ts` (recording and the report), `src/lib/track.ts` (the browser side), `scripts/check-metrics.ts` (`pnpm test:metrics`).
 
-To host it: run behind HTTPS (off `localhost`, session cookies are `Secure`, so plain HTTP can't sign in), keep `data/` on a persistent disk, run one instance, and set `TRUST_PROXY=1` only behind a proxy you control, or rate limits by IP can be spoofed. Serverless hosts such as Vercel don't fit: they have no persistent disk.
+## Hosting
+
+The site runs on Vercel (free Hobby plan) with the database on Turso (free plan), because no free host keeps a file on disk. `vercel.json` puts the API in Paris (`cdg1`); create the Turso database in a European region so the two are close.
+
+Environment variables on the host:
+
+| Variable | Value |
+| --- | --- |
+| `TURSO_DATABASE_URL` | `libsql://<database>-<org>.turso.io` |
+| `TURSO_AUTH_TOKEN` | a token from `turso db tokens create <database>` |
+| `TRUST_PROXY` | `1` (Vercel sets the forwarded headers itself, so rate limits can use the real address) |
+| `CYBERDOJO_ADMINS` | the admin usernames, set only after those accounts exist |
+
+Deploy with `vercel deploy --prod`. The tables are created on first use. Any other Node host works the same way: with a persistent disk, leave the Turso variables unset and keep `data/` on the disk, behind HTTPS (off `localhost`, session cookies are `Secure`).

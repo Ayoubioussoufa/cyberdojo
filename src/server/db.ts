@@ -1,10 +1,12 @@
 /**
- * The database: one SQLite file, using the driver built into Node. It is opened
- * on first use, so `next build` never touches it. Set CYBERDOJO_DB to move it.
+ * The database, through libSQL: a plain SQLite file on this computer (set
+ * CYBERDOJO_DB to move it), or a hosted Turso database when TURSO_DATABASE_URL
+ * and TURSO_AUTH_TOKEN are set, which is what a host without a disk needs.
+ * It is opened on first use, so `next build` never touches it.
  */
 import fs from "node:fs";
 import path from "node:path";
-import { DatabaseSync } from "node:sqlite";
+import { createClient, type Client } from "@libsql/client";
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
@@ -57,15 +59,55 @@ CREATE TABLE IF NOT EXISTS page_stats (
 ) WITHOUT ROWID;
 `;
 
-const slot = globalThis as { __cyberdojoDb?: DatabaseSync };
+export type Arg = string | number | null;
+export type Statement = [sql: string, ...args: Arg[]];
+type Row = Record<string, unknown>;
 
-export function db(): DatabaseSync {
-  if (slot.__cyberdojoDb) return slot.__cyberdojoDb;
+const slot = globalThis as { __cyberdojoDb?: Promise<Client> };
+
+async function open(): Promise<Client> {
+  const url = process.env.TURSO_DATABASE_URL;
+  if (url) {
+    const remote = createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN });
+    await remote.executeMultiple(SCHEMA);
+    return remote;
+  }
   const file = process.env.CYBERDOJO_DB ?? path.join(process.cwd(), "data", "cyberdojo.db");
   fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
-  const conn = new DatabaseSync(file);
-  conn.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
-  conn.exec(SCHEMA);
-  slot.__cyberdojoDb = conn;
-  return conn;
+  const local = createClient({ url: `file:${file}` });
+  await local.executeMultiple(`PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000; ${SCHEMA}`);
+  return local;
+}
+
+/** One client per process. A failed start is forgotten, so the next request tries again. */
+function db(): Promise<Client> {
+  return (slot.__cyberdojoDb ??= open().catch((e: unknown) => {
+    delete slot.__cyberdojoDb;
+    throw e;
+  }));
+}
+
+const plain = (rs: { columns: string[]; rows: ArrayLike<unknown>[] }): Row[] => rs.rows.map((row) => Object.fromEntries(rs.columns.map((c, i) => [c, row[i]])));
+
+export async function all<T = Row>(sql: string, ...args: Arg[]): Promise<T[]> {
+  return plain(await (await db()).execute({ sql, args })) as T[];
+}
+
+export async function get<T = Row>(sql: string, ...args: Arg[]): Promise<T | undefined> {
+  return (await all<T>(sql, ...args))[0];
+}
+
+/** Runs a change and says how many rows it touched. */
+export async function run(sql: string, ...args: Arg[]): Promise<number> {
+  return (await (await db()).execute({ sql, args })).rowsAffected;
+}
+
+/**
+ * Several statements in one trip to the database. Writes are one transaction:
+ * all of them happen or none. Nothing here leans on foreign-key cascades, which
+ * a hosted database may not enforce: related rows are always removed by name.
+ */
+export async function many(statements: Statement[], mode: "write" | "read" = "write"): Promise<Row[][]> {
+  const out = await (await db()).batch(statements.map(([sql, ...args]) => ({ sql, args })), mode);
+  return out.map(plain);
 }

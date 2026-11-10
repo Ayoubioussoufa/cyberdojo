@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { db } from "@/server/db";
+import { get, many } from "@/server/db";
 import { clientIp, fail, limited, note, sameOrigin, smallJson, text } from "@/server/http";
 import { hashPassword, passwordProblem } from "@/server/password";
 import { isAdmin } from "@/server/metrics";
@@ -18,16 +18,23 @@ export async function POST(req: Request) {
   const problem = passwordProblem(password, username);
   if (problem) return fail(400, problem);
   const key = `signup:${clientIp(req)}`;
-  if (limited(key, Number(process.env.SIGNUP_LIMIT ?? 20), 3_600_000)) return fail(429, "Too many new accounts from here. Try again in an hour.");
-  note(key);
+  if (await limited(key, Number(process.env.SIGNUP_LIMIT ?? 20), 3_600_000)) return fail(429, "Too many new accounts from here. Try again in an hour.");
+  await note(key);
   const hash = await hashPassword(password);
   const id = randomUUID();
   const now = Date.now();
-  const conn = db();
-  const taken = conn.prepare("SELECT 1 FROM users WHERE username = ?").get(username);
-  if (taken) return fail(409, "That username is taken. Pick another.");
-  conn.prepare("INSERT INTO users (id, username, password_hash, created_at) VALUES (?, ?, ?, ?)").run(id, username, hash, now);
-  conn.prepare("INSERT INTO progress (user_id, data, version, updated_at) VALUES (?, '{}', 0, ?)").run(id, now);
+  const TAKEN = "That username is taken. Pick another.";
+  if (await get("SELECT 1 FROM users WHERE username = ?", username)) return fail(409, TAKEN);
+  try {
+    await many([
+      ["INSERT INTO users (id, username, password_hash, created_at) VALUES (?, ?, ?, ?)", id, username, hash, now],
+      ["INSERT INTO progress (user_id, data, version, updated_at) VALUES (?, '{}', 0, ?)", id, now],
+    ]);
+  } catch (e) {
+    // Two sign-ups for one name at the same moment: the database lets only one through.
+    if (await get("SELECT 1 FROM users WHERE username = ?", username)) return fail(409, TAKEN);
+    throw e;
+  }
   await startSession(id);
   return NextResponse.json({ user: { id, username, createdAt: now }, ...(isAdmin({ username }) ? { admin: true } : {}) }, { status: 201 });
 }

@@ -10,5 +10,5 @@ export async function GET(req: Request) {
   const user = await currentUser();
   if (!isAdmin(user)) return fail(404, "Not found.");
   const asked = Number(new URL(req.url).searchParams.get("days"));
-  return NextResponse.json(report(RANGES.includes(asked) ? asked : 30));
+  return NextResponse.json(await report(RANGES.includes(asked) ? asked : 30));
 }

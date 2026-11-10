@@ -1,6 +1,6 @@
 /** What every API route needs: same-origin checks, JSON bodies, rate limits. */
 import { NextResponse } from "next/server";
-import { db } from "./db";
+import { many, run } from "./db";
 
 export const fail = (status: number, error: string, extra: Record<string, unknown> = {}) => NextResponse.json({ error, ...extra }, { status });
 
@@ -45,14 +45,15 @@ export async function smallJson(req: Request): Promise<Record<string, unknown> |
 export const text = (v: unknown): string => (typeof v === "string" ? v : "");
 
 /** True when `key` has already had `limit` events in the last `windowMs`. */
-export function limited(key: string, limit: number, windowMs: number): boolean {
-  const since = Date.now() - windowMs;
-  const conn = db();
-  conn.prepare("DELETE FROM attempts WHERE at < ?").run(Date.now() - 86_400_000);
-  const row = conn.prepare("SELECT COUNT(*) AS n FROM attempts WHERE key = ? AND at > ?").get(key, since) as { n: number };
-  return row.n >= limit;
+export async function limited(key: string, limit: number, windowMs: number): Promise<boolean> {
+  const now = Date.now();
+  const [, counted] = await many([
+    ["DELETE FROM attempts WHERE at < ?", now - 86_400_000],
+    ["SELECT COUNT(*) AS n FROM attempts WHERE key = ? AND at > ?", key, now - windowMs],
+  ]);
+  return Number(counted?.[0]?.n ?? 0) >= limit;
 }
 
-export const note = (key: string) => void db().prepare("INSERT INTO attempts (key, at) VALUES (?, ?)").run(key, Date.now());
+export const note = (key: string) => run("INSERT INTO attempts (key, at) VALUES (?, ?)", key, Date.now());
 
-export const forget = (key: string) => void db().prepare("DELETE FROM attempts WHERE key = ?").run(key);
+export const forget = (key: string) => run("DELETE FROM attempts WHERE key = ?", key);

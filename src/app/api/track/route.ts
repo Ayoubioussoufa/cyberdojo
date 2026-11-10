@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   const hit = body && readHit(body);
   if (!hit) return done;
   try {
-    record(hit, await currentUser(), req.headers.get("user-agent") ?? "", clientIp(req));
+    await record(hit, await currentUser(), req.headers.get("user-agent") ?? "", clientIp(req));
   } catch (e) {
     // Statistics must never break a page.
     console.error("track:", e);

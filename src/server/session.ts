@@ -4,7 +4,7 @@
  */
 import { createHash, randomBytes } from "node:crypto";
 import { cookies, headers } from "next/headers";
-import { db } from "./db";
+import { get, many, run } from "./db";
 
 const DAY = 86_400_000;
 const LIFETIME = 30 * DAY;
@@ -38,9 +38,10 @@ async function setCookie(token: string, expires: number) {
 export async function startSession(userId: string) {
   const token = randomBytes(32).toString("base64url");
   const now = Date.now();
-  const conn = db();
-  conn.prepare("DELETE FROM sessions WHERE expires_at < ?").run(now);
-  conn.prepare("INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)").run(digest(token), userId, now, now + LIFETIME);
+  await many([
+    ["DELETE FROM sessions WHERE expires_at < ?", now],
+    ["INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)", digest(token), userId, now, now + LIFETIME],
+  ]);
   await setCookie(token, now + LIFETIME);
 }
 
@@ -48,13 +49,15 @@ export async function currentUser(): Promise<User | null> {
   const token = (await cookies()).get(await cookieName())?.value;
   if (!token) return null;
   const now = Date.now();
-  const row = db()
-    .prepare("SELECT u.id, u.username, u.created_at AS createdAt, s.expires_at AS expiresAt FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ?")
-    .get(digest(token), now) as (User & { expiresAt: number }) | undefined;
+  const row = await get<User & { expiresAt: number }>(
+    "SELECT u.id, u.username, u.created_at AS createdAt, s.expires_at AS expiresAt FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ?",
+    digest(token),
+    now,
+  );
   if (!row) return null;
   // Someone using the site stays signed in. Renewing once a day avoids a write per request.
   if (row.expiresAt - now < LIFETIME - DAY) {
-    db().prepare("UPDATE sessions SET expires_at = ? WHERE token_hash = ?").run(now + LIFETIME, digest(token));
+    await run("UPDATE sessions SET expires_at = ? WHERE token_hash = ?", now + LIFETIME, digest(token));
     await setCookie(token, now + LIFETIME);
   }
   return { id: row.id, username: row.username, createdAt: row.createdAt };
@@ -64,11 +67,9 @@ export async function endSession() {
   const jar = await cookies();
   const name = await cookieName();
   const token = jar.get(name)?.value;
-  if (token) db().prepare("DELETE FROM sessions WHERE token_hash = ?").run(digest(token));
+  if (token) await run("DELETE FROM sessions WHERE token_hash = ?", digest(token));
   jar.delete(name);
 }
 
 /** After a password change: every session goes, including any on a stolen device. */
-export function endAllSessions(userId: string) {
-  db().prepare("DELETE FROM sessions WHERE user_id = ?").run(userId);
-}
+export const endAllSessions = (userId: string) => run("DELETE FROM sessions WHERE user_id = ?", userId);
