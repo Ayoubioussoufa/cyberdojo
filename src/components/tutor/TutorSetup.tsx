@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { fill, useLang } from "@/i18n/LangProvider";
 import type { Lang } from "@/i18n/lang";
 import { say } from "@/i18n/ui";
-import { cancelSetup, deleteModel, saveSettings, startSetup, tutorReady, useTutorStatus } from "@/lib/tutor-client";
+import { cancelSetup, deleteModel, lookupModel, saveSettings, startSetup, tutorReady, useTutorStatus } from "@/lib/tutor-client";
 import type { AdvisedModel, Fit, JobStep, SetupJob, TutorStatus } from "@/lib/tutor-types";
 
 const number = (lang: Lang, n: number, digits = 1) => new Intl.NumberFormat(lang, { maximumFractionDigits: digits }).format(n);
@@ -190,7 +190,6 @@ function Computer({ status }: { status: TutorStatus }) {
 function Models({ status, busy, onError }: { status: TutorStatus; busy: boolean; onError: (e: unknown) => void }) {
   const { t } = useLang();
   const f = useFormat();
-  const [custom, setCustom] = useState("");
   const { settings, catalog } = status;
   const download = (name: string) => startSetup([name, settings.embedModel], settings.chatModel ? undefined : name).catch(onError);
   const remove = (name: string, bytes: number) => {
@@ -243,14 +242,52 @@ function Models({ status, busy, onError }: { status: TutorStatus; busy: boolean;
           </ul>
         </>
       )}
-      <form className="auth-form setup-host" onSubmit={(e) => { e.preventDefault(); if (custom.trim()) void download(custom.trim()); setCustom(""); }}>
-        <label htmlFor="custom-model">{t.tutor.custom}</label>
-        <div className="acct-row">
-          <input id="custom-model" value={custom} onChange={(e) => setCustom(e.target.value)} placeholder={t.tutor.customHolder} spellCheck={false} />
-          <button type="submit" className="btn" disabled={!custom.trim() || busy}>{t.tutor.getCustom}</button>
-        </div>
-      </form>
+      <AnyModel busy={busy} onDownload={(name) => void download(name)} />
     </section>
+  );
+}
+
+/** Any model by name: looked up as the learner types, so its size and fit show before anything downloads. */
+function AnyModel({ busy, onDownload }: { busy: boolean; onDownload: (name: string) => void }) {
+  const { lang, t } = useLang();
+  const f = useFormat();
+  const [name, setName] = useState("");
+  const [found, setFound] = useState<AdvisedModel | null>(null);
+  const [problem, setProblem] = useState("");
+  const [looking, setLooking] = useState(false);
+  useEffect(() => {
+    const wanted = name.trim();
+    setFound(null);
+    setProblem("");
+    if (!wanted) return;
+    const control = new AbortController();
+    const timer = setTimeout(() => {
+      setLooking(true);
+      lookupModel(wanted, control.signal)
+        .then(setFound)
+        .catch((e: unknown) => !control.signal.aborted && setProblem(say(lang, e instanceof Error ? e.message : "That didn't work. Try again.")))
+        .finally(() => !control.signal.aborted && setLooking(false));
+    }, 450);
+    return () => {
+      clearTimeout(timer);
+      control.abort();
+    };
+  }, [name, lang]);
+  const ok = found && found.name === name.trim() && found.fit !== "too-big" && !found.noRoom;
+  return (
+    <form className="auth-form setup-host setup-any" onSubmit={(e) => { e.preventDefault(); if (ok) { onDownload(found.name); setName(""); } }}>
+      <label htmlFor="custom-model">{t.tutor.custom}</label>
+      <p className="muted">{t.tutor.customHint} <a href="https://ollama.com/library" target="_blank" rel="noreferrer">{t.tutor.browse}</a></p>
+      <div className="acct-row">
+        <input id="custom-model" value={name} onChange={(e) => setName(e.target.value)} placeholder={t.tutor.customHolder} spellCheck={false} autoComplete="off" aria-describedby="custom-model-result" />
+        <button type="submit" className="btn" disabled={!ok || busy}>{t.tutor.getCustom}</button>
+      </div>
+      <p id="custom-model-result" className="any-result" aria-live="polite">
+        {looking && <span className="muted">{t.tutor.looking}</span>}
+        {!looking && found && <><span className="model-name">{found.name}</span> · {f.gb(found.bytes)} <FitBadge fit={found.fit} noRoom={found.noRoom} /></>}
+        {!looking && problem && <span className="any-problem">{problem}</span>}
+      </p>
+    </form>
   );
 }
 

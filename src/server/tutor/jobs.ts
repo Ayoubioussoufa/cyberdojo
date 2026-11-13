@@ -7,7 +7,7 @@
 import { jsonLines } from "@/lib/ndjson";
 import type { JobStep, PullEvent, SetupJob } from "@/lib/tutor-types";
 import { hardware } from "./hardware";
-import { catalogBytes } from "./models";
+import { catalogBytes, lookUp } from "./models";
 import { hasModel, installed, OllamaError, pull, version } from "./ollama";
 import { findOllama, install, isLocal, RuntimeError, start } from "./runtime";
 import { readSettings, writeSettings } from "./settings";
@@ -29,7 +29,7 @@ const reason = (e: unknown) => (e instanceof RuntimeError || e instanceof Ollama
 
 async function pullModel(host: string, step: JobStep, signal: AbortSignal) {
   const model = step.model as string;
-  const bytes = catalogBytes(model);
+  const bytes = catalogBytes(model) ?? (await lookUp(model)) ?? undefined;
   const free = (await hardware()).diskFreeGb;
   if (bytes && free !== null && free < bytes / 2 ** 30 + 1) throw new RuntimeError("There isn't enough free disk space for this model.");
   const layers = new Map<string, { total: number; completed: number }>();

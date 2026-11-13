@@ -1101,6 +1101,11 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 
 /* The setup page: what this computer has, the one-click setup, its progress, every model. */
 .setup { display: grid; gap: 24px; }
+.setup-any { max-width: 40rem; }
+.setup-any .muted { font-size: 14.5px; margin: 0 0 4px; overflow-wrap: anywhere; }
+.any-result { min-height: 1.6em; margin: 6px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 14.5px; }
+.any-result .model-name { overflow-wrap: anywhere; }
+.any-problem { color: var(--bad); }
 .setup .page-head { margin-bottom: 0; }
 .setup-welcome { display: grid; gap: 8px; justify-items: start; padding: 14px 16px; background: var(--info-soft); border-left: 2px solid var(--info); border-radius: var(--radius); }
 .setup-welcome p { margin: 0; }
@@ -1172,6 +1177,45 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 .chat-empty button:hover:not(:disabled) { border-color: var(--accent); }
 .chat-empty button:disabled { opacity: 0.55; cursor: default; }
 @media (max-width: 800px) { .chat-page { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); } .chat-list { max-height: 34vh; border-right: 0; border-bottom: 1px solid var(--rule); } .chat-head { padding: 10px 16px; } }
+
+/* The website's page for the desktop app. */
+.nav-dl { color: var(--muted); }
+.nav-dl:hover, .nav-dl.on { color: var(--accent); background: var(--sunk); }
+/* A phone can't install the desktop app, and the bar has no room for it there. */
+@media (max-width: 560px) { .nav-dl { display: none; } }
+.auth-app { max-width: 26rem; margin: 20px auto 0; display: grid; gap: 10px; justify-items: start; padding: 16px 18px; border: 1px dashed var(--rule-strong); border-radius: var(--radius); }
+.auth-app p { margin: 0; font-size: 15px; color: var(--muted); }
+.download { display: grid; gap: 48px; }
+.dl-hero { display: grid; gap: 16px; justify-items: start; padding-bottom: 8px; }
+.dl-hero h1 { font-size: clamp(30px, 5vw, 48px); margin: 0; }
+.dl-hero .lede { max-width: 40rem; margin: 0; }
+.dl-pick { display: grid; gap: 14px; }
+.dl-main { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.dl-main .muted { font-size: 14.5px; }
+.dl-choose { margin: 0; font-weight: 600; }
+.dl-others { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.dl-others a { display: inline-flex; gap: 6px; padding: 6px 12px; border: 1px solid var(--rule-strong); border-radius: var(--radius); text-decoration: none; color: var(--ink); font-size: 14.5px; font-weight: 600; }
+.dl-others a:hover { border-color: var(--accent); }
+.dl-others .muted { font-weight: 400; }
+.dl-soon { margin: 0; padding: 12px 16px; background: var(--info-soft); border-left: 2px solid var(--info); border-radius: var(--radius); }
+.dl-links { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0; font-size: 14.5px; }
+.dl-section { display: grid; gap: 16px; }
+.dl-section h2 { font-size: 24px; margin: 0; }
+.dl-what { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 12px; }
+.dl-what li { padding: 18px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); }
+.dl-what h3 { font-size: 16.5px; margin: 0 0 6px; }
+.dl-what p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
+.dl-need { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.dl-install { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 12px; }
+.dl-install > div { padding: 18px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); min-width: 0; }
+.dl-install h3 { font-size: 16.5px; margin: 0 0 8px; }
+.dl-install ol { margin: 0; padding-left: 20px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; font-size: 15px; line-height: 1.5; }
+.dl-install li { min-width: 0; }
+.dl-install pre { margin: 6px 0 0; padding: 8px 10px; overflow-x: auto; background: var(--term-bg); color: var(--term-ink); border-radius: var(--radius); font-family: var(--mono); font-stretch: 87.5%; font-size: 12.5px; }
+.dl-first { margin: 0; padding: 12px 16px; background: var(--accent-soft); border-left: 2px solid var(--accent); border-radius: var(--radius); }
+.dl-faq { border-top: 1px solid var(--rule); padding: 12px 0; }
+.dl-faq summary { cursor: pointer; font-weight: 600; }
+.dl-faq p { margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
 
 /* The tutor in the desktop app's top bar. */
 .tutor-chip { display: inline-flex; align-items: center; gap: 8px; }

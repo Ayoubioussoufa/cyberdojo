@@ -66,5 +66,41 @@ export function advise(hw: Hardware, catalog: ModelChoice[] = CATALOG): { models
 
 export const catalogBytes = (name: string) => (name === EMBED_MODEL ? EMBED_BYTES : CATALOG.find((m) => m.name === name)?.bytes);
 
-/** A model name as Ollama writes them: "name", "name:tag" or "namespace/name:tag". */
-export const validModel = (name: string) => /^[a-z0-9][\w.-]*(\/[\w.-]+)?(:[\w.-]+)?$/i.test(name) && name.length <= 120;
+/**
+ * A model name as Ollama takes them: "name", "name:tag", "namespace/name:tag",
+ * or a GGUF model on Hugging Face, "hf.co/user/repo:quant".
+ */
+export const validModel = (name: string) =>
+  name.length <= 160 && (/^[a-z0-9][\w.-]*(\/[\w.-]+)?(:[\w.-]+)?$/i.test(name) || /^(hf\.co|huggingface\.co)\/[\w.-]+\/[\w.-]+(:[\w.-]+)?$/i.test(name)) && !name.includes("..");
+
+/** Where a model's manifest lives: Ollama's registry, or Hugging Face's, which speaks the same protocol. */
+export function manifestUrl(name: string): string | null {
+  if (!validModel(name)) return null;
+  const [path = "", tag = "latest"] = name.split(":");
+  const hf = /^(hf\.co|huggingface\.co)\//i.exec(path);
+  if (hf) return `https://hf.co/v2/${path.slice(hf[0].length)}/manifests/${tag}`;
+  return `https://registry.ollama.ai/v2/${path.includes("/") ? path : `library/${path}`}/manifests/${tag}`;
+}
+
+/**
+ * The download size of any model, read from its registry before anything is
+ * downloaded: null when it doesn't exist, undefined when the registry couldn't be reached.
+ */
+export async function lookUp(name: string): Promise<number | null | undefined> {
+  const url = manifestUrl(name);
+  if (!url) return null;
+  let res: Response;
+  try {
+    res = await fetch(url, { headers: { Accept: "application/vnd.docker.distribution.manifest.v2+json" }, signal: AbortSignal.timeout(10_000), redirect: "follow" });
+  } catch {
+    return undefined;
+  }
+  if (res.status === 404 || res.status === 401 || res.status === 400) return null;
+  if (!res.ok) return undefined;
+  const manifest = (await res.json().catch(() => null)) as { layers?: { size?: number }[]; config?: { size?: number } } | null;
+  const bytes = (manifest?.layers ?? []).reduce((n, l) => n + (l.size ?? 0), 0) + (manifest?.config?.size ?? 0);
+  return bytes > 0 ? bytes : null;
+}
+
+/** How any model, not only the catalog's, would run here. */
+export const adviseOne = (name: string, bytes: number, hw: Hardware): AdvisedModel => ({ name, bytes, params: "", family: "", fit: fit(bytes, hw, SPARSE.has(name)), noRoom: noRoom(bytes, hw) });

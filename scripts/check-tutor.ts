@@ -9,11 +9,12 @@ import type { Chunk, TutorIndex } from "../src/lib/tutor-types";
 import { readGrade } from "../src/server/tutor/answer";
 import { chunkBlocks, htmlToText } from "../src/server/tutor/chunking";
 import type { Hardware } from "../src/lib/tutor-types";
-import { advise, CATALOG, fit, validModel } from "../src/server/tutor/models";
+import { advise, CATALOG, fit, manifestUrl, validModel } from "../src/server/tutor/models";
 import { buildIndex, scores, tokens } from "../src/server/tutor/keywords";
 import { assetName, isLocal, parseChecksums } from "../src/server/tutor/runtime";
 import { isThread } from "../src/server/tutor/store";
 import { newer, parseVersion } from "../desktop/updates";
+import { classify, pickRelease } from "../src/lib/release";
 import { fitPage, gradePrompt, historyTurns, PAGE_BUDGET, sourcesOf, systemPrompt } from "../src/server/tutor/prompt";
 
 let failed = 0;
@@ -78,7 +79,8 @@ eq("an unknown verdict", readGrade('{"verdict":"great","score":90,"right":[],"mi
 eq("a score out of range", readGrade('{"verdict":"correct","score":140,"right":[],"missing":[],"feedback":"x"}'), null);
 
 // Model names, as they go into a URL-less API call
-eq("valid and invalid model names", ["qwen2.5:7b", "mistral", "library/llama3.1:8b", "nomic-embed-text", "", "a b", "../x", "x;rm"].map(validModel), [true, true, true, true, false, false, false, false]);
+eq("valid and invalid model names", ["qwen2.5:7b", "mistral", "library/llama3.1:8b", "nomic-embed-text", "hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:Q4_K_M", "", "a b", "../x", "x;rm", "hf.co/../x", "evil.com/a/b"].map(validModel), [true, true, true, true, true, false, false, false, false, false, false]);
+eq("where each model's size is read", ["llama3.1:8b", "mistral", "user/model:q4", "hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:Q4_K_M", "hf.co/a/b"].map(manifestUrl), ["https://registry.ollama.ai/v2/library/llama3.1/manifests/8b", "https://registry.ollama.ai/v2/library/mistral/manifests/latest", "https://registry.ollama.ai/v2/user/model/manifests/q4", "https://hf.co/v2/bartowski/Llama-3.2-3B-Instruct-GGUF/manifests/Q4_K_M", "https://hf.co/v2/a/b/manifests/latest"]);
 
 // Search by words, for what meaning misses
 eq("words: lower case, no accents, no filler, commands and CVEs kept", tokens("What is the CIA triad? Sécurité: nmap -sV, CVE-2021-44228, a 7 de la"), ["cia", "triad", "securite", "nmap", "sv", "cve", "2021", "44228", "7"]);
@@ -121,6 +123,14 @@ eq("conversation keys", ["/tutor/chat/abc123def/", "/tutor/chat/x/", "/tutor/cha
 // Updates
 eq("release tags", ["desktop-v1.2.3", "v0.1.0", "1.0.0", "desktop-v1.2", "latest"].map(parseVersion), [[1, 2, 3], [0, 1, 0], [1, 0, 0], null, null]);
 eq("version order", [newer([0, 2, 0], [0, 1, 9]), newer([0, 1, 0], [0, 1, 0]), newer([1, 0, 0], [1, 0, 1])], [true, false, false]);
+
+// The website's download page
+eq("installers by system", ["CyberDojo-Setup-x64.exe", "CyberDojo-mac-arm64.dmg", "CyberDojo-mac-arm64.zip", "CyberDojo-linux-x86_64.AppImage", "CyberDojo-linux-amd64.deb", "SHA256SUMS.txt"].map(classify), [{ os: "windows", kind: "exe" }, { os: "mac", kind: "dmg" }, null, { os: "linux", kind: "AppImage" }, { os: "linux", kind: "deb" }, null]);
+const asset = (name: string) => ({ name, size: 100, browser_download_url: `https://x/${name}` });
+const rel = (tag: string, extra: Partial<{ draft: boolean; prerelease: boolean }> = {}) => ({ tag_name: tag, html_url: `https://x/${tag}`, published_at: "2026-11-13T00:00:00Z", draft: false, prerelease: false, assets: [asset("CyberDojo-Setup-x64.exe"), asset("SHA256SUMS.txt")], ...extra });
+eq("the newest finished desktop release is offered", pickRelease([rel("desktop-v0.3.0", { draft: true }), rel("desktop-v0.2.1", { prerelease: true }), rel("v9.0.0"), rel("desktop-v0.2.0"), rel("desktop-v0.1.0")])?.version, "0.2.0");
+eq("its checksums file is linked", pickRelease([rel("desktop-v0.2.0")])?.checksums, "https://x/SHA256SUMS.txt");
+eq("no release, nothing offered", pickRelease([rel("desktop-v0.2.0", { draft: true })]), null);
 
 // A model's reply is untrusted
 const html = tutorHtml('**bold** [in](/courses/x/) [out](https://example.com) [bad](javascript:alert(1)) ![pic](https://example.com/x.png) <img src=x onerror=alert(1)>\n\n<script>alert(1)</script>');

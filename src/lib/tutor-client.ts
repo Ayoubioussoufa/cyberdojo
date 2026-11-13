@@ -7,7 +7,7 @@
 import { useSyncExternalStore } from "react";
 import type { Lang } from "@/i18n/lang";
 import { jsonLines } from "./ndjson";
-import type { ChatEvent, Grade, Mode, SetupJob, Thread, TutorMessage, TutorSettings, TutorStatus } from "./tutor-types";
+import type { AdvisedModel, ChatEvent, Grade, Mode, SetupJob, Thread, TutorMessage, TutorSettings, TutorStatus } from "./tutor-types";
 
 interface Dock {
   open: boolean;
@@ -90,6 +90,8 @@ export const deleteModel = async (name: string) => {
   await json<{ ok: boolean }>(await send("DELETE", `/api/tutor/models/?name=${encodeURIComponent(name)}`));
   void refreshStatus();
 };
+/** Any model by name: its size and how it would run here, or a TutorError saying why not. */
+export const lookupModel = async (name: string, signal?: AbortSignal) => json<AdvisedModel>(await send("GET", `/api/tutor/lookup/?name=${encodeURIComponent(name)}`, undefined, signal));
 export const getThreads = async (lang: Lang) => json<{ threads: Thread[]; pages: Thread[] }>(await send("GET", `/api/tutor/threads/?lang=${lang}`));
 
 /**
