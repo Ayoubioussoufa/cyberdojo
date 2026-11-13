@@ -22,6 +22,7 @@ Needs Node 22.13 or newer, for the built-in SQLite. It runs on a Node server, no
 - `src/lib/missions/dojo/` and `src/data/dojo.ts`: the Dojo's 54 flag challenges. See `THIRD_PARTY_NOTICES.md`.
 - `src/data/*.json`: the 24 months, 16 projects and resources, parsed from the PDF.
 - `content/projects/*.md`: each step has `@goal`, `@search` and `@docs`. Walkthroughs are off until the student turns them on.
+- `desktop/`, `scripts/desktop.ts`: the desktop app's shell and build. `src/server/tutor/`, `src/components/tutor/`: its tutor.
 - `src/server/`, `src/app/api/`: accounts. `src/lib/account.ts`: sync. `src/lib/merge.ts`: combining two copies.
 
 ## Modules: the Master's-level reference
@@ -111,6 +112,43 @@ graph LR
   D05 --> D15
 ```
 <!-- prereqs:end -->
+
+## Desktop app
+
+The same course as a program for Windows, macOS and Linux, with a tutor that runs on the learner's computer through [Ollama](https://ollama.com). Once the app and a model are installed it needs no connection, apart from the links that lead to outside labs. How it is put together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+```
+pnpm desktop:dev      # the app window on `next dev`, with live reload
+pnpm desktop:start    # build everything, then run the built app without an installer
+pnpm desktop:dist     # installers for this operating system, in desktop/dist/
+pnpm test:tutor       # the tutor's checks (run `pnpm tutor:index` first)
+```
+
+An installer can only be built on its own system. `.github/workflows/desktop.yml` builds all three: run it by hand from the Actions tab, or push a tag such as `desktop-v0.1.0` to attach them to a release. It produces an NSIS installer (Windows x64), a dmg and zip (macOS, Apple silicon), and an AppImage and deb (Linux x64).
+
+**Signing.** The installers aren't signed, so Windows SmartScreen and macOS Gatekeeper warn on first launch. On Windows choose "More info", then "Run anyway". On macOS, right-click the app and choose Open. Removing the warnings needs a paid certificate for each platform.
+
+### The tutor
+
+1. Install Ollama from <https://ollama.com/download> (Linux: `curl -fsSL https://ollama.com/install.sh | sh`). The app's Tutor setup page checks that it is running and walks through the rest.
+2. Download a model from that page. It suggests one from the computer's memory:
+
+   | Memory | Model | Download |
+   | --- | --- | --- |
+   | Under 12 GB | `llama3.2:3b`, `qwen2.5:3b` | 2 GB |
+   | 12 to 24 GB | `qwen2.5:7b`, `llama3.1:8b`, `mistral:7b`, `qwen2.5-coder:7b` | 4 to 5 GB |
+   | 24 GB or more | `qwen2.5:14b`, `qwen2.5-coder:14b` | 9 GB |
+
+   The `coder` models are best at reviewing code. Any other Ollama model can be downloaded by name. A graphics card with 8 GB or more makes the 7b models answer quickly.
+3. Download the search model, `nomic-embed-text` (0.3 GB). The course is then indexed once, in the background.
+
+The tutor opens from the corner of every page. It has read the page that is open, gives hints before answers, and has four modes: Explain, Hint, Review my work, Quiz me. Every "Ask the tutor" button sends it the question, your answer and the key. Under each written question, "Grade my answer" grades it against the section and keeps the grade.
+
+Everything is stored in one SQLite file in the app's data folder (`%APPDATA%\CyberDojo`, `~/Library/Application Support/CyberDojo`, `~/.config/CyberDojo`): progress, chats per page, grades, settings and the search index. Back up `cyberdojo.db` to keep them.
+
+### Adding content
+
+Write the Markdown file where its kind lives (`content/lessons/`, `modules/<domain>/`, `tools/<category>/` and so on) and run `pnpm test:content`. The website shows it on the next deploy. The desktop app shows it, and the tutor knows it, on the next `pnpm desktop:dist`: the build pre-renders the page and rebuilds the tutor's index from the same file.
 
 ## Accounts
 
