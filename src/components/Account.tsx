@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { changePassword, deleteAccount, signOut, useAccount } from "@/lib/account";
 import { fill, plural, useLang } from "@/i18n/LangProvider";
+import { DESKTOP } from "@/lib/desktop";
 import { exportStore } from "@/lib/progress";
 import { browserRefuses, countingOff, setCounting } from "@/lib/track";
 
@@ -140,13 +141,17 @@ export function Account() {
         <p className="acct-sync" data-state={sync}>{label[sync]}</p>
         <div className="acct-row">
           <button type="button" className="btn" onClick={download}>{t.account.download}</button>
-          <button type="button" className="btn" onClick={() => void leave()}>{t.account.signOut}</button>
+          {!DESKTOP && <button type="button" className="btn" onClick={() => void leave()}>{t.account.signOut}</button>}
         </div>
         {error && <p className="auth-error" role="alert">{error}</p>}
       </section>
-      <Password />
-      <Stats />
-      <Delete />
+      {DESKTOP ? <p className="muted">{t.tutor.localProfile}</p> : (
+        <>
+          <Password />
+          <Stats />
+          <Delete />
+        </>
+      )}
     </>
   );
 }

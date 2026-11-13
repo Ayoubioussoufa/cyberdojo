@@ -230,7 +230,7 @@ function Why({ ex, out, onNext, last }: { ex: Exercise; out: Outcome; onNext: ()
         </>
       )}
       <div className="why-actions">
-        {!out.right && <CopyButton className="link-btn" label={t.player.ask} done={t.common.copiedCap} build={() => drillMessage(ex.prompt, out.answer, out.given, ex.why, lang)} />}
+        {!out.right && <CopyButton className="link-btn" label={t.player.ask} done={t.common.copiedCap} mode="explain" build={() => drillMessage(ex.prompt, out.answer, out.given, ex.why, lang)} />}
         <button type="button" className="btn primary sm" onClick={onNext}>{last ? t.player.score : t.common.next}</button>
       </div>
     </div>

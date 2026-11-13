@@ -29,7 +29,7 @@ export function Gates({ month }: { month: Month }) {
           );
         })}
       </ul>
-      <CopyButton label={t.gate.copy} build={() => gateMessage(month.n, month.title, gates, lang)} />
+      <CopyButton label={t.gate.copy} mode="quiz" build={() => gateMessage(month.n, month.title, gates, lang)} />
     </section>
   );
 }

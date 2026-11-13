@@ -10,6 +10,7 @@ import { QuestionCard } from "./Question";
 import { Terms } from "./Terms";
 import { WrittenCard } from "./Written";
 import { ProjectStep } from "./ProjectStep";
+import { DESKTOP } from "@/lib/desktop";
 import { getStore, setDone, setWord, useSlice } from "@/lib/progress";
 import type { PathStep } from "@/lib/pathState";
 import { fill, useLang } from "@/i18n/LangProvider";
@@ -82,7 +83,7 @@ function Finish({ meta, brief, after, copy }: { meta: DocMeta; brief: DocBrief; 
           </button>
         )}
       </div>
-      <p className="followup">{t.doc.followup}</p>
+      {!DESKTOP && <p className="followup">{t.doc.followup}</p>}
       {isDone && meta.builds && (
         <div className="why ok cando">
           <p><strong>{t.doc.newSkill}</strong> {fill(t.doc.canNow, { skill: meta.builds })} <Link href="/skills/">{t.doc.progressLink}</Link>.</p>
@@ -151,7 +152,7 @@ export function DocView({
 
         <section className="finish">
           <h2 id="finish">{t.doc.corrected}</h2>
-          <p>{t.doc.correctedText}</p>
+          <p>{DESKTOP ? t.tutor.correctedText : t.doc.correctedText}</p>
           {meta.words.length > 0 && (
             <div className="words">
               <p className="words-title">{t.doc.defineTitle}</p>

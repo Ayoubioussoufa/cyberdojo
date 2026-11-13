@@ -26,7 +26,7 @@ export function QuestionCard({ q, doc, n }: { q: Q; doc: DocBrief; n: number }) 
     <section className="qcard" aria-label={fill(t.question.label, { n })}>
       <header className="qcard-head">
         <span className="qcard-tag">{fill(t.question.tag, { n })}</span>
-        <CopyButton className="link-btn" label={t.question.ask} done={t.common.copiedCap} build={() => questionMessage(doc, q, getStore(), lang)} />
+        <CopyButton className="link-btn" label={t.question.ask} done={t.common.copiedCap} mode="explain" build={() => questionMessage(doc, q, getStore(), lang)} />
       </header>
       <p className="qcard-prompt noterms" dangerouslySetInnerHTML={{ __html: q.promptHtml }} />
       <div className="opts">

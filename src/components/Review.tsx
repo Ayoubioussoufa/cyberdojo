@@ -102,7 +102,7 @@ export function Review() {
         <div className={`why ${picked === q.correct ? "ok" : "no"}`}>
           <strong>{picked === q.correct ? t.question.right : t.question.wrong}</strong> <span dangerouslySetInnerHTML={{ __html: q.whyHtml }} />
           <div className="why-actions">
-            <CopyButton className="link-btn" label={t.question.ask} done={t.common.copiedCap} build={() => questionMessage({ slug: "", kind: "lesson", title: item.title, summary: "", number: 0, words: [], wordKeys: [], questions: [], written: [] }, q, { ...store, picks: { ...store.picks, [q.id]: picked ?? 0 } }, lang)} />
+            <CopyButton className="link-btn" label={t.question.ask} done={t.common.copiedCap} mode="explain" build={() => questionMessage({ slug: "", kind: "lesson", title: item.title, summary: "", number: 0, words: [], wordKeys: [], questions: [], written: [] }, q, { ...store, picks: { ...store.picks, [q.id]: picked ?? 0 } }, lang)} />
             <button type="button" className="btn primary sm" onClick={() => { setPos(pos + 1); setPicked(null); }}>{t.common.next}</button>
           </div>
         </div>

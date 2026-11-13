@@ -153,7 +153,7 @@ function Terminal({ mission, onPass, passed }: { mission: Mission; onPass: () =>
       </div>
       <div className="term-foot">
         <span className="term-keys"><code>{t.range.submitCmd}</code> {t.range.k1} <kbd>Tab</kbd> {t.range.k2} <kbd>↑</kbd> {t.range.k3} <code>man ls</code> {t.range.k4} <code>help</code> {t.range.k5}</span>
-        <CopyButton className="link-btn on-dark" label={t.range.stuck} done={t.common.copiedCap} build={() => missionMessage(mission.title, mission.brief, world.current?.shell.history ?? [], lastOut.current, lang)} />
+        <CopyButton className="link-btn on-dark" label={t.range.stuck} done={t.common.copiedCap} mode="hint" build={() => missionMessage(mission.title, mission.brief, world.current?.shell.history ?? [], lastOut.current, lang)} />
       </div>
     </div>
   );
