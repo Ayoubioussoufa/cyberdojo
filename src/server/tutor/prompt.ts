@@ -19,6 +19,8 @@ import type { ChatTurn } from "./ollama";
 /** Characters, not tokens: about four to a token. Together with the chat they fit the 8,192-token context with room to answer. */
 export const PAGE_BUDGET = 9000;
 export const RELATED_LIMIT = 4;
+/** With no page open, the course excerpts are all the tutor has to go on, so it gets more of them. */
+export const RELATED_LIMIT_CHAT = 7;
 const HISTORY_TURNS = 8;
 const HISTORY_CHARS = 3000;
 
@@ -61,12 +63,15 @@ export interface PromptParts {
   /** The open page's chunks, already cut to PAGE_BUDGET. */
   page: Chunk[];
   related: Chunk[];
+  /** A conversation on the tutor's own page, where the learner brings any question. */
+  chat?: boolean;
 }
 
-export function systemPrompt({ lang, mode, reveal, page, related }: PromptParts): string {
+export function systemPrompt({ lang, mode, reveal, page, related, chat }: PromptParts): string {
   const parts = [RULES, `Answer in ${LANGUAGE[lang]}.`, `This turn: ${MODE[mode]}${reveal ? ` ${REVEAL}` : ""}`];
   const first = page[0];
   if (first) parts.push(`The learner has this page open: "${first.title}" (${first.kind}). Its text:\n\n${page.map((c) => fence(c, lang)).join("\n\n")}`);
+  else if (chat) parts.push("The learner opened the tutor on its own page to ask about anything in the course: a concept, an exercise they are stuck on, a command, their study plan. No lesson is open, so build on the course excerpts below, and point them to the page to study next.");
   else parts.push("The learner is on a page with no course text of its own, such as a menu.");
   if (related.length) parts.push(`Other pages of the course that may help. When you use one, name it as a Markdown link with its link value, so the learner can open it:\n\n${related.map((c) => fence(c, lang)).join("\n\n")}`);
   parts.push(reveal ? REVEAL : REMINDER[mode]);

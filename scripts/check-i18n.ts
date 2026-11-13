@@ -61,7 +61,7 @@ for (const [ns, entries] of Object.entries(UI_TABLE)) {
 if (Object.keys(UI.fr).length !== Object.keys(UI.en).length) fail("ui: namespaces differ");
 
 // 3. Every message the server or the account code can show has a French line.
-const MESSAGE_FILES = ["src/server/password.ts", "src/lib/account.ts", "src/components/Prompt.tsx", ...walk("src/app/api").filter((f) => f.endsWith(".ts"))];
+const MESSAGE_FILES = ["src/server/password.ts", "src/lib/account.ts", "src/components/Prompt.tsx", ...walk("src/app/api").filter((f) => f.endsWith(".ts")), ...walk("src/server/tutor").filter((f) => f.endsWith(".ts"))];
 function walk(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]));
 }
@@ -73,6 +73,7 @@ for (const f of MESSAGE_FILES) {
     ...src.matchAll(/return "([A-Z][^"]+[.?])"/g),
     ...src.matchAll(/\?\? "([A-Z][^"]+[.?])"/g),
     ...src.matchAll(/const WRONG = "([^"]+)"/g),
+    ...src.matchAll(/new (?:Runtime|Ollama|Tutor)Error\("([^"]+)"\)/g),
   ].map((m) => m[1] as string);
   for (const m of found) {
     messages++;

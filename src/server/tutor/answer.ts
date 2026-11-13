@@ -3,8 +3,8 @@ import type { Lang } from "@/i18n/lang";
 import type { ChatEvent, Chunk, Grade, Mode, TutorSettings, Verdict } from "@/lib/tutor-types";
 import { pageChunks } from "./corpus";
 import { chat, chatJson, OllamaError } from "./ollama";
-import { fitPage, GRADE_FORMAT, gradePrompt, historyTurns, PAGE_BUDGET, RELATED_LIMIT, sourcesOf, systemPrompt } from "./prompt";
-import { addMessage, history, saveGrade } from "./store";
+import { fitPage, GRADE_FORMAT, gradePrompt, historyTurns, PAGE_BUDGET, RELATED_LIMIT, RELATED_LIMIT_CHAT, sourcesOf, systemPrompt } from "./prompt";
+import { addMessage, history, isThread, saveGrade } from "./store";
 import { search } from "./vectors";
 
 export interface Turn {
@@ -23,12 +23,13 @@ async function context(settings: TutorSettings, turn: Turn): Promise<{ page: Chu
   // "Why isn't that enough?" means little alone: the page's title says what "that" is about.
   const query = `${whole[0] ? `${whole[0].title}. ` : ""}${turn.message.slice(0, QUERY_CHARS)}`;
   const tooLong = whole.reduce((n, c) => n + c.text.length, 0) > PAGE_BUDGET;
+  const limit = isThread(turn.href) ? RELATED_LIMIT_CHAT : RELATED_LIMIT;
   const [ranked, hits] = await Promise.all([
     tooLong ? search(settings, query, turn.lang, whole.length, whole) : [],
-    search(settings, query, turn.lang, RELATED_LIMIT + whole.length),
+    search(settings, query, turn.lang, limit + whole.length),
   ]);
   const page = fitPage(whole, ranked.length ? new Map(ranked.map((h) => [h.chunk.id, h.score])) : undefined);
-  const related = hits.map((h) => h.chunk).filter((c) => c.href !== turn.href).slice(0, RELATED_LIMIT);
+  const related = hits.map((h) => h.chunk).filter((c) => c.href !== turn.href).slice(0, limit);
   return { page, related };
 }
 
@@ -52,7 +53,7 @@ export function answer(settings: TutorSettings, turn: Turn, signal: AbortSignal)
         await addMessage(turn.href, "user", turn.mode, turn.message);
         send({ type: "sources", sources: sourcesOf(related, turn.lang) });
         const messages = [
-          { role: "system" as const, content: systemPrompt({ lang: turn.lang, mode: turn.mode, reveal: turn.reveal, page, related }) },
+          { role: "system" as const, content: systemPrompt({ lang: turn.lang, mode: turn.mode, reveal: turn.reveal, page, related, chat: isThread(turn.href) }) },
           ...historyTurns(past),
           { role: "user" as const, content: turn.message },
         ];

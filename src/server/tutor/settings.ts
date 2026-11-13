@@ -4,7 +4,7 @@ import type { TutorSettings } from "@/lib/tutor-types";
 import { EMBED_MODEL, validModel } from "./models";
 import { DEFAULT_HOST } from "./ollama";
 
-const DEFAULTS: TutorSettings = { host: DEFAULT_HOST, chatModel: "", embedModel: EMBED_MODEL };
+const DEFAULTS: TutorSettings = { host: DEFAULT_HOST, chatModel: "", embedModel: EMBED_MODEL, welcomed: "" };
 
 export async function readSettings(): Promise<TutorSettings> {
   const rows = await all<{ key: string; value: string }>("SELECT key, value FROM tutor_settings");
@@ -32,9 +32,11 @@ export async function writeSettings(patch: Partial<Record<keyof TutorSettings, u
   for (const key of ["chatModel", "embedModel"] as const) {
     const value = patch[key];
     if (value === undefined) continue;
-    if (typeof value !== "string" || !validModel(value)) return "That isn't a valid model name.";
+    // An empty chat model means none: the one in use was deleted.
+    if (typeof value !== "string" || !(validModel(value) || (key === "chatModel" && value === ""))) return "That isn't a valid model name.";
     next[key] = value;
   }
+  if (patch.welcomed !== undefined) next.welcomed = patch.welcomed === "1" ? "1" : "";
   const entries = Object.entries(next);
   if (entries.length) await many(entries.map(([k, v]) => ["INSERT INTO tutor_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", k, v]));
   return null;

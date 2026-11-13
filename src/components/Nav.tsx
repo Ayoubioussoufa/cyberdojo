@@ -8,6 +8,8 @@ import { useAccount } from "@/lib/account";
 import { useLang } from "@/i18n/LangProvider";
 import { LANG_COOKIE, splitLang, switchTo } from "@/i18n/lang";
 import type { Dict } from "@/i18n/ui";
+import { DESKTOP } from "@/lib/desktop";
+import { TutorChip } from "./tutor/TutorChip";
 
 const LINKS: { href: string; label: keyof Dict["nav"]; also: string[] }[] = [
   { href: "/", label: "today", also: [] },
@@ -79,9 +81,11 @@ export function Nav() {
         </nav>
         <div className="nav-tools">
           <Search />
-          {ready && (user
-            ? <Link href="/account/" className="nav-user" title={t.nav.account}>{user.username}</Link>
-            : <Link href="/signin/" className="nav-signin">{t.nav.signIn}</Link>)}
+          {DESKTOP
+            ? <TutorChip active={path.startsWith("/tutor/")} />
+            : ready && (user
+              ? <Link href="/account/" className="nav-user" title={t.nav.account}>{user.username}</Link>
+              : <Link href="/signin/" className="nav-signin">{t.nav.signIn}</Link>)}
           <button type="button" className="icon-btn" onClick={toggle} aria-label={dark ? t.nav.light : t.nav.dark}>
             {dark ? "☀" : "☾"}
           </button>

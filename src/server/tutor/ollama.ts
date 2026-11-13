@@ -50,16 +50,59 @@ export async function installed(host: string): Promise<InstalledModel[]> {
   return models.map((m) => ({ name: m.name, bytes: m.size }));
 }
 
-/** The download's own progress lines, untouched, for the page to draw. */
+/** Models loaded in memory, with the share of each held by the graphics card. */
+export async function loaded(host: string): Promise<{ name: string; gpu: number }[]> {
+  try {
+    const res = await call(host, "/api/ps", { signal: AbortSignal.timeout(3000) });
+    const { models = [] } = (await res.json()) as { models?: { name: string; size: number; size_vram?: number }[] };
+    return models.map((m) => ({ name: m.name, gpu: m.size ? Math.min(1, (m.size_vram ?? 0) / m.size) : 0 }));
+  } catch {
+    return [];
+  }
+}
+
+export async function remove(host: string, model: string): Promise<void> {
+  await call(host, "/api/delete", { method: "DELETE", body: JSON.stringify({ model }), signal: AbortSignal.timeout(30_000) });
+}
+
+/** The download's own progress lines, untouched. */
 export async function pull(host: string, model: string, signal: AbortSignal): Promise<ReadableStream<Uint8Array>> {
   const res = await post(host, "/api/pull", { model, stream: true }, signal);
   if (!res.body) throw new OllamaError("Ollama sent no download progress.");
   return res.body;
 }
 
+const slot = globalThis as { __cyberdojoCaps?: Map<string, string[]> };
+
+/** What a model can do ("completion", "thinking", "vision"…), as Ollama reports it. Asked once per model. */
+async function capabilities(host: string, model: string): Promise<string[]> {
+  const cache = (slot.__cyberdojoCaps ??= new Map());
+  const known = cache.get(model);
+  if (known) return known;
+  try {
+    const res = await post(host, "/api/show", { model }, AbortSignal.timeout(10_000));
+    const caps = ((await res.json()) as { capabilities?: string[] }).capabilities ?? [];
+    cache.set(model, caps);
+    return caps;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Thinking models reason at length before they answer, which on a laptop means
+ * a minute of silence. A tutor that replies in seconds teaches better, so
+ * thinking is switched off, or set to its lowest level where it can't be.
+ * Sending `think` to a model without the capability is an error, hence the check.
+ */
+async function thinking(host: string, model: string): Promise<{ think?: boolean | "low" }> {
+  if (!(await capabilities(host, model)).includes("thinking")) return {};
+  return { think: model.startsWith("gpt-oss") ? "low" : false };
+}
+
 /** The answer, piece by piece. */
 export async function* chat(host: string, model: string, messages: ChatTurn[], signal: AbortSignal): AsyncGenerator<string> {
-  const res = await post(host, "/api/chat", { model, messages, stream: true, options: { num_ctx: NUM_CTX, temperature: 0.4 } }, signal);
+  const res = await post(host, "/api/chat", { model, messages, stream: true, ...(await thinking(host, model)), options: { num_ctx: NUM_CTX, temperature: 0.4 } }, signal);
   if (!res.body) throw new OllamaError("Ollama sent no answer.");
   for await (const line of jsonLines<{ message?: { content?: string }; error?: string }>(res.body)) {
     if (line.error) throw new OllamaError(line.error);
@@ -69,7 +112,7 @@ export async function* chat(host: string, model: string, messages: ChatTurn[], s
 
 /** One whole answer that must match a JSON schema. Used for grading. */
 export async function chatJson(host: string, model: string, messages: ChatTurn[], format: object, signal: AbortSignal): Promise<string> {
-  const res = await post(host, "/api/chat", { model, messages, format, stream: false, options: { num_ctx: NUM_CTX, temperature: 0 } }, signal);
+  const res = await post(host, "/api/chat", { model, messages, format, stream: false, ...(await thinking(host, model)), options: { num_ctx: NUM_CTX, temperature: 0 } }, signal);
   return ((await res.json()) as { message?: { content?: string } }).message?.content ?? "";
 }
 

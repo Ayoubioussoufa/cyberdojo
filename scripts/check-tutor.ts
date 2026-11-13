@@ -8,7 +8,12 @@ import { tutorHtml } from "../src/lib/tutor-markdown";
 import type { Chunk, TutorIndex } from "../src/lib/tutor-types";
 import { readGrade } from "../src/server/tutor/answer";
 import { chunkBlocks, htmlToText } from "../src/server/tutor/chunking";
-import { validModel } from "../src/server/tutor/models";
+import type { Hardware } from "../src/lib/tutor-types";
+import { advise, CATALOG, fit, validModel } from "../src/server/tutor/models";
+import { buildIndex, scores, tokens } from "../src/server/tutor/keywords";
+import { assetName, isLocal, parseChecksums } from "../src/server/tutor/runtime";
+import { isThread } from "../src/server/tutor/store";
+import { newer, parseVersion } from "../desktop/updates";
 import { fitPage, gradePrompt, historyTurns, PAGE_BUDGET, sourcesOf, systemPrompt } from "../src/server/tutor/prompt";
 
 let failed = 0;
@@ -74,6 +79,48 @@ eq("a score out of range", readGrade('{"verdict":"correct","score":140,"right":[
 
 // Model names, as they go into a URL-less API call
 eq("valid and invalid model names", ["qwen2.5:7b", "mistral", "library/llama3.1:8b", "nomic-embed-text", "", "a b", "../x", "x;rm"].map(validModel), [true, true, true, true, false, false, false, false]);
+
+// Search by words, for what meaning misses
+eq("words: lower case, no accents, no filler, commands and CVEs kept", tokens("What is the CIA triad? Sécurité: nmap -sV, CVE-2021-44228, a 7 de la"), ["cia", "triad", "securite", "nmap", "sv", "cve", "2021", "44228", "7"]);
+const kwChunks = [chunk("cia", "Confidentiality, integrity and availability are called the CIA triad."), chunk("net", "A packet travels through routers and switches."), chunk("nmap", "nmap -sV asks each open port which service and version it runs.")];
+const kw = buildIndex(kwChunks);
+eq("the passage with the rare words ranks first", [...scores(kw, "What does the CIA triad mean?", kwChunks.map((c) => c.id)).keys()], ["cia"]);
+eq("a command finds its tool", [...scores(kw, "what does nmap -sV do", kwChunks.map((c) => c.id)).keys()], ["nmap"]);
+eq("small talk matches nothing", scores(kw, "hello, how are you?", kwChunks.map((c) => c.id)).size, 0);
+
+// Which model suits which computer
+const GiB = 2 ** 30;
+const pc = (ramGb: number, vramGb: number | null, unified = false, diskFreeGb: number | null = 500): Hardware => ({ ramGb, cores: 8, gpu: vramGb === null ? null : { name: "card", vramGb, unified }, diskFreeGb });
+eq("a 4 GB model on a 12 GB card is fast", fit(4 * GiB, pc(16, 12)), "fast");
+eq("half on a 6 GB card is slow", fit(9 * GiB, pc(32, 6)), "slow");
+eq("mostly on an 8 GB card is usable", fit(8 * GiB, pc(32, 8)), "ok");
+eq("a small model on the processor alone is usable", fit(2.5 * GiB, pc(8, null)), "ok");
+eq("a 9 GB model on the processor alone is slow", fit(9 * GiB, pc(32, null)), "slow");
+eq("more than the memory is too big", fit(17 * GiB, pc(16, null)), "too-big");
+eq("a sparse model stays usable without a card", fit(13 * GiB, pc(32, null), true), "ok");
+eq("Apple silicon runs within its shared memory", [fit(6 * GiB, pc(16, 10, true)), fit(10 * GiB, pc(16, 10, true)), fit(12 * GiB, pc(16, 10, true))], ["fast", "slow", "too-big"]);
+eq("an 8 GB laptop gets the 4b", advise(pc(8, null)).recommended, "qwen3.5:4b");
+eq("16 GB and no card gets the 4b", advise(pc(16, null)).recommended, "qwen3.5:4b");
+eq("an 8 GB card gets the 4b, which fits whole; the 9b only mostly fits", [advise(pc(16, 8)).recommended, advise(pc(16, 8)).models.find((m) => m.name === "qwen3.5:9b")?.fit], ["qwen3.5:4b", "ok"]);
+eq("a 10 GB card already holds the 12b", advise(pc(16, 10)).recommended, "gemma4:12b");
+eq("a 12 GB card gets the 12b", advise(pc(16, 12)).recommended, "gemma4:12b");
+eq("a 24 GB card gets the 27b", advise(pc(64, 24)).recommended, "qwen3.5:27b");
+eq("a 4 GB laptop gets nothing it can run", advise(pc(4, null)).recommended, null);
+eq("a full disk rules models out", advise(pc(16, 12, false, 3.6)).recommended, "qwen3.5:2b");
+ok("the catalog is smallest first", CATALOG.every((m, i) => i === 0 || (CATALOG[i - 1] as { bytes: number }).bytes <= m.bytes + 1e9));
+
+// Installing Ollama
+eq("the file each system installs", [assetName("win32", "x64"), assetName("darwin", "arm64"), assetName("linux", "x64"), assetName("linux", "arm64"), assetName("linux", "ia32"), assetName("freebsd", "x64")], ["OllamaSetup.exe", "Ollama-darwin.zip", "ollama-linux-amd64.tar.zst", "ollama-linux-arm64.tar.zst", null, null]);
+const sums = parseChecksums(`${"a".repeat(64)}  ./OllamaSetup.exe\n${"B".repeat(64)}  ollama-darwin.tgz\nnot a line\n${"c".repeat(63)}  ./short.zip\n`);
+eq("the release's checksum list", [...sums.entries()], [["OllamaSetup.exe", "a".repeat(64)], ["ollama-darwin.tgz", "b".repeat(64)]]);
+eq("only this computer's addresses can be started or installed", ["http://127.0.0.1:11434", "http://localhost:11500", "http://[::1]:11434", "http://192.168.1.20:11434", "http://127.0.0.1.evil.com", "nonsense"].map(isLocal), [true, true, true, false, false, false]);
+
+// The tutor's own conversations
+eq("conversation keys", ["/tutor/chat/abc123def/", "/tutor/chat/x/", "/tutor/chat/abc123def/../", "/courses/x/"].map(isThread), [true, false, false, false]);
+
+// Updates
+eq("release tags", ["desktop-v1.2.3", "v0.1.0", "1.0.0", "desktop-v1.2", "latest"].map(parseVersion), [[1, 2, 3], [0, 1, 0], [1, 0, 0], null, null]);
+eq("version order", [newer([0, 2, 0], [0, 1, 9]), newer([0, 1, 0], [0, 1, 0]), newer([1, 0, 0], [1, 0, 1])], [true, false, false]);
 
 // A model's reply is untrusted
 const html = tutorHtml('**bold** [in](/courses/x/) [out](https://example.com) [bad](javascript:alert(1)) ![pic](https://example.com/x.png) <img src=x onerror=alert(1)>\n\n<script>alert(1)</script>');

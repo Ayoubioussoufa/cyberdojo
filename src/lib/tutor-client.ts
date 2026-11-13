@@ -7,7 +7,7 @@
 import { useSyncExternalStore } from "react";
 import type { Lang } from "@/i18n/lang";
 import { jsonLines } from "./ndjson";
-import type { ChatEvent, Grade, Mode, PullEvent, TutorMessage, TutorSettings, TutorStatus } from "./tutor-types";
+import type { ChatEvent, Grade, Mode, SetupJob, Thread, TutorMessage, TutorSettings, TutorStatus } from "./tutor-types";
 
 interface Dock {
   open: boolean;
@@ -47,7 +47,11 @@ const send = (method: string, url: string, body?: unknown, signal?: AbortSignal)
   fetch(url, { method, signal, credentials: "same-origin", headers: body === undefined ? {} : { "Content-Type": "application/json" }, body: body === undefined ? null : JSON.stringify(body) });
 
 export const getStatus = async () => json<TutorStatus>(await send("GET", "/api/tutor/status/"));
-export const saveSettings = async (patch: Partial<TutorSettings>) => json<TutorSettings>(await send("PUT", "/api/tutor/settings/", patch));
+export const saveSettings = async (patch: Partial<TutorSettings>) => {
+  const out = await json<TutorSettings>(await send("PUT", "/api/tutor/settings/", patch));
+  void refreshStatus();
+  return out;
+};
 export const getHistory = async (page: string) => json<TutorMessage[]>(await send("GET", `/api/tutor/chat/?page=${encodeURIComponent(page)}`));
 export const clearChat = async (page: string) => json<{ ok: boolean }>(await send("DELETE", `/api/tutor/chat/?page=${encodeURIComponent(page)}`));
 export const getGrade = async (questionId: string) => json<Grade | null>(await send("GET", `/api/tutor/grade/?question=${encodeURIComponent(questionId)}`)).catch(() => null);
@@ -70,16 +74,76 @@ export async function* chat(ask: Ask, signal: AbortSignal): AsyncGenerator<ChatE
   yield* stream<ChatEvent>(await send("POST", "/api/tutor/chat/", ask, signal));
 }
 
-/** Download progress from 0 to 1, or null before any size is known. Throws if the download fails. */
-export async function* pullModel(model: string, signal: AbortSignal): AsyncGenerator<number | null> {
-  const layers = new Map<string, { total: number; completed: number }>();
-  let finished = false;
-  for await (const e of stream<PullEvent>(await send("POST", "/api/tutor/pull/", { model }, signal))) {
-    if (e.error) throw new TutorError(e.error);
-    if (e.status === "success") finished = true;
-    if (e.digest && e.total) layers.set(e.digest, { total: e.total, completed: e.completed ?? 0 });
-    const total = [...layers.values()].reduce((n, l) => n + l.total, 0);
-    yield total ? [...layers.values()].reduce((n, l) => n + l.completed, 0) / total : null;
-  }
-  if (!finished) throw new TutorError("The download stopped before the end. Try again.");
+/** Starts installing or starting Ollama and downloading models, in the background. */
+export const startSetup = async (pull: string[], use?: string) => {
+  const job = await json<SetupJob>(await send("POST", "/api/tutor/setup/", { pull, use }));
+  if (timer) clearTimeout(timer);
+  timer = null;
+  void refreshStatus().then(schedule);
+  return job;
+};
+export const cancelSetup = async () => {
+  await json<{ ok: boolean }>(await send("DELETE", "/api/tutor/setup/"));
+  void refreshStatus();
+};
+export const deleteModel = async (name: string) => {
+  await json<{ ok: boolean }>(await send("DELETE", `/api/tutor/models/?name=${encodeURIComponent(name)}`));
+  void refreshStatus();
+};
+export const getThreads = async (lang: Lang) => json<{ threads: Thread[]; pages: Thread[] }>(await send("GET", `/api/tutor/threads/?lang=${lang}`));
+
+/**
+ * One status for the whole window, shared by the nav, the tutor panel and the
+ * setup page: asked every few seconds while visible, every second while a
+ * setup runs.
+ */
+const FAST_MS = 1000;
+const SLOW_MS = 5000;
+let status: TutorStatus | null = null;
+let timer: ReturnType<typeof setTimeout> | null = null;
+let asking: Promise<void> | null = null;
+const watchers = new Set<() => void>();
+
+export function refreshStatus(): Promise<void> {
+  asking ??= getStatus()
+    .then((s) => {
+      status = s;
+      watchers.forEach((fn) => fn());
+    })
+    .catch(() => undefined)
+    .finally(() => {
+      asking = null;
+    });
+  return asking;
 }
+
+/** The next poll is planned after each answer, so it follows what the answer says: fast while a setup runs. */
+function schedule() {
+  if (timer || !watchers.size) return;
+  timer = setTimeout(async () => {
+    timer = null;
+    if (document.visibilityState === "visible") await refreshStatus();
+    schedule();
+  }, status?.job?.state === "running" ? FAST_MS : SLOW_MS);
+}
+
+function watch(fn: () => void) {
+  watchers.add(fn);
+  if (watchers.size === 1) void refreshStatus().then(schedule);
+  return () => {
+    watchers.delete(fn);
+  };
+}
+
+export const useTutorStatus = () => useSyncExternalStore(watch, () => status, () => null);
+
+/** How far a setup has gone, 0 to 1: finished steps count whole, downloads by their bytes. */
+export function jobShare(job: SetupJob): number {
+  const total = job.steps.reduce((n, s) => n + s.total, 0);
+  if (!total) return job.steps.filter((s) => s.state === "done").length / Math.max(job.steps.length, 1);
+  return job.steps.reduce((n, s) => n + (s.state === "done" ? s.total : s.done), 0) / total;
+}
+
+/** Ready to answer: Ollama answers and a chat model is chosen and present. */
+export const tutorReady = (s: TutorStatus | null) =>
+  !!s?.ollama.running && !!s.settings.chatModel && s.installed.some((m) => m.name === s.settings.chatModel || m.name === `${s.settings.chatModel}:latest`);

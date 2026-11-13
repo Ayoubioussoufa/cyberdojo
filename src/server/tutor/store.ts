@@ -38,3 +38,26 @@ export async function lastGrade(questionId: string): Promise<Grade | null> {
   );
   return row ? toGrade(row) : null;
 }
+
+/** Conversations on the tutor's own page are saved under this prefix, so the chat route treats them like any page. */
+export const THREAD_PREFIX = "/tutor/chat/";
+export const isThread = (page: string) => /^\/tutor\/chat\/[a-z0-9]{6,32}\/$/.test(page);
+
+interface ChatRow {
+  page: string;
+  first: string | null;
+  updatedAt: number;
+  count: number;
+}
+
+/**
+ * Every chat that has messages, newest first: the tutor's own conversations
+ * and the ones held beside lessons. A chat's title is its first question.
+ */
+export async function chats(): Promise<ChatRow[]> {
+  return all<ChatRow>(
+    `SELECT page, MAX(created_at) AS updatedAt, COUNT(*) AS count,
+            (SELECT content FROM tutor_messages f WHERE f.page = m.page AND f.role = 'user' ORDER BY f.id LIMIT 1) AS first
+       FROM tutor_messages m GROUP BY page ORDER BY updatedAt DESC LIMIT 200`,
+  );
+}
