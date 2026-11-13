@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
+/** The desktop app (scripts/desktop.ts) ships the site as a self-contained server, built apart from the website's. */
+const desktop = process.env.NEXT_PUBLIC_CYBERDOJO_DESKTOP === "1";
+
 // Pages are still pre-rendered at build time. The server exists for /api: accounts and saved progress.
 const nextConfig: NextConfig = {
+  ...(desktop ? { output: "standalone" as const, distDir: ".next-desktop" } : {}),
   trailingSlash: true,
   images: { unoptimized: true },
   turbopack: { root: __dirname },

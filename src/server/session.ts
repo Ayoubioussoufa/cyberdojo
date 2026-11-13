@@ -5,6 +5,8 @@
 import { createHash, randomBytes } from "node:crypto";
 import { cookies, headers } from "next/headers";
 import { get, many, run } from "./db";
+import { DESKTOP_COOKIE, fromAppWindow } from "./desktop";
+import { DESKTOP } from "@/lib/desktop";
 
 const DAY = 86_400_000;
 const LIFETIME = 30 * DAY;
@@ -45,7 +47,17 @@ export async function startSession(userId: string) {
   await setCookie(token, now + LIFETIME);
 }
 
+const LOCAL_ID = "local";
+
+/** The desktop app has one profile and no password: whoever sits at the computer. */
+async function localUser(): Promise<User | null> {
+  if (!fromAppWindow((await cookies()).get(DESKTOP_COOKIE)?.value)) return null;
+  await run("INSERT OR IGNORE INTO users (id, username, password_hash, created_at) VALUES (?, ?, '', ?)", LOCAL_ID, LOCAL_ID, Date.now());
+  return (await get<User>("SELECT id, username, created_at AS createdAt FROM users WHERE id = ?", LOCAL_ID)) ?? null;
+}
+
 export async function currentUser(): Promise<User | null> {
+  if (DESKTOP) return localUser();
   const token = (await cookies()).get(await cookieName())?.value;
   if (!token) return null;
   const now = Date.now();

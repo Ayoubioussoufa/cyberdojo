@@ -5,6 +5,9 @@
  * to the sign-in page, which is the only page open to all. The session is
  * checked against the database, not just for a cookie being present.
  *
+ * The desktop app has no sign-in: it lets its own window in and nobody else.
+ * See src/server/desktop.ts.
+ *
  * Language: "/fr/..." is the French site and passes through. Any other page
  * path is rewritten onto the "en" segment, so English addresses keep no
  * prefix. "/en/..." redirects to the address without it, so each page has one
@@ -14,7 +17,9 @@
 import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { LANG_COOKIE } from "@/i18n/lang";
+import { DESKTOP } from "@/lib/desktop";
 import { get } from "@/server/db";
+import { DESKTOP_COOKIE, fromAppWindow } from "@/server/desktop";
 
 /** A browser opening a page, not a client-side navigation, prefetch or JSON fetch. */
 const opensPage = (req: NextRequest) =>
@@ -58,7 +63,15 @@ export async function proxy(req: NextRequest) {
   const bare = french ? pathname.slice(3) || "/" : pathname;
   const wantsFrench = french || req.cookies.get(LANG_COOKIE)?.value === "fr";
 
-  if (!OPEN.test(bare) && !(await signedIn(req))) {
+  if (DESKTOP) {
+    // One local profile: the app's own window is let in, and there is nothing to sign in to.
+    if (!fromAppWindow(req.cookies.get(DESKTOP_COOKIE)?.value)) return new NextResponse("CyberDojo only answers its own window.", { status: 403 });
+    if (OPEN.test(bare)) {
+      url.pathname = wantsFrench ? "/fr/" : "/";
+      url.search = "";
+      return NextResponse.redirect(url, 307);
+    }
+  } else if (!OPEN.test(bare) && !(await signedIn(req))) {
     url.pathname = `${wantsFrench ? "/fr" : ""}/signin/`;
     url.search = bare === "/" ? "" : `?next=${encodeURIComponent(bare + search)}`;
     const res = NextResponse.redirect(url, 307);
