@@ -76,6 +76,9 @@ export default async function Page({ params }: LangParams) {
           <div>
             <h3>macOS</h3>
             <ol><li>{t.download.mac1}</li><li>{t.download.mac2}</li><li>{t.download.mac3}</li></ol>
+            <p className="dl-note">{t.download.macOld}</p>
+            <p className="dl-note">{t.download.macDamaged}</p>
+            <pre><code>xattr -dr com.apple.quarantine /Applications/CyberDojo.app</code></pre>
           </div>
           <div>
             <h3>Linux</h3>

@@ -1215,6 +1215,7 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 .dl-install h3 { font-size: 16.5px; margin: 0 0 8px; }
 .dl-install ol { margin: 0; padding-left: 20px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; font-size: 15px; line-height: 1.5; }
 .dl-install li { min-width: 0; }
+.dl-install .dl-note { margin: 12px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
 .dl-install pre { margin: 6px 0 0; padding: 8px 10px; overflow-x: auto; background: var(--term-bg); color: var(--term-ink); border-radius: var(--radius); font-family: var(--mono); font-stretch: 87.5%; font-size: 12.5px; }
 .dl-first { margin: 0; padding: 12px 16px; background: var(--accent-soft); border-left: 2px solid var(--accent); border-radius: var(--radius); }
 .dl-faq { border-top: 1px solid var(--rule); padding: 12px 0; }
