@@ -34,7 +34,7 @@ export function DownloadPicker({ release }: { release: Release }) {
       {main ? (
         <div className="dl-main">
           <a className="btn primary lg" href={main.url}>{fill(t.download.for, { os: OS_NAME[main.os] })}</a>
-          <span className="muted">{fill(t.download.meta, { version: release.version, size: `${main.kind}, ${mb(lang, main.bytes)}` })}</span>
+          <span className="muted">{fill(t.download.meta, { version: release.version, size: `.${main.kind}, ${mb(lang, main.bytes)}` })}</span>
         </div>
       ) : <p className="dl-choose">{t.download.pick}</p>}
       <ul className="dl-others" aria-label={main ? t.download.others : t.download.pick}>
