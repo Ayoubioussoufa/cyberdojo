@@ -34,6 +34,27 @@ function names(nodeModules: string): string[] {
   });
 }
 
+/**
+ * Where a link leads, worked out from the link's own text. fs.realpathSync would ask the system to follow it,
+ * and on Windows the links in Next's standalone output often can't be followed (EPERM): Next creates
+ * them without saying they point to folders. Reading the target always works.
+ */
+export function resolveLink(p: string): string {
+  let at = path.resolve(p);
+  for (let hops = 0; hops < 40; hops++) {
+    let entry: fs.Stats;
+    try {
+      entry = fs.lstatSync(at);
+    } catch {
+      return at;
+    }
+    if (!entry.isSymbolicLink()) return at;
+    const target = fs.readlinkSync(at).replace(/^\\\\\?\\/, "");
+    at = path.resolve(path.dirname(at), target);
+  }
+  throw new Error(`flatten: too many links in a row at ${p}`);
+}
+
 const versionOf = (dir: string) => (JSON.parse(fs.readFileSync(path.join(dir, "package.json"), "utf8")) as { version?: string }).version ?? "0.0.0";
 
 /** Compares "2.1.2" and "2.0.2" numerically, part by part. */
@@ -58,8 +79,8 @@ function readStore(store: string): Pkg[] {
       const dir = path.join(nm, name);
       if (fs.lstatSync(dir).isSymbolicLink()) continue;
       const deps = new Map<string, string>();
-      for (const dep of here) if (dep !== name) deps.set(dep, fs.realpathSync(path.join(nm, dep)));
-      out.push({ name, version: versionOf(dir), dir: fs.realpathSync(dir), deps });
+      for (const dep of here) if (dep !== name) deps.set(dep, resolveLink(path.join(nm, dep)));
+      out.push({ name, version: versionOf(dir), dir: path.resolve(dir), deps });
     }
   }
   return out;
@@ -81,7 +102,7 @@ export function flattenModules(standalone: string, to: string): Map<string, stri
   // The version at the top: the one the app links to directly, otherwise the newest.
   const top = new Map<string, Pkg>();
   for (const name of names(source)) {
-    const p = byDir.get(fs.realpathSync(path.join(source, name)));
+    const p = byDir.get(resolveLink(path.join(source, name)));
     if (p) top.set(p.name, p);
   }
   for (const p of packages) {
@@ -119,7 +140,7 @@ export function flattenModules(standalone: string, to: string): Map<string, stri
 export function copyResolvingLinks(from: string, to: string, placed: Map<string, string>) {
   const entry = fs.lstatSync(from);
   if (entry.isSymbolicLink()) {
-    const real = fs.realpathSync(from);
+    const real = resolveLink(from);
     const flat = placed.get(real);
     copyReal(flat ?? real, to);
     return;
