@@ -130,21 +130,32 @@ An installer can only be built on its own system. `.github/workflows/desktop.yml
 
 ### The tutor
 
-1. Install Ollama from <https://ollama.com/download> (Linux: `curl -fsSL https://ollama.com/install.sh | sh`). The app's Tutor setup page checks that it is running and walks through the rest.
-2. Download a model from that page. It suggests one from the computer's memory:
+On first launch the app opens on **Your AI tutor** (`/tutor/setup/`). It shows what the computer has (memory, graphics card, free disk), recommends a model, and one button does the rest in the background:
 
-   | Memory | Model | Download |
-   | --- | --- | --- |
-   | Under 12 GB | `llama3.2:3b`, `qwen2.5:3b` | 2 GB |
-   | 12 to 24 GB | `qwen2.5:7b`, `llama3.1:8b`, `mistral:7b`, `qwen2.5-coder:7b` | 4 to 5 GB |
-   | 24 GB or more | `qwen2.5:14b`, `qwen2.5-coder:14b` | 9 GB |
+1. **Ollama.** If it is already running, it is used. If it is installed but stopped, the app starts it. If it is missing, the app installs it from Ollama's own GitHub release, after checking the file against the release's SHA-256 list:
+   - Windows: `OllamaSetup.exe`, run silently for this user only (no administrator rights), only if its signature is Ollama Inc.'s. This is what Ollama's `install.ps1` does.
+   - macOS: `Ollama.app`, unpacked into Applications, only if macOS accepts its signature and notarisation.
+   - Linux: the official build, unpacked into the app's data folder, because the system install needs sudo. The app starts this copy and stops it when it quits.
+2. **The model** the learner chose, then the course search model, `nomic-embed-text` (0.3 GB). The course is then indexed once.
 
-   The `coder` models are best at reviewing code. Any other Ollama model can be downloaded by name. A graphics card with 8 GB or more makes the 7b models answer quickly.
-3. Download the search model, `nomic-embed-text` (0.3 GB). The course is then indexed once, in the background.
+The learner can keep studying during the download: the Tutor button in the top bar shows the progress. Quitting while a download runs asks first. Once the tutor is set up, the app starts Ollama by itself at each launch if it isn't running.
 
-The tutor opens from the corner of every page. It has read the page that is open, gives hints before answers, and has four modes: Explain, Hint, Review my work, Quiz me. Every "Ask the tutor" button sends it the question, your answer and the key. Under each written question, "Grade my answer" grades it against the section and keeps the grade.
+**Which model.** Each model is marked fast, usable, slow or too large for this computer, from its exact download size, the memory, and the graphics card (NVIDIA cards through `nvidia-smi`; Apple silicon shares its memory). The recommendation is the largest of `qwen3.5:2b`, `qwen3.5:4b`, `qwen3.5:9b`, `gemma4:12b` and `qwen3.5:27b` that runs fast:
 
-Everything is stored in one SQLite file in the app's data folder (`%APPDATA%\CyberDojo`, `~/Library/Application Support/CyberDojo`, `~/.config/CyberDojo`): progress, chats per page, grades, settings and the search index. Back up `cyberdojo.db` to keep them.
+| This computer | Recommended | Download |
+| --- | --- | --- |
+| 8 to 16 GB of memory, no graphics card | `qwen3.5:4b` | 3.3 GB |
+| A graphics card with 6 to 8 GB | `qwen3.5:4b`; the 9b also runs, partly on the processor | 3.3 GB |
+| A graphics card with 10 to 19 GB, or a Mac with 16 or 24 GB | `gemma4:12b` | 8.0 GB |
+| A graphics card with 20 GB or more, or a Mac with 32 GB or more | `qwen3.5:27b` | 17.5 GB |
+
+The list also has `llama3.2:3b`, `gemma4:e4b`, `gpt-oss:20b` (a mixture-of-experts model that stays usable without a graphics card) and `gemma4:26b`. Any other Ollama model can be downloaded by name, and models can be deleted to free space. Thinking models (Qwen 3.5, gpt-oss) have their long reasoning switched off or set low, so answers start in seconds.
+
+**Using it.** The tutor opens from the corner of every page, having read the page that is open; it gives hints before answers and has four modes: Explain, Hint, Review my work, Quiz me. Every "Ask the tutor" button sends it the question, your answer and the key. Under each written question, "Grade my answer" grades it against the section and keeps the grade. **Ask the tutor** (`/tutor/`, Ctrl+T) is the tutor on its own page, for any question, with your chats listed beside it. Select text on any page and right-click "Ask the tutor about this".
+
+**The window.** It reopens at its last size and place, on the last page read. The menus have shortcuts: Ctrl+1 to 5 for Roadmap, Lessons, Practice, Progress and the tutor; Alt+Left and Alt+Right (Cmd+[ and Cmd+] on a Mac), or the mouse's side buttons, go back and forward. Help, Check for updates reads the project's public GitHub releases and opens the release page; it runs once a day by itself. Nothing about the learner is sent, and the app never installs an update without them.
+
+Everything is stored in one SQLite file in the app's data folder (`%APPDATA%\CyberDojo`, `~/Library/Application Support/CyberDojo`, `~/.config/CyberDojo`): progress, chats, grades, settings and the search index. Back up `cyberdojo.db` to keep them. The same folder holds `logs/` and, on Linux, the Ollama copy the app installed. Models live where Ollama keeps them (`~/.ollama/models`), shared with any other Ollama on the computer.
 
 ### Adding content
 

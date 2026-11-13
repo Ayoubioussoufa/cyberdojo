@@ -35,12 +35,48 @@ Electron main process (desktop/main.ts)
                      │
                      ▼
       Next.js server ── SQLite file (progress, chats, grades, settings, vectors)
-                     └─ Ollama on http://127.0.0.1:11434 (chat, embeddings, model downloads)
+                     └─ Ollama on http://127.0.0.1:11434 (chat, embeddings, model downloads),
+                        installed and started by the server when it's missing (see below)
 ```
 
 The page talks only to the local server over HTTP, exactly as on the website. Electron adds a window and a process manager, nothing else, so there is no IPC surface to secure. External links open in the system browser.
 
+What the shell adds to the window (`desktop/main.ts`, `desktop/menu.ts`):
+
+- `window.json` in the data folder keeps the size, place, zoom and last page. Saved bounds are used only if they still land on a screen.
+- The first launch opens `/tutor/setup/?welcome=1`; it asks the server, through the same token, whether the setup page was ever seen.
+- Menus in the page's language, with shortcuts; a right-click menu (Electron has none of its own); the mouse's side buttons and a Mac swipe go back and forward.
+- "Ask the tutor about this" on a selection calls `window.cyberdojoAsk(text)`, which the tutor panel defines. `executeJavaScript` passes the text as a JSON literal, so it can't break out of the call.
+- Closing while a setup job runs asks first. On quit, the shell stops the server and the copy of Ollama the server started (`ollama.pid`).
+- Updates (`desktop/updates.ts`) read the public release list of the `repository` in `package.json`, once a day and from the Help menu, and open the release page. Nothing is installed automatically: the builds aren't signed, so the learner runs the new installer themselves.
+
 The server listens on the loopback address, where other programs and web pages on the same computer could reach it. Three checks cover that: every page and tutor route requires the window token, writes require a same-origin `Origin` header, and the window refuses all permission requests.
+
+## Setting up Ollama and the models
+
+```
+setup page ── POST /api/tutor/setup/ {pull, use} ──► jobs.ts: one background job
+   ▲                                                   1. install Ollama   (runtime.install)   if it is missing
+   │ GET /api/tutor/status/ every 1 s while it runs    2. start Ollama     (runtime.start)     if it is stopped
+   └── status: hardware, catalog with a fit per model,  3. pull each model  (Ollama /api/pull)  bytes counted per layer
+       recommendation, Ollama state, job progress      4. switch the tutor to `use`
+```
+
+The job belongs to the server, not to a request: the learner can leave the page, and the nav's Tutor button shows the progress from the same status. One job runs at a time; DELETE cancels it. A model download that was cancelled resumes where it stopped, because Ollama keeps the layers it has.
+
+`runtime.ts` finds Ollama (the desktop app, the `ollama` command on the PATH or in its usual folders, or the copy this app installed) and installs it from Ollama's latest GitHub release:
+
+| System | File | Checks before it runs | Where it goes |
+| --- | --- | --- | --- |
+| Windows | `OllamaSetup.exe` | SHA-256 from the release, then an Authenticode signature by `O=Ollama Inc.`, as `install.ps1` checks it | `%LOCALAPPDATA%\Programs\Ollama`, silent, no administrator rights |
+| macOS | `Ollama-darwin.zip` | SHA-256, then `codesign --verify --deep --strict` and `spctl --assess` | `/Applications`, or `~/Applications` when that isn't writable |
+| Linux | `ollama-linux-<arch>.tar.zst` | SHA-256 (the release has no signature) | the app's data folder, run as `ollama serve` |
+
+Linux decompresses zstd in Node (`zlib.createZstdDecompress`, Node 22.15 and later) and pipes the tar to the system `tar`, so no `zstd` program is needed. The copy the app starts with `ollama serve` runs detached in its own process group, with its pid in `ollama.pid`; the shell stops it on quit (`taskkill /t` on Windows). The Ollama desktop apps are the user's and keep running.
+
+`hardware.ts` reads the memory, the NVIDIA card through `nvidia-smi`, Apple silicon's shared memory (about two thirds usable by the graphics cores) and the free space where Ollama keeps models. `models.ts` turns that into a fit per model: memory needed = download size × 1.15 + 1 GB for the 8,192-token context; fast if it fits on the card, usable if mostly on the card or small enough for the processor, slow if it only fits in main memory. The tests in `scripts/check-tutor.ts` pin the recommendation for typical computers.
+
+Thinking models get `think: false` (gpt-oss, which can't turn it off, gets `"low"`), after `/api/show` confirms the capability: sending `think` to a model without it is an error.
 
 ## Content is the source of truth
 
