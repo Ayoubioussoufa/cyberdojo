@@ -2,7 +2,7 @@
 
 import Link from "@/components/HoverLink";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, signUp, useAccount } from "@/lib/account";
 import { hasProgress } from "@/lib/merge";
 import { useStore } from "@/lib/progress";
@@ -26,6 +26,11 @@ export function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // "Create a free account" on the landing page opens the form on sign-up: /signin/?mode=up.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("mode") === "up") setMode("up");
+  }, []);
 
   if (user) {
     return (

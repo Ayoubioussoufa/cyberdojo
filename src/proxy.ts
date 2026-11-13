@@ -25,8 +25,8 @@ import { DESKTOP_COOKIE, fromAppWindow } from "@/server/desktop";
 const opensPage = (req: NextRequest) =>
   req.method === "GET" && !req.headers.has("rsc") && !req.headers.has("next-router-prefetch") && (req.headers.get("accept") ?? "").includes("text/html");
 
-/** Pages anyone can open on the website: signing in, and getting the desktop app. */
-const OPEN = /^\/(signin|download)(\/|$)/;
+/** Pages anyone can open on the website: signing in, getting the desktop app, and the landing page. */
+const OPEN = /^\/(signin|download|welcome)(\/|$)/;
 const REMEMBER_MS = 60_000;
 
 /** Sessions seen as valid in the last minute, so moving between pages doesn't ask the database each time. */
@@ -73,6 +73,12 @@ export async function proxy(req: NextRequest) {
       url.search = "";
       return NextResponse.redirect(url, 307);
     }
+  } else if (bare === "/" && !(await signedIn(req))) {
+    // A visitor at the front door sees the landing page, at the same address; members see their day.
+    url.pathname = `/${wantsFrench ? "fr" : "en"}/welcome/`;
+    const res = NextResponse.rewrite(url);
+    res.headers.set("Cache-Control", "no-store");
+    return res;
   } else if (!OPEN.test(bare) && !(await signedIn(req))) {
     url.pathname = `${wantsFrench ? "/fr" : ""}/signin/`;
     url.search = bare === "/" ? "" : `?next=${encodeURIComponent(bare + search)}`;

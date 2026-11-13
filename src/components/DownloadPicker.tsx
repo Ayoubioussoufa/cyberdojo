@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "@/components/HoverLink";
 import { useEffect, useState } from "react";
 import { fill, useLang } from "@/i18n/LangProvider";
 import type { Lang } from "@/i18n/lang";
@@ -21,6 +22,24 @@ function detect(): Os | null {
 }
 
 const mb = (lang: Lang, bytes: number) => `${new Intl.NumberFormat(lang).format(Math.round(bytes / 1e6))} ${lang === "fr" ? "Mo" : "MB"}`;
+
+/**
+ * The landing page's version: one button for this computer's system, or, when the
+ * system can't be told (a phone) or there's no release yet, the way to the download page.
+ */
+export function AppButton({ release, fallback }: { release: Release | null; fallback: string }) {
+  const { lang, t } = useLang();
+  const [os, setOs] = useState<Os | null>(null);
+  useEffect(() => setOs(detect()), []);
+  const main = release && os ? release.installers.find((i) => i.os === os && i.kind === FIRST[os]) ?? release.installers.find((i) => i.os === os) : undefined;
+  if (!release || !main) return <Link className="btn primary lg" href="/download/">{fallback}</Link>;
+  return (
+    <div className="dl-main">
+      <a className="btn primary lg" href={main.url}>{fill(t.download.for, { os: OS_NAME[main.os] })}</a>
+      <span className="muted">{fill(t.download.meta, { version: release.version, size: `.${main.kind}, ${mb(lang, main.bytes)}` })}</span>
+    </div>
+  );
+}
 
 /** The big button for this computer's system, and every other installer below it. */
 export function DownloadPicker({ release }: { release: Release }) {

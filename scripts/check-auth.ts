@@ -211,6 +211,10 @@ async function http() {
     ok((await fetch(`${BASE}/signin/`, { redirect: "manual" })).status === 200 && (await fetch(`${BASE}/fr/signin/`, { redirect: "manual" })).status === 200, "the sign-in page is open to all");
     ok((await fetch(`${BASE}/download/`, { redirect: "manual" })).status === 200 && (await fetch(`${BASE}/fr/download/`, { redirect: "manual" })).status === 200, "the app's download page is open to all");
     ok((await fetch(`${BASE}/downloads-secret/`, { redirect: "manual" })).status === 307, "and only that page: a look-alike address stays shut");
+    const door = await fetch(`${BASE}/`, { redirect: "manual" });
+    ok(door.status === 200 && (await door.text()).includes("/signin/?mode=up"), "a visitor at the front door sees the landing page");
+    const doorFr = await fetch(`${BASE}/fr/`, { redirect: "manual" });
+    ok(doorFr.status === 200 && (await doorFr.text()).includes("Apprenez la cybersécurité"), "in French too");
     const member = { cookie: (await omar("GET", "/api/auth/me/")).cookie() };
     const page = await fetch(BASE + lesson, { headers: member });
     ok(page.status === 200 && page.headers.get("x-frame-options") === "DENY" && page.headers.get("x-content-type-options") === "nosniff", "pages carry the security headers");

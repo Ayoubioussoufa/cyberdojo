@@ -7,6 +7,7 @@ import { today, useStore } from "@/lib/progress";
 import { useEffect, useState } from "react";
 import { TIPS, type Tip } from "@/data/tips";
 import { fill, plural, useLang } from "@/i18n/LangProvider";
+import { DESKTOP } from "@/lib/desktop";
 
 export function Home({ path }: { path: PathStep[] }) {
   const store = useStore();
@@ -129,6 +130,13 @@ export function Home({ path }: { path: PathStep[] }) {
         <Link href="/practice/">{t.home.practise}</Link>
         <Link href="/start/">{t.home.how}</Link>
       </p>
+
+      {!DESKTOP && (
+        <aside className="home-app">
+          <p>{t.download.signinPitch}</p>
+          <Link href="/download/" className="btn sm">{t.download.navLabel}</Link>
+        </aside>
+      )}
     </div>
   );
 }

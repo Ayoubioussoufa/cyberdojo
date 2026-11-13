@@ -1180,11 +1180,15 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 
 /* The website's page for the desktop app. */
 .nav-dl { color: var(--muted); }
+.nav-dl { text-decoration: none; }
+
 .nav-dl:hover, .nav-dl.on { color: var(--accent); background: var(--sunk); }
 /* A phone can't install the desktop app, and the bar has no room for it there. */
 @media (max-width: 560px) { .nav-dl { display: none; } }
 .auth-app { max-width: 26rem; margin: 20px auto 0; display: grid; gap: 10px; justify-items: start; padding: 16px 18px; border: 1px dashed var(--rule-strong); border-radius: var(--radius); }
 .auth-app p { margin: 0; font-size: 15px; color: var(--muted); }
+.home-app { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; margin-top: 32px; padding: 14px 18px; border: 1px dashed var(--rule-strong); border-radius: var(--radius); }
+.home-app p { margin: 0; flex: 1 1 20rem; font-size: 15px; color: var(--muted); }
 .download { display: grid; gap: 48px; }
 .dl-hero { display: grid; gap: 16px; justify-items: start; padding-bottom: 8px; }
 .dl-hero h1 { font-size: clamp(30px, 5vw, 48px); margin: 0; }
@@ -1216,6 +1220,69 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 .dl-faq { border-top: 1px solid var(--rule); padding: 12px 0; }
 .dl-faq summary { cursor: pointer; font-weight: 600; }
 .dl-faq p { margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
+
+/* The landing page: what visitors see at "/" before they sign in. */
+.landing { display: grid; gap: 72px; }
+.ld-hero { display: grid; gap: 20px; }
+.ld-hero h1 { font-size: clamp(32px, 6vw, 58px); line-height: 1.05; margin: 0; max-width: 16ch; }
+.ld-hero .lede { max-width: 44rem; margin: 0; }
+.ld-paths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 8px; }
+.ld-path { display: grid; align-content: start; justify-items: start; gap: 12px; padding: 0 22px 22px; overflow: hidden; background: var(--surface); border: 1px solid var(--rule-strong); border-radius: var(--radius); }
+.ld-path h2 { font-size: 23px; margin: 4px 0 0; }
+.ld-path > p:not(.ld-prompt) { margin: 0; line-height: 1.55; }
+.ld-prompt { justify-self: start; width: calc(100% + 44px); margin: 0 -22px 6px; padding: 10px 22px; box-sizing: border-box; background: var(--term-bg); color: var(--term-ink); border-bottom: 1px solid var(--rule); border-radius: var(--radius) var(--radius) 0 0; font-family: var(--mono); font-stretch: 87.5%; font-size: 13.5px; white-space: nowrap; overflow: hidden; }
+.ld-who { color: var(--ok); }
+.ld-dir { color: var(--info); }
+.ld-cmd { display: inline-block; vertical-align: bottom; overflow: hidden; white-space: nowrap; width: calc(var(--n) * 1ch); animation: ld-type 0.8s steps(var(--n)) 0.35s both; }
+.ld-cmd::after { content: ""; display: inline-block; width: 0.6ch; height: 1.1em; margin-left: 2px; vertical-align: -0.2em; background: var(--term-accent); animation: ld-caret 1s step-end 1.2s infinite; }
+@keyframes ld-type { from { width: 0; } }
+@keyframes ld-caret { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ld-cmd, .ld-cmd::after { animation: none; } }
+.ld-small { font-size: 14.5px; color: var(--muted); }
+.ld-free { margin: 0; font-size: 15px; color: var(--muted); }
+.ld-section { display: grid; gap: 18px; }
+.ld-section > h2 { font-size: clamp(24px, 3.4vw, 32px); margin: 0; }
+.ld-lede { margin: 0; max-width: 44rem; color: var(--muted); line-height: 1.55; }
+.ld-inside { margin: 0; border-top: 1px solid var(--rule); }
+.ld-inside > div { display: grid; grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr); gap: 4px 24px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.ld-inside dt { font-family: var(--mono); font-stretch: 87.5%; font-size: 15px; font-weight: 600; }
+.ld-inside dt a { color: var(--accent); text-decoration: none; }
+.ld-inside dt a:hover { text-decoration: underline; }
+.ld-inside dd { margin: 0; color: var(--muted); line-height: 1.55; }
+.ld-table { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); }
+.ld-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.45; }
+.ld-table th, .ld-table td { padding: 11px 16px; text-align: left; vertical-align: top; border-top: 1px solid var(--rule); }
+.ld-table thead th { border-top: 0; font-family: var(--display); font-stretch: 87.5%; font-size: 14.5px; background: var(--sunk); }
+.ld-table thead td { border-top: 0; background: var(--sunk); }
+.ld-table tbody th { font-weight: 600; color: var(--muted); white-space: nowrap; width: 1%; }
+.ld-why { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0 32px; }
+.ld-why li { padding: 16px 0; border-top: 2px solid var(--rule-strong); }
+.ld-why h3 { font-size: 17px; margin: 0 0 6px; }
+.ld-why p { margin: 0; color: var(--muted); line-height: 1.55; }
+.ld-again { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.ld-open { padding: 28px; background: var(--sunk); border-left: 3px solid var(--accent); border-radius: var(--radius); }
+.ld-open > p:not(.ld-lede) { margin: 0; max-width: 46rem; line-height: 1.6; }
+.ld-links { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; font-size: 15px; }
+.ld-start { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+.ld-start > div { display: grid; align-content: start; justify-items: start; gap: 12px; }
+.ld-start h3 { font-size: 18px; margin: 0; }
+.ld-start ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; line-height: 1.55; }
+@media (max-width: 760px) {
+  .landing { gap: 56px; }
+  .ld-paths, .ld-start { grid-template-columns: minmax(0, 1fr); }
+  .ld-inside > div { grid-template-columns: minmax(0, 1fr); }
+  .ld-open { padding: 20px; }
+  /* The comparison stacks: each row's label, then the browser's answer and the app's, each named. */
+  .ld-table { overflow: visible; }
+  .ld-table thead { display: none; }
+  .ld-table table, .ld-table tbody, .ld-table tr, .ld-table th, .ld-table td { display: block; width: auto; }
+  .ld-table tr { padding: 12px 16px; border-top: 1px solid var(--rule); }
+  .ld-table tr:first-child { border-top: 0; }
+  .ld-table tbody th, .ld-table td { padding: 0; border: 0; white-space: normal; }
+  .ld-table tbody th { color: var(--ink); margin-bottom: 6px; width: auto; }
+  .ld-table td { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 8px; padding: 2px 0; }
+  .ld-table td::before { content: attr(data-col); color: var(--muted); font-size: 13.5px; }
+}
 
 /* The tutor in the desktop app's top bar. */
 .tutor-chip { display: inline-flex; align-items: center; gap: 8px; }
