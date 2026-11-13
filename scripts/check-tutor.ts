@@ -15,6 +15,7 @@ import { assetName, isLocal, parseChecksums } from "../src/server/tutor/runtime"
 import { isThread } from "../src/server/tutor/store";
 import { newer, parseVersion } from "../desktop/updates";
 import { classify, pickRelease } from "../src/lib/release";
+import { compareVersions } from "./flatten";
 import { fitPage, gradePrompt, historyTurns, PAGE_BUDGET, sourcesOf, systemPrompt } from "../src/server/tutor/prompt";
 
 let failed = 0;
@@ -123,6 +124,9 @@ eq("conversation keys", ["/tutor/chat/abc123def/", "/tutor/chat/x/", "/tutor/cha
 // Updates
 eq("release tags", ["desktop-v1.2.3", "v0.1.0", "1.0.0", "desktop-v1.2", "latest"].map(parseVersion), [[1, 2, 3], [0, 1, 0], [1, 0, 0], null, null]);
 eq("version order", [newer([0, 2, 0], [0, 1, 9]), newer([0, 1, 0], [0, 1, 0]), newer([1, 0, 0], [1, 0, 1])], [true, false, false]);
+
+// Shipping the server: which version of a package goes at the top
+eq("versions compare by number, not as text", [compareVersions("2.1.2", "2.0.2") > 0, compareVersions("2.10.0", "2.9.9") > 0, compareVersions("1.0.0", "1.0.0") === 0], [true, true, true]);
 
 // The website's download page
 eq("installers by system", ["CyberDojo-Setup-x64.exe", "CyberDojo-mac-arm64.dmg", "CyberDojo-mac-arm64.zip", "CyberDojo-linux-x86_64.AppImage", "CyberDojo-linux-amd64.deb", "SHA256SUMS.txt"].map(classify), [{ os: "windows", kind: "exe" }, { os: "mac", kind: "dmg" }, null, { os: "linux", kind: "AppImage" }, { os: "linux", kind: "deb" }, null]);

@@ -1,0 +1,13 @@
+# Every text file is checked out with LF line ends, on Windows too: the course
+# loader, the shell simulators and their tests compare text byte for byte.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.db binary

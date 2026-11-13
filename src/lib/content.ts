@@ -151,7 +151,9 @@ interface Parsed {
   body: string;
 }
 
-function splitFront(raw: string, file: string): Parsed {
+function splitFront(text: string, file: string): Parsed {
+  // A file saved on Windows may have CRLF line ends; the course is read the same either way.
+  const raw = text.replace(/\r\n?/g, "\n");
   const m = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(raw);
   if (!m) throw new Error(`${file}: no front matter`);
   const front: Record<string, string> = {};
