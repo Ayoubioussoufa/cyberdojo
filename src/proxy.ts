@@ -25,7 +25,8 @@ import { DESKTOP_COOKIE, fromAppWindow } from "@/server/desktop";
 const opensPage = (req: NextRequest) =>
   req.method === "GET" && !req.headers.has("rsc") && !req.headers.has("next-router-prefetch") && (req.headers.get("accept") ?? "").includes("text/html");
 
-const OPEN = /^\/signin(\/|$)/;
+/** Pages anyone can open on the website: signing in, and getting the desktop app. */
+const OPEN = /^\/(signin|download)(\/|$)/;
 const REMEMBER_MS = 60_000;
 
 /** Sessions seen as valid in the last minute, so moving between pages doesn't ask the database each time. */
@@ -66,6 +67,7 @@ export async function proxy(req: NextRequest) {
   if (DESKTOP) {
     // One local profile: the app's own window is let in, and there is nothing to sign in to.
     if (!fromAppWindow(req.cookies.get(DESKTOP_COOKIE)?.value)) return new NextResponse("CyberDojo only answers its own window.", { status: 403 });
+    // Inside the app there's nothing to sign in to and nothing to download.
     if (OPEN.test(bare)) {
       url.pathname = wantsFrench ? "/fr/" : "/";
       url.search = "";

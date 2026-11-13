@@ -1,6 +1,6 @@
 # CyberDojo
 
-A cybersecurity course from absolute zero, built from the 24-month roadmap PDF.
+A cybersecurity course from absolute zero, built from the 24-month roadmap PDF. Read it on the website, [cyberdojo-beta.vercel.app](https://cyberdojo-beta.vercel.app), or [download the desktop app](https://cyberdojo-beta.vercel.app/download/) for Windows, macOS and Linux: the whole course offline, with an AI tutor that runs on your computer.
 
 ```
 pnpm install
@@ -124,9 +124,11 @@ pnpm desktop:dist     # installers for this operating system, in desktop/dist/
 pnpm test:tutor       # the tutor's checks (run `pnpm tutor:index` first)
 ```
 
-An installer can only be built on its own system. `.github/workflows/desktop.yml` builds all three: run it by hand from the Actions tab, or push a tag such as `desktop-v0.1.0` to attach them to a release. It produces an NSIS installer (Windows x64), a dmg and zip (macOS, Apple silicon), and an AppImage and deb (Linux x64).
+An installer can only be built on its own system. `.github/workflows/desktop.yml` builds all three: run it by hand from the Actions tab to get them as workflow files, or publish a release. It produces an NSIS installer (Windows x64), a dmg and zip (macOS, Apple silicon), and an AppImage and deb (Linux x64). The file names carry no version, so `releases/latest/download/<name>` always points to the newest.
 
-**Signing.** The installers aren't signed, so Windows SmartScreen and macOS Gatekeeper warn on first launch. On Windows choose "More info", then "Run anyway". On macOS, right-click the app and choose Open. Removing the warnings needs a paid certificate for each platform.
+**Releasing.** Raise `version` in `package.json`, commit, then push a tag that matches it: `git tag desktop-v0.2.0 && git push origin desktop-v0.2.0`. The workflow checks the two agree, builds the three systems, and one last job publishes them as a GitHub release with `SHA256SUMS.txt` and generated release notes. The website's `/download/` page reads the newest `desktop-v*` release from GitHub every ten minutes, so it offers the new installers without a redeploy, and the app's Help menu tells existing users. The page is open to everyone; the rest of the site stays members-only.
+
+**Signing.** The installers aren't signed with a paid certificate, so Windows SmartScreen and macOS Gatekeeper warn on first launch. On Windows choose "More info", then "Run anyway". On macOS the app is signed ad hoc (Apple silicon runs nothing unsigned): open it once, then System Settings, Privacy & Security, Open Anyway. Removing the warnings needs an Apple Developer account and a Windows code-signing certificate.
 
 ### The tutor
 
@@ -192,3 +194,7 @@ Environment variables on the host:
 | `CYBERDOJO_ADMINS` | the admin usernames, set only after those accounts exist |
 
 Deploy with `vercel deploy --prod`. The tables are created on first use. Any other Node host works the same way: with a persistent disk, leave the Turso variables unset and keep `data/` on the disk, behind HTTPS (off `localhost`, session cookies are `Secure`).
+
+## License
+
+The code is under the [MIT license](LICENSE). The course material, the Markdown in `content/`, `modules/` and `tools/`, is under [CC BY-NC-SA 4.0](LICENSE-CONTENT): share and adapt it with credit, not for profit, under the same license. Third-party material is listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md). Vulnerabilities: [SECURITY.md](SECURITY.md).

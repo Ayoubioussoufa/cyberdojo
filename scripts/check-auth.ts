@@ -209,6 +209,8 @@ async function http() {
     ok((await fetch(BASE + lesson, { redirect: "manual", headers: { cookie: "cyberdojo=made-up-token" } })).status === 307, "a made-up cookie opens nothing");
     ok((await fetch(BASE + lesson, { redirect: "manual", headers: { cookie: before } })).status === 307, "nor does a logged-out session");
     ok((await fetch(`${BASE}/signin/`, { redirect: "manual" })).status === 200 && (await fetch(`${BASE}/fr/signin/`, { redirect: "manual" })).status === 200, "the sign-in page is open to all");
+    ok((await fetch(`${BASE}/download/`, { redirect: "manual" })).status === 200 && (await fetch(`${BASE}/fr/download/`, { redirect: "manual" })).status === 200, "the app's download page is open to all");
+    ok((await fetch(`${BASE}/downloads-secret/`, { redirect: "manual" })).status === 307, "and only that page: a look-alike address stays shut");
     const member = { cookie: (await omar("GET", "/api/auth/me/")).cookie() };
     const page = await fetch(BASE + lesson, { headers: member });
     ok(page.status === 200 && page.headers.get("x-frame-options") === "DENY" && page.headers.get("x-content-type-options") === "nosniff", "pages carry the security headers");

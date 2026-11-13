@@ -75,11 +75,15 @@ const config: Configuration = {
   afterPack: async ({ appOutDir, packager }) => {
     fs.cpSync(SERVER, path.join(packager.getResourcesDir(appOutDir), "server"), { recursive: true });
   },
-  artifactName: "CyberDojo-${version}-${os}-${arch}.${ext}",
+  // Names without the version, so a link to releases/latest/download/<name> keeps working from one release to the next.
+  artifactName: "CyberDojo-${os}-${arch}.${ext}",
   win: { target: "nsis" },
-  nsis: { oneClick: false, allowToChangeInstallationDirectory: true },
-  mac: { target: ["dmg", "zip"], category: "public.app-category.education" },
-  linux: { target: ["AppImage", "deb"], category: "Education", maintainer: "CyberDojo" },
+  nsis: { oneClick: false, allowToChangeInstallationDirectory: true, artifactName: "CyberDojo-Setup-${arch}.${ext}" },
+  // No Apple certificate yet. Apple silicon refuses to run unsigned code at all, so the app is signed ad hoc ("-"):
+  // macOS then asks the learner once (Privacy & Security, Open Anyway) instead of calling the app damaged.
+  // The hardened runtime would reject Electron's own frameworks under an ad-hoc signature, so it is off.
+  mac: { target: ["dmg", "zip"], category: "public.app-category.education", identity: "-", hardenedRuntime: false },
+  linux: { target: ["AppImage", "deb"], category: "Education", maintainer: "CyberDojo <noreply@github.com>", synopsis: "Cybersecurity from zero, with a local AI tutor" },
   publish: null,
 };
 

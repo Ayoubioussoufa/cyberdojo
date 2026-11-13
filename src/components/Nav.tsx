@@ -86,6 +86,11 @@ export function Nav() {
             : ready && (user
               ? <Link href="/account/" className="nav-user" title={t.nav.account}>{user.username}</Link>
               : <Link href="/signin/" className="nav-signin">{t.nav.signIn}</Link>)}
+          {!DESKTOP && (
+            <Link href="/download/" className={`icon-btn nav-dl${path.startsWith("/download/") ? " on" : ""}`} aria-label={t.download.navLabel} title={t.download.navLabel}>
+              <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1.5v8.2M4.6 6.6 8 10l3.4-3.4M2.5 13.5h11" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </Link>
+          )}
           <button type="button" className="icon-btn" onClick={toggle} aria-label={dark ? t.nav.light : t.nav.dark}>
             {dark ? "☀" : "☾"}
           </button>

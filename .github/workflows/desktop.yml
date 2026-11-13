@@ -1,6 +1,7 @@
 # Builds the desktop installers on each operating system, because an installer
-# can only be built on the system it is for. Run it by hand, or push a tag such
-# as desktop-v0.1.0 to attach the installers to a GitHub release.
+# can only be built on the system it is for. Run it by hand to get them as
+# workflow artifacts, or push a tag such as desktop-v0.2.0 to publish them as a
+# GitHub release, which the website's /download/ page links to.
 name: Desktop installers
 
 on:
@@ -9,7 +10,7 @@ on:
     tags: ["desktop-v*"]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -19,7 +20,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     env:
-      # No signing certificates yet: see "Signing" in the README.
+      # No signing certificates yet: see "Signing" in the README. The Mac build signs itself ad hoc.
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +34,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm tutor:index && pnpm test:tutor
+      - name: The tag and the app's version agree
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: test "desktop-v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
       - run: pnpm desktop:dist
       - uses: actions/upload-artifact@v4
         with:
@@ -44,12 +49,24 @@ jobs:
             desktop/dist/*.AppImage
             desktop/dist/*.deb
           if-no-files-found: error
-      - if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+
+  # One job publishes everything, so the release appears complete, with the checksums of every file.
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
         with:
-          files: |
-            desktop/dist/*.exe
-            desktop/dist/*.dmg
-            desktop/dist/*.zip
-            desktop/dist/*.AppImage
-            desktop/dist/*.deb
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: CyberDojo ${{ github.ref_name }}
+          generate_release_notes: true
+          files: dist/*
