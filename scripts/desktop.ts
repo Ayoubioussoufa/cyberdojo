@@ -6,6 +6,7 @@
  *   tsx scripts/desktop.ts start       stage, then run the staged app unpackaged
  *   tsx scripts/desktop.ts dist        stage, then installers for this OS in desktop/dist/
  *   tsx scripts/desktop.ts dist --dir  stage, then the unpacked app only (no installer)
+ *   tsx scripts/desktop.ts pack [--dir] installers from what is already staged
  *
  * Stage = the tutor's index, the site built as a standalone server with the
  * desktop flag on, and the Electron main process bundled into one file.
@@ -65,8 +66,14 @@ const config: Configuration = {
   directories: { app: APP, output: path.join(ROOT, "desktop", "dist"), buildResources: path.join(ROOT, "desktop") },
   icon: path.join(ROOT, "desktop", "icon.png"),
   asar: true,
-  // The server runs in a plain Node process, which can't read inside the app archive.
-  extraResources: [{ from: SERVER, to: "server" }],
+  // The app is main.js alone. Without this, the builder finds no dependencies in its folder, looks in
+  // the repository instead and packs the website's node_modules into the archive.
+  files: ["main.js", "package.json", "!**/node_modules/**"],
+  // The server runs in a plain Node process, which can't read inside the app archive, so it sits
+  // beside it. It is copied here and not through extraResources, which leaves node_modules out.
+  afterPack: async ({ appOutDir, packager }) => {
+    fs.cpSync(SERVER, path.join(packager.getResourcesDir(appOutDir), "server"), { recursive: true });
+  },
   artifactName: "CyberDojo-${version}-${os}-${arch}.${ext}",
   win: { target: "nsis" },
   nsis: { oneClick: false, allowToChangeInstallationDirectory: true },
@@ -86,11 +93,11 @@ async function main() {
   } else if (command === "start") {
     await stage();
     run(electron, [APP]);
-  } else if (command === "dist") {
-    await stage();
+  } else if (command === "dist" || command === "pack") {
+    if (command === "dist") await stage();
     await pack({ config, dir: flag === "--dir" });
   } else {
-    console.error("Usage: tsx scripts/desktop.ts dev | stage | start | dist [--dir]");
+    console.error("Usage: tsx scripts/desktop.ts dev | stage | start | dist [--dir] | pack [--dir]");
     process.exit(1);
   }
 }
