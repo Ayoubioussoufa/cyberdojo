@@ -16,3 +16,6 @@ next-env.d.ts
 .vercel/
 .env*
 /.tutor/
+
+# Private working notes, kept out of the public repository.
+/NOTES.md
