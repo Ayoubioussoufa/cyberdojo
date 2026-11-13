@@ -1,5 +1,8 @@
 node_modules/
 .next/
+.next-desktop/
+/desktop/build/
+/desktop/dist/
 out/
 .shell-test-*
 *.tsbuildinfo
@@ -12,3 +15,4 @@ next-env.d.ts
 !/.claude/skills/
 .vercel/
 .env*
+/.tutor/

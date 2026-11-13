@@ -7,6 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createClient, type Client } from "@libsql/client";
+import { DESKTOP } from "@/lib/desktop";
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
@@ -59,7 +60,42 @@ CREATE TABLE IF NOT EXISTS page_stats (
 ) WITHOUT ROWID;
 `;
 
-export type Arg = string | number | null;
+/** The desktop app's own tables: tutor chats, graded answers, settings and the search vectors. */
+const DESKTOP_SCHEMA = `
+CREATE TABLE IF NOT EXISTS tutor_messages (
+  id         INTEGER PRIMARY KEY,
+  page       TEXT NOT NULL,
+  role       TEXT NOT NULL,
+  mode       TEXT NOT NULL,
+  content    TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS tutor_messages_page ON tutor_messages(page, id);
+CREATE TABLE IF NOT EXISTS tutor_grades (
+  id          INTEGER PRIMARY KEY,
+  page        TEXT NOT NULL,
+  question_id TEXT NOT NULL,
+  answer      TEXT NOT NULL,
+  verdict     TEXT NOT NULL,
+  score       INTEGER NOT NULL,
+  feedback    TEXT NOT NULL,
+  model       TEXT NOT NULL,
+  created_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS tutor_grades_question ON tutor_grades(question_id, id);
+CREATE TABLE IF NOT EXISTS tutor_settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS tutor_vectors (
+  chunk  TEXT NOT NULL,
+  model  TEXT NOT NULL,
+  vector BLOB NOT NULL,
+  PRIMARY KEY (chunk, model)
+) WITHOUT ROWID;
+`;
+
+export type Arg = string | number | null | Uint8Array;
 export type Statement = [sql: string, ...args: Arg[]];
 type Row = Record<string, unknown>;
 
@@ -75,7 +111,7 @@ async function open(): Promise<Client> {
   const file = process.env.CYBERDOJO_DB ?? path.join(process.cwd(), "data", "cyberdojo.db");
   fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
   const local = createClient({ url: `file:${file}` });
-  await local.executeMultiple(`PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000; ${SCHEMA}`);
+  await local.executeMultiple(`PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000; ${SCHEMA}${DESKTOP ? DESKTOP_SCHEMA : ""}`);
   return local;
 }
 
