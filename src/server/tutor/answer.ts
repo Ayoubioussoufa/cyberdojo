@@ -20,7 +20,8 @@ const QUERY_CHARS = 1500;
 
 async function context(settings: TutorSettings, turn: Turn): Promise<{ page: Chunk[]; related: Chunk[] }> {
   const whole = pageChunks(turn.href, turn.lang);
-  const query = turn.message.slice(0, QUERY_CHARS);
+  // "Why isn't that enough?" means little alone: the page's title says what "that" is about.
+  const query = `${whole[0] ? `${whole[0].title}. ` : ""}${turn.message.slice(0, QUERY_CHARS)}`;
   const tooLong = whole.reduce((n, c) => n + c.text.length, 0) > PAGE_BUDGET;
   const [ranked, hits] = await Promise.all([
     tooLong ? search(settings, query, turn.lang, whole.length, whole) : [],

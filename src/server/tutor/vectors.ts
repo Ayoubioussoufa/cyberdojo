@@ -11,8 +11,12 @@ import { allChunks, chunksFor } from "./corpus";
 import { embed } from "./ollama";
 
 const BATCH = 16;
-/** Below this, a chunk is about something else. Measured on nomic-embed-text; other models may want another floor. */
-const FLOOR = 0.5;
+/**
+ * Below this, a chunk is about something else. Measured on nomic-embed-text, whose scores sit close
+ * together: an unrelated passage scores about 0.5, the best match for small talk about 0.6, and a real
+ * match 0.7 or more. Another embedding model may want another floor.
+ */
+const FLOOR = 0.65;
 
 interface State {
   model: string;
