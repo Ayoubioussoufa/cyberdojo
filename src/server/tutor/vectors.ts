@@ -8,6 +8,7 @@ import type { Lang } from "@/i18n/lang";
 import { all, many } from "@/server/db";
 import type { Chunk, IndexStatus, TutorSettings } from "@/lib/tutor-types";
 import { allChunks, chunksFor } from "./corpus";
+import { buildIndex, scores } from "./keywords";
 import { embed } from "./ollama";
 
 const BATCH = 16;
@@ -17,6 +18,18 @@ const BATCH = 16;
  * match 0.7 or more. Another embedding model may want another floor.
  */
 const FLOOR = 0.65;
+/**
+ * A passage that the keyword ranking puts at the top gains up to this much. Measured with the same model:
+ * "What does the CIA triad mean?" scores 0.59 on meaning against the lesson that defines it, just under
+ * the floor, while small talk scores at most 0.58 against the whole course. The boost lifts the first past
+ * the floor and not the second.
+ */
+const KEYWORD_BOOST = 0.08;
+/** Only this many keyword matches get the boost, so a common word can't lift half the course. */
+const KEYWORD_TOP = 8;
+
+const words = globalThis as { __cyberdojoKeywords?: ReturnType<typeof buildIndex> };
+const keywordIndex = () => (words.__cyberdojoKeywords ??= buildIndex(allChunks()));
 
 interface State {
   model: string;
@@ -106,11 +119,15 @@ export async function search(settings: TutorSettings, query: string, lang: Lang,
   } catch {
     return [];
   }
+  const pool = within ?? chunksFor(lang);
+  const byWords = [...scores(keywordIndex(), query, pool.map((c) => c.id)).entries()].sort((a, b) => b[1] - a[1]).slice(0, KEYWORD_TOP);
+  const best = byWords[0]?.[1] ?? 1;
+  const boost = new Map(byWords.map(([id, score]) => [id, KEYWORD_BOOST * (score / best)]));
   const hits: Hit[] = [];
-  for (const chunk of within ?? chunksFor(lang)) {
+  for (const chunk of pool) {
     const v = s.vectors.get(chunk.id);
     if (!v || v.length !== q.length) continue;
-    let score = 0;
+    let score = boost.get(chunk.id) ?? 0;
     for (let i = 0; i < q.length; i++) score += (q[i] as number) * (v[i] as number);
     if (within || score >= FLOOR) hits.push({ chunk, score });
   }
