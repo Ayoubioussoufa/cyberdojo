@@ -1,6 +1,7 @@
 {
   "name": "cyberdojo",
   "version": "0.1.0",
+  "repository": "https://github.com/Ayoubioussoufa/cyberdojo",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3100",

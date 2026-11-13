@@ -25,7 +25,7 @@ const APP = path.join(OUT, "app");
 const SERVER = path.join(OUT, "server");
 const DIST_DIR = ".next-desktop";
 const SHIPPED = ["server.js", "package.json", "node_modules", DIST_DIR];
-const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")) as { version: string };
+const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")) as { version: string; repository?: string };
 
 const DESKTOP_ENV = { ...process.env, NEXT_PUBLIC_CYBERDOJO_DESKTOP: "1", NEXT_TELEMETRY_DISABLED: "1" };
 
@@ -41,8 +41,9 @@ const electron = require.resolve("electron/cli.js");
 async function bundleMain() {
   fs.mkdirSync(APP, { recursive: true });
   await bundle({ entryPoints: [path.join(ROOT, "desktop", "main.ts")], outfile: path.join(APP, "main.js"), bundle: true, platform: "node", format: "cjs", target: "node22", external: ["electron"], logLevel: "warning" });
+  // The repository is where the app looks for updates and sends "Report a problem".
   // The packaged app is this folder alone: no dependencies, so nothing from node_modules is shipped beside the server's own.
-  fs.writeFileSync(path.join(APP, "package.json"), JSON.stringify({ name: "cyberdojo", productName: "CyberDojo", version: pkg.version, description: "Cybersecurity from zero, with a tutor that runs on your computer.", author: "CyberDojo", main: "main.js" }, null, 2));
+  fs.writeFileSync(path.join(APP, "package.json"), JSON.stringify({ name: "cyberdojo", productName: "CyberDojo", version: pkg.version, description: "Cybersecurity from zero, with a tutor that runs on your computer.", author: "CyberDojo", repository: pkg.repository, main: "main.js" }, null, 2));
 }
 
 async function stage() {

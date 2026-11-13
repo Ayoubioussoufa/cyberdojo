@@ -64,6 +64,8 @@ export async function startServer(log: (line: string) => void): Promise<Server> 
     NEXT_PUBLIC_CYBERDOJO_DESKTOP: "1",
     CYBERDOJO_DESKTOP_TOKEN: token,
     CYBERDOJO_DB: path.join(data, "cyberdojo.db"),
+    // Where the server keeps Ollama when it installs it, its pid file and its log. See src/server/tutor/runtime.ts.
+    CYBERDOJO_DATA: data,
     NEXT_TELEMETRY_DISABLED: "1",
   };
 
