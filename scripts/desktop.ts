@@ -43,7 +43,7 @@ async function bundleMain() {
   await bundle({ entryPoints: [path.join(ROOT, "desktop", "main.ts")], outfile: path.join(APP, "main.js"), bundle: true, platform: "node", format: "cjs", target: "node22", external: ["electron"], logLevel: "warning" });
   // The repository is where the app looks for updates and sends "Report a problem".
   // The packaged app is this folder alone: no dependencies, so nothing from node_modules is shipped beside the server's own.
-  fs.writeFileSync(path.join(APP, "package.json"), JSON.stringify({ name: "cyberdojo", productName: "CyberDojo", version: pkg.version, description: "Cybersecurity from zero, with a tutor that runs on your computer.", author: "CyberDojo", repository: pkg.repository, main: "main.js" }, null, 2));
+  fs.writeFileSync(path.join(APP, "package.json"), JSON.stringify({ name: "cyberdojo", productName: "CyberDojo", version: pkg.version, description: "Cybersecurity from zero, with a tutor that runs on your computer.", author: "CyberDojo", repository: pkg.repository, desktopName: "cyberdojo.desktop", main: "main.js" }, null, 2));
 }
 
 async function stage() {

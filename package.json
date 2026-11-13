@@ -12,7 +12,7 @@
     "desktop:dev": "tsx scripts/desktop.ts dev",
     "desktop:start": "tsx scripts/desktop.ts start",
     "desktop:dist": "tsx scripts/desktop.ts dist",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p desktop",
+    "typecheck": "next typegen && tsc --noEmit && tsc --noEmit -p desktop",
     "test:shell": "tsx scripts/check-shell.ts",
     "test:sim": "tsx scripts/check-sim-tools.ts",
     "test:missions": "tsx scripts/check-missions.ts",
