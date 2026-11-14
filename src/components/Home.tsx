@@ -126,6 +126,7 @@ export function Home({ path }: { path: PathStep[] }) {
       )}
 
       <p className="page-links home-links">
+        <Link href="/today/">{t.today.pageTitle}</Link>
         <Link href="/roadmap/">{t.home.seeRoadmap}</Link>
         <Link href="/practice/">{t.home.practise}</Link>
         <Link href="/start/">{t.home.how}</Link>

@@ -22,6 +22,7 @@ const section = (label: string, href: string, ...names: string[]): Target => ({ 
 /** Every part of the site, by the names people use for it. */
 export const SECTIONS: Target[] = [
   section("Today", "/", "home"),
+  section("Today", "/today/", "today", "daily", "next", "streak", "due"),
   section("Roadmap", "/roadmap/", "plan"),
   section("How this site works", "/start/", "start", "start here"),
   section("Lessons", "/courses/", "courses", "course"),
@@ -55,6 +56,7 @@ export const SECTIONS: Target[] = [
 /** French labels and names, by href. The English label stays a name, so "practice" still works in French. */
 const FR: Record<string, string[]> = {
   "/": ["Accueil", "aujourd'hui", "maison"],
+  "/today/": ["Aujourd'hui", "du jour", "quotidien", "série"],
   "/roadmap/": ["Parcours", "feuille de route", "programme"],
   "/start/": ["Comment fonctionne ce site", "commencer", "démarrer", "visite"],
   "/courses/": ["Leçons", "lecons", "cours"],
