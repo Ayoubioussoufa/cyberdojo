@@ -6,12 +6,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import { breakClasses } from "../src/data/breakin";
+import { workshopLabs, type Step } from "../src/data/workshop";
 import { dojoModules } from "../src/data/fr/dojo";
 import { LANGS, type Lang } from "../src/i18n/lang";
 import { guides, lessons, machines, modules, projects, sheets, toolDocs } from "../src/lib/content";
 import type { Chunk, TutorIndex } from "../src/lib/tutor-types";
 import type { Doc } from "../src/lib/types";
 import { chunkBlocks, chunkDoc, missionsText } from "../src/server/tutor/chunking";
+
+/** A lab's phase as plain text with fenced code, so the tutor reads the real commands. */
+const phase = (steps: Step[]) => steps.map((s) => (s.code ? `${s.text}\n\n\`\`\`\n${s.code}\n\`\`\`` : s.text)).join("\n\n");
 
 const SHELVES: [base: string, docs: (lang: Lang) => Doc[]][] = [
   ["/courses/", lessons],
@@ -34,7 +38,15 @@ function build(lang: Lang): Chunk[] {
   const breakIn = breakClasses(lang).flatMap((c) =>
     chunkBlocks({ lang, href: `/break-in/${c.id}/`, kind: "break-in", title: c.title }, [{ text: c.intro.join("\n\n") }, { text: missionsText(c.range) }, { text: `The defence: ${c.defence}` }]),
   );
-  return [...docs, ...dojo, ...breakIn];
+  const workshop = workshopLabs(lang).flatMap((lab) =>
+    chunkBlocks({ lang, href: `/workshop/${lab.id}/`, kind: "workshop", title: lab.title }, [
+      { text: `${lab.intro.join("\n\n")}\n\n${lab.isolate}` },
+      { text: `## Build the server\n\n${phase(lab.build)}` },
+      { text: `## Attack it\n\n${phase(lab.attack)}\n\nWhat happened: ${lab.observe}` },
+      { text: `## Defend it\n\n${phase(lab.defend)}\n\nSpotting it: ${lab.detect}` },
+    ]),
+  );
+  return [...docs, ...dojo, ...breakIn, ...workshop];
 }
 
 const all = LANGS.flatMap(build);

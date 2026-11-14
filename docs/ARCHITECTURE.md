@@ -89,6 +89,8 @@ content/, modules/, tools/  ──(src/lib/content.ts)──►  pre-rendered pa
 
 Adding a lesson is therefore one step: write the Markdown file. The next desktop build pre-renders its page and puts it in the tutor's index.
 
+The Workshop labs (`src/data/workshop.ts`) are added to the index the same way, as chunks under `/workshop/<id>/`, so the tutor's **Lab** mode is grounded in the open lab. Lab mode's prompt (`src/server/tutor/prompt.ts`) binds the whole session to the learner's own `127.0.0.1` server and refuses any other target; `scripts/check-workshop.ts` enforces the same invariant on the lab content, and `scripts/check-tutor.ts` asserts the prompt keeps it.
+
 ## A tutor turn
 
 ```

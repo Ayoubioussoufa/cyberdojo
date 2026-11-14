@@ -154,7 +154,7 @@ export function Composer({ ready, busy, hasMessages, mode, setMode, draft, setDr
     setMode(m);
     if (m === "quiz" && !draft.trim() && ready && !busy) onAsk(t.tutor.quizAsk, "quiz");
   };
-  const label = mode === "review" ? t.tutor.holderReview : placeholder;
+  const label = mode === "review" ? t.tutor.holderReview : mode === "lab" ? t.tutor.holderLab : placeholder;
   return (
     <form className="tutor-form" onSubmit={submit}>
       <div className="tutor-modes" role="radiogroup" aria-label={t.tutor.modeLabel}>

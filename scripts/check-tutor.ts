@@ -61,6 +61,8 @@ ok("hint mode withholds the answer", sys.includes("smallest hint") && !sys.inclu
 ok("course links follow the reader's language", sys.includes('link="/fr/modules/y/"'));
 ok("a full solution needs the flag", systemPrompt({ lang: "en", mode: "hint", reveal: true, page: [], related: [] }).includes("asked for the full solution"));
 ok("authorised targets only", /written permission/.test(sys) && /decline/.test(sys));
+const labSys = systemPrompt({ lang: "en", mode: "lab", reveal: false, page: [], related: [] });
+ok("lab mode stays on the learner's own localhost", /127\.0\.0\.1/.test(labSys) && /own machine/.test(labSys) && /refuse/i.test(labSys) && /defence/.test(labSys));
 ok("a page with no text says so", systemPrompt({ lang: "en", mode: "explain", reveal: false, page: [], related: [] }).includes("no course text of its own"));
 
 const big = Array.from({ length: 12 }, (_, i) => chunk(`c${i}`, "x".repeat(1500)));

@@ -11,6 +11,7 @@ const GROUPS: Record<"practice" | "library", Tab[]> = {
   practice: [
     { href: "/practice/", label: "exercises" },
     { href: "/break-in/", label: "breakin" },
+    { href: "/workshop/", label: "workshop" },
     { href: "/machines/", label: "machines" },
     { href: "/review/", label: "review" },
     { href: "/practice/flashcards/", label: "flashcards" },
