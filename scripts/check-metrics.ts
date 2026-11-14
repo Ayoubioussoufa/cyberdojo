@@ -8,7 +8,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { isAdmin, readHit, type Report } from "../src/server/metrics";
+import { isAdmin, readFeedback, readHit, type Report } from "../src/server/metrics";
 
 const PORT = 3103;
 const BASE = `http://localhost:${PORT}`;
@@ -51,6 +51,14 @@ function unit() {
   ok(readHit({ v, p: `/${"x".repeat(200)}` }) === null, "long paths are refused");
   ok(readHit({ v, p: "/", ms: -5 })?.ms === 0 && readHit({ v, p: "/", ms: "9" })?.ms === 0, "bad durations count as zero");
   ok(readHit({ v, p: "/", r: "Evil.example/<x>" })?.referrer === "", "a referrer that isn't a hostname is dropped");
+
+  ok(readFeedback({ v, p: "/courses/", helpful: true }) !== null, "a plain vote is read");
+  ok(readFeedback({ v, p: "/courses/", helpful: "yes" }) === null, "a vote with no boolean is refused");
+  ok(readFeedback({ v: "short", p: "/", helpful: true }) === null && readFeedback({ v, p: "/a?x", helpful: true }) === null, "a bad visitor or path is refused");
+  ok(readFeedback({ v, p: "/fr/courses/x", helpful: false })?.path === "/courses/x/", "a vote's path is canonical, both languages as one");
+  ok(readFeedback({ v, p: "/", helpful: true, note: "  a\n b  " })?.note === "a b", "a note is trimmed and its spaces collapsed");
+  ok((readFeedback({ v, p: "/", helpful: true, note: "x".repeat(900) })?.note.length ?? 0) === 500, "a long note is cut to 500");
+
   const before = process.env.CYBERDOJO_ADMINS;
   delete process.env.CYBERDOJO_ADMINS;
   ok(!isAdmin({ username: "root" }), "with no admins named, nobody is one");
@@ -136,6 +144,20 @@ async function http() {
     ok(rep.referrers[0]?.host === "www.example.org" && rep.pages.length === 3 && rep.langs.length === 1, "pages and sources are listed", { r: rep.referrers, p: rep.pages });
     ok(!JSON.stringify(rep).includes("password") && !JSON.stringify(rep).includes(g), "the report holds no hashes and no visitor numbers");
     ok((await boss("GET", "/api/admin/stats/?days=99999")).json.days === 30, "an odd period falls back to 30 days");
+
+    // Feedback on a page.
+    const fb = (who: ReturnType<typeof client>, body: unknown, headers: Record<string, string> = {}) => who("POST", "/api/feedback/", body, headers);
+    ok((await fb(guest, { v: g, p: "/courses/0001-what-a-computer-is/", helpful: true }, { origin: "https://evil.example" })).status === 204 && count("SELECT COUNT(*) AS n FROM feedback") === 0, "another site can't leave feedback");
+    await fb(guest, { v: g, p: "/courses/0001-what-a-computer-is/", helpful: true });
+    await fb(guest, { v: g, p: "/fr/courses/0001-what-a-computer-is", helpful: false }); // the same browser, same page: the later vote wins
+    await fb(lea, { v: l, p: "/roadmap/", helpful: false, note: "  step three  was  unclear " });
+    ok(count("SELECT COUNT(*) AS n FROM feedback") === 2, "one row per browser per page; a second vote replaces it", count("SELECT COUNT(*) AS n FROM feedback"));
+    const vote = raw.prepare("SELECT helpful, path, lang, user_id FROM feedback WHERE visitor = ?").get(g) as Record<string, unknown>;
+    ok(vote.helpful === 0 && vote.path === "/courses/0001-what-a-computer-is/", "the later vote won, stored on the canonical path", vote);
+    const rep2 = (await boss("GET", "/api/admin/stats/?days=7")).json as unknown as Report;
+    ok(rep2.feedback.some((f) => f.path === "/courses/0001-what-a-computer-is/" && f.down === 1 && f.up === 0), "feedback is summarised per page", rep2.feedback);
+    ok(rep2.notes.some((n) => n.note === "step three was unclear" && n.helpful === false && n.path === "/roadmap/" && n.lang === "en"), "a note appears with its page, spaces tidied", rep2.notes);
+    ok(!JSON.stringify(rep2).includes(g) && !JSON.stringify(rep2).includes(l), "feedback in the report carries no visitor numbers");
 
     // Leaving.
     ok((await lea("DELETE", "/api/account/", { password: pw })).status === 200, "the learner deletes the account");

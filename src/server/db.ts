@@ -58,6 +58,18 @@ CREATE TABLE IF NOT EXISTS page_stats (
   active_ms INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, path)
 ) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS feedback (
+  path       TEXT NOT NULL,
+  visitor    TEXT NOT NULL,
+  lang       TEXT NOT NULL,
+  user_id    TEXT REFERENCES users(id) ON DELETE SET NULL,
+  helpful    INTEGER NOT NULL,
+  note       TEXT NOT NULL DEFAULT '',
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (visitor, path)
+) WITHOUT ROWID;
+CREATE INDEX IF NOT EXISTS feedback_path ON feedback(path);
+CREATE INDEX IF NOT EXISTS feedback_recent ON feedback(created_at);
 `;
 
 /** The desktop app's own tables: tutor chats, graded answers, settings and the search vectors. */

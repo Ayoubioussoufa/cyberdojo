@@ -117,6 +117,32 @@ function start() {
   window.addEventListener("pagehide", flush);
 }
 
+/**
+ * Sends a thumbs-up/down on a page, with an optional note. This is an explicit
+ * choice the reader made, so it is sent even when passive counting is off; it
+ * still carries only the random visitor number, never anything about the person.
+ * A browser without storage gets a throwaway number so the vote still lands.
+ */
+export async function sendFeedback(path: string, helpful: boolean, note: string): Promise<boolean> {
+  if (navigator.webdriver) return false;
+  let v = visitor();
+  if (!v) {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    v = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  try {
+    const res = await fetch("/api/feedback/", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ v, p: path, helpful, note }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /** Called on every page, including moves between pages without a reload. */
 export function pageOpened(next: string) {
   if (next === path) return;

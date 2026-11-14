@@ -215,6 +215,31 @@ export function Admin() {
         </div>
       </section>
 
+      <section className="adm-part">
+        <h2>Lesson feedback</h2>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Page</th><th scope="col">Clear</th><th scope="col">Not clear</th><th scope="col">Notes</th></tr></thead>
+            <tbody>
+              {data.feedback.map((f) => (
+                <tr key={f.path}><th scope="row"><a href={f.path}>{f.path}</a></th><td>{f.up}</td><td>{f.down}</td><td>{f.notes}</td></tr>
+              ))}
+              {data.feedback.length === 0 && <tr><td colSpan={4}>No feedback in this period.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+        {data.notes.length > 0 && (
+          <div className="adm-notes">
+            {data.notes.map((n, i) => (
+              <blockquote key={i} className={n.helpful ? "fb-up" : "fb-down"}>
+                <p>{n.note}</p>
+                <footer><a href={n.path}>{n.path}</a> · {n.lang === "fr" ? "French" : "English"} · {ago(n.at, data.generatedAt)}</footer>
+              </blockquote>
+            ))}
+          </div>
+        )}
+      </section>
+
       <div className="adm-splits">
         <Split title="Arrived from" rows={data.referrers.map((x) => ({ name: x.host, visits: x.visits }))} empty="No visit came from another site." />
         <Split title="First page" rows={data.entries.map((x) => ({ name: x.path, visits: x.visits }))} empty="No visits yet." />

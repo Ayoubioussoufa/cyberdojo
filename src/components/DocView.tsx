@@ -10,6 +10,7 @@ import { QuestionCard } from "./Question";
 import { Terms } from "./Terms";
 import { WrittenCard } from "./Written";
 import { ProjectStep } from "./ProjectStep";
+import { Feedback } from "./Feedback";
 import { DESKTOP } from "@/lib/desktop";
 import { getStore, setDone, setWord, useSlice } from "@/lib/progress";
 import type { PathStep } from "@/lib/pathState";
@@ -162,6 +163,8 @@ export function DocView({
           <Score brief={brief} />
           <Finish meta={meta} brief={brief} after={after} copy={copy} />
         </section>
+
+        {!DESKTOP && <Feedback />}
 
         <nav className="pager" aria-label={t.doc.pager}>
           {prev ? <Link href={`${base}${prev.slug}/`}><span>{t.common.previous}</span>{prev.title}</Link> : <span />}

@@ -19,6 +19,8 @@ const KEEP_DAYS = 400;
 const MAX_VISITS_A_DAY = 20_000;
 const MAX_PATHS_A_DAY = 2_500;
 const MAX_NEW_PER_IP = 60;
+const MAX_FEEDBACK_A_DAY = 5_000;
+const NOTE_MAX = 500;
 
 const VISITOR = /^[A-Za-z0-9_-]{16,40}$/;
 const PATH = /^\/[A-Za-z0-9\-_.~/]{0,119}$/;
@@ -51,6 +53,45 @@ export function readHit(body: Record<string, unknown>): Hit | null {
   let referrer = typeof body.r === "string" ? body.r.toLowerCase() : "";
   if (!HOST.test(referrer)) referrer = "";
   return { visitor, path: raw, view: body.view === true, ms, referrer };
+}
+
+export interface Feedback {
+  /** Canonical (English) page path, so the two languages count as one page. */
+  path: string;
+  visitor: string;
+  lang: string;
+  helpful: boolean;
+  note: string;
+}
+
+/** Reads a thumbs-up/down with an optional note. Null means ignore it. */
+export function readFeedback(body: Record<string, unknown>): Feedback | null {
+  const visitor = typeof body.v === "string" ? body.v : "";
+  const raw = typeof body.p === "string" ? body.p : "";
+  if (!VISITOR.test(visitor) || !PATH.test(raw) || typeof body.helpful !== "boolean") return null;
+  const note = (typeof body.note === "string" ? body.note : "").replace(/\s+/g, " ").trim().slice(0, NOTE_MAX);
+  const { lang, path } = splitPath(raw);
+  return { path, visitor, lang, helpful: body.helpful, note };
+}
+
+/**
+ * Stores one vote. A browser has at most one vote per page, which a later vote
+ * replaces; a fresh browser's row is only added while the day is under its cap,
+ * so rotating visitor numbers can't flood the table.
+ */
+export async function saveFeedback(fb: Feedback, user: User | null, now = Date.now()): Promise<void> {
+  const dayStart = Date.parse(`${dayOf(now)}T00:00:00Z`);
+  await many([
+    [
+      `INSERT INTO feedback (path, visitor, lang, user_id, helpful, note, created_at)
+       SELECT ?, ?, ?, ?, ?, ?, ?
+       WHERE EXISTS (SELECT 1 FROM feedback WHERE visitor = ? AND path = ?)
+          OR (SELECT COUNT(*) FROM feedback WHERE created_at >= ?) < ?
+       ON CONFLICT (visitor, path) DO UPDATE SET helpful = excluded.helpful, note = excluded.note, lang = excluded.lang, user_id = excluded.user_id, created_at = excluded.created_at`,
+      fb.path, fb.visitor, fb.lang, user?.id ?? null, fb.helpful ? 1 : 0, fb.note, now,
+      fb.visitor, fb.path, dayStart, MAX_FEEDBACK_A_DAY,
+    ],
+  ]);
 }
 
 /** "/fr/courses/x/" and "/courses/x" are the same page, read in two languages. */
@@ -144,6 +185,8 @@ export interface Report {
   devices: { name: string; visits: number }[];
   langs: { name: string; visits: number }[];
   users: { username: string; createdAt: number; lastSeen: number | null; visits: number; days: number; totalMs: number; done: number }[];
+  feedback: { path: string; up: number; down: number; notes: number }[];
+  notes: { path: string; helpful: boolean; note: string; lang: string; at: number }[];
 }
 
 const num = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
@@ -151,6 +194,7 @@ const num = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
 /** Every figure in one trip to the database: on a hosted database each trip costs a network call. */
 export async function report(days: number, now = Date.now()): Promise<Report> {
   const since = dayOf(now - (days - 1) * DAY);
+  const sinceMs = Date.parse(`${since}T00:00:00Z`);
   const d7 = dayOf(now - 6 * DAY);
   const d30 = dayOf(now - 29 * DAY);
   const today = dayOf(now);
@@ -190,6 +234,12 @@ export async function report(days: number, now = Date.now()): Promise<Report> {
        FROM users u LEFT JOIN visits v ON v.user_id = u.id LEFT JOIN progress p ON p.user_id = u.id
        GROUP BY u.id ORDER BY lastSeen DESC NULLS LAST, u.created_at DESC LIMIT 500`,
     ],
+    feedback: [
+      `SELECT path, COALESCE(SUM(helpful), 0) AS up, COALESCE(SUM(1 - helpful), 0) AS down, COALESCE(SUM(note <> ''), 0) AS notes
+       FROM feedback WHERE created_at >= ? GROUP BY path ORDER BY down DESC, (up + down) DESC LIMIT 25`,
+      sinceMs,
+    ],
+    notes: ["SELECT path, helpful, note, lang, created_at AS at FROM feedback WHERE note <> '' AND created_at >= ? ORDER BY created_at DESC LIMIT 50", sinceMs],
   } satisfies Record<string, Statement>;
   const names = Object.keys(queries) as (keyof typeof queries)[];
   const results = await many(names.map((n) => queries[n]), "read");
@@ -253,5 +303,7 @@ export async function report(days: number, now = Date.now()): Promise<Report> {
     devices: counts("devices", "name"),
     langs: counts("langs", "name"),
     users,
+    feedback: rows("feedback").map((x) => ({ path: String(x.path), up: num(x.up), down: num(x.down), notes: num(x.notes) })),
+    notes: rows("notes").map((x) => ({ path: String(x.path), helpful: num(x.helpful) === 1, note: String(x.note), lang: String(x.lang), at: num(x.at) })),
   };
 }
