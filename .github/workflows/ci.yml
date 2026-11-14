@@ -1,0 +1,57 @@
+# Every pull request and every change to main runs the whole test suite and
+# builds the desktop app's server. main only accepts pull requests whose checks
+# pass (the repository's "main" ruleset), so nothing reaches it untested.
+#
+# Pull requests from forks run with a read-only token and no secrets, and a
+# maintainer approves each outside contributor's run first.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests and website build
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 12
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+      # The terminal simulators are tested against the real programs.
+      - run: sudo apt-get update -q && sudo apt-get install -y -q sqlite3 xxd curl
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm audit --prod --audit-level high
+      - run: pnpm test
+
+  desktop:
+    name: Desktop server
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 12
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Builds the server the installers ship, refuses any symlink in it, and starts it from another folder.
+      - run: pnpm exec tsx scripts/desktop.ts stage
