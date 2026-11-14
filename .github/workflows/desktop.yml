@@ -50,6 +50,8 @@ jobs:
             desktop/dist/*.zip
             desktop/dist/*.AppImage
             desktop/dist/*.deb
+            desktop/dist/*.yml
+            desktop/dist/*.blockmap
           if-no-files-found: error
 
   # One job publishes everything, so the release appears complete, with the checksums of every file.
