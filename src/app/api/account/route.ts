@@ -24,6 +24,7 @@ export async function DELETE(req: Request) {
     ["DELETE FROM sessions WHERE user_id = ?", user.id],
     ["DELETE FROM progress WHERE user_id = ?", user.id],
     ["UPDATE visits SET user_id = NULL WHERE user_id = ?", user.id],
+    ["UPDATE feedback SET user_id = NULL WHERE user_id = ?", user.id],
     ["DELETE FROM users WHERE id = ?", user.id],
   ]);
   return NextResponse.json({ ok: true });

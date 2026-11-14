@@ -825,6 +825,17 @@ const TABLE = {
     learnMore: ["Learn the theory:", "Apprendre la théorie :"],
     nextClass: ["Next", "Suivant"],
   },
+  feedback: {
+    title: ["Was this page clear?", "Cette page était-elle claire ?"],
+    yes: ["Yes", "Oui"],
+    no: ["Not really", "Pas vraiment"],
+    noteGood: ["Thanks! Anything that would make it even better? (optional)", "Merci ! Quelque chose qui la rendrait encore meilleure ? (facultatif)"],
+    noteBad: ["Sorry about that. What was confusing or missing? (optional)", "Désolé. Qu'est-ce qui portait à confusion ou manquait ? (facultatif)"],
+    notePlaceholder: ["Your note helps improve this page", "Votre note aide à améliorer cette page"],
+    send: ["Send", "Envoyer"],
+    skip: ["No thanks", "Non merci"],
+    thanks: ["Thanks — this helps.", "Merci — cela aide."],
+  },
   doc: {
     defineHolder: ["One sentence, no looking", "Une phrase, sans regarder"],
     score: ["{answered} of {total} answered, {right} right", "{answered} sur {total} répondues, {right} justes"],
