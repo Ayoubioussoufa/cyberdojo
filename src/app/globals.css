@@ -500,6 +500,27 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
   body { background: #fff; }
   .cert { box-shadow: none; border: 2px solid var(--belt, #333); margin-top: 0; }
 }
+
+/* The Today dashboard: the next twenty minutes */
+.today { max-width: 640px; }
+.today-hero { display: flex; align-items: center; gap: 18px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); }
+.today-streak { display: flex; flex-direction: column; align-items: center; line-height: 1; flex: none; }
+.today-streak strong { font-size: 40px; color: var(--accent); }
+.today-streak span { font-size: 12px; color: var(--muted); margin-top: 5px; text-align: center; }
+.today-count { font-size: 15px; color: var(--muted); }
+.today-belt { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+.today-belt-dot { width: 14px; height: 14px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25); }
+.today-belt .meter { flex: 1; min-width: 120px; }
+.today-plan-title { margin: 22px 0 10px; font-size: 18px; }
+.today-plan { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.today-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink); text-decoration: none; }
+.today-row:hover { border-color: var(--accent); }
+.today-row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.today-row-kind { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.today-row-label { font-size: 16px; font-weight: 500; }
+.today-row-go { color: var(--accent); font-size: 18px; flex: none; }
+.today-clear { margin-top: 14px; color: var(--muted); }
+
 .pager .to-next { text-align: right; grid-column: 2; }
 
 /* ── glossary + resources ── */
