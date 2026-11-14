@@ -16,7 +16,7 @@ export default async function Page({ params }: LangParams) {
         <p className="kicker">{t.nav.roadmap}</p>
         <h1>{t.pages.roadmapH1}</h1>
         <p className="lede">{t.pages.roadmapLede}</p>
-        <p className="page-links"><Link href="/start/">{t.home.how}</Link><Link href="/guides/a2-how-to-use-this-plan/">{t.pages.runMonth}</Link></p>
+        <p className="page-links"><Link href="/start/">{t.home.how}</Link><Link href="/guides/a2-how-to-use-this-plan/">{t.pages.runMonth}</Link><Link href="/certificates/">{t.cert.pageTitle}</Link></p>
       </header>
       <PathView path={buildPath(lang)} />
     </div>

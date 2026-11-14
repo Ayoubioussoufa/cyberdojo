@@ -70,6 +70,14 @@ CREATE TABLE IF NOT EXISTS feedback (
 ) WITHOUT ROWID;
 CREATE INDEX IF NOT EXISTS feedback_path ON feedback(path);
 CREATE INDEX IF NOT EXISTS feedback_recent ON feedback(created_at);
+CREATE TABLE IF NOT EXISTS certificates (
+  id        TEXT PRIMARY KEY,
+  user_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  belt      INTEGER NOT NULL,
+  name      TEXT NOT NULL,
+  issued_at INTEGER NOT NULL,
+  UNIQUE (user_id, belt)
+);
 `;
 
 /** The desktop app's own tables: tutor chats, graded answers, settings and the search vectors. */

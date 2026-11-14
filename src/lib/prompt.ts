@@ -46,6 +46,7 @@ export const SECTIONS: Target[] = [
   section("Glossary", "/glossary/", "terms"),
   section("Resources", "/resources/"),
   section("Your progress", "/skills/", "progress", "skills"),
+  section("Your certificates", "/certificates/", "certificates", "certificate", "certs", "belts", "credential"),
   section("Sign in", "/signin/", "signin", "login", "log in", "sign up", "register"),
   section("Download the app", "/download/", "download", "app", "desktop", "install", "offline"),
   section("Account", "/account/", "profile"),
@@ -79,6 +80,7 @@ const FR: Record<string, string[]> = {
   "/download/": ["Télécharger l'application", "télécharger", "telecharger", "application", "bureau", "installer", "hors ligne"],
   "/resources/": ["Ressources"],
   "/skills/": ["Votre progression", "progrès", "progression", "compétences"],
+  "/certificates/": ["Vos certificats", "certificats", "certificat", "ceintures", "diplôme"],
   "/signin/": ["Connexion", "se connecter", "créer un compte", "inscription"],
   "/account/": ["Compte", "mon compte", "profil"],
 };
