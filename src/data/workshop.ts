@@ -246,6 +246,70 @@ export const WORKSHOP: WorkshopLab[] = [
       { href: "/modules/10-05-container-escape-and-runtime/", title: "Container escape and runtime" },
     ],
   },
+  {
+    id: "ssti",
+    title: "Run code through a template",
+    tagline: "greet a user by name, watch the name get evaluated as server-side code, then render it as plain data",
+    tag: "Injection",
+    minutes: 35,
+    needs: ["Python 3", "curl"],
+    intro: [
+      "A template turns data into a page: a fixed layout with {{ slots }} the server fills in. The danger is subtle. If the server builds the template itself out of your input — pasting your name straight into the template source instead of passing it in as a value — then your input stops being data and becomes part of the template, which the engine evaluates as code. This is server-side template injection, and in Jinja2 it leads from {{ 7*7 }} all the way to reading secrets and running commands.",
+      "You'll build a page that greets you by name the unsafe way, make it do arithmetic and then leak the app's configuration, and fix it by passing your name in as a value the template only ever prints.",
+    ],
+    isolate: "The app is a file in a folder on your machine, bound to 127.0.0.1, with made-up secrets. You attack your own template: this is how a developer tests their own rendering safely.",
+    build: [
+      { text: "Make a folder and a virtual environment, and install Flask.", code: `mkdir ssti-lab && cd ssti-lab\npython3 -m venv venv\n. venv/bin/activate        # Windows: venv\\Scripts\\activate\npip install flask` },
+      { text: "Save this as `app.py`. The mistake is on one line: the name is pasted into the template string, so whatever you send becomes part of the template.", code: `from flask import Flask, request, render_template_string\n\napp = Flask(__name__)\napp.config["SECRET_KEY"] = "pretend-this-is-sensitive"\n\n@app.get("/")\ndef hi():\n    name = request.args.get("name", "friend")\n    # Unsafe: the name is built into the template SOURCE, so it is evaluated, not printed.\n    return render_template_string(f"<h1>Hello {name}</h1>")\n\nif __name__ == "__main__":\n    app.run(host="127.0.0.1", port=5000)` },
+      { text: "Run it and greet yourself normally.", code: `python app.py\n# other terminal:\ncurl "http://127.0.0.1:5000/?name=Ada"` },
+    ],
+    attack: [
+      { text: "Send an expression instead of a name. If it's evaluated, the page does the sum.", code: `curl "http://127.0.0.1:5000/?name={{7*7}}"      # "Hello 49" means it ran your code` },
+      { text: "Now reach the application's configuration, where secrets live. The template context exposes `config`.", code: `curl "http://127.0.0.1:5000/?name={{config.items()}}"   # the SECRET_KEY and more` },
+    ],
+    observe: "`{{7*7}}` came back as 49: your input was run as server-side code, not printed. `{{config.items()}}` handed you the app's secrets. The same door, through Python's object internals, leads to running shell commands — template injection is as serious as it gets.",
+    defend: [
+      { text: "Pass the name in as a value, so the template treats it as data and only ever prints it (escaped). The template itself is now a fixed string the user can't change.", code: `@app.get("/")\ndef hi():\n    name = request.args.get("name", "friend")\n    # Safe: the template is fixed; 'name' is data filled into the {{ name }} slot and auto-escaped.\n    return render_template_string("<h1>Hello {{ name }}</h1>", name=name)` },
+      { text: "Restart and send the same payload. It comes back as text, not a sum. Never build a template out of user input; keep templates in files and let the engine fill in values.", code: `curl "http://127.0.0.1:5000/?name={{7*7}}"      # now literally "Hello {{7*7}}"` },
+    ],
+    detect: "A defender watches for template syntax in user input — `{{`, `}}`, `${`, `#{` — and for template-engine errors in the logs, which a probe tends to trigger. Sudden reads of configuration or environment objects, or a web process spawning a shell, point at injection that reached code execution. Keeping user input out of template source, and a template engine with autoescaping on, removes the bug class.",
+    learn: [
+      { href: "/courses/0047-keeping-input-out-of-the-code/", title: "Keeping input out of the code" },
+      { href: "/modules/04-03-injection-beyond-sql/", title: "Injection beyond SQL" },
+    ],
+  },
+  {
+    id: "jwt",
+    title: "Forge an admin token",
+    tagline: "sign in as a normal user, then mint yourself an admin token because the secret is guessable",
+    tag: "Access control",
+    minutes: 35,
+    needs: ["Python 3", "curl"],
+    intro: [
+      "A JSON Web Token is a little signed note the server hands you — \"this is guest, role user\" — and trusts on your next visit because it carries a signature only the server's secret could make. The security rests entirely on that secret being unguessable and on the server actually checking the signature. When the secret is a dictionary word, an attacker signs their own note: they write \"role admin\", sign it with the guessed secret, and the server believes it.",
+      "You'll build a service that signs tokens with a weak secret, get an ordinary token, be turned away from the admin page, then forge an admin token yourself and walk in — and fix it with a long random secret the attacker can't guess.",
+    ],
+    isolate: "The service runs on 127.0.0.1 on your own machine, with invented accounts. You forge a token for your own weak app: exactly what reviewing your own authentication looks like.",
+    build: [
+      { text: "Make a folder and a virtual environment, and install Flask and PyJWT.", code: `mkdir jwt-lab && cd jwt-lab\npython3 -m venv venv\n. venv/bin/activate        # Windows: venv\\Scripts\\activate\npip install flask pyjwt` },
+      { text: "Save this as `app.py`. It signs and checks tokens correctly — except the secret is the word \"secret\", which is the whole problem.", code: `import jwt\nfrom flask import Flask, request\n\napp = Flask(__name__)\nSECRET = "secret"   # weak and guessable: this is the flaw\n\n@app.get("/login")\ndef login():\n    # A real login checks a password; here everyone gets an ordinary user token.\n    return jwt.encode({"user": "guest", "role": "user"}, SECRET, algorithm="HS256") + "\\n"\n\n@app.get("/admin")\ndef admin():\n    token = request.headers.get("Authorization", "").removeprefix("Bearer ")\n    try:\n        data = jwt.decode(token, SECRET, algorithms=["HS256"])\n    except Exception:\n        return "denied\\n", 401\n    if data.get("role") != "admin":\n        return "not an admin\\n", 403\n    return "secret admin data\\n"\n\nif __name__ == "__main__":\n    app.run(host="127.0.0.1", port=5000)` },
+      { text: "Run it, get a token, and confirm a normal user is turned away from the admin page.", code: `python app.py\n# other terminal:\nTOKEN=$(curl -s http://127.0.0.1:5000/login)\ncurl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:5000/admin   # "not an admin"` },
+    ],
+    attack: [
+      { text: "The secret is a common word, so you can sign your own token. Mint one that says you're an admin.", code: `python -c 'import jwt; print(jwt.encode({"user":"guest","role":"admin"}, "secret", algorithm="HS256"))'` },
+      { text: "Send your forged token to the admin page.", code: `FORGED=<paste the token from the line above>\ncurl -H "Authorization: Bearer $FORGED" http://127.0.0.1:5000/admin   # "secret admin data"` },
+    ],
+    observe: "You walked into the admin page with a token you signed yourself, because the server's secret was a word anyone would try. A real attacker runs a weak token through a cracker and recovers a short or dictionary secret offline in seconds — then they can mint any identity they like.",
+    defend: [
+      { text: "Sign with a long random secret kept outside the code, so it can't be guessed or cracked. Load it from the environment and generate it once with a cryptographic source.", code: `import os, jwt\n\nSECRET = os.environ["JWT_SECRET"]   # set once to a long random value, never committed\n# generate it with:  python -c "import secrets; print(secrets.token_urlsafe(32))"\n\n# decoding stays strict: the algorithm is pinned, so an "alg: none" token is refused,\n# and you should also set an "exp" claim and let jwt.decode enforce it.` },
+      { text: "Set the secret, restart, and try the forgery again with \"secret\". The signature no longer matches, so the token is refused.", code: `JWT_SECRET=$(python -c "import secrets; print(secrets.token_urlsafe(32))") python app.py\n# the old forged token, and any signed with "secret", now get "denied"` },
+    ],
+    detect: "A defender alerts on a spike of signature-verification failures (someone trying forged tokens), on tokens whose header says `alg: none`, and on admin actions that aren't preceded by a real login. Strong random secrets, a pinned algorithm, short expiries and key rotation close the gap; logging every token rejection makes the probing visible.",
+    learn: [
+      { href: "/courses/0036-sessions-and-the-browser/", title: "Sessions and the browser" },
+      { href: "/modules/04-06-authentication-and-jwt-attacks/", title: "Authentication and JWT attacks" },
+    ],
+  },
 ];
 
 /** The labs in the page's language; a lab with no French copy keeps its English steps. */
