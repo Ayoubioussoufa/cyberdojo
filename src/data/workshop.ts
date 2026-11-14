@@ -211,6 +211,41 @@ export const WORKSHOP: WorkshopLab[] = [
       { href: "/modules/04-06-authentication-and-jwt-attacks/", title: "Authentication and JWT attacks" },
     ],
   },
+  {
+    id: "contain",
+    title: "Contain the blast radius",
+    tagline: "run a weak app in a container, break into it, then lock the container down so the same bug goes nowhere",
+    tag: "Container security",
+    minutes: 45,
+    needs: ["Docker"],
+    intro: [
+      "A container is not a sandbox by default. Out of the box it runs as root, with a writable filesystem and full network access, so a single flaw in your app — a command injection, say — doesn't just run some code: it runs as root, can read and rewrite anything in the container, and can call out to the network. The container is a packaging tool, not a security boundary, until you make it one.",
+      "You'll build a deliberately weak app inside a container, exploit it over localhost to run commands as root, then harden the container — an unprivileged user, a read-only filesystem, no Linux capabilities, no new privileges — and watch the very same injection do almost nothing. Only then do you fix the bug itself. The lesson is defence in depth: even after an attacker finds a bug, least privilege decides how far they get.",
+    ],
+    isolate: "Everything runs in a container on your own machine, published only to 127.0.0.1, on throwaway data. The app binds inside the container; Docker maps it to loopback, so nothing is reachable from the network. You only ever attack your own container at 127.0.0.1 — pointing these commands at anyone else's host is a crime.",
+    build: [
+      { text: "Make a folder and save this `Dockerfile`. It installs Flask and runs the app — as root, with no hardening, the way a container starts by default.", code: `FROM python:3.12-slim\nRUN pip install flask\nWORKDIR /app\nCOPY app.py .\nCMD ["python", "app.py"]` },
+      { text: "Save this as `app.py`: a tiny \"network tools\" service with one deliberately unsafe endpoint. It builds a shell command by pasting your input straight in, the classic command-injection mistake.", code: `import subprocess\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n@app.get("/ping")\ndef ping():\n    host = request.args.get("host", "127.0.0.1")\n    # Unsafe on purpose: the host is dropped straight into a shell string.\n    out = subprocess.run(f"ping -c 1 {host}", shell=True, capture_output=True, text=True)\n    return out.stdout + out.stderr\n\nif __name__ == "__main__":\n    app.run(host="0.0.0.0", port=5000)` },
+      { text: "Save this as `compose.yaml`. The port is published only to 127.0.0.1, so the service answers on your machine and nowhere else. Build and run it.", code: `services:\n  tools:\n    build: .\n    ports:\n      - "127.0.0.1:5000:5000"` },
+      { text: "Start it, and from another terminal check a normal request works.", code: `docker compose up --build\n# other terminal:\ncurl "http://127.0.0.1:5000/ping?host=127.0.0.1"` },
+    ],
+    attack: [
+      { text: "Inject a second command after the host. A semicolon ends the `ping` command and the shell runs whatever follows — here, `id`, which prints who the code is running as.", code: `curl "http://127.0.0.1:5000/ping?host=127.0.0.1;id"` },
+      { text: "Read the answer: alongside the ping output you get something like `uid=0(root) gid=0(root)`. The injected command runs as root inside the container. Confirm the reach — it can read files and the filesystem is writable.", code: `curl "http://127.0.0.1:5000/ping?host=;cat%20/etc/os-release"\ncurl "http://127.0.0.1:5000/ping?host=;touch%20/app/owned%20&&%20echo%20wrote-a-file"` },
+    ],
+    observe: "One injection owns the whole container: it runs as root, reads any file, and writes anywhere. The app only meant to ping a host, but because the container gives the process root, a writable disk and full capabilities, the bug's blast radius is the entire container — and from there, often the host.",
+    defend: [
+      { text: "First, shrink what the process is allowed to do, without touching the bug. Replace `compose.yaml` with this: a non-root user, a read-only root filesystem, every Linux capability dropped, and no way to gain new privileges. A small `tmpfs` gives the few writable paths the runtime needs.", code: `services:\n  tools:\n    build: .\n    ports:\n      - "127.0.0.1:5000:5000"\n    user: "10001:10001"\n    read_only: true\n    cap_drop:\n      - ALL\n    security_opt:\n      - "no-new-privileges:true"\n    tmpfs:\n      - /tmp` },
+      { text: "Rebuild, then run the very same injection. Now `id` shows an unprivileged user, not root, and a write fails because the filesystem is read-only. The bug is still there, but it can barely do anything.", code: `docker compose up --build --force-recreate\n# other terminal, the same attack:\ncurl "http://127.0.0.1:5000/ping?host=127.0.0.1;id"\ncurl "http://127.0.0.1:5000/ping?host=;touch%20/app/owned"   # read-only: denied` },
+      { text: "Now close the bug itself. In `app.py`, stop using a shell and only accept an IP address, so the input can never be anything but data. Rebuild and try the injection one more time.", code: `import ipaddress, subprocess\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n@app.get("/ping")\ndef ping():\n    host = request.args.get("host", "127.0.0.1")\n    try:\n        ipaddress.ip_address(host)        # must be an IP, nothing else\n    except ValueError:\n        return "not an IP address\\n", 400\n    # A list, no shell: the arguments can't become commands.\n    out = subprocess.run(["ping", "-c", "1", host], capture_output=True, text=True)\n    return out.stdout + out.stderr` },
+    ],
+    detect: "A defender watches for the shapes this lab leaves: a process running as root inside a container, a container holding more Linux capabilities than it needs, writes to a filesystem that should be read-only, or unexpected outbound connections from a service that shouldn't make them. Image scanners flag root users and missing hardening before deploy; a runtime monitor such as Falco alerts when a web process suddenly spawns a shell or reads sensitive files.",
+    learn: [
+      { href: "/courses/0029-tests-and-docker/", title: "Tests and Docker" },
+      { href: "/courses/0025-hardening-linux/", title: "Hardening Linux" },
+      { href: "/modules/10-05-container-escape-and-runtime/", title: "Container escape and runtime" },
+    ],
+  },
 ];
 
 /** The labs in the page's language; a lab with no French copy keeps its English steps. */

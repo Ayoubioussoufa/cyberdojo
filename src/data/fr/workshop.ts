@@ -81,4 +81,17 @@ export const WORKSHOP_FR: Record<string, WorkshopFr> = {
     detect: "Beaucoup de logins échoués pour un compte ou depuis une adresse, en peu de temps, est la signature classique de la force brute ; de même qu'une rafale de requêtes essayant des identifiants de session successifs. Limites de débit, verrouillages et longs jetons aléatoires la déjouent, et les journaux d'authentification plus des alertes sur les pics d'échecs la révèlent.",
     learn: ["Les sessions et le navigateur", "Attaques sur l'authentification et les JWT"],
   },
+  contain: {
+    title: "Limitez les dégâts",
+    tagline: "lancez une application faible dans un conteneur, pénétrez-la, puis verrouillez le conteneur pour que le même bug ne mène nulle part",
+    tag: "Sécurité des conteneurs",
+    intro: [
+      "Un conteneur n'est pas un bac à sable par défaut. Tel quel, il tourne en root, avec un système de fichiers inscriptible et un accès réseau complet : une seule faille dans votre application — une injection de commande, par exemple — ne fait pas qu'exécuter du code, elle l'exécute en root, peut lire et réécrire tout ce qui est dans le conteneur, et peut appeler le réseau. Le conteneur est un outil d'empaquetage, pas une frontière de sécurité, tant que vous n'en faites pas une.",
+      "Vous allez construire une application volontairement faible dans un conteneur, l'exploiter en local pour exécuter des commandes en root, puis durcir le conteneur — un utilisateur non privilégié, un système de fichiers en lecture seule, aucune capacité Linux, aucun nouveau privilège — et voir la même injection ne presque plus rien pouvoir. Ensuite seulement, vous corrigez le bug lui-même. La leçon, c'est la défense en profondeur : même après qu'un attaquant a trouvé un bug, c'est le moindre privilège qui décide jusqu'où il va.",
+    ],
+    isolate: "Tout tourne dans un conteneur sur votre propre machine, publié uniquement sur 127.0.0.1, sur des données jetables. L'application écoute à l'intérieur du conteneur ; Docker la mappe sur la boucle locale, donc rien n'est joignable depuis le réseau. Vous n'attaquez jamais que votre propre conteneur sur 127.0.0.1 — diriger ces commandes vers l'hôte d'autrui est un délit.",
+    observe: "Une seule injection s'empare de tout le conteneur : elle tourne en root, lit n'importe quel fichier et écrit partout. L'application ne voulait que faire un ping, mais parce que le conteneur donne au processus root, un disque inscriptible et toutes les capacités, le rayon d'action du bug, c'est le conteneur entier — et de là, souvent l'hôte.",
+    detect: "Un défenseur guette les traces que laisse ce lab : un processus tournant en root dans un conteneur, un conteneur détenant plus de capacités Linux qu'il n'en faut, des écritures sur un système de fichiers censé être en lecture seule, ou des connexions sortantes inattendues d'un service qui ne devrait pas en faire. Les scanners d'images signalent les utilisateurs root et le durcissement manquant avant le déploiement ; un moniteur d'exécution comme Falco alerte quand un processus web lance soudain un shell ou lit des fichiers sensibles.",
+    learn: ["Tests et Docker", "Durcir Linux", "Évasion de conteneur et exécution"],
+  },
 };
