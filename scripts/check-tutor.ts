@@ -63,6 +63,7 @@ ok("a full solution needs the flag", systemPrompt({ lang: "en", mode: "hint", re
 ok("authorised targets only", /written permission/.test(sys) && /decline/.test(sys));
 const labSys = systemPrompt({ lang: "en", mode: "lab", reveal: false, page: [], related: [] });
 ok("lab mode stays on the learner's own localhost", /127\.0\.0\.1/.test(labSys) && /own machine/.test(labSys) && /refuse/i.test(labSys) && /defence/.test(labSys));
+ok("lab mode refuses a configurable target", /configurable/.test(labSys) && /argument/.test(labSys) && /variable/.test(labSys));
 ok("a page with no text says so", systemPrompt({ lang: "en", mode: "explain", reveal: false, page: [], related: [] }).includes("no course text of its own"));
 
 const big = Array.from({ length: 12 }, (_, i) => chunk(`c${i}`, "x".repeat(1500)));
