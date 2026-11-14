@@ -28,6 +28,8 @@ const APP = path.join(OUT, "app");
 const SERVER = path.join(OUT, "server");
 const DIST_DIR = ".next-desktop";
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")) as { version: string; repository?: string };
+const ghMatch = /github\.com\/([^/]+)\/([^/.]+)/.exec(pkg.repository ?? "");
+const ghRepo = ghMatch ? { owner: ghMatch[1] as string, repo: ghMatch[2] as string } : null;
 
 const DESKTOP_ENV = { ...process.env, NEXT_PUBLIC_CYBERDOJO_DESKTOP: "1", NEXT_TELEMETRY_DISABLED: "1" };
 
@@ -150,7 +152,10 @@ const config: Configuration = {
   // The hardened runtime would reject Electron's own frameworks under an ad-hoc signature, so it is off.
   mac: { target: ["dmg", "zip"], category: "public.app-category.education", identity: "-", hardenedRuntime: false },
   linux: { target: ["AppImage", "deb"], category: "Education", maintainer: "CyberDojo <noreply@github.com>", synopsis: "Cybersecurity from zero, with a local AI tutor" },
-  publish: null,
+  // The GitHub provider makes electron-builder write the update metadata (latest.yml, latest-linux.yml,
+  // app-update.yml) that the Windows and AppImage auto-updater reads. The build never uploads, though
+  // (`publish: "never"` passed to pack): the workflow's release job publishes every file itself.
+  publish: ghRepo ? { provider: "github", owner: ghRepo.owner, repo: ghRepo.repo, releaseType: "release" } : null,
 };
 
 async function main() {
@@ -166,7 +171,8 @@ async function main() {
     run(electron, [APP]);
   } else if (command === "dist" || command === "pack") {
     if (command === "dist") await stage();
-    await pack({ config, dir: flag === "--dir" });
+    // Generate the update metadata but never upload: the release workflow publishes.
+    await pack({ config, dir: flag === "--dir", publish: "never" });
   } else {
     console.error("Usage: tsx scripts/desktop.ts dev | stage | start | dist [--dir] | pack [--dir]");
     process.exit(1);

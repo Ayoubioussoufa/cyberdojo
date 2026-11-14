@@ -1,6 +1,6 @@
 {
   "name": "cyberdojo",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "repository": "https://github.com/Ayoubioussoufa/cyberdojo",
   "license": "(MIT AND CC-BY-NC-SA-4.0)",
   "private": true,
@@ -45,6 +45,7 @@
     "@types/react-dom": "^19",
     "electron": "45.3.1",
     "electron-builder": "26.18.0",
+    "electron-updater": "6.8.11",
     "esbuild": "0.28.2",
     "tsx": "^4.19.2",
     "typescript": "^5"

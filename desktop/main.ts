@@ -14,6 +14,7 @@ import path from "node:path";
 import { app, BrowserWindow, dialog, Menu, screen, session, shell } from "electron";
 import { appMenu, contextMenu, type Lang } from "./menu";
 import { startServer, type Server } from "./server";
+import { installNow, wireAutoUpdate } from "./autoupdate";
 import { findUpdate } from "./updates";
 
 /** Must match DESKTOP_COOKIE in src/server/desktop.ts. */
@@ -115,6 +116,8 @@ const SAY = {
     quit: "Quit", stay: "Keep downloading",
     upToDate: "CyberDojo is up to date.", noCheck: "Updates couldn't be checked. Check your connection, or try again later.",
     newVersion: (v: string) => `CyberDojo ${v} is available.`, newDetail: "Download the installer from the release page, then run it. Your progress and chats stay where they are.",
+    ready: (v: string) => `CyberDojo ${v} is ready to install.`, readyDetail: "It downloaded in the background. Restart now to use it, or it installs the next time you quit. Your progress and chats stay where they are.",
+    restart: "Restart now",
     download: "Open the release page", later: "Later",
     about: (v: string) => `CyberDojo ${v}`, aboutDetail: "Cybersecurity from zero, with a tutor that runs on your computer.",
     failed: "CyberDojo couldn't start",
@@ -125,6 +128,8 @@ const SAY = {
     quit: "Quitter", stay: "Continuer le téléchargement",
     upToDate: "CyberDojo est à jour.", noCheck: "Impossible de vérifier les mises à jour. Vérifiez votre connexion, ou réessayez plus tard.",
     newVersion: (v: string) => `CyberDojo ${v} est disponible.`, newDetail: "Téléchargez l'installateur depuis la page de la version, puis lancez-le. Votre progression et vos échanges restent en place.",
+    ready: (v: string) => `CyberDojo ${v} est prêt à être installé.`, readyDetail: "Il a été téléchargé en arrière-plan. Redémarrez maintenant pour l'utiliser, ou il s'installera au prochain arrêt. Votre progression et vos échanges restent en place.",
+    restart: "Redémarrer maintenant",
     download: "Ouvrir la page de la version", later: "Plus tard",
     about: (v: string) => `CyberDojo ${v}`, aboutDetail: "La cybersécurité depuis zéro, avec un tuteur qui tourne sur votre ordinateur.",
     failed: "CyberDojo n'a pas pu démarrer",
@@ -147,10 +152,13 @@ async function tutorStatus(): Promise<StatusPeek | null> {
   }
 }
 
-async function checkUpdates(byHand: boolean) {
+/**
+ * The manual notice, for macOS and the Debian package, which can't replace
+ * themselves without a paid certificate: the release page opens in the browser.
+ */
+async function manualUpdate(byHand: boolean) {
   const say = SAY[pageLang()];
   const where = repo();
-  writeState({ updateCheckedAt: Date.now() });
   let found: Awaited<ReturnType<typeof findUpdate>> = null;
   try {
     if (!where) throw new Error("no repository set");
@@ -169,6 +177,31 @@ async function checkUpdates(byHand: boolean) {
   if (!win) return;
   const { response } = await dialog.showMessageBox(win, { type: "info", message: say.newVersion(found.version), detail: say.newDetail, buttons: [say.download, say.later], defaultId: 0, cancelId: 1 });
   if (response === 0) void shell.openExternal(found.url);
+}
+
+/** Download-and-replace for Windows and the Linux AppImage; null on macOS, the .deb and in dev. */
+const autoCheck = wireAutoUpdate({
+  log,
+  onReady: (version) => {
+    if (!win) return;
+    const say = SAY[pageLang()];
+    void dialog
+      .showMessageBox(win, { type: "info", message: say.ready(version), detail: say.readyDetail, buttons: [say.restart, say.later], defaultId: 0, cancelId: 1 })
+      .then(({ response }) => {
+        if (response === 0) installNow();
+      });
+  },
+  onUpToDate: () => {
+    if (win) void dialog.showMessageBox(win, { type: "info", message: SAY[pageLang()].upToDate });
+  },
+  // If the updater itself fails, the learner still gets the manual notice and the release page.
+  onError: (byHand) => void manualUpdate(byHand),
+});
+
+function checkUpdates(byHand: boolean) {
+  writeState({ updateCheckedAt: Date.now() });
+  if (autoCheck) autoCheck(byHand);
+  else void manualUpdate(byHand);
 }
 
 function setMenu() {
