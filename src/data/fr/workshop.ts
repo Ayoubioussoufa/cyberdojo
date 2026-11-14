@@ -94,4 +94,30 @@ export const WORKSHOP_FR: Record<string, WorkshopFr> = {
     detect: "Un défenseur guette les traces que laisse ce lab : un processus tournant en root dans un conteneur, un conteneur détenant plus de capacités Linux qu'il n'en faut, des écritures sur un système de fichiers censé être en lecture seule, ou des connexions sortantes inattendues d'un service qui ne devrait pas en faire. Les scanners d'images signalent les utilisateurs root et le durcissement manquant avant le déploiement ; un moniteur d'exécution comme Falco alerte quand un processus web lance soudain un shell ou lit des fichiers sensibles.",
     learn: ["Tests et Docker", "Durcir Linux", "Évasion de conteneur et exécution"],
   },
+  ssti: {
+    title: "Exécutez du code via un gabarit",
+    tagline: "saluez un utilisateur par son nom, voyez le nom évalué comme du code côté serveur, puis affichez-le comme simple donnée",
+    tag: "Injection",
+    intro: [
+      "Un gabarit transforme des données en page : une mise en forme fixe avec des {{ emplacements }} que le serveur remplit. Le danger est subtil. Si le serveur construit lui-même le gabarit à partir de votre saisie — en collant votre nom dans la source du gabarit au lieu de le passer comme valeur — alors votre saisie cesse d'être une donnée et devient une partie du gabarit, que le moteur évalue comme du code. C'est l'injection de gabarit côté serveur (SSTI), et dans Jinja2 elle mène de {{ 7*7 }} jusqu'à la lecture de secrets et l'exécution de commandes.",
+      "Vous allez construire une page qui vous salue par votre nom de la mauvaise manière, lui faire faire une addition puis divulguer la configuration de l'application, et la corriger en passant votre nom comme une valeur que le gabarit ne fait qu'afficher.",
+    ],
+    isolate: "L'application est un fichier dans un dossier de votre machine, liée à 127.0.0.1, avec des secrets inventés. Vous attaquez votre propre gabarit : c'est ainsi qu'un développeur teste son propre rendu en toute sécurité.",
+    observe: "`{{7*7}}` est revenu en 49 : votre saisie a été exécutée comme du code côté serveur, pas affichée. `{{config.items()}}` vous a livré les secrets de l'application. La même porte, via les mécanismes internes des objets Python, mène à l'exécution de commandes shell — l'injection de gabarit est on ne peut plus grave.",
+    detect: "Un défenseur guette la syntaxe de gabarit dans la saisie — `{{`, `}}`, `${`, `#{` — et les erreurs du moteur de gabarit dans les journaux, qu'une sonde tend à déclencher. Des lectures soudaines d'objets de configuration ou d'environnement, ou un processus web qui lance un shell, trahissent une injection ayant atteint l'exécution de code. Garder la saisie hors de la source du gabarit, avec l'échappement automatique activé, élimine cette classe de bugs.",
+    learn: ["Garder la saisie hors du code", "L'injection au-delà de SQL"],
+  },
+  jwt: {
+    title: "Forgez un jeton d'administrateur",
+    tagline: "connectez-vous en utilisateur normal, puis fabriquez-vous un jeton d'admin parce que le secret se devine",
+    tag: "Contrôle d'accès",
+    intro: [
+      "Un JSON Web Token est un petit mot signé que le serveur vous remet — « ceci est guest, rôle user » — et auquel il fait confiance à votre prochaine visite parce qu'il porte une signature que seul le secret du serveur pouvait produire. La sécurité repose entièrement sur ce secret indevinable et sur le fait que le serveur vérifie vraiment la signature. Quand le secret est un mot du dictionnaire, un attaquant signe son propre mot : il écrit « rôle admin », le signe avec le secret deviné, et le serveur le croit.",
+      "Vous allez construire un service qui signe les jetons avec un secret faible, obtenir un jeton ordinaire, être refoulé de la page d'administration, puis forger vous-même un jeton d'admin et entrer — et le corriger avec un long secret aléatoire que l'attaquant ne peut pas deviner.",
+    ],
+    isolate: "Le service tourne sur 127.0.0.1 sur votre propre machine, avec des comptes inventés. Vous forgez un jeton pour votre propre application faible : exactement ce à quoi ressemble la revue de votre propre authentification.",
+    observe: "Vous êtes entré dans la page d'administration avec un jeton que vous avez signé vous-même, parce que le secret du serveur était un mot que tout le monde essaierait. Un vrai attaquant passe un jeton faible dans un casseur et récupère un secret court ou de dictionnaire hors ligne en quelques secondes — puis il peut fabriquer l'identité qu'il veut.",
+    detect: "Un défenseur alerte sur une montée des échecs de vérification de signature (quelqu'un essaie des jetons forgés), sur des jetons dont l'en-tête indique `alg: none`, et sur des actions d'admin non précédées d'une vraie connexion. Des secrets aléatoires forts, un algorithme épinglé, des expirations courtes et la rotation des clés comblent la faille ; journaliser chaque rejet de jeton rend le sondage visible.",
+    learn: ["Les sessions et le navigateur", "Attaques sur l'authentification et les JWT"],
+  },
 };
