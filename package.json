@@ -21,11 +21,12 @@
     "test:drills": "tsx scripts/check-drills.ts",
     "test:prompt": "tsx scripts/check-prompt.ts",
     "test:tutor": "tsx scripts/check-tutor.ts",
+    "test:workshop": "tsx scripts/check-workshop.ts",
     "audit:coverage": "tsx scripts/coverage/audit.ts",
     "test:coverage": "tsx scripts/coverage/audit.ts --check",
     "audit:tools": "tsx scripts/tools/index.ts",
     "test:tools": "tsx scripts/tools/index.ts --check",
-    "test": "pnpm test:shell && pnpm test:sim && pnpm test:missions && pnpm test:drills && pnpm test:prompt && pnpm tutor:index && pnpm test:tutor && pnpm test:content && pnpm test:i18n && pnpm test:coverage && pnpm test:tools && pnpm build && pnpm test:auth && pnpm test:metrics",
+    "test": "pnpm test:shell && pnpm test:sim && pnpm test:missions && pnpm test:drills && pnpm test:prompt && pnpm test:workshop && pnpm tutor:index && pnpm test:tutor && pnpm test:content && pnpm test:i18n && pnpm test:coverage && pnpm test:tools && pnpm build && pnpm test:auth && pnpm test:metrics",
     "user:reset": "tsx scripts/reset-password.ts",
     "test:auth": "tsx scripts/check-auth.ts",
     "test:metrics": "tsx scripts/check-metrics.ts"

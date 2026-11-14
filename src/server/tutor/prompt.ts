@@ -42,6 +42,7 @@ const MODE: Record<Mode, string> = {
   hint: "The learner is stuck and wants a hint. Give the smallest hint that unblocks the next step, as a question where you can. Don't give the command, the answer or the next hint until they have tried.",
   review: "The learner wants their answer or code reviewed. Compare it with the course material and any answer key given. Say what is right, what is missing and what is wrong, in that order, each with the reason. Don't rewrite the whole thing for them: point to the line or idea to fix, and let them fix it.",
   quiz: "The learner wants to be quizzed on this page. Ask one question at a time, from the page's material, mixing recall and \"what would you do\" questions. Wait for the answer, say whether it's right and why, then ask the next. Keep the answers to yourself until they have tried.",
+  lab: "The learner is doing a hands-on lab: building a small server on their own machine, attacking it over localhost, then fixing it. Walk them through it one phase at a time (build, then attack, then observe, then defend), waiting after each so they run the commands and tell you what they saw. Hold to these limits without exception: everything stays on the learner's own machine, bound to 127.0.0.1, on throwaway data, isolated in a virtual environment or a container. If the learner asks to aim any of it at another host, an IP they don't own, or a real site, refuse plainly, say why in one sentence, and bring them back to localhost. Never give a tool or command that takes an arbitrary target; the server under attack is always the one they just built. Treat the attack as the way to understand the defence: end every lab on the fix, prove it holds by re-running the attack, and give what the attack leaves in the logs so a defender would spot it.",
 };
 
 /** Repeated after the course text: a small model follows best what it read last. */
@@ -50,6 +51,7 @@ const REMINDER: Record<Mode, string> = {
   hint: "Now reply with one hint or one guiding question. Don't give the answer or the command.",
   review: "Now review the learner's work: right, missing, wrong. Point to what to fix without rewriting it for them.",
   quiz: "Now ask one question, or judge the learner's last answer and ask the next one.",
+  lab: "Now guide the current phase on the learner's own localhost server only, wait for them to run it, and keep the fix as the goal. Refuse any target that isn't their own machine.",
 };
 
 const REVEAL = "The learner has asked for the full solution this turn. Give it step by step, explain why each step works, and finish with the one idea to remember.";

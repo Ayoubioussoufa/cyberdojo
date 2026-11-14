@@ -1,7 +1,7 @@
 /** Shapes shared by the tutor's server code, its pages and the index builder. No Node or DOM APIs. */
 import type { Lang } from "@/i18n/lang";
 
-export const MODES = ["explain", "hint", "review", "quiz"] as const;
+export const MODES = ["explain", "hint", "review", "quiz", "lab"] as const;
 export type Mode = (typeof MODES)[number];
 export const isMode = (v: unknown): v is Mode => typeof v === "string" && (MODES as readonly string[]).includes(v);
 

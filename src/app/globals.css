@@ -800,6 +800,29 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .breakin-card.done { border-color: color-mix(in srgb, var(--ok) 55%, var(--rule)); }
 .breakin-card.done .phase-n { color: var(--ok); }
 .breakin-intro { margin-top: 18px; }
+
+/* The Workshop: build-attack-defend labs on your own machine. */
+.ws-cards { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+.ws-card { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); text-decoration: none; color: var(--ink); }
+.ws-card:hover { border-color: var(--accent); }
+.ws-card-tag { align-self: start; font-family: var(--mono); font-stretch: 87.5%; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.ws-card h2 { font-size: 19px; margin: 2px 0 0; }
+.ws-card p { margin: 0; color: var(--muted); line-height: 1.5; flex: 1; }
+.ws-card-meta { font-size: 13.5px; color: var(--muted); }
+.ws-meta { font-size: 14.5px; color: var(--muted); }
+.ws-tutor { margin: 0 0 1.2em; padding: 10px 14px; background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; font-size: 15px; }
+.ws-en-note { font-size: 14px; }
+.ws-phase { margin: 28px 0; }
+.ws-phase > h2 { font-size: 22px; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+.ws-attack > h2 { color: var(--seal); border-bottom-color: color-mix(in srgb, var(--seal) 40%, var(--rule)); }
+.ws-defend > h2 { color: var(--ok); border-bottom-color: color-mix(in srgb, var(--ok) 40%, var(--rule)); }
+.ws-steps { margin: 0; padding-left: 1.4em; display: grid; gap: 14px; }
+.ws-steps li { padding-left: 4px; }
+.ws-steps li p { margin: 0 0 8px; line-height: 1.55; }
+.ws-steps pre { margin: 0; }
+.ws-foot { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--rule); display: grid; gap: 14px; justify-items: start; }
+.ws-learn { margin: 0; }
+.ws-learn span:first-child { font-weight: 600; color: var(--muted); }
 .breakin-defence { margin-top: 20px; }
 .breakin-foot { margin-top: 24px; display: grid; gap: 12px; }
 .breakin-learn { margin: 0; color: var(--muted); font-size: 15px; }

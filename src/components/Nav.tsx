@@ -18,7 +18,7 @@ const LINKS: { href: string; label: keyof Dict["nav"]; also: string[] }[] = [
   { href: "/modules/", label: "modules", also: [] },
   { href: "/tools/", label: "tools", also: [] },
   { href: "/dojo/", label: "dojo", also: [] },
-  { href: "/practice/", label: "practice", also: ["/machines/", "/review/", "/break-in/"] },
+  { href: "/practice/", label: "practice", also: ["/machines/", "/review/", "/break-in/", "/workshop/"] },
   { href: "/projects/", label: "projects", also: [] },
   { href: "/library/", label: "library", also: ["/guides/", "/sheets/", "/glossary/", "/resources/"] },
   { href: "/skills/", label: "progress", also: [] },
