@@ -91,6 +91,15 @@ export default async function Page({ params }: LangParams) {
         <p className="dl-first">{t.download.firstRun}</p>
       </section>
 
+      <section className="dl-section" aria-labelledby="dl-update">
+        <h2 id="dl-update">{t.download.updateTitle}</h2>
+        <ul className="dl-update">
+          <li>{t.download.updateAuto}</li>
+          <li>{t.download.updateManual}</li>
+          <li>{t.download.updateData}</li>
+        </ul>
+      </section>
+
       <section className="dl-section" aria-labelledby="dl-faq">
         <h2 id="dl-faq">{t.download.faqTitle}</h2>
         {faq.map(([q, a]) => <details key={q} className="dl-faq"><summary>{q}</summary><p>{a}</p></details>)}
