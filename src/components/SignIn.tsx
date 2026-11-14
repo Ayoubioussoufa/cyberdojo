@@ -3,6 +3,7 @@
 import Link from "@/components/HoverLink";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { safeNext } from "@/lib/safe-next";
 import { signIn, signUp, useAccount } from "@/lib/account";
 import { hasProgress } from "@/lib/merge";
 import { useStore } from "@/lib/progress";
@@ -10,11 +11,6 @@ import { useLang } from "@/i18n/LangProvider";
 import { localize } from "@/i18n/lang";
 import { say } from "@/i18n/ui";
 
-/** Only paths on this site, so a crafted link can't send someone elsewhere after sign-in. */
-const safeNext = (search: string) => {
-  const next = new URLSearchParams(search).get("next");
-  return next && /^\/(?![/\\])/.test(next) ? next : "/";
-};
 
 export function SignIn() {
   const router = useRouter();
@@ -54,7 +50,7 @@ export function SignIn() {
     }
     setPassword("");
     // A full load, not a client move: the router may hold redirects it was given while signed out.
-    window.location.assign(localize(safeNext(window.location.search), lang));
+    window.location.assign(localize(safeNext(window.location.search, window.location.origin), lang));
   };
 
   const up = mode === "up";

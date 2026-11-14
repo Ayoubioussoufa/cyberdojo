@@ -11,6 +11,7 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { cleanProgress, EMPTY_STORE, hasProgress, MAX_PROGRESS_BYTES, mergeStores } from "../src/lib/merge";
 import type { Store } from "../src/lib/progress-types";
+import { safeNext } from "../src/lib/safe-next";
 import { hashPassword, needsRehash, passwordProblem, verifyPassword } from "../src/server/password";
 
 const PORT = 3102;
@@ -48,6 +49,15 @@ function client() {
 }
 
 async function unit() {
+  // Where sign-in sends you next: this site only, however the address is disguised.
+  const site = "https://cyberdojo.example";
+  const next = (v: string) => safeNext(`?next=${encodeURIComponent(v)}`, site);
+  ok(next("/courses/0001-x/?q=1#a") === "/courses/0001-x/?q=1#a", "a page on this site is kept, with its query and anchor");
+  for (const evil of ["//evil.com", "/\\evil.com", "/\t/evil.com", "/\n/evil.com", "/\r\n/evil.com", "https://evil.com/", "javascript:alert(1)", " //evil.com", "\\/evil.com"]) {
+    ok(next(evil) === "/" || next(evil).startsWith("/") && new URL(next(evil), site).origin === site, `a disguised address stays home: ${JSON.stringify(evil)}`, next(evil));
+  }
+  ok(safeNext("", site) === "/", "no next, home");
+
   const stored = await hashPassword("correct horse battery");
   ok(stored.startsWith("scrypt$17$8$1$"), "hash records its parameters");
   ok(await verifyPassword(stored, "correct horse battery"), "right password verifies");

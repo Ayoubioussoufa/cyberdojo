@@ -340,4 +340,30 @@ void fs;
 void path;
 console.log(`${roadmap.length} roadmap steps, ${projects().flatMap((p) => p.checks).length} project checkpoints, ${Object.keys(TOOLS).length} tools`);
 console.log(`${docs.length} documents, ${questions} questions, ${glossary().length} terms, ${Object.keys(DRILLS).length} drills, ${Object.values(RANGES).reduce((n, r) => n + r.missions.length, 0)} missions`);
+// Nothing in the course may run script. The pages insert this HTML as it is, so a raw <script>, an event
+// handler, a frame or a javascript: link slipped into a Markdown file, by mistake or in a pull request,
+// would run on every reader's page. Code spans and blocks are escaped by the renderer and don't count.
+const DANGER: [RegExp, string][] = [
+  [/<script[\s>]/i, "a <script> tag"],
+  [/<(iframe|object|embed|frame)[\s>]/i, "an embedded frame or object"],
+  [/<[a-z][^>]*\son[a-z]+\s*=/i, "an inline event handler (on...=)"],
+  [/\b(href|src|action|formaction)\s*=\s*["']?\s*(javascript|vbscript|data):/i, "a script or data URL in a link"],
+  [/<meta[^>]+http-equiv/i, "a meta refresh"],
+];
+const htmlOf = (v: unknown, out: string[] = []): string[] => {
+  if (Array.isArray(v)) v.forEach((x) => htmlOf(x, out));
+  else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) (k === "html" && typeof x === "string" ? out.push(x) : htmlOf(x, out));
+  return out;
+};
+let scanned = 0;
+for (const lang of ["en", "fr"] as const) {
+  for (const d of [...lessons(lang), ...guides(lang), ...machines(lang), ...projects(lang), ...modules(lang), ...toolDocs(lang), ...sheets(lang)]) {
+    for (const html of htmlOf(d)) {
+      scanned++;
+      for (const [re, what] of DANGER) if (re.test(html)) fail(`${lang} ${d.meta.slug}: the page would carry ${what}: ${(re.exec(html)?.[0] ?? "").slice(0, 60)}`);
+    }
+  }
+}
+console.log(`${scanned} rendered blocks scanned for script`);
+
 process.exit(bad ? 1 : 0);
