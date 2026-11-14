@@ -10,6 +10,8 @@ import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { cleanProgress, EMPTY_STORE, hasProgress, MAX_PROGRESS_BYTES, mergeStores } from "../src/lib/merge";
+import { BELTS } from "../src/data/path";
+import { buildPath } from "../src/lib/path";
 import type { Store } from "../src/lib/progress-types";
 import { safeNext } from "../src/lib/safe-next";
 import { hashPassword, needsRehash, passwordProblem, verifyPassword } from "../src/server/password";
@@ -233,6 +235,38 @@ async function http() {
     ok(!page.headers.has("x-powered-by"), "the server doesn't advertise itself");
     const data = await fetch(`${BASE}/data/questions.json`, { headers: member });
     ok(data.status === 200 && (((await data.json()) as unknown[]).length) > 300, "question data is served");
+
+    // Certificates: a shared certificate is public; issuing one needs an earned belt.
+    ok((await fetch(`${BASE}/cert/does-not-exist/`, { redirect: "manual" })).status === 404, "a shared certificate is open to all; an unknown one is just not found");
+    ok((await fetch(`${BASE}/certificates/`, { redirect: "manual" })).status === 307, "but the learner's own certificates page needs sign-in");
+    ok((await fetch(`${BASE}/api/cert/`, { method: "POST", headers: { origin: BASE, "content-type": "application/json" }, body: "{}" })).status === 401, "issuing a certificate needs an account");
+    const beforeEarn = await omar("GET", "/api/cert/");
+    ok(beforeEarn.status === 200 && Array.isArray(beforeEarn.json.earned) && (beforeEarn.json.earned as number[]).length === 0, "a fresh account has earned no belts", beforeEarn.json);
+    ok((await omar("POST", "/api/cert/", { belt: 1 })).status === 400 && (await omar("POST", "/api/cert/", { belt: 99 })).status === 400, "an unearned or out-of-range belt is refused");
+
+    // Complete every required step up to the yellow belt (month 0) in the stored progress, the real way the roadmap defines it.
+    const need = buildPath("en").filter((s) => s.required && s.month <= 0);
+    const store = structuredClone(EMPTY_STORE);
+    for (const s of need) {
+      if (s.slug) store.done[s.slug] = "2026-11-14";
+      for (const k of s.checks ?? []) store.checks[k] = "2026-11-14";
+      for (const k of s.gates ?? []) store.gates[k] = true;
+      for (const k of s.missions ?? []) store.missions[k] = "2026-11-14";
+    }
+    const raw2 = new DatabaseSync(file);
+    const omarId = (raw2.prepare("SELECT id FROM users WHERE username = 'omar'").get() as { id: string }).id;
+    raw2.prepare("UPDATE progress SET data = ?, version = version + 1 WHERE user_id = ?").run(JSON.stringify(store), omarId);
+    raw2.close();
+
+    const earned = await omar("GET", "/api/cert/");
+    ok((earned.json.earned as number[]).includes(1) && !(earned.json.earned as number[]).includes(2), "finishing the required steps earns exactly the yellow belt", earned.json.earned);
+    const issued = await omar("POST", "/api/cert/", { belt: 1, name: "  Omar  the  Learner  " });
+    ok(issued.status === 200 && typeof issued.json.id === "string", "an earned belt issues a certificate", issued.json);
+    const certId = String(issued.json.id);
+    const view = await fetch(`${BASE}/cert/${certId}/`, { redirect: "manual" });
+    const html = await view.text();
+    ok(view.status === 200 && html.includes("Omar the Learner") && html.includes(BELTS[1]?.name as string), "the certificate is public and shows the tidied name and the belt", { status: view.status });
+    ok(String((await omar("POST", "/api/cert/", { belt: 1, name: "Someone Else" })).json.id) === certId, "re-creating a certificate returns the same one, keeping the first name");
   } finally {
     server.kill();
     fs.rmSync(dir, { recursive: true, force: true });

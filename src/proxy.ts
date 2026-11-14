@@ -25,8 +25,8 @@ import { DESKTOP_COOKIE, fromAppWindow } from "@/server/desktop";
 const opensPage = (req: NextRequest) =>
   req.method === "GET" && !req.headers.has("rsc") && !req.headers.has("next-router-prefetch") && (req.headers.get("accept") ?? "").includes("text/html");
 
-/** Pages anyone can open on the website: signing in, getting the desktop app, and the landing page. */
-const OPEN = /^\/(signin|download|welcome)(\/|$)/;
+/** Pages anyone can open on the website: signing in, getting the desktop app, the landing page, and a shared certificate. */
+const OPEN = /^\/(signin|download|welcome|cert)(\/|$)/;
 const REMEMBER_MS = 60_000;
 
 /** Sessions seen as valid in the last minute, so moving between pages doesn't ask the database each time. */
