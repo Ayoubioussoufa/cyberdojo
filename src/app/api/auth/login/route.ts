@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { DESKTOP } from "@/lib/desktop";
 import { get, run } from "@/server/db";
 import { clientIp, fail, forget, limited, note, sameOrigin, smallJson, text } from "@/server/http";
 import { hashPassword, needsRehash, verifyPassword, wasteTime } from "@/server/password";
@@ -9,6 +10,9 @@ const WINDOW = 15 * 60_000;
 const WRONG = "That username and password don't match.";
 
 export async function POST(req: Request) {
+  // The desktop app has one local profile and nothing to sign in to. Answering here would let a web
+  // page that reaches the app's local server (DNS rebinding) write accounts into its database.
+  if (DESKTOP) return fail(404, "Not found.");
   if (!sameOrigin(req)) return fail(403, "This request came from another site.");
   const body = await smallJson(req);
   if (!body) return fail(400, "That request wasn't valid.");

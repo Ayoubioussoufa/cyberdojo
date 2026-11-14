@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { DESKTOP } from "@/lib/desktop";
 import { get, many } from "@/server/db";
 import { clientIp, fail, limited, note, sameOrigin, smallJson, text } from "@/server/http";
 import { hashPassword, passwordProblem } from "@/server/password";
@@ -9,6 +10,9 @@ import { startSession } from "@/server/session";
 const USERNAME = /^[A-Za-z0-9_.-]{3,32}$/;
 
 export async function POST(req: Request) {
+  // The desktop app has one local profile and nothing to sign in to. Answering here would let a web
+  // page that reaches the app's local server (DNS rebinding) write accounts into its database.
+  if (DESKTOP) return fail(404, "Not found.");
   if (!sameOrigin(req)) return fail(403, "This request came from another site.");
   const body = await smallJson(req);
   if (!body) return fail(400, "That request wasn't valid.");

@@ -1,0 +1,18 @@
+# Weekly pull requests for outdated dependencies and the workflow's actions.
+# Security fixes come as soon as GitHub publishes an advisory, not weekly.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      next-and-react:
+        patterns: ["next", "react", "react-dom"]
+      desktop:
+        patterns: ["electron", "electron-builder"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

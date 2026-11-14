@@ -1,6 +1,6 @@
 {
   "name": "cyberdojo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": "https://github.com/Ayoubioussoufa/cyberdojo",
   "license": "(MIT AND CC-BY-NC-SA-4.0)",
   "private": true,
@@ -35,7 +35,7 @@
     "@fontsource-variable/martian-mono": "^5.3.0",
     "@libsql/client": "^0.18.0",
     "marked": "15.0.12",
-    "next": "16.2.10",
+    "next": "16.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -43,7 +43,7 @@
     "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "electron": "45.3.1",
+    "electron": "45.3.2",
     "electron-builder": "26.18.0",
     "esbuild": "0.28.2",
     "tsx": "^4.19.2",
