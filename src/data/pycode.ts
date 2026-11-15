@@ -959,6 +959,57 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def finding_gaps(finding):\n    parts = ['title', 'severity', 'impact', 'steps', 'evidence', 'fix', 'retest']\n    gaps = []\n    for part in parts:\n        if not str(finding.get(part) or '').strip():\n            gaps.append(part)\n    return gaps\n",
   },
+  {
+    id: "triage-order",
+    prompt: "Write triage_order(alerts): alerts is a list of dicts with 'id', 'severity' ('critical', 'high', 'medium' or 'low') and 'waiting' (minutes in the queue). Return the list of ids in the order to handle them: most severe first, and among alerts of the same severity, the one that has waited longest first.",
+    starter: "def triage_order(alerts):\n    rank = {'critical': 0, 'high': 1, 'medium': 2, 'low': 3}\n    # sorted(items, key=...) sorts by whatever key returns. A key can be a pair.\n    return [a['id'] for a in alerts]\n",
+    tests: [
+      { name: "the whole queue", expr: "triage_order([{'id': 'A1', 'severity': 'low', 'waiting': 300}, {'id': 'A2', 'severity': 'critical', 'waiting': 5}, {'id': 'A3', 'severity': 'high', 'waiting': 20}, {'id': 'A4', 'severity': 'critical', 'waiting': 12}, {'id': 'A5', 'severity': 'medium', 'waiting': 90}, {'id': 'A6', 'severity': 'high', 'waiting': 70}]) == ['A4', 'A2', 'A6', 'A3', 'A5', 'A1']" },
+      { name: "a critical alert jumps a long-waiting low one", expr: "triage_order([{'id': 'A1', 'severity': 'low', 'waiting': 300}, {'id': 'A2', 'severity': 'critical', 'waiting': 5}, {'id': 'A3', 'severity': 'high', 'waiting': 20}, {'id': 'A4', 'severity': 'critical', 'waiting': 12}, {'id': 'A5', 'severity': 'medium', 'waiting': 90}, {'id': 'A6', 'severity': 'high', 'waiting': 70}]).index('A2') < triage_order([{'id': 'A1', 'severity': 'low', 'waiting': 300}, {'id': 'A2', 'severity': 'critical', 'waiting': 5}, {'id': 'A3', 'severity': 'high', 'waiting': 20}, {'id': 'A4', 'severity': 'critical', 'waiting': 12}, {'id': 'A5', 'severity': 'medium', 'waiting': 90}, {'id': 'A6', 'severity': 'high', 'waiting': 70}]).index('A1')" },
+      { name: "the older of two equals goes first", expr: "triage_order([{'id': 'x', 'severity': 'high', 'waiting': 5}, {'id': 'y', 'severity': 'high', 'waiting': 50}]) == ['y', 'x']" },
+      { name: "an empty queue", expr: "triage_order([]) == []" },
+    ],
+    solution: "def triage_order(alerts):\n    rank = {'critical': 0, 'high': 1, 'medium': 2, 'low': 3}\n    ordered = sorted(alerts, key=lambda a: (rank[a['severity']], -a['waiting']))\n    return [a['id'] for a in ordered]\n",
+  },
+  {
+    id: "alert-label",
+    prompt: "Write alert_label(malicious, fired, authorised): each argument is True or False. Return 'true positive' when the behaviour was malicious and an alert fired, 'false negative' when it was malicious and none fired, 'true negative' when it was not malicious and none fired. When it was not malicious and an alert fired, return 'benign positive' if the behaviour was authorised and 'false positive' otherwise.",
+    starter: "def alert_label(malicious, fired, authorised):\n    # Your code here.\n    return \"true negative\"\n",
+    tests: [
+      { name: "a real attack that was caught", expr: "alert_label(True, True, False) == 'true positive'" },
+      { name: "a real attack that nobody saw", expr: "alert_label(True, False, False) == 'false negative'" },
+      { name: "a quiet day", expr: "alert_label(False, False, False) == 'true negative'" },
+      { name: "an approved scan that set off the rule", expr: "alert_label(False, True, True) == 'benign positive'" },
+      { name: "a rule that matched something harmless", expr: "alert_label(False, True, False) == 'false positive'" },
+      { name: "authorised work with no alert is still a true negative", expr: "alert_label(False, False, True) == 'true negative'" },
+    ],
+    solution: "def alert_label(malicious, fired, authorised):\n    if malicious:\n        return 'true positive' if fired else 'false negative'\n    if not fired:\n        return 'true negative'\n    return 'benign positive' if authorised else 'false positive'\n",
+  },
+  {
+    id: "sla-breaches",
+    prompt: "Write sla_breaches(alerts): alerts is a list of dicts with 'id', 'severity' and 'waiting' (minutes without triage). The limits are 15 minutes for 'critical', 60 for 'high', 240 for 'medium' and 1440 for 'low'. Return the ids, in the order given, of the alerts that have waited longer than their limit.",
+    starter: "def sla_breaches(alerts):\n    limits = {'critical': 15, 'high': 60, 'medium': 240, 'low': 1440}\n    # Your code here.\n    return []\n",
+    tests: [
+      { name: "one high alert is over its hour", expr: "sla_breaches([{'id': 'A1', 'severity': 'low', 'waiting': 300}, {'id': 'A2', 'severity': 'critical', 'waiting': 5}, {'id': 'A3', 'severity': 'high', 'waiting': 20}, {'id': 'A4', 'severity': 'critical', 'waiting': 12}, {'id': 'A5', 'severity': 'medium', 'waiting': 90}, {'id': 'A6', 'severity': 'high', 'waiting': 70}]) == ['A6']" },
+      { name: "exactly on the limit is not a breach", expr: "sla_breaches([{'id': 'c', 'severity': 'critical', 'waiting': 15}]) == []" },
+      { name: "one minute over is", expr: "sla_breaches([{'id': 'c', 'severity': 'critical', 'waiting': 16}]) == ['c']" },
+      { name: "a low alert may wait a day", expr: "sla_breaches([{'id': 'l', 'severity': 'low', 'waiting': 1000}, {'id': 'm', 'severity': 'low', 'waiting': 2000}]) == ['m']" },
+      { name: "an empty queue", expr: "sla_breaches([]) == []" },
+    ],
+    solution: "def sla_breaches(alerts):\n    limits = {'critical': 15, 'high': 60, 'medium': 240, 'low': 1440}\n    return [a['id'] for a in alerts if a['waiting'] > limits[a['severity']]]\n",
+  },
+  {
+    id: "mttd-mttr",
+    prompt: "Write mttd_mttr(incidents): incidents is a list of dicts with 'began', 'noticed' and 'stopped', each a time in minutes. Return (mttd, mttr): the mean of noticed minus began, and the mean of stopped minus noticed. Return (0, 0) for an empty list.",
+    starter: "def mttd_mttr(incidents):\n    # Your code here.\n    return 0, 0\n",
+    tests: [
+      { name: "the two incidents from the lesson", expr: "mttd_mttr([{'began': 100, 'noticed': 160, 'stopped': 190}, {'began': 400, 'noticed': 420, 'stopped': 520}]) == (40, 65)" },
+      { name: "one incident", expr: "mttd_mttr([{'began': 0, 'noticed': 45, 'stopped': 60}]) == (45, 15)" },
+      { name: "a mean that is not a whole number", expr: "mttd_mttr([{'began': 0, 'noticed': 1, 'stopped': 2}, {'began': 0, 'noticed': 2, 'stopped': 4}]) == (1.5, 1.5)" },
+      { name: "no incidents", expr: "mttd_mttr([]) == (0, 0)" },
+    ],
+    solution: "def mttd_mttr(incidents):\n    if not incidents:\n        return 0, 0\n    detect = sum(i['noticed'] - i['began'] for i in incidents) / len(incidents)\n    respond = sum(i['stopped'] - i['noticed'] for i in incidents) / len(incidents)\n    return detect, respond\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

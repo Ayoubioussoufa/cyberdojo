@@ -645,4 +645,38 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un constat vide manque de tout",
     ],
   },
+  "triage-order": {
+    prompt: "Écrivez triage_order(alerts) : alerts est une liste de dicts avec 'id', 'severity' ('critical', 'high', 'medium' ou 'low') et 'waiting' (les minutes passées dans la file). Renvoyez la liste des id dans l'ordre où les traiter : les plus graves d'abord, et parmi les alertes de même gravité, celle qui attend depuis le plus longtemps d'abord.",
+    tests: [
+      "toute la file",
+      "une alerte critique passe devant une alerte basse qui attend depuis longtemps",
+      "la plus ancienne de deux alertes égales passe en premier",
+      "une file vide",
+    ],
+  },
+  "alert-label": {
+    prompt: "Écrivez alert_label(malicious, fired, authorised) : chaque argument vaut True ou False. Renvoyez 'true positive' quand le comportement était malveillant et qu'une alerte s'est déclenchée, 'false negative' quand il était malveillant et qu'aucune ne s'est déclenchée, 'true negative' quand il n'était pas malveillant et qu'aucune ne s'est déclenchée. Quand il n'était pas malveillant et qu'une alerte s'est déclenchée, renvoyez 'benign positive' si le comportement était autorisé et 'false positive' sinon.",
+    tests: [
+      "une vraie attaque qui a été attrapée",
+      "une vraie attaque que personne n'a vue",
+      "une journée calme",
+      "un balayage approuvé qui a déclenché la règle",
+      "une règle qui a correspondu à quelque chose d'inoffensif",
+      "un travail autorisé sans alerte reste un vrai négatif",
+    ],
+  },
+  "sla-breaches": {
+    prompt: "Écrivez sla_breaches(alerts) : alerts est une liste de dicts avec 'id', 'severity' et 'waiting' (les minutes sans triage). Les limites sont de 15 minutes pour 'critical', 60 pour 'high', 240 pour 'medium' et 1440 pour 'low'. Renvoyez les id, dans l'ordre donné, des alertes qui ont attendu plus longtemps que leur limite.",
+    tests: [
+      "une alerte haute a dépassé son heure",
+      "exactement à la limite, ce n'est pas un dépassement",
+      "une minute de plus, si",
+      "une alerte basse peut attendre un jour",
+      "une file vide",
+    ],
+  },
+  "mttd-mttr": {
+    prompt: "Écrivez mttd_mttr(incidents) : incidents est une liste de dicts avec 'began', 'noticed' et 'stopped', chacun étant une heure en minutes. Renvoyez (mttd, mttr) : la moyenne de noticed moins began, et la moyenne de stopped moins noticed. Renvoyez (0, 0) pour une liste vide.",
+    tests: ["les deux incidents de la leçon", "un seul incident", "une moyenne qui n'est pas un nombre entier", "aucun incident"],
+  },
 };
