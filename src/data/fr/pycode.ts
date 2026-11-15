@@ -605,4 +605,44 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un article vide est refusé",
     ],
   },
+  "status-by-ip": {
+    prompt: "Écrivez status_by_ip(lines) : lines contient des lignes de journal d'accès au format de la leçon. Renvoyez un dict qui associe chaque adresse de client à un dict qui va du code d'état (en texte) au nombre de réponses ayant ce code. Après line.split(), l'adresse est l'élément 0 et le code l'élément 8. Sautez les lignes de moins de 9 éléments.",
+    tests: ["compte par adresse et par code", "une ligne abîmée est sautée", "une ligne vide est sautée", "aucune ligne"],
+  },
+  "guessed-logins": {
+    prompt: "Écrivez guessed_logins(events, threshold) : events est une liste de paires (adresse, code) pour des tentatives de connexion, dans l'ordre du temps. Renvoyez la liste triée des adresses qui ont eu au moins threshold échecs (code 401) avant leur première réussite (code 200). Une adresse qui ne réussit jamais n'est pas renvoyée.",
+    tests: [
+      "trois échecs, puis une réussite",
+      "une erreur avant de se connecter est ordinaire",
+      "des échecs sans réussite ne sont pas listés",
+      "un seuil plus bas en liste davantage, triés",
+      "les échecs après la première réussite ne comptent pas",
+      "aucun événement",
+    ],
+  },
+  "cvss-rating": {
+    prompt: "Écrivez cvss_rating(score) : renvoyez le niveau d'un score CVSS : 'None' pour 0.0, 'Low' de 0.1 à 3.9, 'Medium' de 4.0 à 6.9, 'High' de 7.0 à 8.9 et 'Critical' de 9.0 à 10.0. Renvoyez 'Invalid' pour tout ce qui est inférieur à 0 ou supérieur à 10.",
+    tests: [
+      "zéro",
+      "le Low le plus bas",
+      "le Low le plus haut",
+      "le Medium le plus bas",
+      "le Medium le plus haut",
+      "7.1 est High",
+      "8.9 est encore High",
+      "9.0 est Critical",
+      "10.0 est Critical",
+      "hors limites",
+    ],
+  },
+  "finding-gaps": {
+    prompt: "Écrivez finding_gaps(finding) : finding est un dict. Un constat complet a ces sept parties, chacune avec un texte qui n'est ni vide ni fait seulement d'espaces : 'title', 'severity', 'impact', 'steps', 'evidence', 'fix', 'retest'. Renvoyez la liste des parties manquantes ou vides, dans cet ordre.",
+    tests: [
+      "un constat complet",
+      "le constat de trois lignes de la leçon",
+      "une partie faite seulement d'espaces est un manque",
+      "une partie qui vaut None est un manque",
+      "un constat vide manque de tout",
+    ],
+  },
 };

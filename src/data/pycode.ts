@@ -902,6 +902,63 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import json\n\ndef parse_order(body):\n    try:\n        data = json.loads(body)\n    except ValueError:\n        return None\n    if not isinstance(data, dict) or set(data.keys()) != {'item', 'quantity'}:\n        return None\n    item, quantity = data['item'], data['quantity']\n    if not isinstance(item, str) or item == '':\n        return None\n    if isinstance(quantity, bool) or not isinstance(quantity, int):\n        return None\n    if quantity < 1 or quantity > 99:\n        return None\n    return data\n",
   },
+  {
+    id: "status-by-ip",
+    prompt: "Write status_by_ip(lines): lines are access-log lines in the format from the lesson. Return a dict that maps each client address to a dict of status code (as text) to the number of responses with that status. After line.split(), the address is item 0 and the status is item 8. Skip lines with fewer than 9 items.",
+    starter: "def status_by_ip(lines):\n    counts = {}\n    # Your code here.\n    return counts\n",
+    tests: [
+      { name: "counts per address and status", expr: "status_by_ip([\"203.0.113.7 - - [15/Nov/2026:10:14:02 +0000] \\\"GET /admin HTTP/1.1\\\" 403 153\", \"203.0.113.7 - - [15/Nov/2026:10:14:03 +0000] \\\"GET /nope HTTP/1.1\\\" 404 90\", \"203.0.113.7 - - [15/Nov/2026:10:14:04 +0000] \\\"GET /nope2 HTTP/1.1\\\" 404 90\", \"198.51.100.4 - - [15/Nov/2026:10:15:00 +0000] \\\"GET / HTTP/1.1\\\" 200 5120\"]) == {'203.0.113.7': {'403': 1, '404': 2}, '198.51.100.4': {'200': 1}}" },
+      { name: "a broken line is skipped", expr: "status_by_ip([\"203.0.113.7 - - [15/Nov/2026:10:14:02 +0000] \\\"GET /admin HTTP/1.1\\\" 403 153\", \"203.0.113.7 - - [15/Nov/2026:10:14:03 +0000] \\\"GET /nope HTTP/1.1\\\" 404 90\", \"203.0.113.7 - - [15/Nov/2026:10:14:04 +0000] \\\"GET /nope2 HTTP/1.1\\\" 404 90\", \"198.51.100.4 - - [15/Nov/2026:10:15:00 +0000] \\\"GET / HTTP/1.1\\\" 200 5120\"] + ['garbage']) == status_by_ip([\"203.0.113.7 - - [15/Nov/2026:10:14:02 +0000] \\\"GET /admin HTTP/1.1\\\" 403 153\", \"203.0.113.7 - - [15/Nov/2026:10:14:03 +0000] \\\"GET /nope HTTP/1.1\\\" 404 90\", \"203.0.113.7 - - [15/Nov/2026:10:14:04 +0000] \\\"GET /nope2 HTTP/1.1\\\" 404 90\", \"198.51.100.4 - - [15/Nov/2026:10:15:00 +0000] \\\"GET / HTTP/1.1\\\" 200 5120\"])" },
+      { name: "an empty line is skipped", expr: "status_by_ip(['']) == {}" },
+      { name: "no lines", expr: "status_by_ip([]) == {}" },
+    ],
+    solution: "def status_by_ip(lines):\n    counts = {}\n    for line in lines:\n        parts = line.split()\n        if len(parts) < 9:\n            continue\n        ip, status = parts[0], parts[8]\n        per_ip = counts.setdefault(ip, {})\n        per_ip[status] = per_ip.get(status, 0) + 1\n    return counts\n",
+  },
+  {
+    id: "guessed-logins",
+    prompt: "Write guessed_logins(events, threshold): events is a list of (address, status) pairs for login attempts, in time order. Return the sorted list of addresses that had at least threshold failures (status 401) before their first success (status 200). An address that never succeeds is not returned.",
+    starter: "def guessed_logins(events, threshold):\n    failures = {}    # address -> failures so far\n    found = set()\n    done = set()     # addresses whose first success has been seen\n    # Your code here.\n    return sorted(found)\n",
+    tests: [
+      { name: "three failures, then a success", expr: "guessed_logins([('198.51.100.23', 401), ('198.51.100.23', 401), ('198.51.100.23', 401), ('203.0.113.5', 401), ('203.0.113.5', 200), ('198.51.100.23', 200), ('192.0.2.9', 200), ('192.0.2.77', 401), ('192.0.2.77', 401), ('192.0.2.77', 401)], 3) == ['198.51.100.23']" },
+      { name: "one mistake before logging in is ordinary", expr: "'203.0.113.5' not in guessed_logins([('198.51.100.23', 401), ('198.51.100.23', 401), ('198.51.100.23', 401), ('203.0.113.5', 401), ('203.0.113.5', 200), ('198.51.100.23', 200), ('192.0.2.9', 200), ('192.0.2.77', 401), ('192.0.2.77', 401), ('192.0.2.77', 401)], 3)" },
+      { name: "failures with no success are not listed", expr: "'192.0.2.77' not in guessed_logins([('198.51.100.23', 401), ('198.51.100.23', 401), ('198.51.100.23', 401), ('203.0.113.5', 401), ('203.0.113.5', 200), ('198.51.100.23', 200), ('192.0.2.9', 200), ('192.0.2.77', 401), ('192.0.2.77', 401), ('192.0.2.77', 401)], 3)" },
+      { name: "a lower threshold lists more, sorted", expr: "guessed_logins([('198.51.100.23', 401), ('198.51.100.23', 401), ('198.51.100.23', 401), ('203.0.113.5', 401), ('203.0.113.5', 200), ('198.51.100.23', 200), ('192.0.2.9', 200), ('192.0.2.77', 401), ('192.0.2.77', 401), ('192.0.2.77', 401)], 1) == ['198.51.100.23', '203.0.113.5']" },
+      { name: "failures after the first success do not count", expr: "guessed_logins([('a', 200), ('a', 401), ('a', 401), ('a', 401), ('a', 200)], 3) == []" },
+      { name: "no events", expr: "guessed_logins([], 3) == []" },
+    ],
+    solution: "def guessed_logins(events, threshold):\n    failures = {}\n    found = set()\n    done = set()\n    for address, status in events:\n        if address in done:\n            continue\n        if status == 401:\n            failures[address] = failures.get(address, 0) + 1\n        elif status == 200:\n            if failures.get(address, 0) >= threshold:\n                found.add(address)\n            done.add(address)\n    return sorted(found)\n",
+  },
+  {
+    id: "cvss-rating",
+    prompt: "Write cvss_rating(score): return the rating for a CVSS score: 'None' for 0.0, 'Low' for 0.1 to 3.9, 'Medium' for 4.0 to 6.9, 'High' for 7.0 to 8.9 and 'Critical' for 9.0 to 10.0. Return 'Invalid' for anything below 0 or above 10.",
+    starter: "def cvss_rating(score):\n    # Your code here.\n    return \"None\"\n",
+    tests: [
+      { name: "zero", expr: "cvss_rating(0.0) == 'None'" },
+      { name: "the lowest Low", expr: "cvss_rating(0.1) == 'Low'" },
+      { name: "the highest Low", expr: "cvss_rating(3.9) == 'Low'" },
+      { name: "the lowest Medium", expr: "cvss_rating(4.0) == 'Medium'" },
+      { name: "the highest Medium", expr: "cvss_rating(6.9) == 'Medium'" },
+      { name: "7.1 is High", expr: "cvss_rating(7.1) == 'High'" },
+      { name: "8.9 is still High", expr: "cvss_rating(8.9) == 'High'" },
+      { name: "9.0 is Critical", expr: "cvss_rating(9.0) == 'Critical'" },
+      { name: "10.0 is Critical", expr: "cvss_rating(10.0) == 'Critical'" },
+      { name: "out of range", expr: "cvss_rating(10.5) == 'Invalid' and cvss_rating(-1) == 'Invalid'" },
+    ],
+    solution: "def cvss_rating(score):\n    if score < 0 or score > 10:\n        return 'Invalid'\n    if score == 0:\n        return 'None'\n    if score < 4.0:\n        return 'Low'\n    if score < 7.0:\n        return 'Medium'\n    if score < 9.0:\n        return 'High'\n    return 'Critical'\n",
+  },
+  {
+    id: "finding-gaps",
+    prompt: "Write finding_gaps(finding): finding is a dict. A complete finding has these seven parts, each with text that is not empty or only spaces: 'title', 'severity', 'impact', 'steps', 'evidence', 'fix', 'retest'. Return the list of parts that are missing or empty, in that order.",
+    starter: "def finding_gaps(finding):\n    parts = ['title', 'severity', 'impact', 'steps', 'evidence', 'fix', 'retest']\n    gaps = []\n    # Your code here.\n    return gaps\n",
+    tests: [
+      { name: "a complete finding", expr: "finding_gaps({'title': 'a', 'severity': 'b', 'impact': 'c', 'steps': 'd', 'evidence': 'e', 'fix': 'f', 'retest': 'g'}) == []" },
+      { name: "the three-line finding from the lesson", expr: "finding_gaps({'title': 'IDOR', 'severity': 'Critical!!', 'details': 'Fix ASAP.'}) == ['impact', 'steps', 'evidence', 'fix', 'retest']" },
+      { name: "a part that is only spaces is a gap", expr: "finding_gaps({'title': 'a', 'severity': 'b', 'impact': '   ', 'steps': 'd', 'evidence': 'e', 'fix': 'f', 'retest': 'g'}) == ['impact']" },
+      { name: "a part set to None is a gap", expr: "finding_gaps({'title': 'a', 'severity': 'b', 'impact': 'c', 'steps': 'd', 'evidence': 'e', 'fix': None, 'retest': 'g'}) == ['fix']" },
+      { name: "an empty finding lacks everything", expr: "finding_gaps({}) == ['title', 'severity', 'impact', 'steps', 'evidence', 'fix', 'retest']" },
+    ],
+    solution: "def finding_gaps(finding):\n    parts = ['title', 'severity', 'impact', 'steps', 'evidence', 'fix', 'retest']\n    gaps = []\n    for part in parts:\n        if not str(finding.get(part) or '').strip():\n            gaps.append(part)\n    return gaps\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
