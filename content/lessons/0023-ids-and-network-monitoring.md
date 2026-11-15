@@ -2,7 +2,7 @@
 title: IDS and network monitoring
 summary: How Suricata and Zeek watch traffic, how to relate alerts to packets, and the network attacks they catch.
 month: 3
-minutes: 30
+minutes: 50
 builds: a working sensor that alerts on your own Nmap scan
 source: Suricata documentation | https://docs.suricata.io/
 words: IDS, signature, false positive
@@ -48,6 +48,31 @@ An IDS only watches a copy, so it can alert, but it can't block:
 
 They're complementary: signatures catch the known, and Zeek's records let you investigate the unknown afterwards.
 
+Seeing one line from each makes the difference concrete. This is a Suricata alert, as written to `fast.log`:
+
+```
+11/15/2026-10:14:02.123456  [**] [1:1000001:1] SSH connection to lab [**] [Classification: (null)] [Priority: 3] {TCP} 192.168.56.20:51514 -> 192.168.56.10:22
+```
+
+Read it left to right: when it happened, then three numbers in brackets (the middle one, `1000001`, is the rule's ID), the rule's message, the protocol, and who talked to whom. It tells you that a rule matched. It doesn't tell you what happened next.
+
+This is the same connection in Zeek's `conn.log`, with only the main columns shown:
+
+```
+id.orig_h      id.orig_p  id.resp_h      id.resp_p  proto  service  duration  orig_bytes  resp_bytes  conn_state
+192.168.56.20  51514      192.168.56.10  22         tcp    ssh      4.21      1893        2540        SF
+```
+
+Zeek wrote this line with no rule involved, because it writes one for every connection. `orig` is the side that started the connection and `resp` is the side that answered. `conn_state` sums up how it went:
+
+| `conn_state` | Meaning |
+|---|---|
+| `SF` | A normal connection: opened, used, closed |
+| `S0` | A SYN was sent and nothing came back |
+| `REJ` | The SYN was answered with a reset: the port is closed |
+
+A port scan in `conn.log` is therefore easy to spot: one `id.orig_h`, hundreds of different `id.resp_p`, zero bytes, and a wall of `REJ` and `S0`.
+
 ?? You want to know what a host did last Tuesday. Which suits that better?
 + Zeek, because it records what really happened
 - Suricata, because it only matches known signatures
@@ -69,6 +94,23 @@ alert tcp any any -> $HOME_NET 22 (msg:"SSH connection to lab"; flags:S; sid:100
 ```
 
 The [rules documentation](https://docs.suricata.io/en/latest/rules/intro.html) covers the rest. You'll write detections for a living from Month 11.
+
+The part before the brackets is the **header**: it decides which packets the rule even looks at. The part in brackets is the list of **options**, each ending with a semicolon:
+
+| Option | Meaning |
+|---|---|
+| `msg:"…"` | The text that appears in the alert |
+| `flags:S` | Match only packets with the SYN flag set, so the start of a connection |
+| `sid:1000001` | The rule's unique ID. Use numbers from 1000000 up for your own rules, so they never clash with published ones |
+| `rev:1` | The version of this rule. Raise it each time you edit the rule |
+
+That rule alerts on every single SYN to port 22, which is fine for a first test and useless in production. One more option turns "a connection" into "a pattern":
+
+```
+alert tcp any any -> $HOME_NET any (msg:"Possible port scan"; flags:S; threshold: type threshold, track by_src, count 20, seconds 10; sid:1000002; rev:1;)
+```
+
+`threshold` counts matches per source address (`track by_src`) and only alerts when one source sends 20 SYNs within 10 seconds. A person opening one SSH session never reaches the count. A scanner reaches it in a moment. Choosing those two numbers is tuning, and the section after next explains what it costs.
 
 ?? In a Suricata rule, what does `$HOME_NET` stand for?
 + The networks that you have defined as yours
@@ -129,6 +171,26 @@ Most traffic today is TLS, so an IDS can't read the contents. It relies on metad
 
 ## Your lab
 
+The commands, for an Ubuntu VM. The quick start linked below has the full detail.
+
+```
+sudo apt install suricata jq                 install the sensor, and jq to read its JSON
+ip a                                         note the name of your lab interface
+sudo nano /etc/suricata/suricata.yaml        set HOME_NET to your lab network, and the interface under af-packet
+sudo suricata-update                         download the default rule set
+sudo suricata -T -c /etc/suricata/suricata.yaml   test the configuration without starting
+sudo systemctl restart suricata              start with the new settings
+sudo tail -f /var/log/suricata/fast.log      watch alerts arrive, one line each
+```
+
+For your own rule, create a file such as `/etc/suricata/rules/local.rules`, put the rule in it, and add that path to the `rule-files:` list in `suricata.yaml`. Run the `-T` test again before each restart: a rule with a missing semicolon stops the whole sensor from loading, and the test tells you which line is wrong.
+
+Suricata also writes every event as JSON to `/var/log/suricata/eve.json`. That's the file other tools read, and `jq` filters it:
+
+```
+sudo tail -f /var/log/suricata/eve.json | jq 'select(.event_type=="alert")'
+```
+
 ::: try Build a sensor
 1. On Ubuntu, install Suricata following the [quick start](https://docs.suricata.io/en/latest/quickstart.html).
 2. Point it at your lab interface and enable the default rules.
@@ -143,5 +205,29 @@ Most traffic today is TLS, so an IDS can't read the contents. It relies on metad
 - The contents of any file being downloaded
 - The HTML of each requested web page
 => Without the keys, an IDS can't see inside TLS. Metadata remains.
+
+## From an alert to the packets
+
+An alert is a claim, and the packets are the evidence. Practise connecting them: take the time, the two addresses and the two ports from the alert line, and use them as a Wireshark display filter on a capture taken at the same moment.
+
+```
+ip.addr == 192.168.56.20 && tcp.port == 22
+```
+
+If the capture shows one SYN, a SYN-ACK and then a long encrypted conversation, someone logged in. If it shows a SYN and an immediate RST, repeated across many ports, that was a scan and port 22 was only one stop on the way. The alert text was the same in both cases. The packets tell them apart.
+
+?? A `fast.log` line contains `[1:1000002:1]`. What is the number `1000002`?
++ The ID of the rule that fired
+- The count of packets in the alert
+- The port that the scanner connected from
+- The time in seconds since the start
+=> The three numbers are the generator, the signature ID and the revision. The signature ID leads you straight to the rule's text.
+
+?? Zeek's `conn.log` shows one source with 400 connections, all `REJ` or `S0`, each to a different port. What happened?
++ A port scan, since nothing was ever exchanged
+- A large download, split across many small connections
+- A normal login, repeated by a busy user
+- A backup job, sending files to one server
+=> `REJ` and `S0` mean the connections never carried data. Many ports from one source with no data is the shape of a scan.
 
 ?! Why would a team run both Suricata and Zeek, rather than picking one?
