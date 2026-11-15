@@ -2,7 +2,7 @@
 title: Log sources and the SIEM
 summary: What each log proves, how a SIEM turns logs into searchable data, what it costs, and how to write queries that answer questions.
 month: 9
-minutes: 50
+minutes: 75
 builds: write the three gate queries from memory
 source: Must Learn KQL, free series | https://github.com/rod-trent/MustLearnKQL
 words: SIEM, normalization, correlation
@@ -60,7 +60,19 @@ Parsed: time=09:14:02 host=web1 program=sshd outcome=failure user=root src_ip=20
 
 The **parser** turned one sentence into named fields. **Normalization** then makes the names consistent: if one source says `src_ip` and another says `client`, you can't join them, so both become one common name. It's the unglamorous key. When parsing silently breaks, a dashboard shows nothing and looks reassuring, so check real events before you trust it.
 
+You wrote a parser like this in Month 4, and it's worth writing this exact one, because it shows what a SIEM does millions of times a second and where it goes wrong: a line that doesn't fit the pattern produces nothing at all.
+
+@code parse-sshd-line
+
+For the common names, many teams use a published scheme so that nobody has to invent one. In the [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/current/index.html), the source address is always `source.ip`, the account is `user.name` and the result is `event.outcome`, whichever product wrote the original line. Normalizing is then a renaming table per source.
+
+@code normalize-event
+
 **Correlation** links events: "five failures, then a success, from the same IP, within ten minutes".
+
+Linking across sources is the part that turns logs into a story, and it works by finding a field that two sources share. The firewall knows which laptop connected to which address. DNS knows which name that laptop looked up and which address came back. The address is the shared field, so a join on it puts a name on every connection.
+
+@code join-dns-firewall
 
 ?? A dashboard shows zero failed logins for a week, on a busy public server. What should you suspect first?
 + Parsing or log collection has quietly broken
@@ -120,6 +132,40 @@ SysmonEvent
 | sort by Count asc
 ```
 
+Six operators cover nearly every query you'll write in your first year:
+
+| Operator | Does | Month 1 equivalent |
+|---|---|---|
+| `where` | Keeps the rows that pass a test | `grep` |
+| `project` | Keeps only the named columns | `awk '{print $1, $9}'` |
+| `summarize … by` | Groups rows and computes a count, sum or other aggregate | `sort \| uniq -c` |
+| `sort by` | Orders the result | `sort -rn` |
+| `take 10` | Keeps the first rows | `head` |
+| `extend` | Adds a computed column | |
+
+Time is the filter you'll add to almost everything, because searching a year of logs is slow and expensive. `ago()` counts back from now, and `bin()` rounds times into buckets so that you can count per period:
+
+```
+SecurityEvent
+| where TimeGenerated > ago(1h) and EventID == 4625
+| summarize Failures = count() by IpAddress, bin(TimeGenerated, 10m)
+| where Failures >= 5
+```
+
+In words: failed logons from the last hour, counted per address in ten-minute buckets, keeping only the buckets with five or more. That's a brute-force detection in four lines.
+
+The same question in the other two languages you'll meet, so that you can see it's one idea:
+
+| Language | Failed logons per source |
+|---|---|
+| KQL | `SecurityEvent \| where EventID == 4625 \| summarize count() by IpAddress` |
+| SPL | `index=wineventlog EventCode=4625 \| stats count by src_ip` |
+| ES\|QL | `FROM logs-* \| WHERE event.code == "4625" \| STATS failures = COUNT(*) BY source.ip` |
+
+Behind every one of them is the same small program: group the events by a field, count each group, and sort.
+
+@code summarize-count
+
 Table names vary by environment, so treat these as shapes. The gate asks you to write those three from memory. Splunk's SPL follows the same logic: `index=wineventlog EventCode=4625 | stats count by src_ip | sort -count`.
 
 ?? You want the top source of failed logins. Which pattern is right?
@@ -128,6 +174,37 @@ Table names vary by environment, so treat these as shapes. The gate asks you to 
 - Count everything first, then filter the total
 - Join every table, then read each row
 => It's your `grep | sort | uniq -c | sort -rn` shape again, in another language.
+
+## Read a query, and read a silence
+
+Two things you'll do every day in a SIEM: work out what somebody else's query is asking, and notice when the data has stopped arriving.
+
+```
+SecurityEvent
+| where EventID == 4624 and LogonType == 10
+| summarize Logons = count() by Account, IpAddress
+| sort by Logons desc
+```
+
+?? What question does that query answer?
++ Who logged on by Remote Desktop, from where
+- Who failed to log on, and how often
+- Which services were installed, and on which hosts
+- Which programs ran, and with which parent process
+=> 4624 is a successful logon, and type 10 is Remote Desktop. Grouping by account and address gives one line per person and place.
+
+```
+Source          13:00   14:00   15:00   16:00
+firewall        48210   47902   48377   47650
+dc1-security     9120       0       0       0
+```
+
+?? That table counts events per source per hour. What does the second row tell you?
++ The domain controller's logs have stopped arriving
+- The domain controller had a calm afternoon
+- The firewall is sending too many events
+- The attackers went home at two o'clock
+=> A domain controller never produces zero events. From 14:00 you're blind on that machine, and every detection that depends on it is silently off. Collection health is the first dashboard to build.
 
 ## Practise the three gate queries
 

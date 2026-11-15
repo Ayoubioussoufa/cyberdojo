@@ -645,4 +645,164 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un constat vide manque de tout",
     ],
   },
+  "triage-order": {
+    prompt: "Écrivez triage_order(alerts) : alerts est une liste de dicts avec 'id', 'severity' ('critical', 'high', 'medium' ou 'low') et 'waiting' (les minutes passées dans la file). Renvoyez la liste des id dans l'ordre où les traiter : les plus graves d'abord, et parmi les alertes de même gravité, celle qui attend depuis le plus longtemps d'abord.",
+    tests: [
+      "toute la file",
+      "une alerte critique passe devant une alerte basse qui attend depuis longtemps",
+      "la plus ancienne de deux alertes égales passe en premier",
+      "une file vide",
+    ],
+  },
+  "alert-label": {
+    prompt: "Écrivez alert_label(malicious, fired, authorised) : chaque argument vaut True ou False. Renvoyez 'true positive' quand le comportement était malveillant et qu'une alerte s'est déclenchée, 'false negative' quand il était malveillant et qu'aucune ne s'est déclenchée, 'true negative' quand il n'était pas malveillant et qu'aucune ne s'est déclenchée. Quand il n'était pas malveillant et qu'une alerte s'est déclenchée, renvoyez 'benign positive' si le comportement était autorisé et 'false positive' sinon.",
+    tests: [
+      "une vraie attaque qui a été attrapée",
+      "une vraie attaque que personne n'a vue",
+      "une journée calme",
+      "un balayage approuvé qui a déclenché la règle",
+      "une règle qui a correspondu à quelque chose d'inoffensif",
+      "un travail autorisé sans alerte reste un vrai négatif",
+    ],
+  },
+  "sla-breaches": {
+    prompt: "Écrivez sla_breaches(alerts) : alerts est une liste de dicts avec 'id', 'severity' et 'waiting' (les minutes sans triage). Les limites sont de 15 minutes pour 'critical', 60 pour 'high', 240 pour 'medium' et 1440 pour 'low'. Renvoyez les id, dans l'ordre donné, des alertes qui ont attendu plus longtemps que leur limite.",
+    tests: [
+      "une alerte haute a dépassé son heure",
+      "exactement à la limite, ce n'est pas un dépassement",
+      "une minute de plus, si",
+      "une alerte basse peut attendre un jour",
+      "une file vide",
+    ],
+  },
+  "mttd-mttr": {
+    prompt: "Écrivez mttd_mttr(incidents) : incidents est une liste de dicts avec 'began', 'noticed' et 'stopped', chacun étant une heure en minutes. Renvoyez (mttd, mttr) : la moyenne de noticed moins began, et la moyenne de stopped moins noticed. Renvoyez (0, 0) pour une liste vide.",
+    tests: ["les deux incidents de la leçon", "un seul incident", "une moyenne qui n'est pas un nombre entier", "aucun incident"],
+  },
+  "parse-sshd-line": {
+    prompt: "Écrivez parse_sshd(line) : transformez une ligne de journal de sshd en dict avec 'time', 'host', 'outcome', 'user' et 'src_ip'. outcome vaut 'failure' pour une ligne qui dit Failed password et 'success' pour Accepted password. Renvoyez None pour toute ligne qui ne correspond pas. Un motif est fourni : ses cinq groupes sont l'heure, l'hôte, le mot Failed ou Accepted, l'utilisateur et l'adresse.",
+    tests: [
+      "l'échec de connexion de la leçon",
+      "une connexion réussie",
+      "une ligne invalid user donne quand même l'utilisateur",
+      "une ligne d'un autre programme donne None",
+      "une ligne vide donne None",
+    ],
+  },
+  "normalize-event": {
+    prompt: "Écrivez normalize(event, mapping) : event est un dict de champs venus d'un produit, et mapping dit comment les noms de champs de ce produit se traduisent en noms communs. Renvoyez un nouveau dict où chaque champ nommé dans mapping porte son nouveau nom, et où tous les autres champs sont gardés tels quels.",
+    tests: [
+      "deux produits aboutissent au même nom de champ",
+      "les champs sont renommés",
+      "les champs que mapping ne mentionne pas sont gardés",
+      "l'événement d'origine n'est pas modifié",
+      "un événement vide",
+    ],
+  },
+  "join-dns-firewall": {
+    prompt: "Écrivez name_connections(firewall, dns) : firewall est une liste de dicts avec 'host' et 'dst_ip'. dns est une liste de dicts avec 'host', 'name' et 'ip'. Pour chaque connexion du pare-feu, dans l'ordre, trouvez un enregistrement DNS du même hôte dont ip est égal à dst_ip. Renvoyez une liste de tuples (host, dst_ip, name), avec None comme nom quand cet hôte n'a jamais recherché l'adresse.",
+    tests: [
+      "chaque connexion reçoit son nom",
+      "une connexion sans recherche de cet hôte reçoit None",
+      "aucune donnée DNS",
+      "aucune connexion",
+    ],
+  },
+  "summarize-count": {
+    prompt: "Écrivez summarize_count(events, field) : events est une liste de dicts. Comptez combien d'événements ont chaque valeur du champ donné, et renvoyez une liste de paires (valeur, compte) triée du compte le plus élevé au plus bas. Les paires de même compte sont rangées par valeur. Sautez les événements qui n'ont pas le champ.",
+    tests: ["les échecs par adresse source", "les mêmes événements regroupés par utilisateur", "les événements sans le champ sont sautés", "aucun événement"],
+  },
+  "indicator-kind": {
+    prompt: "Écrivez indicator_kind(value) : renvoyez 'hash' quand value fait 32, 40 ou 64 caractères hexadécimaux, 'ip' quand ipaddress.ip_address l'accepte, 'domain' quand il contient un point, n'a ni espace ni barre oblique, et que sa dernière partie n'est faite que de lettres, et 'other' pour tout le reste. Vérifiez dans cet ordre.",
+    tests: [
+      "un SHA-256",
+      "un MD5",
+      "une adresse IPv4",
+      "une adresse IPv6",
+      "un domaine",
+      "un domaine avec un sous-domaine",
+      "une phrase n'est pas un indicateur",
+      "un chemin de fichier n'est pas un domaine",
+      "un nombre à points qui n'est pas une adresse",
+    ],
+  },
+  "pyramid-sort": {
+    prompt: "Écrivez pyramid_sort(indicators) : indicators est une liste de dicts avec 'value' et 'level', qui vaut 'hash', 'ip', 'domain', 'artifact', 'tool' ou 'ttp'. Renvoyez les valeurs rangées du sommet de la pyramide de la douleur vers la base : ttp, tool, artifact, domain, ip, hash. Les indicateurs de même niveau gardent leur ordre d'origine.",
+    tests: ["les six indices de la leçon", "le comportement vient toujours en premier", "deux indices de même niveau gardent leur ordre", "une liste vide"],
+  },
+  "office-spawns-script": {
+    prompt: "Écrivez office_spawns_script(events) : events est une liste d'événements de création de processus, chacun étant un dict avec 'parent' et 'image', deux chemins Windows complets. Renvoyez les événements où le nom de fichier du parent est winword.exe, excel.exe, powerpnt.exe ou outlook.exe et où le nom de fichier de l'image est powershell.exe, cmd.exe, wscript.exe, cscript.exe ou mshta.exe. Ignorez les majuscules et les minuscules. Le nom de fichier est la partie après la dernière barre oblique inverse.",
+    tests: [
+      "deux des quatre événements correspondent",
+      "Word qui lance PowerShell correspond",
+      "Excel qui lance wscript correspond",
+      "PowerShell lancé depuis le bureau ne correspond pas",
+      "Word qui lance son assistant d'impression ne correspond pas",
+      "un dossier nommé comme Word n'est pas Word",
+    ],
+  },
+  "coverage-gaps": {
+    prompt: "Écrivez coverage_gaps(wanted, detections) : wanted est la liste des identifiants de techniques qui vous importent, et detections est une liste de dicts avec 'name' et 'technique'. Une technique voulue est couverte quand une détection a exactement cet identifiant, ou celui de son parent : une détection pour 'T1059' couvre 'T1059.001'. Renvoyez les identifiants voulus qui ne sont pas couverts, dans leur ordre d'origine.",
+    tests: [
+      "deux techniques sur quatre n'ont aucune détection",
+      "une détection sur le parent couvre sa sous-technique",
+      "une détection sur une sous-technique ne couvre pas ses sœurs",
+      "aucune détection",
+      "rien de voulu",
+    ],
+  },
+  "reply-mismatch": {
+    prompt: "Écrivez reply_mismatch(from_header, reply_to) : chaque argument est le texte d'un en-tête, comme '\"IT Support\" <it-support@corp.example>', et reply_to vaut None quand le message n'a pas de Reply-To. Renvoyez True quand il y a un Reply-To et que son domaine diffère du domaine du From. Comparez les domaines en minuscules. parseaddr(texte) renvoie une paire (nom, adresse).",
+    tests: [
+      "les réponses vont vers un autre domaine",
+      "les réponses vont vers le même domaine",
+      "pas d'en-tête Reply-To",
+      "des majuscules dans un domaine ne font pas une différence",
+      "une adresse nue fonctionne aussi",
+    ],
+  },
+  "auth-results": {
+    prompt: "Écrivez auth_results(header) : header est le texte d'un en-tête Authentication-Results. Ses parties sont séparées par des points-virgules, et chaque partie commence par un contrôle et son résultat, comme spf=pass. Renvoyez un dict avec le résultat de 'spf', 'dkim' et 'dmarc', en mettant 'none' pour un contrôle que l'en-tête ne mentionne pas.",
+    tests: [
+      "l'exemple de la leçon",
+      "un en-tête qui ne mentionne que SPF",
+      "un en-tête réparti sur plusieurs lignes",
+      "les détails ne sont pas pris pour des contrôles",
+      "un en-tête vide",
+    ],
+  },
+  "dmarc-aligned": {
+    prompt: "Écrivez dmarc_aligned(from_domain, spf_result, spf_domain, dkim_result, dkim_domain) : renvoyez True quand DMARC réussirait : SPF a réussi pour un domaine aligné avec from_domain, ou DKIM a réussi pour un domaine aligné avec from_domain. Un domaine est aligné quand il est égal à from_domain ou qu'il se termine par un point suivi de from_domain. Les résultats sont des textes comme 'pass' ou 'fail'.",
+    tests: [
+      "l'exemple de la leçon échoue",
+      "SPF réussit pour le même domaine",
+      "DKIM seul suffit",
+      "un sous-domaine est aligné",
+      "un domaine aligné qui a échoué ne compte pas",
+      "un domaine qui finit seulement pareil n'est pas un sous-domaine",
+    ],
+  },
+  "lookalike-domain": {
+    prompt: "Écrivez is_lookalike(domain, brands) : brands associe un nom de marque à son vrai domaine, comme {'paypal': 'paypal.example'}. Défaites les substitutions courantes dans le domaine : minuscules, '1' en 'l', '0' en 'o', 'rn' en 'm', et retirez les tirets. Renvoyez True quand le résultat contient un nom de marque et que le domaine d'origine n'est ni le vrai domaine de cette marque ni l'un de ses sous-domaines.",
+    tests: [
+      "un chiffre à la place d'une lettre",
+      "le vrai domaine n'est pas un sosie",
+      "un vrai sous-domaine n'est pas un sosie",
+      "r et n à la place d'un m",
+      "un zéro à la place d'un o",
+      "le nom de la marque sur le domaine de quelqu'un d'autre",
+      "un domaine sans rapport",
+    ],
+  },
+  "defang-url": {
+    prompt: "Écrivez defang(url) : renvoyez l'URL rendue sûre à noter : 'http' au début devient 'hxxp' (donc 'https' devient 'hxxps'), et chaque point devient '[.]'. Écrivez ensuite refang(text), qui retransforme une URL neutralisée en l'URL d'origine.",
+    tests: [
+      "un lien https",
+      "un lien http avec plusieurs points",
+      "un domaine nu",
+      "les lettres http plus loin dans l'adresse sont laissées telles quelles",
+      "refang défait defang",
+      "un aller-retour redonne l'original",
+    ],
+  },
 };

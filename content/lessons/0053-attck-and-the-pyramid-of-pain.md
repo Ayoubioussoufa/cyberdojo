@@ -2,7 +2,7 @@
 title: Behaviours, not indicators
 summary: Mapping alerts to ATT&CK, IOCs versus TTPs, and why the Pyramid of Pain shapes good detection.
 month: 9
-minutes: 35
+minutes: 55
 builds: map alerts to ATT&CK accurately, and rank indicators by value
 source: The Pyramid of Pain, David Bianco | https://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html
 words: IOC, TTP, Pyramid of Pain
@@ -27,6 +27,10 @@ Wear gloves and the fingerprint is gone. The habit is much harder to change. So 
 | Effort to detect | Low: search for it | Higher: needs good logs |
 | Best use | Quick checks, scoping | Lasting detections |
 
+A threat report usually ends with a list of indicators, all mixed together. The first thing an analyst does with it is sort them by kind, because each kind is searched in a different log: hashes in endpoint data, addresses in firewall logs, names in DNS. The kinds are recognisable by shape, which you learned in Month 6.
+
+@code indicator-kind
+
 ?? Which of these is a TTP rather than an IOC?
 + Dumping credentials from memory after logging in
 - The SHA-256 hash of one specific file
@@ -48,9 +52,28 @@ Domain names | evil.example. Simple
 IP addresses | 203.0.113.7. Easy
 Hash values | a file's SHA-256. Trivial: change one byte
 
+Take one incident and put its clues on the pyramid. Suppose a report on last month's intrusion gives you these:
+
+| Clue from the report | Level | If you block it, the attacker must… |
+|---|---|---|
+| The dropper's SHA-256 | Hash | Change one byte and recompile |
+| `203.0.113.7` | IP address | Rent another server |
+| `cdn-sync.example` | Domain name | Register another name |
+| A user agent of `SyncClient/2.1` | Network artifact | Edit a setting in their tool |
+| The tool itself, recognised by how it behaves on the wire | Tool | Find or write a different tool |
+| Office starts a script interpreter, which adds a scheduled task | TTP | Learn a different way to work |
+
+The top row costs them a second. The bottom row costs them weeks, and it would also have caught a different group using the same habit.
+
+@code pyramid-sort
+
 Indicators are still useful: they're quick to search, and they help you scope. But **detections built on behaviour last longer**.
 
 @drill ioc-rank
+
+A behaviour can be written down as precisely as a hash can. "An Office program started a script interpreter" is a test on two fields of a process-creation event, the parent and the child. Write it, and you've written the logic of a real detection rule.
+
+@code office-spawns-script
 
 ?? Which detection will survive the longest as an attacker changes their setup?
 + Office apps spawning a script interpreter here
@@ -84,6 +107,16 @@ For each alert, ask two questions: what's the attacker trying to do, and how?
 | New scheduled task runs at logon | Persistence | T1053.005 Scheduled Task |
 | Fifty failed logins, then a success | Credential Access | T1110 Brute Force |
 
+The IDs have a shape worth knowing, because reports and tools use them without explanation:
+
+| ID | Kind | Example |
+|---|---|---|
+| `TA0003` | A tactic | Persistence |
+| `T1053` | A technique | Scheduled Task/Job |
+| `T1053.005` | A sub-technique of T1053 | Scheduled Task, on Windows |
+
+Open any technique page on the ATT&CK site and you'll find the same four parts: a description of the behaviour, **procedure examples** naming groups that used it, **mitigations** that make it harder, and **detection** guidance saying which data shows it. For a defender, the last two are the page. Reading them for one technique a day is among the best habits you can start this month.
+
 One technique can serve several tactics, so the same behaviour may appear twice on the map.
 
 ::: trap Precision is the skill
@@ -98,6 +131,34 @@ Don't map generously to look thorough. Map only what the evidence shows, and cit
 - ATT&CK can only ever map a single tactic
 - PowerShell isn't a technique listed anywhere in ATT&CK
 => Each mapped technique needs its own evidence. Over-mapping makes reports look thorough while making them less true.
+
+## From coverage to gaps
+
+Once your detections are tagged with technique IDs, a simple comparison shows where you're blind: list the techniques that matter to your organisation, and cross off the ones a detection covers. What's left is your hunting list. ATT&CK Navigator draws this as a coloured grid, and underneath it's a set difference.
+
+@code coverage-gaps
+
+A gap becomes a hunt when you write a **hypothesis**, a sentence that can turn out to be false. A good one has three parts: the behaviour, the log that would show it, and what exactly you expect to see.
+
+```
+If an attacker is persisting with scheduled tasks,
+then Security event 4698 will show tasks created outside \Microsoft\
+by accounts that aren't administrators.
+```
+
+?? What makes that a usable hunting hypothesis?
++ It names a behaviour, a log, an observable
+- It names the attacker and their home country
+- It promises that an attack will be found
+- It lists every technique in the ATT&CK matrix
+=> A hypothesis you can test tells you where to look and what would count as a hit. If the search finds nothing, you've still learned whether the log can show it.
+
+?? A report gives a file hash, a domain, and "Office starts `rundll32`". You can build one detection today. Which lasts longest?
++ The Office-`rundll32` behaviour, top of the pyramid
+- The file hash, since hashes never collide
+- The domain, since registering names is hard
+- All three equally, since each was seen
+=> Search for the hash and the domain today to scope the incident. Build the lasting detection on the behaviour, which survives new files and new infrastructure.
 
 ## From map to plan
 

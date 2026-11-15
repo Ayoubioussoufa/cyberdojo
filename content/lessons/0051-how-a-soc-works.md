@@ -2,7 +2,7 @@
 title: How a SOC works
 summary: Tiers, shifts, the alert lifecycle, verdicts, escalation, and how to take one alert to a written conclusion with evidence.
 month: 9
-minutes: 45
+minutes: 65
 builds: triage an alert to a written verdict
 source: TryHackMe SOC Level 1 path | https://tryhackme.com/path/outline/soclevel1
 words: triage, alert fatigue, escalation
@@ -24,6 +24,10 @@ SOC analyst is still the most common way into this field. A **SOC**, or security
 It's 09:00. You open a ticket queue, which is a list of alerts waiting for someone. There are 40. Three are marked high. Each one is a claim made by a piece of software: "this looks bad". Your job is to find out whether the claim is true.
 
 You can't investigate all 40 deeply. You also can't ignore any of them. So you do what a hospital's emergency room does: **triage**. Look at each one quickly, decide how urgent it is, and spend your time where it counts.
+
+The order isn't a feeling. Most queues sort the same way: the most severe first, and among equals, the one that has waited longest. A ticketing system does this for you, and writing the rule once shows there's nothing more to it.
+
+@code triage-order
 
 ?? Why doesn't a SOC analyst investigate every alert in full depth?
 + Time is limited, so urgency decides the order
@@ -62,6 +66,10 @@ An alert ends with one of four labels. Learn them exactly, because every intervi
 
 There's a useful fifth case. A **benign positive** is when the rule was right about the behaviour but the behaviour was allowed, like an admin running a scan they had approval for.
 
+The five labels come from three yes-or-no questions: was the behaviour malicious, did an alert fire, and was the behaviour authorised? That makes them something you can write down exactly, which is a good test of whether you really know them.
+
+@code alert-label
+
 ::: trap False negatives are invisible
 Nobody files a ticket for the attack that no rule caught. A quiet queue doesn't prove that you're safe. That's why hunting and testing exist.
 :::
@@ -93,6 +101,30 @@ ALERT  Encoded PowerShell     Host: HR-LAP-12     User: sara     09:14 UTC
 - **Evidence:** the parent process is the signed deployment agent, it runs every Tuesday at 09:14, and it decodes to the approved inventory script.
 - **Verdict:** benign.
 
+Now one that goes the other way, so that you've seen both endings.
+
+```
+ALERT  Login from new country     User: marc     Source: 203.0.113.80     02:41 UTC
+```
+
+- **Context:** Marc works in finance. His calendar shows no travel, and 02:41 is the middle of his night.
+- **Hypothesis:** a trip nobody recorded, a VPN, or a stolen password.
+- **Evidence:** the same address failed 14 times before it succeeded. Six MFA prompts were sent, and the sixth was approved. Three minutes later, a mailbox rule began forwarding all his mail to an outside address.
+- **Verdict:** true positive. Each fact has an innocent explanation alone. Together they don't.
+
+The verdict isn't the end of your part. This one goes to Tier 2, and what you send decides how fast they can act:
+
+```
+WHAT I KNOW   marc logged in from 203.0.113.80 at 02:41 UTC after 14 failures and 6 MFA prompts.
+              At 02:44 a mailbox rule started forwarding all mail to an outside address.
+WHAT I DID    Checked his calendar: no travel. Attached the sign-in and audit log entries.
+WHAT'S OPEN   His sessions are still active. I have not disabled the account.
+              Unknown: which messages were already forwarded.
+ASK           Revoke sessions and reset credentials now.
+```
+
+Four headings, and the reader knows what happened, what they can skip, what's still dangerous and what you want from them.
+
 ::: key Write the verdict so someone else can check it
 Bad: "looks fine, closed". Good: "Encoded PowerShell on HR-LAP-12 at 09:14 UTC. Parent is the signed deployment agent, on its normal schedule, and it decodes to the approved inventory script. Benign. No action."
 :::
@@ -119,6 +151,10 @@ Not every alert deserves the same speed. Teams write this down in advance, often
 
 Those times are examples: each organisation sets its own. When in doubt, escalate, and say what you know, what you don't, and what you've already done.
 
+A clock is running on every open alert, and a queue can tell you which ones have already run out. Given how long each alert has waited, the check is a lookup and a comparison.
+
+@code sla-breaches
+
 ?? When you escalate, what makes the handover useful?
 + What you know, what you tried, what remains
 - A short message saying it looks quite bad
@@ -136,12 +172,41 @@ Those times are examples: each organisation sets its own. When in doubt, escalat
 
 Numbers can mislead: closing tickets quickly isn't the same as getting them right. And too much noise causes **alert fatigue**: people start closing things without looking, and the real attack slips past inside the noise. Reducing noise is a security improvement.
 
+Both averages come from three timestamps per incident: when the attack began, when it was noticed and when it was stopped. Take two incidents, with times in minutes from the start of the day:
+
+| Incident | Began | Noticed | Stopped | Time to detect | Time to respond |
+|---|---|---|---|---|---|
+| A | 100 | 160 | 190 | 60 | 30 |
+| B | 400 | 420 | 520 | 20 | 100 |
+
+MTTD is the mean of 60 and 20, so 40 minutes. MTTR is the mean of 30 and 100, so 65. An average hides a great deal: here one incident was slow to notice and the other slow to stop, and the cures for those are different.
+
+@code mttd-mttr
+
 ?? A manager rewards whoever closes the most alerts per hour. What's the likely result?
 + Rushed closures that miss some real attacks
 - Far fewer true positives in the logs
 - Attackers becoming discouraged and leaving the network
 - Every alert getting a much deeper investigation
 => You get what you measure. Speed alone rewards careless verdicts, so measure quality as well.
+
+## The handover is the work
+
+You're finishing a night shift and the Marc case is still open with Tier 2. Whoever sits down next knows nothing about it. Two questions about what you leave them.
+
+?? Which line of the escalation note matters most to someone reading it at 02:50?
++ His sessions are still active right now
+- His calendar shows no travel this week
+- The alert fired at exactly 02:41 UTC
+- Marc works in the company's finance team
+=> The other lines explain the past. That one says the attacker can still act, which is the only thing a reader can change.
+
+?? Marc's manager phones back: Marc was at home asleep. Which label does the alert get?
++ True positive: malicious, and the alert did fire
+- Benign positive: correct, but the login was authorised
+- False positive: the rule matched some harmless behaviour
+- False negative: an attack that raised no alert
+=> Nobody authorised that login, so it isn't benign. The rule saw real malicious behaviour and said so.
 
 ## Practise
 
