@@ -160,6 +160,77 @@ export const PY_CHALLENGES: PyChallenge[] = [
     solution:
       "import json\n\ndef report(counts, skipped):\n    top = sorted(counts.items(), key=lambda pair: pair[1], reverse=True)\n    return json.dumps({\"top\": top, \"skipped\": skipped})\n",
   },
+  {
+    id: "mask-key",
+    prompt: "Write mask_key(key): return the key with every character replaced by * except the last four. A key of four characters or fewer is masked completely.",
+    starter: "def mask_key(key):\n    # Your code here.\n    return key\n",
+    tests: [
+      { name: "keeps only the last four", expr: "mask_key('abcd1234efgh') == '********efgh'" },
+      { name: "the length stays the same", expr: "len(mask_key('x' * 40)) == 40" },
+      { name: "a four-character key is fully masked", expr: "mask_key('abcd') == '****'" },
+      { name: "a two-character key is fully masked", expr: "mask_key('ab') == '**'" },
+      { name: "the empty key stays empty", expr: "mask_key('') == ''" },
+    ],
+    solution: "def mask_key(key):\n    if len(key) <= 4:\n        return '*' * len(key)\n    return '*' * (len(key) - 4) + key[-4:]\n",
+  },
+  {
+    id: "backoff-delays",
+    prompt: "Write backoff_delays(attempts): return the list of waiting times, in seconds, for that many attempts with exponential backoff: 1, then 2, then 4, doubling each time.",
+    starter: "def backoff_delays(attempts):\n    delays = []\n    # Your code here.\n    return delays\n",
+    tests: [
+      { name: "five attempts", expr: "backoff_delays(5) == [1, 2, 4, 8, 16]" },
+      { name: "one attempt", expr: "backoff_delays(1) == [1]" },
+      { name: "no attempts gives an empty list", expr: "backoff_delays(0) == []" },
+      { name: "eight attempts end at 128", expr: "backoff_delays(8)[-1] == 128" },
+    ],
+    solution: "def backoff_delays(attempts):\n    delays = []\n    for attempt in range(attempts):\n        delays.append(2 ** attempt)\n    return delays\n",
+  },
+  {
+    id: "cached-lookup",
+    prompt: "Write lookup(ip, cache, fetch): if ip is already a key of the dict cache, return the stored value. Otherwise call fetch(ip), store what it returns in cache under ip, and return it.",
+    starter: "def lookup(ip, cache, fetch):\n    # Your code here.\n    return fetch(ip)\n",
+    tests: [
+      { name: "returns what fetch returns", expr: "lookup('10.0.0.1', {}, lambda ip: 87) == 87" },
+      { name: "stores the answer in the cache", expr: "(lambda cache: (lookup('10.0.0.1', cache, lambda ip: 87), cache))({})[1] == {'10.0.0.1': 87}" },
+      { name: "uses the cache when the answer is there", expr: "lookup('10.0.0.1', {'10.0.0.1': 5}, lambda ip: 87) == 5" },
+      {
+        name: "asks only once for the same address",
+        expr: "(lambda calls, cache: (lookup('a', cache, lambda ip: calls.append(ip) or 7), lookup('a', cache, lambda ip: calls.append(ip) or 7), len(calls)))([], {}) == (7, 7, 1)",
+      },
+      {
+        name: "asks again for a different address",
+        expr: "(lambda calls, cache: (lookup('a', cache, lambda ip: calls.append(ip) or 7), lookup('b', cache, lambda ip: calls.append(ip) or 7), len(calls)))([], {})[2] == 2",
+      },
+    ],
+    solution: "def lookup(ip, cache, fetch):\n    if ip in cache:\n        return cache[ip]\n    result = fetch(ip)\n    cache[ip] = result\n    return result\n",
+  },
+  {
+    id: "sha256-hex",
+    prompt: "Write sha256_hex(data): given bytes, return their SHA-256 hash as 64 hexadecimal characters. Use the hashlib module.",
+    starter: "import hashlib\n\ndef sha256_hex(data):\n    # Your code here.\n    return \"\"\n",
+    tests: [
+      { name: "the hash of b'abc'", expr: "sha256_hex(b'abc') == 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'" },
+      { name: "the hash of no bytes at all", expr: "sha256_hex(b'') == 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'" },
+      { name: "always 64 characters", expr: "len(sha256_hex(b'any file contents')) == 64" },
+      { name: "one changed byte changes the hash", expr: "sha256_hex(b'report.pdf') != sha256_hex(b'report.pdg')" },
+    ],
+    solution: "import hashlib\n\ndef sha256_hex(data):\n    return hashlib.sha256(data).hexdigest()\n",
+  },
+  {
+    id: "read-score",
+    prompt: "Write read_score(body): body is the parsed JSON of a response. Return body['data']['abuseConfidenceScore'] when it is there, and None when body is not a dict, has no 'data' dict, or has no score. It must never raise.",
+    starter: "def read_score(body):\n    # Your code here.\n    return body[\"data\"][\"abuseConfidenceScore\"]\n",
+    tests: [
+      { name: "reads the score", expr: "read_score({'data': {'abuseConfidenceScore': 87, 'countryCode': 'NL'}}) == 87" },
+      { name: "a score of 0 is still a score", expr: "read_score({'data': {'abuseConfidenceScore': 0}}) == 0" },
+      { name: "no data field gives None", expr: "read_score({'errors': [{'detail': 'bad key'}]}) is None" },
+      { name: "data without a score gives None", expr: "read_score({'data': {'countryCode': 'NL'}}) is None" },
+      { name: "data that is not a dict gives None", expr: "read_score({'data': 'oops'}) is None" },
+      { name: "a body that is a list gives None", expr: "read_score([]) is None" },
+    ],
+    solution:
+      "def read_score(body):\n    if not isinstance(body, dict):\n        return None\n    data = body.get('data')\n    if not isinstance(data, dict):\n        return None\n    return data.get('abuseConfidenceScore')\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

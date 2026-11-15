@@ -8,6 +8,7 @@
 import { spawnSync } from "node:child_process";
 import { flatSegments, guides, lessons, machines, modules, projects } from "../src/lib/content";
 import { PY_CHALLENGES, pyChallenge } from "../src/data/pycode";
+import { PY_FR } from "../src/data/fr/pycode";
 import { interpretResult, PY_HARNESS, type RunResult, testsJson } from "../src/lib/pycode";
 
 let bad = 0;
@@ -41,6 +42,18 @@ for (const c of PY_CHALLENGES) {
   if (c.tests.length < 2) fail(`${where}: needs at least two tests`);
   if (c.tests.some((t) => !t.name.trim() || !t.expr.trim())) fail(`${where}: a test is missing its name or expression`);
 }
+
+// French: every challenge has a prompt and one name per test, and nothing is left over.
+for (const c of PY_CHALLENGES) {
+  const fr = PY_FR[c.id];
+  if (!fr) fail(`pycode ${c.id}: no French prompt`);
+  else {
+    if (!fr.prompt.trim() || fr.prompt === c.prompt) fail(`pycode ${c.id}: the French prompt is empty or still English`);
+    if (fr.tests.length !== c.tests.length) fail(`pycode ${c.id}: ${fr.tests.length} French test names, English has ${c.tests.length}`);
+    if (fr.tests.some((t) => !t.trim())) fail(`pycode ${c.id}: a French test name is empty`);
+  }
+}
+for (const id of Object.keys(PY_FR)) if (!ids.has(id)) fail(`pycode fr: ${id} has no English challenge`);
 
 // Every challenge referenced from the course exists.
 const docs = [...lessons(), ...guides(), ...modules(), ...machines(), ...projects()];

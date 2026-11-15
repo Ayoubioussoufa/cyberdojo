@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { DESKTOP } from "@/lib/desktop";
 import { fill, plural, useLang } from "@/i18n/LangProvider";
 import { pyChallenge } from "@/data/pycode";
+import { PY_FR } from "@/data/fr/pycode";
 import { interpretResult, PY_HARNESS, type RunResult, testsJson } from "@/lib/pycode";
 
 // Pyodide (Python compiled to WebAssembly) runs the learner's code in their own
@@ -59,7 +60,10 @@ export function PyRunner({ id }: { id: string }) {
   const area = useRef<HTMLTextAreaElement>(null);
 
   if (!challenge) return null;
-  if (DESKTOP) return <section className="pyrun"><p className="pyrun-prompt">{challenge.prompt}</p><p className="pyrun-note">{P.desktopNote}</p></section>;
+  // French shows its own prompt and test names; the code and the tests themselves are shared.
+  const fr = lang === "fr" ? PY_FR[id] : undefined;
+  const prompt = fr?.prompt ?? challenge.prompt;
+  if (DESKTOP) return <section className="pyrun"><p className="pyrun-prompt">{prompt}</p><p className="pyrun-note">{P.desktopNote}</p></section>;
 
   const run = async () => {
     setBusy(true);
@@ -90,7 +94,7 @@ export function PyRunner({ id }: { id: string }) {
 
   return (
     <section className="pyrun" aria-label={P.title}>
-      <p className="pyrun-prompt">{challenge.prompt}</p>
+      <p className="pyrun-prompt">{prompt}</p>
       <textarea
         ref={area}
         className="pyrun-code"
@@ -128,7 +132,7 @@ export function PyRunner({ id }: { id: string }) {
             {result.results.map((r, i) => (
               <li key={i} className={r.ok ? "ok" : "bad"}>
                 <span className="pyrun-mark" aria-hidden>{r.ok ? "✓" : "✗"}</span>
-                <span>{r.name}{r.error ? ` — ${r.error}` : ""}</span>
+                <span>{fr?.tests[i] ?? r.name}{r.error ? ` — ${r.error}` : ""}</span>
               </li>
             ))}
           </ul>
