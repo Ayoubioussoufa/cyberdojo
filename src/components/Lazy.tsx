@@ -13,6 +13,7 @@ const Loading = ({ what }: { what: "drill" | "range" }) => {
 
 const Drill = dynamic(() => import("./Drill").then((m) => m.Drill), { ssr: false, loading: () => <Loading what="drill" /> });
 const Range = dynamic(() => import("./Range").then((m) => m.Range), { ssr: false, loading: () => <Loading what="range" /> });
+const PyRun = dynamic(() => import("./PyRunner").then((m) => m.PyRunner), { ssr: false });
 
 /** Keeps heavy parts out of the first load: their code arrives as the reader gets near. */
 function WhenNear({ label, children }: { label: string; children: React.ReactNode }) {
@@ -36,4 +37,8 @@ export const LazyDrill = ({ id, roundSize, bare }: { id: string; roundSize?: num
 
 export const LazyRange = ({ id, bare }: { id: string; bare?: boolean }) => (
   <WhenNear label={useLang().t.misc.terminal}><Range id={id} bare={bare} /></WhenNear>
+);
+
+export const LazyCode = ({ id }: { id: string }) => (
+  <WhenNear label={useLang().t.pyrun.title}><PyRun id={id} /></WhenNear>
 );

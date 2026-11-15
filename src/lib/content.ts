@@ -348,6 +348,13 @@ function parseBody(slug: string, title: string, body: string, href: string, seed
       i++;
       continue;
     }
+    const code = /^@code\s+(\S+)/.exec(line);
+    if (code) {
+      flush();
+      out.push({ kind: "code", id: code[1] as string });
+      i++;
+      continue;
+    }
     const range = /^@range\s+(\S+)/.exec(line);
     if (range) {
       flush();

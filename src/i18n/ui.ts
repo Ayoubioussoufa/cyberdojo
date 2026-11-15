@@ -867,6 +867,18 @@ const TABLE = {
     skip: ["No thanks", "Non merci"],
     thanks: ["Thanks — this helps.", "Merci — cela aide."],
   },
+  pyrun: {
+    title: ["Code challenge", "Défi de code"],
+    run: ["Run", "Lancer"],
+    running: ["Running…", "Exécution…"],
+    reset: ["Reset", "Réinitialiser"],
+    output: ["Output", "Sortie"],
+    score: ["{n} of {total} tests passing", "{n} tests sur {total} passent"],
+    allPassed: ["All {n} test passes — nicely done!|All {n} tests pass — nicely done!", "Le {n} test passe — bien joué !|Les {n} tests passent — bien joué !"],
+    yourError: ["Your code didn't run:", "Votre code ne s'est pas exécuté :"],
+    loadError: ["Couldn't load the Python runner. Check your connection and try again.", "Impossible de charger l'exécuteur Python. Vérifiez votre connexion et réessayez."],
+    desktopNote: ["Code challenges run in the browser version for now — open this page on the website to try it.", "Les défis de code s'exécutent dans la version web pour l'instant — ouvrez cette page sur le site pour l'essayer."],
+  },
   doc: {
     defineHolder: ["One sentence, no looking", "Une phrase, sans regarder"],
     score: ["{answered} of {total} answered, {right} right", "{answered} sur {total} répondues, {right} justes"],

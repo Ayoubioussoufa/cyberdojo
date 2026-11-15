@@ -25,6 +25,8 @@ export type Segment =
   | { kind: "written"; written: Written }
   | { kind: "drill"; id: string }
   | { kind: "range"; id: string }
+  /** An interactive Python challenge the learner writes and runs in the browser. */
+  | { kind: "code"; id: string }
   /** A project checkpoint she ticks off. */
   | { kind: "check"; id: string; html: string }
   /** How much help this tool gets here. */
