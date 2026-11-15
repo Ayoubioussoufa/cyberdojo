@@ -34,6 +34,7 @@ export const PLACEMENT: Record<number, { before?: Placed[]; after?: Placed[] }> 
   2: {
     before: [
       { ref: "guide:s3-studying-hands-on", why: "Labs get longer from here, so learn how to get stuck well and keep a lab notebook." },
+      { ref: "guide:s5-working-with-your-tutor", why: "You'll lean on the local tutor for these labs, so learn to ask it well and keep every attack on your own machine." },
       { ref: "guide:h3-write-ups-and-reports", why: "Your first written case is coming, so learn what makes one good." },
     ],
     after: [{ ref: "project:P02:1", why: "You can read packets now. Solve your first real case." }],
