@@ -82,6 +82,10 @@ def parse(path: str) -> tuple[Counter, int]:
 - It fixes spelling in logs
 => Attackers control some of what's logged, so bad bytes mustn't crash your parser.
 
+Your turn. Write the counting step yourself, run it, and watch the tests go green. This runs real Python in your browser — nothing leaves your machine.
+
+@code count-failed-logins
+
 ## Structured output
 
 Tools should talk in structured formats so that other tools can use them.

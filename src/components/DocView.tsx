@@ -3,7 +3,7 @@
 import Link from "@/components/HoverLink";
 import { memo } from "react";
 import { CopyButton } from "./Copy";
-import { LazyDrill, LazyRange } from "./Lazy";
+import { LazyCode, LazyDrill, LazyRange } from "./Lazy";
 import { CheckBox, HelpBadge } from "./ProjectParts";
 import { Html } from "./Html";
 import { QuestionCard } from "./Question";
@@ -30,6 +30,7 @@ const Segments = memo(function Segments({ segments, brief }: { segments: Segment
       if (s.kind === "written") return <WrittenCard key={s.written.id} w={s.written} />;
       if (s.kind === "drill") return <LazyDrill key={i} id={s.id} />;
       if (s.kind === "range") return <LazyRange key={i} id={s.id} />;
+      if (s.kind === "code") return <LazyCode key={i} id={s.id} />;
       if (s.kind === "check") return <CheckBox key={s.id} id={s.id} html={s.html} />;
       if (s.kind === "step") return <ProjectStep key={`step-${s.n}`} slug={brief.slug} step={s} walkthrough={render(s.body)} after={render(s.after)} />;
       return <HelpBadge key={i} tool={s.tool} level={s.level} />;

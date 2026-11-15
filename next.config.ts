@@ -10,13 +10,17 @@ const desktop = process.env.NEXT_PUBLIC_CYBERDOJO_DESKTOP === "1";
  * still stops scripts, styles and data from other origins, plugins, framing, form posts
  * elsewhere and <base> rewrites. Production only: the dev server's live reload needs eval.
  */
+// Pyodide (the in-browser Python runner) loads its script and WebAssembly from
+// jsDelivr, so the code challenges need that origin and wasm-unsafe-eval. Self-
+// hosting Pyodide later lets us drop jsdelivr and keep only wasm-unsafe-eval.
+const PYODIDE_CDN = "https://cdn.jsdelivr.net";
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' ${PYODIDE_CDN}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self' ${PYODIDE_CDN}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

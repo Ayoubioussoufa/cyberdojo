@@ -231,7 +231,7 @@ async function http() {
     const page = await fetch(BASE + lesson, { headers: member });
     ok(page.status === 200 && page.headers.get("x-frame-options") === "DENY" && page.headers.get("x-content-type-options") === "nosniff", "pages carry the security headers");
     const csp = page.headers.get("content-security-policy") ?? "";
-    ok(/default-src 'self'/.test(csp) && /frame-ancestors 'none'/.test(csp) && /object-src 'none'/.test(csp) && !/unsafe-eval/.test(csp), "pages carry a content security policy", csp);
+    ok(/default-src 'self'/.test(csp) && /frame-ancestors 'none'/.test(csp) && /object-src 'none'/.test(csp) && !/'unsafe-eval'/.test(csp), "pages carry a content security policy, with no bare unsafe-eval", csp);
     ok(!page.headers.has("x-powered-by"), "the server doesn't advertise itself");
     const data = await fetch(`${BASE}/data/questions.json`, { headers: member });
     ok(data.status === 200 && (((await data.json()) as unknown[]).length) > 300, "question data is served");
