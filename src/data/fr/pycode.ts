@@ -497,4 +497,47 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "le dossier lui-même n'est pas un fichier qu'il contient",
     ],
   },
+  "authorize-request": {
+    prompt: "Écrivez authorize(user, action, record) : user vaut None quand personne n'est connecté, sinon c'est un dict avec 'id' et 'role' ('customer' ou 'admin'). action vaut 'read', 'update' ou 'export'. record est un dict avec 'owner_id', ou None pour les actions qui ne portent sur aucun enregistrement précis. Renvoyez 401 quand personne n'est connecté. Un administrateur reçoit 200 pour tout. Un client reçoit 200 pour 'read' et 'update' sur un enregistrement qui lui appartient, et 403 pour tout le reste. Tout autre rôle reçoit 403.",
+    tests: [
+      "personne n'est connecté",
+      "un client lit sa propre facture",
+      "un client lit la facture d'un autre client",
+      "un client modifie son propre enregistrement",
+      "un client appelle l'export",
+      "un administrateur appelle l'export",
+      "un administrateur lit n'importe quelle facture",
+      "une action que personne n'a définie est refusée",
+      "un rôle que personne n'a défini est refusé",
+    ],
+  },
+  "csrf-check": {
+    prompt: "Écrivez csrf_ok(session_token, form_token) : renvoyez True seulement quand les deux sont des textes non vides et qu'ils sont égaux. L'un ou l'autre peut valoir None quand il manque. Comparez avec hmac.compare_digest.",
+    tests: [
+      "des jetons identiques",
+      "un mauvais jeton",
+      "le formulaire n'a envoyé aucun jeton",
+      "aucun jeton des deux côtés n'est pas une correspondance",
+      "deux jetons vides ne sont pas une correspondance",
+    ],
+  },
+  "allowed-fields": {
+    prompt: "Écrivez allowed_fields(data, allowed) : data est le dict qu'un client a envoyé, et allowed est la liste des noms de champs qu'un client peut définir. Renvoyez un nouveau dict qui ne contient que les champs autorisés présents dans data. Ne modifiez pas data.",
+    tests: [
+      "les champs ordinaires passent",
+      "un champ role en trop est écarté",
+      "plusieurs champs en trop sont écartés",
+      "rien d'envoyé, rien d'enregistré",
+      "le dict d'origine reste intact",
+    ],
+  },
+  "access-failures": {
+    prompt: "Écrivez access_failures(expected, actual) : les deux sont des dicts qui associent une paire (action, rôle) à un code d'état. expected est le tableau que vous avez conçu, et actual est ce que l'application a répondu. Renvoyez la liste triée des paires où actual diffère de expected ou n'a aucune réponse.",
+    tests: [
+      "une application conforme au tableau",
+      "un IDOR apparaît comme une seule case en échec",
+      "deux échecs reviennent triés",
+      "une case jamais testée compte comme un échec",
+    ],
+  },
 };

@@ -767,6 +767,61 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import posixpath\n\ndef safe_path(base, name):\n    target = posixpath.normpath(posixpath.join(base, name))\n    if target.startswith(base + '/'):\n        return target\n    return None\n",
   },
+  {
+    id: "authorize-request",
+    prompt: "Write authorize(user, action, record): user is None when nobody is logged in, otherwise a dict with 'id' and 'role' ('customer' or 'admin'). action is 'read', 'update' or 'export'. record is a dict with 'owner_id', or None for actions on no single record. Return 401 when nobody is logged in. An admin gets 200 for everything. A customer gets 200 for 'read' and 'update' on a record they own, and 403 for anything else. Any other role gets 403.",
+    starter: "def authorize(user, action, record):\n    # Start from no. Return 200 only where a rule allows it.\n    return 200\n",
+    tests: [
+      { name: "nobody logged in", expr: "authorize(None, 'read', {'owner_id': 1}) == 401" },
+      { name: "a customer reads their own invoice", expr: "authorize({'id': 1, 'role': 'customer'}, 'read', {'owner_id': 1}) == 200" },
+      { name: "a customer reads another customer's invoice", expr: "authorize({'id': 1, 'role': 'customer'}, 'read', {'owner_id': 2}) == 403" },
+      { name: "a customer updates their own record", expr: "authorize({'id': 1, 'role': 'customer'}, 'update', {'owner_id': 1}) == 200" },
+      { name: "a customer calls the export", expr: "authorize({'id': 1, 'role': 'customer'}, 'export', None) == 403" },
+      { name: "an admin calls the export", expr: "authorize({'id': 9, 'role': 'admin'}, 'export', None) == 200" },
+      { name: "an admin reads any invoice", expr: "authorize({'id': 9, 'role': 'admin'}, 'read', {'owner_id': 2}) == 200" },
+      { name: "an action nobody defined is refused", expr: "authorize({'id': 1, 'role': 'customer'}, 'delete', {'owner_id': 1}) == 403" },
+      { name: "a role nobody defined is refused", expr: "authorize({'id': 5, 'role': 'guest'}, 'read', {'owner_id': 5}) == 403" },
+    ],
+    solution: "def authorize(user, action, record):\n    if user is None:\n        return 401\n    if user['role'] == 'admin':\n        return 200\n    if user['role'] == 'customer' and action in ('read', 'update'):\n        if record is not None and record['owner_id'] == user['id']:\n            return 200\n    return 403\n",
+  },
+  {
+    id: "csrf-check",
+    prompt: "Write csrf_ok(session_token, form_token): return True only when both are non-empty text and they are equal. Either may be None when it is missing. Compare with hmac.compare_digest.",
+    starter: "import hmac\n\ndef csrf_ok(session_token, form_token):\n    # Your code here.\n    return session_token == form_token\n",
+    tests: [
+      { name: "matching tokens", expr: "csrf_ok('k3Jx9aQ-7fPq', 'k3Jx9aQ-7fPq') == True" },
+      { name: "a wrong token", expr: "csrf_ok('k3Jx9aQ-7fPq', 'something-else') == False" },
+      { name: "the form sent no token", expr: "csrf_ok('k3Jx9aQ-7fPq', None) == False" },
+      { name: "no token on either side is not a match", expr: "csrf_ok(None, None) == False" },
+      { name: "two empty tokens are not a match", expr: "csrf_ok('', '') == False" },
+    ],
+    solution: "import hmac\n\ndef csrf_ok(session_token, form_token):\n    if not session_token or not form_token:\n        return False\n    return hmac.compare_digest(session_token, form_token)\n",
+  },
+  {
+    id: "allowed-fields",
+    prompt: "Write allowed_fields(data, allowed): data is the dict a client sent, and allowed is the list of field names a client may set. Return a new dict with only the allowed fields that are present in data. Do not change data.",
+    starter: "def allowed_fields(data, allowed):\n    # Your code here.\n    return data\n",
+    tests: [
+      { name: "ordinary fields pass", expr: "allowed_fields({'name': 'Ana', 'bio': 'Hi'}, ['name', 'bio']) == {'name': 'Ana', 'bio': 'Hi'}" },
+      { name: "an extra role field is dropped", expr: "allowed_fields({'name': 'Ana', 'role': 'admin'}, ['name', 'bio']) == {'name': 'Ana'}" },
+      { name: "several extra fields are dropped", expr: "allowed_fields({'bio': 'x', 'is_admin': True, 'balance': 9999, 'id': 1}, ['name', 'bio']) == {'bio': 'x'}" },
+      { name: "nothing sent, nothing saved", expr: "allowed_fields({}, ['name', 'bio']) == {}" },
+      { name: "the original dict is left alone", expr: "(lambda d: (allowed_fields(d, ['name']), d))({'name': 'Ana', 'role': 'admin'})[1] == {'name': 'Ana', 'role': 'admin'}" },
+    ],
+    solution: "def allowed_fields(data, allowed):\n    return {name: data[name] for name in allowed if name in data}\n",
+  },
+  {
+    id: "access-failures",
+    prompt: "Write access_failures(expected, actual): both are dicts that map an (action, role) pair to a status code. expected is the table you designed, and actual is what the application answered. Return the sorted list of pairs where actual differs from expected or has no answer at all.",
+    starter: "def access_failures(expected, actual):\n    failures = []\n    # Your code here.\n    return sorted(failures)\n",
+    tests: [
+      { name: "an application that matches the table", expr: "access_failures({('read', 'anonymous'): 401, ('read', 'customer'): 200, ('read', 'other customer'): 403, ('export', 'customer'): 403, ('export', 'admin'): 200}, {('read', 'anonymous'): 401, ('read', 'customer'): 200, ('read', 'other customer'): 403, ('export', 'customer'): 403, ('export', 'admin'): 200}) == []" },
+      { name: "an IDOR shows as one failing cell", expr: "access_failures({('read', 'anonymous'): 401, ('read', 'customer'): 200, ('read', 'other customer'): 403, ('export', 'customer'): 403, ('export', 'admin'): 200}, {('read', 'anonymous'): 401, ('read', 'customer'): 200, ('read', 'other customer'): 200, ('export', 'customer'): 403, ('export', 'admin'): 200}) == [('read', 'other customer')]" },
+      { name: "two failures come back sorted", expr: "access_failures({('read', 'anonymous'): 401, ('read', 'customer'): 200, ('read', 'other customer'): 403, ('export', 'customer'): 403, ('export', 'admin'): 200}, {('read', 'anonymous'): 200, ('read', 'customer'): 200, ('read', 'other customer'): 403, ('export', 'customer'): 200, ('export', 'admin'): 200}) == [('export', 'customer'), ('read', 'anonymous')]" },
+      { name: "a cell that was never tested counts as a failure", expr: "access_failures({('read', 'anonymous'): 401, ('read', 'customer'): 200, ('read', 'other customer'): 403, ('export', 'customer'): 403, ('export', 'admin'): 200}, {}) == sorted({('read', 'anonymous'): 401, ('read', 'customer'): 200, ('read', 'other customer'): 403, ('export', 'customer'): 403, ('export', 'admin'): 200}.keys())" },
+    ],
+    solution: "def access_failures(expected, actual):\n    failures = []\n    for pair, code in expected.items():\n        if actual.get(pair) != code:\n            failures.append(pair)\n    return sorted(failures)\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
