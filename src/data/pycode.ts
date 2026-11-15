@@ -360,6 +360,41 @@ export const PY_CHALLENGES: PyChallenge[] = [
     solution:
       "from urllib.parse import urlsplit\n\ndef origin(url):\n    u = urlsplit(url)\n    port = u.port\n    if port is None:\n        port = 443 if u.scheme == 'https' else 80\n    return (u.scheme, u.hostname, port)\n\ndef same_origin(a, b):\n    return origin(a) == origin(b)\n",
   },
+  {
+    id: "users-with-role",
+    prompt: "Write users_with_role(db, role): return the list of names of the users who have that role, in alphabetical order. Pass role as a parameter with a ? placeholder: one test sends a role that tries to rewrite the query.",
+    starter: "import sqlite3\n\ndef make_db():\n    # A small shop database, built in memory. Leave this function as it is.\n    db = sqlite3.connect(':memory:')\n    db.executescript(\"\"\"\n        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);\n        CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);\n        INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');\n        INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);\n    \"\"\")\n    return db\n\ndef users_with_role(db, role):\n    rows = db.execute(\"SELECT name FROM users\").fetchall()\n    # Change the query: filter on the role, with a ? placeholder, and sort by name.\n    return [row[0] for row in rows]\n",
+    tests: [
+      { name: "the two ordinary users", expr: "users_with_role(make_db(), 'user') == ['sam', 'tom']" },
+      { name: "the one admin", expr: "users_with_role(make_db(), 'admin') == ['ana']" },
+      { name: "a role nobody has gives an empty list", expr: "users_with_role(make_db(), 'auditor') == []" },
+      { name: "an injection attempt finds nobody", expr: "users_with_role(make_db(), \"x' OR '1'='1\") == []" },
+    ],
+    solution: "import sqlite3\n\ndef make_db():\n    # A small shop database, built in memory. Leave this function as it is.\n    db = sqlite3.connect(':memory:')\n    db.executescript(\"\"\"\n        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);\n        CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);\n        INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');\n        INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);\n    \"\"\")\n    return db\n\ndef users_with_role(db, role):\n    rows = db.execute(\"SELECT name FROM users WHERE role = ? ORDER BY name\", (role,)).fetchall()\n    return [row[0] for row in rows]\n",
+  },
+  {
+    id: "orders-with-names",
+    prompt: "Write orders_with_names(db): return one (name, total) pair for each order, joining orders to users, sorted from the highest total to the lowest.",
+    starter: "import sqlite3\n\ndef make_db():\n    # A small shop database, built in memory. Leave this function as it is.\n    db = sqlite3.connect(':memory:')\n    db.executescript(\"\"\"\n        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);\n        CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);\n        INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');\n        INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);\n    \"\"\")\n    return db\n\ndef orders_with_names(db):\n    # Your query here: JOIN orders to users, and ORDER BY the total.\n    return db.execute(\"SELECT user_id, total FROM orders\").fetchall()\n",
+    tests: [
+      { name: "names, not user ids", expr: "orders_with_names(make_db())[0][0] == 'sam'" },
+      { name: "every order, highest total first", expr: "orders_with_names(make_db()) == [('sam', 70), ('ana', 40), ('sam', 15)]" },
+      { name: "a user with no orders does not appear", expr: "'tom' not in [row[0] for row in orders_with_names(make_db())]" },
+    ],
+    solution: "import sqlite3\n\ndef make_db():\n    # A small shop database, built in memory. Leave this function as it is.\n    db = sqlite3.connect(':memory:')\n    db.executescript(\"\"\"\n        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);\n        CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);\n        INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');\n        INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);\n    \"\"\")\n    return db\n\ndef orders_with_names(db):\n    return db.execute(\"SELECT users.name, orders.total FROM orders JOIN users ON orders.user_id = users.id ORDER BY orders.total DESC\").fetchall()\n",
+  },
+  {
+    id: "big-spenders",
+    prompt: "Write big_spenders(db, minimum): return (name, spent) for each user whose orders add up to more than minimum, where spent is the sum of their totals, highest first. Use GROUP BY and HAVING, and pass minimum as a parameter.",
+    starter: "import sqlite3\n\ndef make_db():\n    # A small shop database, built in memory. Leave this function as it is.\n    db = sqlite3.connect(':memory:')\n    db.executescript(\"\"\"\n        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);\n        CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);\n        INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');\n        INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);\n    \"\"\")\n    return db\n\ndef big_spenders(db, minimum):\n    # Your query here: JOIN, GROUP BY the user, HAVING on the sum.\n    return []\n",
+    tests: [
+      { name: "more than 50", expr: "big_spenders(make_db(), 50) == [('sam', 85)]" },
+      { name: "more than 10 keeps both buyers, highest first", expr: "big_spenders(make_db(), 10) == [('sam', 85), ('ana', 40)]" },
+      { name: "more than 100 keeps nobody", expr: "big_spenders(make_db(), 100) == []" },
+      { name: "exactly 40 is not more than 40", expr: "big_spenders(make_db(), 40) == [('sam', 85)]" },
+    ],
+    solution: "import sqlite3\n\ndef make_db():\n    # A small shop database, built in memory. Leave this function as it is.\n    db = sqlite3.connect(':memory:')\n    db.executescript(\"\"\"\n        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);\n        CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);\n        INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');\n        INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);\n    \"\"\")\n    return db\n\ndef big_spenders(db, minimum):\n    return db.execute(\"SELECT users.name, SUM(orders.total) AS spent FROM orders JOIN users ON orders.user_id = users.id GROUP BY users.id HAVING SUM(orders.total) > ? ORDER BY spent DESC\", (minimum,)).fetchall()\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

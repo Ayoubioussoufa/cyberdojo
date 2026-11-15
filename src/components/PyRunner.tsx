@@ -15,6 +15,8 @@ const PYODIDE_BASE = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/
 
 interface Pyodide {
   runPython(code: string): unknown;
+  /** Fetches the standard-library parts Pyodide ships separately (sqlite3, for one) when the code imports them. */
+  loadPackagesFromImports(code: string): Promise<unknown>;
   globals: { get(name: string): ((...args: unknown[]) => unknown) & { destroy?: () => void } };
 }
 
@@ -70,6 +72,7 @@ export function PyRunner({ id }: { id: string }) {
     setLoadError(false);
     try {
       const py = await getPyodide();
+      await py.loadPackagesFromImports(code);
       const runFn = py.globals.get("_run");
       const raw = String(runFn(code, testsJson(challenge.tests)));
       runFn.destroy?.();

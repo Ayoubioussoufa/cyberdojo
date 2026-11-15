@@ -224,4 +224,16 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "le port http par défaut est la même origine",
     ],
   },
+  "users-with-role": {
+    prompt: "Écrivez users_with_role(db, role) : renvoyez la liste des noms des utilisateurs qui ont ce rôle, par ordre alphabétique. Passez role en paramètre avec un ? à sa place : un test envoie un rôle qui tente de réécrire la requête.",
+    tests: ["les deux utilisateurs ordinaires", "le seul administrateur", "un rôle que personne n'a donne une liste vide", "une tentative d'injection ne trouve personne"],
+  },
+  "orders-with-names": {
+    prompt: "Écrivez orders_with_names(db) : renvoyez une paire (name, total) pour chaque commande, en joignant orders à users, triée du total le plus élevé au plus bas.",
+    tests: ["des noms, pas des identifiants", "chaque commande, le total le plus élevé d'abord", "un utilisateur sans commande n'apparaît pas"],
+  },
+  "big-spenders": {
+    prompt: "Écrivez big_spenders(db, minimum) : renvoyez (name, spent) pour chaque utilisateur dont les commandes dépassent minimum au total, où spent est la somme de ses totaux, le plus élevé d'abord. Utilisez GROUP BY et HAVING, et passez minimum en paramètre.",
+    tests: ["plus de 50", "plus de 10 garde les deux acheteurs, le plus élevé d'abord", "plus de 100 ne garde personne", "exactement 40 n'est pas plus que 40"],
+  },
 };

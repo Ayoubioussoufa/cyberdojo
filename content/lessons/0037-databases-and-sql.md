@@ -2,7 +2,7 @@
 title: Databases and SQL
 summary: Tables, queries, joins and aggregates, plus the parameterised queries that stop SQL injection.
 month: 6
-minutes: 40
+minutes: 65
 builds: write joins and aggregates from memory
 source: SQLBolt, interactive SQL lessons | https://sqlbolt.com/
 words: SQL, join, parameterised query
@@ -34,6 +34,33 @@ id | name  | role                  id | user_id | total
 
 `id` is each table's **primary key**. `orders.user_id` is a **foreign key**, pointing at a user.
 
+Don't just read the tables: build them. SQLite is a complete SQL database in a single file, with nothing to configure, which makes it ideal for learning. On Ubuntu, install its command-line tool with `sudo apt install sqlite3`, then open a new database:
+
+```
+sqlite3 shop.db
+```
+
+You're now at a `sqlite>` prompt. Type these statements. Each one ends with a semicolon, and nothing runs until you type it:
+
+```sql
+CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);
+CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);
+
+INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');
+INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);
+```
+
+`CREATE TABLE` names the columns and says what type of value each holds. `INSERT INTO` adds rows, one set of brackets per row. Four commands that start with a dot belong to the tool, not to SQL, and make it pleasant to use:
+
+| Command | Does |
+|---|---|
+| `.tables` | Lists the tables |
+| `.schema users` | Shows the statement that created a table |
+| `.headers on` then `.mode column` | Prints results as a neat table with column names |
+| `.quit` | Leaves |
+
+Run `SELECT * FROM users;` and you should see the three rows above. Keep this window open for the rest of the lesson and try every query as you meet it.
+
 ?? What's a foreign key?
 + A column pointing at another table
 - A password from another country's server
@@ -48,6 +75,14 @@ SELECT name, role FROM users WHERE role = 'user';
 SELECT * FROM orders WHERE total > 20 ORDER BY total DESC LIMIT 5;
 ```
 
+Read a query as a sentence that starts in the middle. `FROM users` picks the table, `WHERE role = 'user'` keeps only the rows that pass the test, and `SELECT name, role` chooses which columns of those rows to show. In the second query, `*` means every column, `ORDER BY total DESC` sorts from the largest total down, and `LIMIT 5` stops after five rows.
+
+Text values go in single quotes, and numbers don't. That small rule is where SQL injection lives, as you'll see below.
+
+In an application, the value you search for comes from a user. The challenges in this lesson give you a small database, built by a `make_db()` function that you leave as it is, and ask you to query it from Python. `db.execute(sql, values)` runs a query and `.fetchall()` returns the rows as a list of tuples. Put a `?` in the SQL wherever a value goes, and pass the values separately.
+
+@code users-with-role
+
 ### Joining tables
 
 ```sql
@@ -57,6 +92,18 @@ JOIN users ON orders.user_id = users.id;
 ```
 
 `JOIN` matches rows where the condition holds. `LEFT JOIN` keeps all rows from the left table, even with no match.
+
+On the tables above, that join produces one line for each order, with the matching user's name attached:
+
+| name | total |
+|---|---|
+| ana | 40 |
+| sam | 15 |
+| sam | 70 |
+
+`tom` has no orders, so no row matches him and he vanishes from the result. Start from `users` and write `LEFT JOIN orders` if you want him kept: he then appears once, with an empty total. Forgetting this is the classic way a report quietly loses the accounts that did nothing, which are sometimes the ones you were looking for.
+
+@code orders-with-names
 
 ### Aggregates
 
@@ -68,6 +115,21 @@ HAVING SUM(total) > 50;
 ```
 
 `WHERE` filters rows before grouping, and `HAVING` filters groups after. This is the same thinking as your `sort | uniq -c` pipeline, and SIEM languages work the same way.
+
+The clauses are written in one order and carried out in another. Knowing the real order removes most confusion:
+
+| Step | Clause | What happens |
+|---|---|---|
+| 1 | `FROM` and `JOIN` | Gather the rows |
+| 2 | `WHERE` | Drop the rows that fail the test |
+| 3 | `GROUP BY` | Put the remaining rows into groups |
+| 4 | `HAVING` | Drop the groups that fail the test |
+| 5 | `SELECT` | Compute the columns to show |
+| 6 | `ORDER BY`, then `LIMIT` | Sort, then cut |
+
+On the example, step 3 makes two groups: user 1 with one order of 40, and user 2 with two orders adding up to 85. Step 4 keeps only user 2, because 40 isn't more than 50.
+
+@code big-spenders
 
 ?? You want each IP's failure count, only for IPs with more than 10. Which clause filters on the count?
 + `HAVING`, because it filters after any grouping
@@ -113,6 +175,29 @@ The fix is a **parameterised query**: the SQL and the values travel separately, 
 cur.execute("SELECT * FROM users WHERE name = %s", (name,))
 ```
 
+Watch the difference on your own database. Python's `sqlite3` module uses `?` as its placeholder, where the PostgreSQL driver above uses `%s`:
+
+```python
+import sqlite3
+db = sqlite3.connect("shop.db")
+
+name = "' OR 1=1 --"
+print(db.execute(f"SELECT name FROM users WHERE name = '{name}'").fetchall())
+print(db.execute("SELECT name FROM users WHERE name = ?", (name,)).fetchall())
+```
+
+The first line prints all three users: the input rewrote the question. The second prints an empty list: the database looked for a user whose name is literally `' OR 1=1 --`, and nobody is called that. Same input, same database, and the only change is that the value travelled separately.
+
+Parameters are the fix, and two more layers limit the damage if one query is missed. The application should connect with a database account that can only do what the application needs, so that an injected query can't drop tables or read other databases. And errors shown to users should say "something went wrong", not print the failed SQL.
+
+You'll also meet injection from the defender's side, in web logs. Attempts arrive percent-encoded, so decode before you read:
+
+```
+GET /item?id=7%27%20OR%201%3D1-- HTTP/1.1
+```
+
+`%27` is a single quote, `%20` a space and `%3D` an equals sign, so the parameter is `7' OR 1=1--`. Somebody is checking whether `id` is pasted into a query.
+
 ::: key
 The root cause of injection is **mixing code and data in one string**. You'll see the same mistake with HTML (XSS), shell commands and even LLM prompts. Fix the mixing and you fix the class.
 :::
@@ -129,5 +214,38 @@ An **ORM** uses parameters for you, unless you build raw queries with string for
 ::: try Practise
 Finish [SQLBolt](https://sqlbolt.com/), all lessons. Then install PostgreSQL in your VM and recreate the tables above with `psql`. Write the queries from memory: that's on your Month 6 gate.
 :::
+
+## Predict, then run
+
+For each question, work out the answer on paper from the two tables at the top of the lesson. Then run the query in your `sqlite>` window and compare.
+
+```sql
+SELECT name FROM users WHERE role = 'user' ORDER BY name LIMIT 1;
+```
+
+?? What does that query return?
++ `sam`
+- `tom`
+- `ana`
+- `user`
+=> Two rows pass the `WHERE`: sam and tom. Sorted by name, sam comes first, and `LIMIT 1` keeps only him.
+
+```sql
+SELECT users.name, orders.total FROM users LEFT JOIN orders ON orders.user_id = users.id;
+```
+
+?? How many rows does that query return?
++ `4`
+- `3`
+- `2`
+- `6`
+=> One for ana's order, two for sam's, and one for tom with an empty total, because `LEFT JOIN` keeps every user.
+
+?? A web log shows `GET /item?id=7%27%20OR%201%3D1--`. What is the sender doing?
++ Testing whether the parameter reaches SQL
+- Asking for item seven in French
+- Sending a normal, slightly long request
+- Checking whether the site uses HTTPS
+=> Decoded, the value is `7' OR 1=1--`: a quote to end the text, a condition that is always true, and a comment to discard the rest. It only works where input is pasted into the SQL.
 
 ?! In your own words, what's the root cause of SQL injection, and why does the same idea apply to XSS?
