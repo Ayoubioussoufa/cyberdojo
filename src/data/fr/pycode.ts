@@ -199,4 +199,29 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "100 et 600 sont autre chose",
     ],
   },
+  "missing-cookie-flags": {
+    prompt: "Écrivez missing_flags(set_cookie) : à partir de la valeur d'un en-tête Set-Cookie, renvoyez la liste des protections qui lui manquent, dans cet ordre : 'HttpOnly', 'Secure', 'SameSite'. Les attributs sont séparés par des points-virgules et peuvent être écrits en majuscules ou en minuscules. Un cookie qui a les trois donne une liste vide.",
+    tests: [
+      "un cookie entièrement protégé",
+      "un cookie nu n'a aucun des trois",
+      "seul Secure manque",
+      "les attributs en minuscules comptent",
+      "une valeur qui contient le mot secure n'est pas l'attribut",
+    ],
+  },
+  "jwt-payload": {
+    prompt: "Écrivez jwt_payload(token) : un JWT est fait de trois parties reliées par des points. Renvoyez la partie du milieu décodée en dict. C'est du Base64URL sans remplissage, donc ajoutez des caractères '=' jusqu'à ce que sa longueur soit un multiple de 4, puis utilisez base64.urlsafe_b64decode et json.loads.",
+    tests: ["lit le sujet et le rôle", "fonctionne quand il faut du remplissage", "aucune clé n'a été nécessaire"],
+  },
+  "same-origin": {
+    prompt: "Écrivez same_origin(a, b) : renvoyez True quand les deux URL ont le même schéma, le même hôte et le même port. Une URL sans port utilise 443 pour https et 80 pour http. urlsplit(url) donne .scheme, .hostname et .port (None quand aucun port n'est écrit).",
+    tests: [
+      "un chemin différent reste la même origine",
+      "un schéma différent, non",
+      "un hôte différent, non",
+      "un port différent, non",
+      "le port https par défaut est la même origine",
+      "le port http par défaut est la même origine",
+    ],
+  },
 };

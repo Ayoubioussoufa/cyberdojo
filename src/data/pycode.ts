@@ -316,6 +316,50 @@ export const PY_CHALLENGES: PyChallenge[] = [
     solution:
       "def status_class(code):\n    if 200 <= code <= 299:\n        return 'success'\n    if 300 <= code <= 399:\n        return 'redirect'\n    if 400 <= code <= 499:\n        return 'client error'\n    if 500 <= code <= 599:\n        return 'server error'\n    return 'other'\n",
   },
+  {
+    id: "missing-cookie-flags",
+    prompt: "Write missing_flags(set_cookie): given the value of a Set-Cookie header, return the list of protections it lacks, in this order: 'HttpOnly', 'Secure', 'SameSite'. Flags are separated by semicolons and may be written in any case. A cookie with all three gives an empty list.",
+    starter: "def missing_flags(set_cookie):\n    missing = []\n    # Your code here.\n    return missing\n",
+    tests: [
+      { name: "a fully protected cookie", expr: "missing_flags('session=x7f3k9; HttpOnly; Secure; SameSite=Lax; Path=/') == []" },
+      { name: "a bare cookie lacks all three", expr: "missing_flags('session=1042; Path=/') == ['HttpOnly', 'Secure', 'SameSite']" },
+      { name: "only Secure is missing", expr: "missing_flags('id=abc; HttpOnly; SameSite=Strict') == ['Secure']" },
+      { name: "lower case flags count", expr: "missing_flags('id=abc; httponly; secure; samesite=lax') == []" },
+      { name: "a value that contains the word secure is not the flag", expr: "missing_flags('note=secure; HttpOnly; SameSite=Lax') == ['Secure']" },
+    ],
+    solution:
+      "def missing_flags(set_cookie):\n    parts = [p.strip().lower() for p in set_cookie.split(';')[1:]]\n    names = [p.split('=')[0] for p in parts]\n    missing = []\n    for flag in ['HttpOnly', 'Secure', 'SameSite']:\n        if flag.lower() not in names:\n            missing.append(flag)\n    return missing\n",
+  },
+  {
+    id: "jwt-payload",
+    prompt: "Write jwt_payload(token): a JWT is three parts joined by dots. Return the middle part decoded into a dict. It is Base64URL without padding, so add '=' characters until its length is a multiple of 4, then use base64.urlsafe_b64decode and json.loads.",
+    starter: "import base64, json\n\ndef jwt_payload(token):\n    # Your code here.\n    return {}\n",
+    tests: [
+      {
+        name: "reads the subject and the role",
+        expr: "jwt_payload('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbmEiLCJyb2xlIjoidXNlciIsImV4cCI6MTc5NDAwMDAwMH0.c2lnbmF0dXJl') == {'sub': 'ana', 'role': 'user', 'exp': 1794000000}",
+      },
+      { name: "works when padding is needed", expr: "jwt_payload('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJibyIsInJvbGUiOiJhZG1pbiJ9.eA') == {'sub': 'bo', 'role': 'admin'}" },
+      { name: "no key was needed", expr: "jwt_payload('x.eyJzdWIiOiJibyIsInJvbGUiOiJhZG1pbiJ9.y')['role'] == 'admin'" },
+    ],
+    solution:
+      "import base64, json\n\ndef jwt_payload(token):\n    part = token.split('.')[1]\n    while len(part) % 4 != 0:\n        part += '='\n    return json.loads(base64.urlsafe_b64decode(part))\n",
+  },
+  {
+    id: "same-origin",
+    prompt: "Write same_origin(a, b): return True when the two URLs have the same scheme, the same host and the same port. A URL with no port uses 443 for https and 80 for http. urlsplit(url) gives .scheme, .hostname and .port (None when no port is written).",
+    starter: "from urllib.parse import urlsplit\n\ndef same_origin(a, b):\n    # Your code here.\n    return False\n",
+    tests: [
+      { name: "a different path is the same origin", expr: "same_origin('https://shop.example', 'https://shop.example/cart') == True" },
+      { name: "a different scheme is not", expr: "same_origin('https://shop.example', 'http://shop.example') == False" },
+      { name: "a different host is not", expr: "same_origin('https://shop.example', 'https://api.shop.example') == False" },
+      { name: "a different port is not", expr: "same_origin('https://shop.example', 'https://shop.example:8443') == False" },
+      { name: "the default https port is the same origin", expr: "same_origin('https://shop.example', 'https://shop.example:443/x') == True" },
+      { name: "the default http port is the same origin", expr: "same_origin('http://shop.example:80', 'http://shop.example') == True" },
+    ],
+    solution:
+      "from urllib.parse import urlsplit\n\ndef origin(url):\n    u = urlsplit(url)\n    port = u.port\n    if port is None:\n        port = 443 if u.scheme == 'https' else 80\n    return (u.scheme, u.hostname, port)\n\ndef same_origin(a, b):\n    return origin(a) == origin(b)\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
