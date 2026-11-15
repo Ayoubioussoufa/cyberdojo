@@ -163,6 +163,8 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "les majuscules comptent aussi",
       "seulement le signal d'encodage",
       "la forme longue -EncodedCommand compte comme encodée",
+    ],
+  },
   "query-params": {
     prompt: "Écrivez query_params(url) : renvoyez un dict des paramètres de la chaîne de requête de l'URL, avec l'encodage en pourcentage décodé. Une URL sans chaîne de requête donne un dict vide. Utilisez urllib.parse : urlsplit(url).query donne la chaîne de requête, et parse_qsl la transforme en paires.",
     tests: [
