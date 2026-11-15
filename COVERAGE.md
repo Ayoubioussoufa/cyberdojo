@@ -191,7 +191,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ○ | ● | Token impersonation | None. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
-| ◐ | ● | Service misconfiguration: unquoted paths, weak ACLs | 3 mentions in 2 docs, most in 0057-auditing-for-privilege-escalation. *Section 'Services'.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ◐ | ● | Service misconfiguration: unquoted paths, weak ACLs | 4 mentions in 3 docs, most in 0057-auditing-for-privilege-escalation. *Section 'Services'.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ○ | ● | AlwaysInstallElevated and UAC bypass concepts | None. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ○ | ◐ | Enumeration tools: winPEAS, Seatbelt, PowerUp (tool) | None. *One tools table row.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ●* | ● | Windows persistence: run keys, tasks, services | 10 mentions in 5 docs, most in 0032-windows-persistence. *Lesson 32, 'The eight places to know'.* |  |
@@ -331,7 +331,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ◐* | ● | A02 Security Misconfiguration | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
 | ●* | ● | A03 Software Supply Chain Failures | 2 mentions in 2 docs, most in 0046-how-web-applications-fail. *Lesson 69 is about exactly this, under other words.* |  |
 | ●* | ● | A04 Cryptographic Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 38 to 40.* |  |
-| ● | ● | A05 Injection | 55 mentions in 18 docs, most in 0047-keeping-input-out-of-the-code, practice 45. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | A05 Injection | 57 mentions in 19 docs, most in 0047-keeping-input-out-of-the-code, practice 45. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ●* | ● | A06 Insecure Design | 2 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lesson 68.* |  |
 | ●* | ● | A07 Authentication Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 40 to 42.* |  |
 | ◐* | ● | A08 Software or Data Integrity Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
@@ -342,7 +342,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | SQL injection basics | 14 mentions in 6 docs, most in 0037-databases-and-sql, practice 23. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | SQL injection basics | 16 mentions in 7 docs, most in 0037-databases-and-sql, practice 23. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | SQLi variants: union, blind, time-based, second-order | None. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ◐ | sqlmap (tool) | None. *Named in the tools table, for labs. Not taught.* | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | NoSQL injection | Practice only (3). *Section 'NoSQL'.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
