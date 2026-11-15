@@ -2,7 +2,7 @@
 title: Parsing logs with Python
 summary: Regular expressions, files, JSON and CSV, turning a messy log into a structured report.
 month: 4
-minutes: 45
+minutes: 60
 builds: logparse, the first tool in your P03 toolkit
 source: Python re module documentation | https://docs.python.org/3/library/re.html
 words: regular expression, JSON, parser
@@ -53,6 +53,10 @@ If your parser skips the lines it doesn't understand, your numbers look fine and
 - Everything up to the line ending
 => `\d` is one digit and `+` means one or more, so it takes all of them.
 
+Now write one. `re.search(pattern, line)` returns a match object when the pattern is found anywhere in the line, and `None` when it isn't. On a match, `m.group(0)` is the whole text that matched. A dot means "any character" in a regular expression, so a real dot is written `\.`.
+
+@code extract-ip
+
 ## From lines to a report
 
 ```python
@@ -86,6 +90,10 @@ Your turn. Write the counting step yourself, run it, and watch the tests go gree
 
 @code count-failed-logins
 
+Now the full step, with the `skipped` count from the trap above. A group in round brackets captures part of the match: with the pattern `r"from (\d+\.\d+\.\d+\.\d+)"`, `m.group(1)` is the address alone, without the word `from`.
+
+@code failures-by-ip
+
 ## Structured output
 
 Tools should talk in structured formats so that other tools can use them.
@@ -107,6 +115,10 @@ with open("report.csv", "w", newline="") as f:
 - It makes logs much smaller
 - Humans can't read plain text
 => Structured output is what lets small tools work together.
+
+`json.dumps(value)` turns a Python dict or list into JSON text. To order the pairs, `sorted(counts.items(), key=lambda pair: pair[1], reverse=True)` sorts by the second element of each pair, the count, from highest to lowest.
+
+@code json-report
 
 ## A real command-line interface
 
