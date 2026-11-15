@@ -191,7 +191,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ○ | ● | Token impersonation | None. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
-| ◐ | ● | Service misconfiguration: unquoted paths, weak ACLs | 4 mentions in 3 docs, most in 0057-auditing-for-privilege-escalation. *Section 'Services'.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ◐ | ● | Service misconfiguration: unquoted paths, weak ACLs | 5 mentions in 4 docs, most in 0057-auditing-for-privilege-escalation. *Section 'Services'.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ○ | ● | AlwaysInstallElevated and UAC bypass concepts | None. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ○ | ◐ | Enumeration tools: winPEAS, Seatbelt, PowerUp (tool) | None. *One tools table row.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ●* | ● | Windows persistence: run keys, tasks, services | 10 mentions in 5 docs, most in 0032-windows-persistence. *Lesson 32, 'The eight places to know'.* |  |
@@ -732,7 +732,7 @@ Basis: Brief 10.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ◐ | ● | How containers isolate | 7 mentions in 2 docs, most in 0029-tests-and-docker, practice 1. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ●* | ● | Dockerfile and image hardening | 18 mentions in 4 docs, most in P03, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
+| ●* | ● | Dockerfile and image hardening | 23 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 | ◐ | ● | Container escape classes | 2 mentions in 1 docs, most in P14, practice 2. *Causes and defences, deliberately not techniques.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 | ●* | ● | Trivy, Grype (tool) | 9 mentions in 3 docs, most in P14. *Walked through in project P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ○ | ● | Container runtime security | None. | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
@@ -769,7 +769,7 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 | ●* | ● | Authentication versus authorisation | 3 mentions in 3 docs, most in 0048-access-control-that-holds. *Lesson 41.* |  |
 | ● | ● | Access control models: RBAC, ABAC, ReBAC | 15 mentions in 5 docs, most in 0041-identity-and-access, practice 4. | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | Formal models: Bell-LaPadula, Biba, Clark-Wilson | Practice only (2). | [Formal access control models](modules/11-identity/01-formal-access-models.md) |
-| ●* | ● | Least privilege, separation of duties | 14 mentions in 10 docs, most in 0007-users-and-permissions, practice 3. *Lesson 7, 'Least privilege', and lesson 41.* |  |
+| ●* | ● | Least privilege, separation of duties | 15 mentions in 10 docs, most in 0007-users-and-permissions, practice 3. *Lesson 7, 'Least privilege', and lesson 41.* |  |
 | ●* | ● | Privileged access management, just-in-time | 4 mentions in 1 docs, most in 0041-identity-and-access. *Lesson 41, 'Reducing standing privilege'.* |  |
 | ●* | ● | Identity governance: joiner-mover-leaver, SCIM | 3 mentions in 1 docs, most in 0041-identity-and-access. *Lesson 41, 'The identity lifecycle'.* |  |
 | ○ | ● | NIST SP 800-63 password guidance | 3 mentions in 1 docs, most in 0040-storing-passwords. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
