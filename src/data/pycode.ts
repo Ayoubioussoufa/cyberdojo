@@ -246,6 +246,30 @@ export const PY_CHALLENGES: PyChallenge[] = [
       "def spots_bugs(parse_port):\n    cases = [('22', 22), ('1', 1), ('65535', 65535), ('0', None), ('65536', None), ('ssh', None), ('', None)]\n    for text, expected in cases:\n        if parse_port(text) != expected:\n            return False\n    return True\n",
   },
   {
+    id: "decode-enc",
+    prompt: "Write decode_enc(b64): given the text that follows -enc on a PowerShell command line, return the command it hides. It is Base64 of UTF-16LE text. Use the base64 module.",
+    starter: "import base64\n\ndef decode_enc(b64):\n    # Your code here.\n    return \"\"\n",
+    tests: [
+      { name: "decodes Get-Date", expr: "decode_enc('RwBlAHQALQBEAGEAdABlAA==') == 'Get-Date'" },
+      { name: "decodes a command with spaces and quotes", expr: "decode_enc('VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAnAGgAZQBsAGwAbwAnAA==') == \"Write-Output 'hello'\"" },
+      { name: "the result has no null characters left", expr: "'\\x00' not in decode_enc('RwBlAHQALQBEAGEAdABlAA==')" },
+      { name: "an empty string decodes to an empty string", expr: "decode_enc('') == ''" },
+    ],
+    solution: "import base64\n\ndef decode_enc(b64):\n    return base64.b64decode(b64).decode('utf-16-le')\n",
+  },
+  {
+    id: "ps-flags",
+    prompt: "Write ps_flags(cmdline): return a list of the warning signs found on a PowerShell command line, in this order: 'encoded' if it contains -enc, 'hidden' if it contains -w hidden, 'noprofile' if it contains -nop. Ignore upper and lower case. Return an empty list when none is present.",
+    starter: "def ps_flags(cmdline):\n    flags = []\n    # Your code here.\n    return flags\n",
+    tests: [
+      { name: "all three signs", expr: "ps_flags('powershell -nop -w hidden -enc SQBFAFgA') == ['encoded', 'hidden', 'noprofile']" },
+      { name: "an ordinary command has none", expr: "ps_flags('powershell Get-Service') == []" },
+      { name: "upper case still counts", expr: "ps_flags('PowerShell.exe -NoP -W Hidden -Enc AAAA') == ['encoded', 'hidden', 'noprofile']" },
+      { name: "only the encoded sign", expr: "ps_flags('powershell -enc AAAA') == ['encoded']" },
+      { name: "the long form -EncodedCommand counts as encoded", expr: "ps_flags('powershell -EncodedCommand AAAA') == ['encoded']" },
+    ],
+    solution:
+      "def ps_flags(cmdline):\n    text = cmdline.lower()\n    flags = []\n    if '-enc' in text:\n        flags.append('encoded')\n    if '-w hidden' in text:\n        flags.append('hidden')\n    if '-nop' in text:\n        flags.append('noprofile')\n    return flags\n",
     id: "query-params",
     prompt: "Write query_params(url): return a dict of the parameters in the URL's query string, with percent-encoding decoded. A URL with no query string gives an empty dict. Use urllib.parse: urlsplit(url).query gives the query string, and parse_qsl turns it into pairs.",
     starter: "from urllib.parse import urlsplit, parse_qsl\n\ndef query_params(url):\n    # Your code here.\n    return {}\n",

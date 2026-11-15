@@ -146,6 +146,23 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "repère une version qui renvoie 0 pour du texte",
     ],
   },
+  "decode-enc": {
+    prompt: "Écrivez decode_enc(b64) : à partir du texte qui suit -enc sur une ligne de commande PowerShell, renvoyez la commande qu'il cache. C'est du Base64 d'un texte en UTF-16LE. Utilisez le module base64.",
+    tests: [
+      "décode Get-Date",
+      "décode une commande avec des espaces et des apostrophes",
+      "le résultat ne contient plus aucun caractère nul",
+      "une chaîne vide se décode en chaîne vide",
+    ],
+  },
+  "ps-flags": {
+    prompt: "Écrivez ps_flags(cmdline) : renvoyez la liste des signaux d'alerte trouvés sur une ligne de commande PowerShell, dans cet ordre : 'encoded' si elle contient -enc, 'hidden' si elle contient -w hidden, 'noprofile' si elle contient -nop. Ignorez les majuscules et les minuscules. Renvoyez une liste vide quand il n'y en a aucun.",
+    tests: [
+      "les trois signaux",
+      "une commande ordinaire n'en a aucun",
+      "les majuscules comptent aussi",
+      "seulement le signal d'encodage",
+      "la forme longue -EncodedCommand compte comme encodée",
   "query-params": {
     prompt: "Écrivez query_params(url) : renvoyez un dict des paramètres de la chaîne de requête de l'URL, avec l'encodage en pourcentage décodé. Une URL sans chaîne de requête donne un dict vide. Utilisez urllib.parse : urlsplit(url).query donne la chaîne de requête, et parse_qsl la transforme en paires.",
     tests: [
