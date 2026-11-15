@@ -54,7 +54,7 @@ Basis: Brief 1, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | DNS resolution and record types | 13 mentions in 3 docs, most in 0019-dns-and-dhcp, practice 2. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
-| ◐ | ● | dig, host, nslookup (tool) | 8 mentions in 5 docs, most in 0019-dns-and-dhcp. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
+| ◐ | ● | dig, host, nslookup (tool) | 11 mentions in 6 docs, most in 0019-dns-and-dhcp. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ◐* | ● | DNS attacks: cache poisoning, hijacking | 2 mentions in 2 docs, most in 0017-ethernet-arp-layers. *Section 'Poisoning'. The word count credited the web cache module by mistake.* | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ◐ | ● | DNS tunnelling and exfiltration | 1 mentions in 1 docs, most in 0019-dns-and-dhcp, practice 1. *Section 'Tunnelling', with detection features.* | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ○ | ● | DNS rebinding | None. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
@@ -69,12 +69,12 @@ Basis: Brief 1, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Email transport: SMTP, IMAP, POP3 | 6 mentions in 2 docs, most in ports, practice 3. *Lesson 54, 'How email really travels'.* |  |
-| ● | ● | SPF, DKIM, DMARC | 33 mentions in 3 docs, most in 0054-phishing-analysis, practice 7. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
+| ● | ● | SPF, DKIM, DMARC | 39 mentions in 3 docs, most in 0054-phishing-analysis, practice 7. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ◐ | ● | SMB and file shares | 3 mentions in 3 docs, most in s2-memorising-what-must-be-instant, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ◐ | ● | Cleartext legacy: FTP, Telnet | 3 mentions in 2 docs, most in ports, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ◐ | ● | SNMP | 1 mentions in 1 docs, most in ports, practice 1. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | NFS | 1 mentions in 1 docs, most in ports. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
-| ◐ | ● | RDP | 6 mentions in 4 docs, most in 0033-windows-logging-and-sysmon, practice 3. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
+| ◐ | ● | RDP | 8 mentions in 5 docs, most in 0033-windows-logging-and-sysmon, practice 3. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | LLMNR, NBT-NS, mDNS poisoning | None. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | SSH internals: host keys, agent forwarding, key exchange | 1 mentions in 1 docs, most in 0013-ssh-and-your-first-wargame. | [SSH internals and forwarding](modules/01-networking/09-ssh-internals-and-forwarding.md) |
 
@@ -177,7 +177,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ○ | ● | Windows privileges: SeDebug, SeImpersonate | None. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ●* | ● | Services and the Service Control Manager | 8 mentions in 2 docs, most in 0031-windows-objects. *Lesson 31, 'Services and scheduled tasks'.* |  |
 | ◐ | ● | DLL search order and side-loading | 4 mentions in 3 docs, most in 0032-windows-persistence. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
-| ●* | ● | Scheduled tasks and WMI | 30 mentions in 9 docs, most in 0032-windows-persistence, practice 2. *Lessons 31 and 32.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ●* | ● | Scheduled tasks and WMI | 34 mentions in 9 docs, most in 0032-windows-persistence, practice 2. *Lessons 31 and 32.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ◐ | ● | Credential stores: LSASS, SAM, DPAPI | 3 mentions in 2 docs, most in 0057-auditing-for-privilege-escalation. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
 | ◐ | ● | Credential Guard and protected processes | 3 mentions in 2 docs, most in 0057-auditing-for-privilege-escalation. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
 | ○ | ● | AppLocker and App Control | None. | [Windows built-in defences](modules/02-operating-systems/09-windows-defences.md) |
@@ -200,7 +200,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Domains, forests, OUs, trusts | 62 mentions in 8 docs, most in 0043-active-directory, practice 3. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
+| ● | ● | Domains, forests, OUs, trusts | 65 mentions in 9 docs, most in 0043-active-directory, practice 3. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
 | ● | ● | Group Policy | 38 mentions in 5 docs, most in 0043-active-directory. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ◐ | ◐ | LDAP | 7 mentions in 3 docs, most in ports, practice 12. |  |
 | ● | ● | BloodHound and attack paths | 35 mentions in 8 docs, most in 0045-attacking-and-defending-identity, practice 1. |  |
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 45 mentions in 12 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 47 mentions in 13 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 37 mentions in 4 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -495,7 +495,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | Malware taxonomy: virus, worm, trojan, RAT, loader | 6 mentions in 2 docs, most in 0067-safe-malware-triage, practice 10. *Lesson 67, 'What malware does'.* | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
+| ●* | ● | Malware taxonomy: virus, worm, trojan, RAT, loader | 7 mentions in 3 docs, most in 0067-safe-malware-triage, practice 10. *Lesson 67, 'What malware does'.* | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
 | ◐ | ● | Ransomware and double extortion | 19 mentions in 10 docs, most in 0001-what-security-protects, practice 7. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Wipers | None. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Botnets | None. | [Firmware and IoT security](modules/15-wireless-mobile-hardware-ot/06-firmware-and-iot.md) |
@@ -510,7 +510,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Safe lab design for malware | 63 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
+| ● | ● | Safe lab design for malware | 64 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ●* | ● | Static triage: hashes, strings, imports, entropy | 11 mentions in 3 docs, most in 0067-safe-malware-triage, practice 4. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ◐ | ● | Packers and unpacking | 11 mentions in 5 docs, most in 0067-safe-malware-triage. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
 | ● | ● | Dynamic analysis and sandboxes | 10 mentions in 5 docs, most in 0067-safe-malware-triage, practice 3. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
@@ -581,7 +581,7 @@ Basis: Brief 7, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | VPN concepts | 15 mentions in 8 docs, most in 0021-firewalls-and-segmentation, practice 6. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
+| ● | ● | VPN concepts | 16 mentions in 8 docs, most in 0021-firewalls-and-segmentation, practice 6. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | WireGuard (tool) | 2 mentions in 1 docs, most in 0021-firewalls-and-segmentation. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | IPsec: IKE, ESP, tunnel versus transport | 1 mentions in 1 docs, most in 0021-firewalls-and-segmentation. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | OpenVPN (tool) | None. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
@@ -604,12 +604,12 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 |---|---|---|---|---|
 | ● | ● | SOC tiers and alert triage | 68 mentions in 28 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ●* | ● | Log sources and pipelines | 15 mentions in 7 docs, most in P06. *Lesson 52, 'What each log proves'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | SIEM concepts | 35 mentions in 16 docs, most in P06, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ● | ● | SIEM concepts | 37 mentions in 16 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Wazuh (tool) | 20 mentions in 5 docs, most in P06, practice 1. |  |
-| ◐ | ● | Splunk and SPL (tool) | 9 mentions in 2 docs, most in P08. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ◐ | ● | Elastic stack and KQL (tool) | 8 mentions in 4 docs, most in e1-platforms, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ◐ | ● | Splunk and SPL (tool) | 10 mentions in 2 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ◐ | ● | Elastic stack and KQL (tool) | 10 mentions in 4 docs, most in 0052-logs-and-siem, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ○ | ● | Microsoft Sentinel (tool) | 1 mentions in 1 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | Writing correlation rules, tuning false positives | 32 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
+| ● | ● | Writing correlation rules, tuning false positives | 33 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
 | ●* | ● | Sigma (tool) | 17 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | SOAR and playbooks | 18 mentions in 8 docs, most in P06, practice 1. |  |
 
@@ -617,7 +617,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | Hypothesis-driven hunting | 14 mentions in 8 docs, most in 0058-detection-engineering, practice 3. | [Threat hunting](modules/08-blue-team/02-threat-hunting.md) |
+| ◐ | ● | Hypothesis-driven hunting | 18 mentions in 8 docs, most in 0053-attck-and-the-pyramid-of-pain, practice 3. | [Threat hunting](modules/08-blue-team/02-threat-hunting.md) |
 | ○ | ● | Purple teaming | 2 mentions in 1 docs, most in 0058-detection-engineering. | [Purple teaming](modules/08-blue-team/03-purple-teaming.md) |
 | ◐ | ● | Atomic Red Team, Caldera (tool) | 9 mentions in 7 docs, most in h1-cv-and-online-presence. | [Purple teaming](modules/08-blue-team/03-purple-teaming.md) |
 | ●* | ● | osquery, Velociraptor (tool) | 16 mentions in 4 docs, most in P08. *Walked through in project P08.* |  |
@@ -660,7 +660,7 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | MITRE ATT&CK | 61 mentions in 26 docs, most in 0011-maps-of-the-field, practice 3. | [Attack models compared](modules/09-threat-intel/01-attack-models.md) |
+| ● | ● | MITRE ATT&CK | 64 mentions in 26 docs, most in 0053-attck-and-the-pyramid-of-pain, practice 3. | [Attack models compared](modules/09-threat-intel/01-attack-models.md) |
 | ●* | ● | ATT&CK v20 tactics, including Stealth and Defense Impairment | 2 mentions in 1 docs, most in 0011-maps-of-the-field. *Lesson 11 lists all 15 and explains the split.* | [How defences get evaded, and how to notice](modules/06-malware-edr/05-evasion-concepts.md) |
 | ○ | ● | D3FEND | 1 mentions in 1 docs, most in e1-platforms. | [Attack models compared](modules/09-threat-intel/01-attack-models.md) |
 | ○ | ● | Lockheed Cyber Kill Chain | None. | [Attack models compared](modules/09-threat-intel/01-attack-models.md) |
@@ -778,11 +778,11 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | MFA factors and strength | 55 mentions in 21 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
+| ●* | ● | MFA factors and strength | 57 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ○ | ● | TOTP mechanics | None. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ● | ● | FIDO2, WebAuthn, passkeys | 13 mentions in 3 docs, most in 0041-identity-and-access. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ◐ | ● | Credential stuffing and spraying | 4 mentions in 3 docs, most in 0040-storing-passwords. *Section on guessing at scale.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
-| ◐ | ● | MFA fatigue and AiTM phishing | 4 mentions in 2 docs, most in 0041-identity-and-access. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
+| ◐ | ● | MFA fatigue and AiTM phishing | 6 mentions in 3 docs, most in 0041-identity-and-access. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 
 ### Federation
 
@@ -823,7 +823,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ● | ● | Security policies, standards, procedures | 31 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 9 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
-| ◐ | ● | Security metrics and reporting to a board | 33 mentions in 18 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
+| ◐ | ● | Security metrics and reporting to a board | 34 mentions in 18 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
 | ● | ● | Audit and evidence | 6 mentions in 2 docs, most in 0061-frameworks, practice 3. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 
 ### Regulation

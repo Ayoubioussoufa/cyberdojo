@@ -751,4 +751,58 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "rien de voulu",
     ],
   },
+  "reply-mismatch": {
+    prompt: "Écrivez reply_mismatch(from_header, reply_to) : chaque argument est le texte d'un en-tête, comme '\"IT Support\" <it-support@corp.example>', et reply_to vaut None quand le message n'a pas de Reply-To. Renvoyez True quand il y a un Reply-To et que son domaine diffère du domaine du From. Comparez les domaines en minuscules. parseaddr(texte) renvoie une paire (nom, adresse).",
+    tests: [
+      "les réponses vont vers un autre domaine",
+      "les réponses vont vers le même domaine",
+      "pas d'en-tête Reply-To",
+      "des majuscules dans un domaine ne font pas une différence",
+      "une adresse nue fonctionne aussi",
+    ],
+  },
+  "auth-results": {
+    prompt: "Écrivez auth_results(header) : header est le texte d'un en-tête Authentication-Results. Ses parties sont séparées par des points-virgules, et chaque partie commence par un contrôle et son résultat, comme spf=pass. Renvoyez un dict avec le résultat de 'spf', 'dkim' et 'dmarc', en mettant 'none' pour un contrôle que l'en-tête ne mentionne pas.",
+    tests: [
+      "l'exemple de la leçon",
+      "un en-tête qui ne mentionne que SPF",
+      "un en-tête réparti sur plusieurs lignes",
+      "les détails ne sont pas pris pour des contrôles",
+      "un en-tête vide",
+    ],
+  },
+  "dmarc-aligned": {
+    prompt: "Écrivez dmarc_aligned(from_domain, spf_result, spf_domain, dkim_result, dkim_domain) : renvoyez True quand DMARC réussirait : SPF a réussi pour un domaine aligné avec from_domain, ou DKIM a réussi pour un domaine aligné avec from_domain. Un domaine est aligné quand il est égal à from_domain ou qu'il se termine par un point suivi de from_domain. Les résultats sont des textes comme 'pass' ou 'fail'.",
+    tests: [
+      "l'exemple de la leçon échoue",
+      "SPF réussit pour le même domaine",
+      "DKIM seul suffit",
+      "un sous-domaine est aligné",
+      "un domaine aligné qui a échoué ne compte pas",
+      "un domaine qui finit seulement pareil n'est pas un sous-domaine",
+    ],
+  },
+  "lookalike-domain": {
+    prompt: "Écrivez is_lookalike(domain, brands) : brands associe un nom de marque à son vrai domaine, comme {'paypal': 'paypal.example'}. Défaites les substitutions courantes dans le domaine : minuscules, '1' en 'l', '0' en 'o', 'rn' en 'm', et retirez les tirets. Renvoyez True quand le résultat contient un nom de marque et que le domaine d'origine n'est ni le vrai domaine de cette marque ni l'un de ses sous-domaines.",
+    tests: [
+      "un chiffre à la place d'une lettre",
+      "le vrai domaine n'est pas un sosie",
+      "un vrai sous-domaine n'est pas un sosie",
+      "r et n à la place d'un m",
+      "un zéro à la place d'un o",
+      "le nom de la marque sur le domaine de quelqu'un d'autre",
+      "un domaine sans rapport",
+    ],
+  },
+  "defang-url": {
+    prompt: "Écrivez defang(url) : renvoyez l'URL rendue sûre à noter : 'http' au début devient 'hxxp' (donc 'https' devient 'hxxps'), et chaque point devient '[.]'. Écrivez ensuite refang(text), qui retransforme une URL neutralisée en l'URL d'origine.",
+    tests: [
+      "un lien https",
+      "un lien http avec plusieurs points",
+      "un domaine nu",
+      "les lettres http plus loin dans l'adresse sont laissées telles quelles",
+      "refang défait defang",
+      "un aller-retour redonne l'original",
+    ],
+  },
 };
