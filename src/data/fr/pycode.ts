@@ -458,4 +458,43 @@ export const PY_FR: Record<string, PyChallengeFr> = {
     prompt: "Écrivez longest_run(paths) : paths est la liste des chemins qu'un utilisateur a demandés, dans l'ordre, comme '/invoices/1043'. Renvoyez la longueur de la plus longue série de requêtes où chaque numéro vaut exactement un de plus que le précédent. Une seule requête est une série de 1, et une liste vide donne 0. Le numéro est la dernière partie du chemin.",
     tests: ["cinq à la suite", "une navigation ordinaire", "une série au milieu", "la même facture deux fois n'est pas une série", "une seule requête", "aucune requête"],
   },
+  "escape-html": {
+    prompt: "Écrivez escape_html(text) : renvoyez le texte avec les cinq caractères spéciaux du HTML remplacés : & par &amp;, < par &lt;, > par &gt;, \" par &quot; et ' par &#x27;. Remplacez & en premier, sinon vous encoderez les esperluettes que vous venez d'écrire.",
+    tests: [
+      "les balises deviennent du texte",
+      "une esperluette",
+      "des guillemets doubles",
+      "une apostrophe",
+      "les esperluettes ne sont pas encodées deux fois",
+      "un texte simple est inchangé",
+      "le même résultat que la bibliothèque standard",
+    ],
+  },
+  "safe-filename": {
+    prompt: "Écrivez safe_filename(name) : renvoyez True seulement quand name fait de 1 à 100 caractères, n'utilise que des lettres ASCII, des chiffres, des points, des tirets et des tirets bas, et ne commence ni par un point ni par un tiret. Tout le reste est refusé.",
+    tests: [
+      "un nom ordinaire",
+      "une barre oblique est refusée",
+      "un dossier parent est refusé",
+      "un nom qui commence par un tiret est refusé",
+      "un fichier caché est refusé",
+      "une espace est refusée",
+      "un point-virgule est refusé",
+      "le nom vide est refusé",
+      "101 caractères, c'est trop long",
+      "une lettre accentuée est refusée",
+    ],
+  },
+  "safe-path": {
+    prompt: "Écrivez safe_path(base, name) : joignez name au dossier base et nettoyez le résultat avec posixpath.normpath, qui résout les parties '..'. Renvoyez le chemin nettoyé quand il est à l'intérieur de base, et None sinon. À l'intérieur veut dire qu'il commence par base suivi d'une barre oblique. base est un chemin absolu sans barre oblique finale.",
+    tests: [
+      "un simple fichier",
+      "un sous-dossier",
+      "des points qui restent à l'intérieur sont nettoyés",
+      "sortir du dossier est refusé",
+      "un chemin absolu est refusé",
+      "un voisin dont le nom commence pareil est refusé",
+      "le dossier lui-même n'est pas un fichier qu'il contient",
+    ],
+  },
 };
