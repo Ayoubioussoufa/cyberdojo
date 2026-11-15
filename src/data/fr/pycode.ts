@@ -308,4 +308,35 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un rôle qui ressemble seulement à admin ne compte pas",
     ],
   },
+  "extra-access": {
+    prompt: "Écrivez extra_access(users, allowed) : users est une liste de dicts avec 'name', 'department' et 'groups'. allowed associe chaque service aux groupes que ses membres peuvent avoir. Renvoyez une liste de paires (name, group) pour chaque groupe qu'un utilisateur possède et que son service n'autorise pas, dans l'ordre où vous les rencontrez.",
+    tests: [
+      "une personne mutée qui a gardé l'ancien groupe",
+      "un compte propre ne donne rien",
+      "deux utilisateurs, constats dans l'ordre",
+      "un service inconnu n'autorise rien",
+      "pas d'utilisateur, pas de constat",
+    ],
+  },
+  "stale-accounts": {
+    prompt: "Écrivez stale_accounts(accounts, today, days) : accounts est une liste de dicts avec 'name' et 'last_login', une date sous la forme 'AAAA-MM-JJ' ou None si le compte ne s'est jamais connecté. today est une date sous la même forme. Renvoyez les noms dont la dernière connexion remonte à plus de days jours avant today, ou qui ne se sont jamais connectés. date.fromisoformat(texte) transforme le texte en date, et soustraire deux dates donne une valeur qui a un nombre .days.",
+    tests: [
+      "une vieille connexion est périmée",
+      "une connexion récente ne l'est pas",
+      "ne jamais s'être connecté compte comme périmé",
+      "il y a exactement 90 jours, ce n'est pas plus de 90",
+      "il y a 91 jours, si",
+      "une liste mélangée garde son ordre",
+    ],
+  },
+  "hotp-code": {
+    prompt: "Écrivez hotp(secret, counter) : renvoyez le code à usage unique de six chiffres pour un secret (des octets) et un compteur (un nombre entier), sous forme de texte en gardant les zéros de tête. Le HMAC est calculé pour vous. Prenez les 4 derniers bits du condensat comme position, lisez 4 octets à partir de là comme un nombre gros-boutiste, effacez son bit de poids fort avec & 0x7fffffff, et gardez les six derniers chiffres décimaux.",
+    tests: [
+      "le premier code du secret de test de la RFC 4226",
+      "le deuxième",
+      "le troisième",
+      "un zéro de tête est conservé",
+      "un autre secret donne un autre code",
+    ],
+  },
 };

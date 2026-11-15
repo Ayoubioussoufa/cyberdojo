@@ -504,6 +504,46 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def can_read(user, note):\n    if user is None:\n        return False\n    return user['id'] == note['owner_id'] or user['role'] == 'admin'\n",
   },
+  {
+    id: "extra-access",
+    prompt: "Write extra_access(users, allowed): users is a list of dicts with 'name', 'department' and 'groups'. allowed maps each department to the groups its people may have. Return a list of (name, group) pairs for every group a user has that their department doesn't allow, in the order you meet them.",
+    starter: "def extra_access(users, allowed):\n    findings = []\n    # Your code here.\n    return findings\n",
+    tests: [
+      { name: "a mover who kept the old group", expr: "extra_access([{'name': 'ana', 'department': 'marketing', 'groups': ['finance-read', 'marketing-edit']}], {'finance': ['finance-read'], 'marketing': ['marketing-edit', 'web-publish']}) == [('ana', 'finance-read')]" },
+      { name: "a clean account gives nothing", expr: "extra_access([{'name': 'sam', 'department': 'finance', 'groups': ['finance-read']}], {'finance': ['finance-read'], 'marketing': ['marketing-edit', 'web-publish']}) == []" },
+      { name: "two users, findings in order", expr: "extra_access([{'name': 'ana', 'department': 'marketing', 'groups': ['finance-read']}, {'name': 'tom', 'department': 'finance', 'groups': ['finance-read', 'web-publish']}], {'finance': ['finance-read'], 'marketing': ['marketing-edit', 'web-publish']}) == [('ana', 'finance-read'), ('tom', 'web-publish')]" },
+      { name: "an unknown department allows nothing", expr: "extra_access([{'name': 'leo', 'department': 'interns', 'groups': ['finance-read']}], {'finance': ['finance-read'], 'marketing': ['marketing-edit', 'web-publish']}) == [('leo', 'finance-read')]" },
+      { name: "no users, no findings", expr: "extra_access([], {'finance': ['finance-read'], 'marketing': ['marketing-edit', 'web-publish']}) == []" },
+    ],
+    solution: "def extra_access(users, allowed):\n    findings = []\n    for user in users:\n        permitted = allowed.get(user['department'], [])\n        for group in user['groups']:\n            if group not in permitted:\n                findings.append((user['name'], group))\n    return findings\n",
+  },
+  {
+    id: "stale-accounts",
+    prompt: "Write stale_accounts(accounts, today, days): accounts is a list of dicts with 'name' and 'last_login', a date as 'YYYY-MM-DD' text or None if the account never logged in. today is a date in the same form. Return the names whose last login is more than days days before today, or who never logged in. date.fromisoformat(text) turns the text into a date, and subtracting two dates gives a value with a .days number.",
+    starter: "from datetime import date\n\ndef stale_accounts(accounts, today, days):\n    stale = []\n    # Your code here.\n    return stale\n",
+    tests: [
+      { name: "an old login is stale", expr: "stale_accounts([{'name': 'ana', 'last_login': '2026-03-01'}], '2026-11-15', 90) == ['ana']" },
+      { name: "a recent login is not", expr: "stale_accounts([{'name': 'sam', 'last_login': '2026-11-10'}], '2026-11-15', 90) == []" },
+      { name: "never logged in counts as stale", expr: "stale_accounts([{'name': 'svc-old', 'last_login': None}], '2026-11-15', 90) == ['svc-old']" },
+      { name: "exactly 90 days ago is not more than 90", expr: "stale_accounts([{'name': 'tom', 'last_login': '2026-08-17'}], '2026-11-15', 90) == []" },
+      { name: "91 days ago is", expr: "stale_accounts([{'name': 'tom', 'last_login': '2026-08-16'}], '2026-11-15', 90) == ['tom']" },
+      { name: "a mixed list keeps its order", expr: "stale_accounts([{'name': 'a', 'last_login': '2025-01-01'}, {'name': 'b', 'last_login': '2026-11-14'}, {'name': 'c', 'last_login': None}], '2026-11-15', 30) == ['a', 'c']" },
+    ],
+    solution: "from datetime import date\n\ndef stale_accounts(accounts, today, days):\n    now = date.fromisoformat(today)\n    stale = []\n    for account in accounts:\n        last = account['last_login']\n        if last is None or (now - date.fromisoformat(last)).days > days:\n            stale.append(account['name'])\n    return stale\n",
+  },
+  {
+    id: "hotp-code",
+    prompt: "Write hotp(secret, counter): return the six-digit one-time code for a secret (bytes) and a counter (a whole number), as text with leading zeros kept. The HMAC is computed for you. Take the last 4 bits of the digest as a position, read 4 bytes from there as a big-endian number, clear its top bit with & 0x7fffffff, and keep the last six decimal digits.",
+    starter: "import hmac, hashlib, struct\n\ndef hotp(secret, counter):\n    digest = hmac.new(secret, struct.pack('>Q', counter), hashlib.sha1).digest()\n    # digest is 20 bytes. digest[-1] & 0x0f gives the position.\n    # int.from_bytes(some_bytes, 'big') turns bytes into a number.\n    return \"000000\"\n",
+    tests: [
+      { name: "the first code of the RFC 4226 test secret", expr: "hotp(b'12345678901234567890', 0) == '755224'" },
+      { name: "the second", expr: "hotp(b'12345678901234567890', 1) == '287082'" },
+      { name: "the third", expr: "hotp(b'12345678901234567890', 2) == '359152'" },
+      { name: "a leading zero is kept", expr: "hotp(b'12345678901234567890', 37037036) == '081804'" },
+      { name: "a different secret gives a different code", expr: "hotp(b'another-secret', 0) != hotp(b'12345678901234567890', 0)" },
+    ],
+    solution: "import hmac, hashlib, struct\n\ndef hotp(secret, counter):\n    digest = hmac.new(secret, struct.pack('>Q', counter), hashlib.sha1).digest()\n    position = digest[-1] & 0x0f\n    number = int.from_bytes(digest[position:position + 4], 'big') & 0x7fffffff\n    return str(number % 1000000).zfill(6)\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
