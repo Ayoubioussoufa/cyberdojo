@@ -1084,6 +1084,7 @@ const TABLE = {
     close: ["Close the tutor", "Fermer le tuteur"],
     clear: ["Clear this chat", "Effacer cet échange"],
     setupLink: ["Models and settings", "Modèles et réglages"],
+    howToAsk: ["How to ask the tutor", "Comment interroger le tuteur"],
     offOllama: ["Ollama isn't running, so the tutor can't answer yet.", "Ollama n'est pas lancé : le tuteur ne peut pas encore répondre."],
     offModel: ["The tutor has no model yet.", "Le tuteur n'a pas encore de modèle."],
     openSetup: ["Set up the tutor", "Configurer le tuteur"],
