@@ -1185,6 +1185,60 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def defang(url):\n    if url.startswith('http'):\n        url = 'hxxp' + url[4:]\n    return url.replace('.', '[.]')\n\ndef refang(text):\n    if text.startswith('hxxp'):\n        text = 'http' + text[4:]\n    return text.replace('[.]', '.')\n",
   },
+  {
+    id: "parse-cve",
+    prompt: "Write parse_cve(text): return (year, number) as two whole numbers when text is a well-formed CVE identifier: the letters CVE in upper case, a dash, a four-digit year, a dash, and a number of four or more digits. Spaces around it are ignored. Return None for anything else.",
+    starter: "import re\n\ndef parse_cve(text):\n    # re.fullmatch(pattern, text) matches only when the whole text fits the pattern.\n    return None\n",
+    tests: [
+      { name: "a well-formed identifier", expr: "parse_cve('CVE-2024-3094') == (2024, 3094)" },
+      { name: "a longer number", expr: "parse_cve('CVE-2021-44228') == (2021, 44228)" },
+      { name: "spaces around it are ignored", expr: "parse_cve('  CVE-2024-6387\\n') == (2024, 6387)" },
+      { name: "a two-digit year is refused", expr: "parse_cve('CVE-24-3094') is None" },
+      { name: "a missing dash is refused", expr: "parse_cve('CVE2024-3094') is None" },
+      { name: "lower case is refused", expr: "parse_cve('cve-2024-3094') is None" },
+      { name: "a three-digit number is refused", expr: "parse_cve('CVE-2024-309') is None" },
+      { name: "extra text is refused", expr: "parse_cve('CVE-2024-3094 (xz)') is None" },
+    ],
+    solution: "import re\n\ndef parse_cve(text):\n    m = re.fullmatch(r'CVE-(\\d{4})-(\\d{4,})', text.strip())\n    if not m:\n        return None\n    return int(m.group(1)), int(m.group(2))\n",
+  },
+  {
+    id: "vuln-priority",
+    prompt: "Write priority(finding): finding is a dict with 'cvss', 'epss' (0 to 1), 'kev' (True or False) and 'exposed' (True when it faces the internet). Apply the first rule that fits: 'today' when it is in KEV and exposed; 'this week' when it is in KEV, or when epss is at least 0.5 and it is exposed; 'this month' when cvss is at least 9.0; otherwise 'normal cycle'.",
+    starter: "def priority(finding):\n    # Your code here.\n    return \"normal cycle\"\n",
+    tests: [
+      { name: "the four findings from the lesson", expr: "[priority(f) for f in [{'id': 'W', 'cvss': 9.8, 'epss': 0.04, 'kev': False, 'exposed': False}, {'id': 'X', 'cvss': 8.1, 'epss': 0.88, 'kev': True, 'exposed': True}, {'id': 'Y', 'cvss': 5.3, 'epss': 0.61, 'kev': False, 'exposed': True}, {'id': 'Z', 'cvss': 9.1, 'epss': 0.02, 'kev': False, 'exposed': False}]] == ['this month', 'today', 'this week', 'this month']" },
+      { name: "exploited but not exposed", expr: "priority({'cvss': 7.0, 'epss': 0.3, 'kev': True, 'exposed': False}) == 'this week'" },
+      { name: "likely to be exploited but not exposed", expr: "priority({'cvss': 6.0, 'epss': 0.9, 'kev': False, 'exposed': False}) == 'normal cycle'" },
+      { name: "a critical score alone is not urgent", expr: "priority({'cvss': 9.8, 'epss': 0.01, 'kev': False, 'exposed': True}) == 'this month'" },
+      { name: "a medium, unlikely, internal finding", expr: "priority({'cvss': 5.0, 'epss': 0.01, 'kev': False, 'exposed': False}) == 'normal cycle'" },
+      { name: "an EPSS of exactly 0.5 on an exposed system", expr: "priority({'cvss': 4.0, 'epss': 0.5, 'kev': False, 'exposed': True}) == 'this week'" },
+    ],
+    solution: "def priority(finding):\n    if finding['kev'] and finding['exposed']:\n        return 'today'\n    if finding['kev'] or (finding['epss'] >= 0.5 and finding['exposed']):\n        return 'this week'\n    if finding['cvss'] >= 9.0:\n        return 'this month'\n    return 'normal cycle'\n",
+  },
+  {
+    id: "expired-exceptions",
+    prompt: "Write exception_problems(exceptions, today): exceptions is a list of dicts with 'id', 'owner' and 'expires', a date as 'YYYY-MM-DD' or None. today is a date in the same form. Return a list of (id, problem) pairs, in order: 'no expiry' when expires is None, 'expired' when the date is before today, and 'no owner' when owner is None. An exception can give two problems: the date problem first.",
+    starter: "from datetime import date\n\ndef exception_problems(exceptions, today):\n    problems = []\n    # Your code here.\n    return problems\n",
+    tests: [
+      { name: "the register from the tests", expr: "exception_problems([{'id': 'EX-1', 'owner': 'ana', 'expires': '2026-12-31'}, {'id': 'EX-2', 'owner': 'sam', 'expires': '2026-06-30'}, {'id': 'EX-3', 'owner': 'tom', 'expires': None}, {'id': 'EX-4', 'owner': None, 'expires': '2027-01-15'}], '2026-11-15') == [('EX-2', 'expired'), ('EX-3', 'no expiry'), ('EX-4', 'no owner')]" },
+      { name: "an exception that expires today is still valid", expr: "exception_problems([{'id': 'E', 'owner': 'ana', 'expires': '2026-11-15'}], '2026-11-15') == []" },
+      { name: "no date and no owner gives both problems", expr: "exception_problems([{'id': 'E', 'owner': None, 'expires': None}], '2026-11-15') == [('E', 'no expiry'), ('E', 'no owner')]" },
+      { name: "an empty register", expr: "exception_problems([], '2026-11-15') == []" },
+    ],
+    solution: "from datetime import date\n\ndef exception_problems(exceptions, today):\n    now = date.fromisoformat(today)\n    problems = []\n    for e in exceptions:\n        if e['expires'] is None:\n            problems.append((e['id'], 'no expiry'))\n        elif date.fromisoformat(e['expires']) < now:\n            problems.append((e['id'], 'expired'))\n        if e['owner'] is None:\n            problems.append((e['id'], 'no owner'))\n    return problems\n",
+  },
+  {
+    id: "still-open",
+    prompt: "Write still_open(marked_fixed, rescan): marked_fixed is a list of (host, cve) pairs that tickets say were fixed. rescan is a list of (host, cve) pairs that the new scan still reports. Return the sorted list of pairs that were marked fixed and are still found.",
+    starter: "def still_open(marked_fixed, rescan):\n    # Your code here.\n    return []\n",
+    tests: [
+      { name: "one fix was never applied", expr: "still_open([('web1', 'CVE-2024-6387'), ('web2', 'CVE-2024-6387'), ('db1', 'CVE-2024-3094')], [('web2', 'CVE-2024-6387'), ('mail1', 'CVE-2023-0001')]) == [('web2', 'CVE-2024-6387')]" },
+      { name: "the same CVE on another host is a different finding", expr: "still_open([('web1', 'CVE-2024-6387')], [('web2', 'CVE-2024-6387')]) == []" },
+      { name: "everything really was fixed", expr: "still_open([('web1', 'CVE-2024-6387')], []) == []" },
+      { name: "several come back sorted", expr: "still_open([('b', 'CVE-2024-0002'), ('a', 'CVE-2024-0001')], [('b', 'CVE-2024-0002'), ('a', 'CVE-2024-0001')]) == [('a', 'CVE-2024-0001'), ('b', 'CVE-2024-0002')]" },
+    ],
+    solution: "def still_open(marked_fixed, rescan):\n    found = set(rescan)\n    return sorted(pair for pair in set(marked_fixed) if pair in found)\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

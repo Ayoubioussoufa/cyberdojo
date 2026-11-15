@@ -805,4 +805,46 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un aller-retour redonne l'original",
     ],
   },
+  "parse-cve": {
+    prompt: "Écrivez parse_cve(text) : renvoyez (année, numéro) sous forme de deux nombres entiers quand text est un identifiant CVE bien formé : les lettres CVE en majuscules, un tiret, une année à quatre chiffres, un tiret, et un numéro de quatre chiffres ou plus. Les espaces autour sont ignorées. Renvoyez None pour tout le reste.",
+    tests: [
+      "un identifiant bien formé",
+      "un numéro plus long",
+      "les espaces autour sont ignorées",
+      "une année à deux chiffres est refusée",
+      "un tiret manquant est refusé",
+      "les minuscules sont refusées",
+      "un numéro à trois chiffres est refusé",
+      "du texte en plus est refusé",
+    ],
+  },
+  "vuln-priority": {
+    prompt: "Écrivez priority(finding) : finding est un dict avec 'cvss', 'epss' (de 0 à 1), 'kev' (True ou False) et 'exposed' (True quand il est exposé à Internet). Appliquez la première règle qui convient : 'today' quand il est dans KEV et exposé ; 'this week' quand il est dans KEV, ou quand epss vaut au moins 0.5 et qu'il est exposé ; 'this month' quand cvss vaut au moins 9.0 ; sinon 'normal cycle'.",
+    tests: [
+      "les quatre constats de la leçon",
+      "exploité mais pas exposé",
+      "probablement exploité mais pas exposé",
+      "un score critique seul n'est pas urgent",
+      "un constat moyen, improbable et interne",
+      "un EPSS d'exactement 0.5 sur un système exposé",
+    ],
+  },
+  "expired-exceptions": {
+    prompt: "Écrivez exception_problems(exceptions, today) : exceptions est une liste de dicts avec 'id', 'owner' et 'expires', une date sous la forme 'AAAA-MM-JJ' ou None. today est une date sous la même forme. Renvoyez une liste de paires (id, problème), dans l'ordre : 'no expiry' quand expires vaut None, 'expired' quand la date est antérieure à today, et 'no owner' quand owner vaut None. Une exception peut donner deux problèmes : celui de la date d'abord.",
+    tests: [
+      "le registre des tests",
+      "une exception qui expire aujourd'hui est encore valide",
+      "ni date ni responsable donne les deux problèmes",
+      "un registre vide",
+    ],
+  },
+  "still-open": {
+    prompt: "Écrivez still_open(marked_fixed, rescan) : marked_fixed est une liste de paires (hôte, cve) que les tickets disent corrigées. rescan est une liste de paires (hôte, cve) que le nouveau scan signale encore. Renvoyez la liste triée des paires marquées corrigées qui sont toujours trouvées.",
+    tests: [
+      "un correctif n'a jamais été appliqué",
+      "la même CVE sur un autre hôte est un autre constat",
+      "tout a vraiment été corrigé",
+      "plusieurs reviennent triés",
+    ],
+  },
 };
