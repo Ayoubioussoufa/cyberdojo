@@ -74,7 +74,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ◐ | ● | Cleartext legacy: FTP, Telnet | 3 mentions in 2 docs, most in ports, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ◐ | ● | SNMP | 1 mentions in 1 docs, most in ports, practice 1. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | NFS | 1 mentions in 1 docs, most in ports. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
-| ◐ | ● | RDP | 3 mentions in 3 docs, most in 0034-powershell, practice 3. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
+| ◐ | ● | RDP | 6 mentions in 4 docs, most in 0033-windows-logging-and-sysmon, practice 3. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | LLMNR, NBT-NS, mDNS poisoning | None. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | SSH internals: host keys, agent forwarding, key exchange | 1 mentions in 1 docs, most in 0013-ssh-and-your-first-wargame. | [SSH internals and forwarding](modules/01-networking/09-ssh-internals-and-forwarding.md) |
 
@@ -84,7 +84,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 20 mentions in 11 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ● | ● | curl (tool) | 21 mentions in 11 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 1 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 9 mentions in 6 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 5 mentions in 3 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -135,19 +135,19 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Kernel and user mode, system calls | 15 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
-| ○ | ● | Processes, fork and exec | None. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
-| ● | ● | Virtual memory and page tables | 6 mentions in 1 docs, most in 0030-how-operating-systems-work. |  |
-| ○ | ● | The /proc filesystem | 2 mentions in 1 docs, most in 0009-processes-and-signals. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
+| ● | ● | Kernel and user mode, system calls | 19 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
+| ○ | ● | Processes, fork and exec | 1 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
+| ● | ● | Virtual memory and page tables | 9 mentions in 1 docs, most in 0030-how-operating-systems-work. |  |
+| ○ | ● | The /proc filesystem | 4 mentions in 2 docs, most in 0009-processes-and-signals. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
 | ○ | ● | Inodes and file descriptors | Practice only (2). | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
 | ◐ | ● | Boot, init and systemd | 7 mentions in 3 docs, most in 0025-hardening-linux. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
 | ○ | ● | Dynamic linking, LD_PRELOAD | Practice only (1). | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
 | ○ | ● | PAM | None. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
-| ◐ | ● | /etc/passwd and /etc/shadow | 5 mentions in 4 docs, most in 0008-suid-sticky-umask, practice 2. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
+| ◐ | ● | /etc/passwd and /etc/shadow | 9 mentions in 5 docs, most in 0030-how-operating-systems-work, practice 2. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
 | ○ | ● | POSIX ACLs | None. *Section on discretionary access.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | Linux capabilities | None. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | SELinux and AppArmor | Practice only (1). | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ○* | ● | seccomp, namespaces, cgroups | 15 mentions in 2 docs, most in P14, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
+| ○* | ● | seccomp, namespaces, cgroups | 16 mentions in 3 docs, most in P14, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ● | ● | auditd (tool) | 11 mentions in 3 docs, most in P06. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | eBPF for security | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | Kernel modules | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
@@ -169,22 +169,22 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Processes, threads, handles, core system processes | 14 mentions in 3 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
-| ● | ● | The registry | 24 mentions in 13 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
-| ● | ● | NTFS, $MFT, alternate data streams | 11 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
-| ● | ● | Access tokens and SIDs | 16 mentions in 2 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
+| ● | ● | Processes, threads, handles, core system processes | 23 mentions in 3 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
+| ● | ● | The registry | 33 mentions in 13 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | NTFS, $MFT, alternate data streams | 12 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
+| ● | ● | Access tokens and SIDs | 21 mentions in 2 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ○ | ● | Windows privileges: SeDebug, SeImpersonate | None. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
-| ●* | ● | Services and the Service Control Manager | 5 mentions in 2 docs, most in 0057-auditing-for-privilege-escalation. *Lesson 31, 'Services and scheduled tasks'.* |  |
-| ◐ | ● | DLL search order and side-loading | 3 mentions in 3 docs, most in 0030-how-operating-systems-work. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
-| ●* | ● | Scheduled tasks and WMI | 22 mentions in 8 docs, most in 0032-windows-persistence, practice 2. *Lessons 31 and 32.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ●* | ● | Services and the Service Control Manager | 8 mentions in 2 docs, most in 0031-windows-objects. *Lesson 31, 'Services and scheduled tasks'.* |  |
+| ◐ | ● | DLL search order and side-loading | 4 mentions in 3 docs, most in 0032-windows-persistence. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ●* | ● | Scheduled tasks and WMI | 30 mentions in 9 docs, most in 0032-windows-persistence, practice 2. *Lessons 31 and 32.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ◐ | ● | Credential stores: LSASS, SAM, DPAPI | 3 mentions in 2 docs, most in 0057-auditing-for-privilege-escalation. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
 | ◐ | ● | Credential Guard and protected processes | 3 mentions in 2 docs, most in 0057-auditing-for-privilege-escalation. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
 | ○ | ● | AppLocker and App Control | None. | [Windows built-in defences](modules/02-operating-systems/09-windows-defences.md) |
 | ○ | ● | AMSI | None. | [Windows built-in defences](modules/02-operating-systems/09-windows-defences.md) |
 | ○ | ● | ETW | None. | [Windows built-in defences](modules/02-operating-systems/09-windows-defences.md) |
 | ●* | ● | PowerShell logging and constrained language | 7 mentions in 4 docs, most in 0034-powershell. *Lesson 34, 'Script block logging'.* | [Windows built-in defences](modules/02-operating-systems/09-windows-defences.md) |
-| ● | ● | Sysinternals (tool) | 25 mentions in 6 docs, most in 0031-windows-objects. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | Sysinternals (tool) | 31 mentions in 7 docs, most in 0031-windows-objects. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 
 ### Windows privilege escalation
 
@@ -194,7 +194,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ◐ | ● | Service misconfiguration: unquoted paths, weak ACLs | 5 mentions in 4 docs, most in 0057-auditing-for-privilege-escalation. *Section 'Services'.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ○ | ● | AlwaysInstallElevated and UAC bypass concepts | None. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ○ | ◐ | Enumeration tools: winPEAS, Seatbelt, PowerUp (tool) | None. *One tools table row.* | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
-| ●* | ● | Windows persistence: run keys, tasks, services | 10 mentions in 5 docs, most in 0032-windows-persistence. *Lesson 32, 'The eight places to know'.* |  |
+| ●* | ● | Windows persistence: run keys, tasks, services | 15 mentions in 5 docs, most in 0032-windows-persistence. *Lesson 32, 'The eight places to know'.* |  |
 
 ### Active Directory
 
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 33 mentions in 10 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 34 mentions in 11 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 27 mentions in 3 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -454,7 +454,7 @@ Basis: Brief 5, CyBOK Software Security, CWE Top 25.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ○ | ● | ASLR and PIE | None. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
+| ○ | ● | ASLR and PIE | 1 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
 | ○ | ● | DEP / NX | None. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
 | ○ | ● | Stack canaries | None. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
 | ○ | ● | RELRO | None. | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
@@ -472,7 +472,7 @@ Basis: Brief 5, CyBOK Software Security, CWE Top 25.
 | ◐ | ● | Ghidra (tool) | 6 mentions in 2 docs, most in P13. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
 | ○ | ◐ | IDA, radare2, Binary Ninja (tool) | None. *A comparison table only. Ghidra is what's taught.* | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
 | ○ | ● | gdb and pwndbg (tool) | None. | [Dynamic analysis and debugging](modules/05-binary/08-dynamic-analysis-and-debugging.md) |
-| ○ | ● | strace, ltrace (tool) | None. | [Dynamic analysis and debugging](modules/05-binary/08-dynamic-analysis-and-debugging.md) |
+| ○ | ● | strace, ltrace (tool) | 7 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Dynamic analysis and debugging](modules/05-binary/08-dynamic-analysis-and-debugging.md) |
 | ● | ● | Static versus dynamic analysis | 5 mentions in 1 docs, most in 0067-safe-malware-triage. | [Program analysis and the kernel](modules/05-binary/10-symbolic-execution-and-kernels.md) |
 | ◐ | ● | Obfuscation and anti-debugging | 4 mentions in 3 docs, most in 0034-powershell. | [How defences get evaded, and how to notice](modules/06-malware-edr/05-evasion-concepts.md) |
 | ○ | ● | Decompilers and how they lie | 1 mentions in 1 docs, most in c1-the-jobs. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
@@ -513,7 +513,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 | ● | ● | Safe lab design for malware | 63 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ●* | ● | Static triage: hashes, strings, imports, entropy | 11 mentions in 3 docs, most in 0067-safe-malware-triage, practice 4. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ◐ | ● | Packers and unpacking | 11 mentions in 5 docs, most in 0067-safe-malware-triage. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
-| ● | ● | Dynamic analysis and sandboxes | 9 mentions in 4 docs, most in 0067-safe-malware-triage, practice 3. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
+| ● | ● | Dynamic analysis and sandboxes | 10 mentions in 5 docs, most in 0067-safe-malware-triage, practice 3. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ●* | ● | capa, FLOSS, PEStudio, Detect It Easy (tool) | 13 mentions in 3 docs, most in P13. *Walked through in project P13.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ● | ● | REMnux and FLARE-VM (tool) | 24 mentions in 2 docs, most in P13. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ○ | ● | Cuckoo, CAPE, ANY.RUN (tool) | 2 mentions in 2 docs, most in l1-after-24-months. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
@@ -526,7 +526,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 | ○ | ● | How antivirus decides: signature, heuristic, ML, reputation | None. *Section 'how a product decides'.* | [How defences get evaded, and how to notice](modules/06-malware-edr/05-evasion-concepts.md) |
 | ◐ | ◐ | Process injection and hollowing (concept) | 6 mentions in 3 docs, most in 0030-how-operating-systems-work. *Detection only, deliberately not how it's done.* | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
 | ◐ | ● | Masquerading and timestomping | 3 mentions in 3 docs, most in 0031-windows-objects. | [How defences get evaded, and how to notice](modules/06-malware-edr/05-evasion-concepts.md) |
-| ◐ | ● | Log tampering and clearing | 10 mentions in 6 docs, most in keystone, practice 9. | [Anti-forensics and reporting](modules/08-blue-team/09-anti-forensics-and-reporting.md) |
+| ◐ | ● | Log tampering and clearing | 12 mentions in 6 docs, most in keystone, practice 9. | [Anti-forensics and reporting](modules/08-blue-team/09-anti-forensics-and-reporting.md) |
 | ◐ | ● | Disabling defences (ATT&CK Defense Impairment) | 3 mentions in 2 docs, most in 0011-maps-of-the-field, practice 1. | [Windows built-in defences](modules/02-operating-systems/09-windows-defences.md) |
 | ○ | ● | Code signing abuse, BYOVD | None. | [How defences get evaded, and how to notice](modules/06-malware-edr/05-evasion-concepts.md) |
 
@@ -536,7 +536,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 |---|---|---|---|---|
 | ◐ | ● | EDR architecture: sensors, kernel callbacks, telemetry | 8 mentions in 6 docs, most in 0060-risk-assessment. | [How EDR works](modules/06-malware-edr/06-edr-internals.md) |
 | ○ | ● | EDR internals: kernel callbacks, minifilters, ETW, hooks | None. | [How EDR works](modules/06-malware-edr/06-edr-internals.md) |
-| ● | ● | Sysmon as free telemetry | 43 mentions in 12 docs, most in 0033-windows-logging-and-sysmon, practice 12. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
+| ● | ● | Sysmon as free telemetry | 62 mentions in 12 docs, most in 0033-windows-logging-and-sysmon, practice 12. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
 | ○ | ● | Behavioural detection versus signatures | None. *Same section, and the EDR module's detection layers.* | [How defences get evaded, and how to notice](modules/06-malware-edr/05-evasion-concepts.md) |
 
 ## 07 Network security and infrastructure
@@ -570,7 +570,7 @@ Basis: Brief 7, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Segmentation and DMZ | 48 mentions in 4 docs, most in 0021-firewalls-and-segmentation. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
+| ● | ● | Segmentation and DMZ | 49 mentions in 5 docs, most in 0021-firewalls-and-segmentation. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
 | ○ | ● | Microsegmentation | None. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
 | ○ | ● | Bastion hosts and jump boxes | None. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
 | ○ | ● | Network access control, 802.1X | None. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
@@ -689,7 +689,7 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 | ◐* | ● | MISP, OpenCTI (tool) | 7 mentions in 2 docs, most in P12. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ● | ● | Traffic Light Protocol | 16 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ◐ | ● | Attribution and its limits | 5 mentions in 2 docs, most in 0066-threat-intelligence. | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
-| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 28 mentions in 7 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
+| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 29 mentions in 8 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ○ | ● | The underground economy: IABs, RaaS | None. *Section 'Crime as a supply chain'.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 
 ### OSINT and recon (ATT&CK Reconnaissance)
@@ -820,10 +820,10 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ○ | ● | NIST RMF, SP 800-53 | 3 mentions in 3 docs, most in d1-ai-what-changed. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | ISO/IEC 27001 and 27002 | 20 mentions in 6 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | CIS Controls and Benchmarks | 12 mentions in 4 docs, most in 0061-frameworks, practice 3. |  |
-| ● | ● | Security policies, standards, procedures | 30 mentions in 12 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
+| ● | ● | Security policies, standards, procedures | 31 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 9 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
-| ◐ | ● | Security metrics and reporting to a board | 31 mentions in 17 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
+| ◐ | ● | Security metrics and reporting to a board | 33 mentions in 18 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
 | ● | ● | Audit and evidence | 6 mentions in 2 docs, most in 0061-frameworks, practice 3. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 
 ### Regulation
