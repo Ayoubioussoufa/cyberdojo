@@ -111,7 +111,7 @@ Comparer un fichier à son empreinte publiée tient en deux lignes de Python, av
 Usages : vérifier qu'un téléchargement n'a pas été modifié, identifier des échantillons de malwares, et servir de brique pour les signatures. **MD5 et SHA-1 sont cassés** pour la sécurité : on peut fabriquer des collisions volontairement. Utilisez SHA-256 ou SHA-3. Les [normes de hachage](https://csrc.nist.gov/projects/hash-functions) du NIST (en anglais) listent ce qui est approuvé.
 
 ?? Vous publiez un fichier avec son SHA-256 à côté, sur la même page web. Contre quoi cela protège-t-il ?
-+ La corruption accidentelle du fichier pendant son téléchargement
++ La corruption accidentelle du fichier lors du transfert
 - Un attaquant qui contrôle toute cette page web
 - Quiconque lit le fichier pendant son transit réseau
 - Une personne ayant volé votre clé de signature
