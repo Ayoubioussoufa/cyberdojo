@@ -2,7 +2,7 @@
 title: Python from zero
 summary: Variables, lists, loops, functions and virtual environments, using a security task as the running example.
 month: 4
-minutes: 45
+minutes: 60
 builds: a small script that flags weak passwords from a list
 source: The Python Tutorial, official | https://docs.python.org/3/tutorial/
 words: variable, function, virtual environment
@@ -37,6 +37,10 @@ Run it with `python3 hello.py`. The `f` before the quotes lets you put values in
 - It fixes any spelling in text
 => It's an f-string: anything in `{}` gets filled in.
 
+Your turn. The box below runs real Python in your browser, and nothing leaves your machine. Write the function, press Run, and read the tests: each one tells you what it expected.
+
+@code greet-user
+
 ## The types you'll use constantly
 
 ```python
@@ -58,6 +62,12 @@ A **dict** is the workhorse of log analysis: `hits[ip]` looks up the count for a
 - A boolean recording each new address you see
 => A dict gives you a direct lookup by key. Python even has `collections.Counter`, built for exactly this.
 
+Two moves cover most of what you'll do with a dict. `hits[ip] = 1` stores a value under a key. `hits.get(ip, 0)` reads the value for a key, and gives you `0` when the key isn't there yet, rather than stopping with a `KeyError`. Put together, `hits[ip] = hits.get(ip, 0) + 1` means "add one to this IP's count, starting from zero the first time".
+
+To visit every item of a list, write `for ip in ips:` and indent the lines that should run for each one. The next section explains the loop itself; here you only need that one line.
+
+@code count-hits
+
 ## Decisions and loops
 
 Python uses **indentation** to group code. Those spaces aren't decoration: they're the structure.
@@ -78,6 +88,10 @@ for ip, n in hits.items():
 - It sets the file's size
 - It marks lines as comments
 => Those spaces are the structure. Wrong indentation changes what the program does.
+
+Python checks the conditions from top to bottom and runs the first branch that is true, then skips the rest. So the order matters: test the strictest condition first.
+
+@code classify-attempts
 
 ## Functions
 
@@ -102,6 +116,10 @@ The `: str` and `-> bool` are type hints: they don't change behaviour, but they 
 - They hide code from other people
 => Small named pieces are what make testing possible.
 
+A string is a sequence of characters, so `for ch in password:` visits them one at a time, and `ch.isdigit()` is `True` when that character is a digit. That's all you need for the next one.
+
+@code is-weak-password
+
 ## Handling errors
 
 Real data is messy. **Exceptions** let you handle problems rather than crash:
@@ -123,6 +141,10 @@ except FileNotFoundError:
 - Run code twice at once
 => Real data is messy, so a good tool expects problems and handles them.
 
+The same pattern guards any conversion. `int("22")` gives the number 22, but `int("ssh")` raises a `ValueError`, because the text isn't a number. Text that comes from a file, a form or a log is never guaranteed to be what you expect, so you convert inside `try` and decide what to return when it fails.
+
+@code parse-port
+
 ## Virtual environments
 
 Different projects need different package versions. A **virtual environment** gives each one its own folder.
@@ -142,6 +164,14 @@ Add `.venv/` to `.gitignore`. Never install random packages system-wide, and rem
 - It makes the Python interpreter run much faster
 - It lets the project run without any Python
 => Isolation avoids version conflicts and makes a project reproducible from `requirements.txt`.
+
+## Put it together
+
+One last challenge uses everything above: a function, a loop, decisions and a conversion. Two string tools help. `"10.0.0.1".split(".")` cuts the text at each dot and gives the list `["10", "0", "0", "1"]`. `"10".isdigit()` is `True` when every character is a digit, so you can check a part before you call `int()` on it. `len(parts)` tells you how many parts you got.
+
+Validating input like this is a security habit, not an exercise: a tool that accepts `999.1.1.1` or an empty string as an address will pass rubbish to whatever runs next.
+
+@code is-valid-ip
 
 ::: try Your first tool
 Write `weakpass.py`. It reads a file of passwords, one per line, and prints how many fail your rules. Use made-up passwords, never real ones. Then read the [Python tutorial](https://docs.python.org/3/tutorial/) up to chapter 5. If you'd like a structured course, [CS50P](https://cs50.harvard.edu/python/) is excellent.
