@@ -544,6 +544,46 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import hmac, hashlib, struct\n\ndef hotp(secret, counter):\n    digest = hmac.new(secret, struct.pack('>Q', counter), hashlib.sha1).digest()\n    position = digest[-1] & 0x0f\n    number = int.from_bytes(digest[position:position + 4], 'big') & 0x7fffffff\n    return str(number % 1000000).zfill(6)\n",
   },
+  {
+    id: "pkce-challenge",
+    prompt: "Write pkce_challenge(verifier): return the PKCE code challenge for a code verifier given as text. It is the SHA-256 of the verifier, encoded with base64.urlsafe_b64encode, with the = padding removed, as text.",
+    starter: "import hashlib, base64\n\ndef pkce_challenge(verifier):\n    # Your code here.\n    return \"\"\n",
+    tests: [
+      { name: "the example from RFC 7636", expr: "pkce_challenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk') == 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'" },
+      { name: "another verifier", expr: "pkce_challenge('a-different-verifier') == 'AkNVVHAAJGZURriUoiB3SOS2JidiVGdHI-ZhLoPPKP8'" },
+      { name: "no padding is left", expr: "'=' not in pkce_challenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk')" },
+      { name: "always 43 characters", expr: "len(pkce_challenge('x')) == 43" },
+    ],
+    solution: "import hashlib, base64\n\ndef pkce_challenge(verifier):\n    digest = hashlib.sha256(verifier.encode()).digest()\n    return base64.urlsafe_b64encode(digest).decode().rstrip('=')\n",
+  },
+  {
+    id: "redirect-allowed",
+    prompt: "Write redirect_allowed(uri, registered): return True only when uri is exactly one of the addresses in the list registered. The starter accepts anything that begins like a registered address, and the tests show why that is not enough.",
+    starter: "def redirect_allowed(uri, registered):\n    for allowed in registered:\n        if uri.startswith(allowed):\n            return True\n    return False\n",
+    tests: [
+      { name: "a registered address", expr: "redirect_allowed('https://app.example/callback', ['https://app.example/callback', 'https://app.example/silent-renew']) == True" },
+      { name: "the second registered address", expr: "redirect_allowed('https://app.example/silent-renew', ['https://app.example/callback', 'https://app.example/silent-renew']) == True" },
+      { name: "an unknown site", expr: "redirect_allowed('https://evil.example/callback', ['https://app.example/callback', 'https://app.example/silent-renew']) == False" },
+      { name: "a longer host that starts the same", expr: "redirect_allowed('https://app.example/callback.evil.example/x', ['https://app.example/callback', 'https://app.example/silent-renew']) == False" },
+      { name: "extra path after the registered one", expr: "redirect_allowed('https://app.example/callback/../admin', ['https://app.example/callback', 'https://app.example/silent-renew']) == False" },
+      { name: "the same address over http", expr: "redirect_allowed('http://app.example/callback', ['https://app.example/callback', 'https://app.example/silent-renew']) == False" },
+    ],
+    solution: "def redirect_allowed(uri, registered):\n    return uri in registered\n",
+  },
+  {
+    id: "id-token-problems",
+    prompt: "Write id_token_problems(claims, issuer, client_id, now): claims is the decoded payload of an ID token, a dict with 'iss', 'aud' and 'exp'. Return a list of what is wrong, in this order: 'wrong issuer' if iss is not issuer, 'wrong audience' if aud is not client_id, 'expired' if exp is not later than now. A good token gives an empty list.",
+    starter: "def id_token_problems(claims, issuer, client_id, now):\n    problems = []\n    # Your code here.\n    return problems\n",
+    tests: [
+      { name: "a good token", expr: "id_token_problems({'iss': 'https://idp.example', 'aud': 'notes-app', 'exp': 2000}, 'https://idp.example', 'notes-app', 1000) == []" },
+      { name: "issued to another app", expr: "id_token_problems({'iss': 'https://idp.example', 'aud': 'calendar-app', 'exp': 2000}, 'https://idp.example', 'notes-app', 1000) == ['wrong audience']" },
+      { name: "from another provider", expr: "id_token_problems({'iss': 'https://idp.evil.example', 'aud': 'notes-app', 'exp': 2000}, 'https://idp.example', 'notes-app', 1000) == ['wrong issuer']" },
+      { name: "expired", expr: "id_token_problems({'iss': 'https://idp.example', 'aud': 'notes-app', 'exp': 900}, 'https://idp.example', 'notes-app', 1000) == ['expired']" },
+      { name: "expiring this very second counts as expired", expr: "id_token_problems({'iss': 'https://idp.example', 'aud': 'notes-app', 'exp': 1000}, 'https://idp.example', 'notes-app', 1000) == ['expired']" },
+      { name: "everything wrong, in order", expr: "id_token_problems({'iss': 'x', 'aud': 'y', 'exp': 1}, 'https://idp.example', 'notes-app', 1000) == ['wrong issuer', 'wrong audience', 'expired']" },
+    ],
+    solution: "def id_token_problems(claims, issuer, client_id, now):\n    problems = []\n    if claims['iss'] != issuer:\n        problems.append('wrong issuer')\n    if claims['aud'] != client_id:\n        problems.append('wrong audience')\n    if claims['exp'] <= now:\n        problems.append('expired')\n    return problems\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

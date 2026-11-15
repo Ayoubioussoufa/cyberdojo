@@ -339,4 +339,30 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un autre secret donne un autre code",
     ],
   },
+  "pkce-challenge": {
+    prompt: "Écrivez pkce_challenge(verifier) : renvoyez le défi PKCE (code challenge) d'un vérificateur donné sous forme de texte. C'est le SHA-256 du vérificateur, encodé avec base64.urlsafe_b64encode, sans le remplissage =, sous forme de texte.",
+    tests: ["l'exemple de la RFC 7636", "un autre vérificateur", "il ne reste aucun remplissage", "toujours 43 caractères"],
+  },
+  "redirect-allowed": {
+    prompt: "Écrivez redirect_allowed(uri, registered) : renvoyez True seulement quand uri est exactement l'une des adresses de la liste registered. Le code de départ accepte tout ce qui commence comme une adresse enregistrée, et les tests montrent pourquoi cela ne suffit pas.",
+    tests: [
+      "une adresse enregistrée",
+      "la seconde adresse enregistrée",
+      "un site inconnu",
+      "un hôte plus long qui commence pareil",
+      "du chemin en plus après l'adresse enregistrée",
+      "la même adresse en http",
+    ],
+  },
+  "id-token-problems": {
+    prompt: "Écrivez id_token_problems(claims, issuer, client_id, now) : claims est la charge utile décodée d'un jeton d'identité, un dict avec 'iss', 'aud' et 'exp'. Renvoyez la liste de ce qui ne va pas, dans cet ordre : 'wrong issuer' si iss n'est pas issuer, 'wrong audience' si aud n'est pas client_id, 'expired' si exp n'est pas postérieur à now. Un bon jeton donne une liste vide.",
+    tests: [
+      "un bon jeton",
+      "délivré à une autre application",
+      "venu d'un autre fournisseur",
+      "expiré",
+      "expirer à la seconde même compte comme expiré",
+      "tout est faux, dans l'ordre",
+    ],
+  },
 };
