@@ -1010,6 +1010,56 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def mttd_mttr(incidents):\n    if not incidents:\n        return 0, 0\n    detect = sum(i['noticed'] - i['began'] for i in incidents) / len(incidents)\n    respond = sum(i['stopped'] - i['noticed'] for i in incidents) / len(incidents)\n    return detect, respond\n",
   },
+  {
+    id: "parse-sshd-line",
+    prompt: "Write parse_sshd(line): turn one sshd log line into a dict with 'time', 'host', 'outcome', 'user' and 'src_ip'. outcome is 'failure' for a line that says Failed password and 'success' for Accepted password. Return None for any line that does not fit. A pattern is given: its five groups are the time, the host, the word Failed or Accepted, the user and the address.",
+    starter: "import re\n\nPATTERN = re.compile(r'^\\w+ +\\d+ (\\S+) (\\S+) sshd\\[\\d+\\]: (Failed|Accepted) password for (?:invalid user )?(\\S+) from (\\S+) port')\n\ndef parse_sshd(line):\n    m = PATTERN.search(line)\n    # Your code here: return None when there is no match, otherwise build the dict from m.group(1) to m.group(5).\n    return None\n",
+    tests: [
+      { name: "the failed login from the lesson", expr: "parse_sshd('Oct 27 09:14:02 web1 sshd[811]: Failed password for root from 203.0.113.7 port 44210 ssh2') == {'time': '09:14:02', 'host': 'web1', 'outcome': 'failure', 'user': 'root', 'src_ip': '203.0.113.7'}" },
+      { name: "a successful login", expr: "parse_sshd('Oct 27 09:20:11 web1 sshd[840]: Accepted password for ana from 198.51.100.4 port 51000 ssh2')['outcome'] == 'success'" },
+      { name: "an invalid user line still gives the user", expr: "parse_sshd('Oct 27 09:14:05 web1 sshd[812]: Failed password for invalid user admin from 203.0.113.7 port 44211 ssh2')['user'] == 'admin'" },
+      { name: "a line from another program gives None", expr: "parse_sshd('Oct 27 09:15:00 web1 cron[900]: (root) CMD (run-parts /etc/cron.hourly)') is None" },
+      { name: "an empty line gives None", expr: "parse_sshd('') is None" },
+    ],
+    solution: "import re\n\nPATTERN = re.compile(r'^\\w+ +\\d+ (\\S+) (\\S+) sshd\\[\\d+\\]: (Failed|Accepted) password for (?:invalid user )?(\\S+) from (\\S+) port')\n\ndef parse_sshd(line):\n    m = PATTERN.search(line)\n    if not m:\n        return None\n    outcome = 'failure' if m.group(3) == 'Failed' else 'success'\n    return {'time': m.group(1), 'host': m.group(2), 'outcome': outcome, 'user': m.group(4), 'src_ip': m.group(5)}\n",
+  },
+  {
+    id: "normalize-event",
+    prompt: "Write normalize(event, mapping): event is a dict of fields from one product, and mapping says how that product's field names translate to the common ones. Return a new dict in which every field named in mapping has its new name, and every other field is kept as it is.",
+    starter: "def normalize(event, mapping):\n    # Your code here.\n    return event\n",
+    tests: [
+      { name: "two products end up with the same field name", expr: "normalize({'client': '203.0.113.7', 'user': 'root'}, {'client': 'source.ip', 'user': 'user.name'}) == normalize({'src_ip': '203.0.113.7', 'account': 'root'}, {'src_ip': 'source.ip', 'account': 'user.name'})" },
+      { name: "fields are renamed", expr: "normalize({'src_ip': '10.0.0.5', 'outcome': 'failure'}, {'src_ip': 'source.ip', 'outcome': 'event.outcome'}) == {'source.ip': '10.0.0.5', 'event.outcome': 'failure'}" },
+      { name: "fields the mapping does not mention are kept", expr: "normalize({'src_ip': '10.0.0.5', 'port': 22}, {'src_ip': 'source.ip'}) == {'source.ip': '10.0.0.5', 'port': 22}" },
+      { name: "the original event is not changed", expr: "(lambda e: (normalize(e, {'a': 'b'}), e))({'a': 1})[1] == {'a': 1}" },
+      { name: "an empty event", expr: "normalize({}, {'a': 'b'}) == {}" },
+    ],
+    solution: "def normalize(event, mapping):\n    return {mapping.get(name, name): value for name, value in event.items()}\n",
+  },
+  {
+    id: "join-dns-firewall",
+    prompt: "Write name_connections(firewall, dns): firewall is a list of dicts with 'host' and 'dst_ip'. dns is a list of dicts with 'host', 'name' and 'ip'. For each firewall connection, in order, find a DNS record from the same host whose ip equals the dst_ip. Return a list of (host, dst_ip, name) tuples, with None as the name when that host never looked the address up.",
+    starter: "def name_connections(firewall, dns):\n    result = []\n    # Your code here.\n    return result\n",
+    tests: [
+      { name: "each connection gets its name", expr: "name_connections([{'host': 'HR-LAP-12', 'dst_ip': '203.0.113.50'}, {'host': 'HR-LAP-12', 'dst_ip': '198.51.100.9'}, {'host': 'FIN-LAP-03', 'dst_ip': '203.0.113.50'}], [{'host': 'HR-LAP-12', 'name': 'updates.example', 'ip': '198.51.100.9'}, {'host': 'HR-LAP-12', 'name': 'cdn-sync.example', 'ip': '203.0.113.50'}, {'host': 'FIN-LAP-03', 'name': 'mail.example', 'ip': '192.0.2.10'}])[:2] == [('HR-LAP-12', '203.0.113.50', 'cdn-sync.example'), ('HR-LAP-12', '198.51.100.9', 'updates.example')]" },
+      { name: "a connection with no lookup from that host gets None", expr: "name_connections([{'host': 'HR-LAP-12', 'dst_ip': '203.0.113.50'}, {'host': 'HR-LAP-12', 'dst_ip': '198.51.100.9'}, {'host': 'FIN-LAP-03', 'dst_ip': '203.0.113.50'}], [{'host': 'HR-LAP-12', 'name': 'updates.example', 'ip': '198.51.100.9'}, {'host': 'HR-LAP-12', 'name': 'cdn-sync.example', 'ip': '203.0.113.50'}, {'host': 'FIN-LAP-03', 'name': 'mail.example', 'ip': '192.0.2.10'}])[2] == ('FIN-LAP-03', '203.0.113.50', None)" },
+      { name: "no DNS data at all", expr: "name_connections([{'host': 'HR-LAP-12', 'dst_ip': '203.0.113.50'}, {'host': 'HR-LAP-12', 'dst_ip': '198.51.100.9'}, {'host': 'FIN-LAP-03', 'dst_ip': '203.0.113.50'}], []) == [('HR-LAP-12', '203.0.113.50', None), ('HR-LAP-12', '198.51.100.9', None), ('FIN-LAP-03', '203.0.113.50', None)]" },
+      { name: "no connections", expr: "name_connections([], [{'host': 'HR-LAP-12', 'name': 'updates.example', 'ip': '198.51.100.9'}, {'host': 'HR-LAP-12', 'name': 'cdn-sync.example', 'ip': '203.0.113.50'}, {'host': 'FIN-LAP-03', 'name': 'mail.example', 'ip': '192.0.2.10'}]) == []" },
+    ],
+    solution: "def name_connections(firewall, dns):\n    result = []\n    for conn in firewall:\n        name = None\n        for record in dns:\n            if record['host'] == conn['host'] and record['ip'] == conn['dst_ip']:\n                name = record['name']\n                break\n        result.append((conn['host'], conn['dst_ip'], name))\n    return result\n",
+  },
+  {
+    id: "summarize-count",
+    prompt: "Write summarize_count(events, field): events is a list of dicts. Count how many events have each value of the given field, and return a list of (value, count) pairs sorted from the highest count to the lowest. Pairs with the same count are ordered by value. Skip events that lack the field.",
+    starter: "def summarize_count(events, field):\n    counts = {}\n    # Your code here.\n    return []\n",
+    tests: [
+      { name: "failures by source address", expr: "summarize_count([{'src_ip': '203.0.113.7', 'user': 'root'}, {'src_ip': '198.51.100.4', 'user': 'ana'}, {'src_ip': '203.0.113.7', 'user': 'admin'}, {'src_ip': '203.0.113.7', 'user': 'root'}, {'src_ip': '192.0.2.9', 'user': 'ana'}], 'src_ip') == [('203.0.113.7', 3), ('192.0.2.9', 1), ('198.51.100.4', 1)]" },
+      { name: "the same events grouped by user", expr: "summarize_count([{'src_ip': '203.0.113.7', 'user': 'root'}, {'src_ip': '198.51.100.4', 'user': 'ana'}, {'src_ip': '203.0.113.7', 'user': 'admin'}, {'src_ip': '203.0.113.7', 'user': 'root'}, {'src_ip': '192.0.2.9', 'user': 'ana'}], 'user') == [('ana', 2), ('root', 2), ('admin', 1)]" },
+      { name: "events without the field are skipped", expr: "summarize_count([{'a': 1}, {'b': 2}, {'a': 1}], 'a') == [(1, 2)]" },
+      { name: "no events", expr: "summarize_count([], 'src_ip') == []" },
+    ],
+    solution: "def summarize_count(events, field):\n    counts = {}\n    for event in events:\n        if field in event:\n            counts[event[field]] = counts.get(event[field], 0) + 1\n    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

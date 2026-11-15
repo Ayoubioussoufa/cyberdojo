@@ -679,4 +679,37 @@ export const PY_FR: Record<string, PyChallengeFr> = {
     prompt: "Écrivez mttd_mttr(incidents) : incidents est une liste de dicts avec 'began', 'noticed' et 'stopped', chacun étant une heure en minutes. Renvoyez (mttd, mttr) : la moyenne de noticed moins began, et la moyenne de stopped moins noticed. Renvoyez (0, 0) pour une liste vide.",
     tests: ["les deux incidents de la leçon", "un seul incident", "une moyenne qui n'est pas un nombre entier", "aucun incident"],
   },
+  "parse-sshd-line": {
+    prompt: "Écrivez parse_sshd(line) : transformez une ligne de journal de sshd en dict avec 'time', 'host', 'outcome', 'user' et 'src_ip'. outcome vaut 'failure' pour une ligne qui dit Failed password et 'success' pour Accepted password. Renvoyez None pour toute ligne qui ne correspond pas. Un motif est fourni : ses cinq groupes sont l'heure, l'hôte, le mot Failed ou Accepted, l'utilisateur et l'adresse.",
+    tests: [
+      "l'échec de connexion de la leçon",
+      "une connexion réussie",
+      "une ligne invalid user donne quand même l'utilisateur",
+      "une ligne d'un autre programme donne None",
+      "une ligne vide donne None",
+    ],
+  },
+  "normalize-event": {
+    prompt: "Écrivez normalize(event, mapping) : event est un dict de champs venus d'un produit, et mapping dit comment les noms de champs de ce produit se traduisent en noms communs. Renvoyez un nouveau dict où chaque champ nommé dans mapping porte son nouveau nom, et où tous les autres champs sont gardés tels quels.",
+    tests: [
+      "deux produits aboutissent au même nom de champ",
+      "les champs sont renommés",
+      "les champs que mapping ne mentionne pas sont gardés",
+      "l'événement d'origine n'est pas modifié",
+      "un événement vide",
+    ],
+  },
+  "join-dns-firewall": {
+    prompt: "Écrivez name_connections(firewall, dns) : firewall est une liste de dicts avec 'host' et 'dst_ip'. dns est une liste de dicts avec 'host', 'name' et 'ip'. Pour chaque connexion du pare-feu, dans l'ordre, trouvez un enregistrement DNS du même hôte dont ip est égal à dst_ip. Renvoyez une liste de tuples (host, dst_ip, name), avec None comme nom quand cet hôte n'a jamais recherché l'adresse.",
+    tests: [
+      "chaque connexion reçoit son nom",
+      "une connexion sans recherche de cet hôte reçoit None",
+      "aucune donnée DNS",
+      "aucune connexion",
+    ],
+  },
+  "summarize-count": {
+    prompt: "Écrivez summarize_count(events, field) : events est une liste de dicts. Comptez combien d'événements ont chaque valeur du champ donné, et renvoyez une liste de paires (valeur, compte) triée du compte le plus élevé au plus bas. Les paires de même compte sont rangées par valeur. Sautez les événements qui n'ont pas le champ.",
+    tests: ["les échecs par adresse source", "les mêmes événements regroupés par utilisateur", "les événements sans le champ sont sautés", "aucun événement"],
+  },
 };
