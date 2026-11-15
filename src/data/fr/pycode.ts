@@ -276,4 +276,36 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "une fin ressemblante ne correspond pas",
     ],
   },
+  "password-hash": {
+    prompt: "Écrivez deux fonctions. hash_password(password, salt, iterations) renvoie le PBKDF2-HMAC-SHA256 du mot de passe sous forme de texte hexadécimal : password est du texte, encodez-le donc d'abord en octets, et salt est déjà en octets. verify_password(password, salt, iterations, stored) renvoie True quand hacher de nouveau le mot de passe donne stored. Comparez avec hmac.compare_digest.",
+    tests: [
+      "la valeur connue pour hunter2 avec salt-a",
+      "un autre sel donne une autre empreinte",
+      "plus d'itérations donnent une autre empreinte",
+      "le bon mot de passe est accepté",
+      "le mauvais mot de passe est refusé",
+      "le bon mot de passe avec le mauvais sel est refusé",
+    ],
+  },
+  "login-rate-limit": {
+    prompt: "Écrivez allow_attempt(failures, now, limit, window) : failures est la liste des instants, en secondes, des échecs de connexion précédents d'un compte. Renvoyez True quand moins de limit d'entre eux ont eu lieu dans les window dernières secondes avant now, pour qu'une nouvelle tentative puisse avoir lieu.",
+    tests: [
+      "aucun échec pour l'instant",
+      "quatre échecs récents, limite de cinq",
+      "cinq échecs récents, limite de cinq",
+      "les vieux échecs ne comptent plus",
+      "un mélange d'anciens et de récents",
+      "un échec vieux d'exactement une fenêtre a expiré",
+    ],
+  },
+  "can-read-note": {
+    prompt: "Écrivez can_read(user, note) : user est un dict avec 'id' et 'role', et note est un dict avec 'owner_id'. Renvoyez True quand l'utilisateur possède la note ou a le rôle 'admin'. Quand user vaut None, personne n'est connecté : renvoyez False.",
+    tests: [
+      "le propriétaire peut lire",
+      "un autre utilisateur ne peut pas",
+      "un administrateur peut lire toute note",
+      "sans personne de connecté, non",
+      "un rôle qui ressemble seulement à admin ne compte pas",
+    ],
+  },
 };

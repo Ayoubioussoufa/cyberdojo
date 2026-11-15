@@ -463,6 +463,47 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def name_matches(host, pattern):\n    host, pattern = host.lower(), pattern.lower()\n    if not pattern.startswith('*.'):\n        return host == pattern\n    rest = pattern[2:]\n    first, _, tail = host.partition('.')\n    return first != '' and tail == rest\n",
   },
+  {
+    id: "password-hash",
+    prompt: "Write two functions. hash_password(password, salt, iterations) returns the PBKDF2-HMAC-SHA256 of the password as hex text: password is text, so encode it to bytes first, and salt is already bytes. verify_password(password, salt, iterations, stored) returns True when hashing the password again gives stored. Compare with hmac.compare_digest.",
+    starter: "import hashlib, hmac\n\ndef hash_password(password, salt, iterations):\n    # hashlib.pbkdf2_hmac('sha256', password_bytes, salt, iterations) returns bytes; .hex() turns them into text.\n    return \"\"\n\ndef verify_password(password, salt, iterations, stored):\n    # Your code here.\n    return False\n",
+    tests: [
+      { name: "the known value for hunter2 with salt-a", expr: "hash_password('hunter2', b'salt-a', 1000) == 'f681163bbdaa9270a5c685ee22d3be6c24577bcccc63df0f10b2b67f465ff9d4'" },
+      { name: "a different salt gives a different hash", expr: "hash_password('hunter2', b'salt-a', 1000) != hash_password('hunter2', b'salt-b', 1000)" },
+      { name: "more iterations give a different hash", expr: "hash_password('hunter2', b'salt-a', 1000) != hash_password('hunter2', b'salt-a', 2000)" },
+      { name: "the right password verifies", expr: "verify_password('hunter2', b'salt-a', 1000, 'f681163bbdaa9270a5c685ee22d3be6c24577bcccc63df0f10b2b67f465ff9d4') == True" },
+      { name: "the wrong password does not", expr: "verify_password('hunter3', b'salt-a', 1000, 'f681163bbdaa9270a5c685ee22d3be6c24577bcccc63df0f10b2b67f465ff9d4') == False" },
+      { name: "the right password with the wrong salt does not", expr: "verify_password('hunter2', b'salt-b', 1000, 'f681163bbdaa9270a5c685ee22d3be6c24577bcccc63df0f10b2b67f465ff9d4') == False" },
+    ],
+    solution: "import hashlib, hmac\n\ndef hash_password(password, salt, iterations):\n    return hashlib.pbkdf2_hmac('sha256', password.encode(), salt, iterations).hex()\n\ndef verify_password(password, salt, iterations, stored):\n    return hmac.compare_digest(hash_password(password, salt, iterations), stored)\n",
+  },
+  {
+    id: "login-rate-limit",
+    prompt: "Write allow_attempt(failures, now, limit, window): failures is a list of the times, in seconds, of an account's earlier failed logins. Return True when fewer than limit of them happened in the last window seconds before now, so that another attempt may go ahead.",
+    starter: "def allow_attempt(failures, now, limit, window):\n    # Your code here.\n    return True\n",
+    tests: [
+      { name: "no failures yet", expr: "allow_attempt([], 1000, 5, 60) == True" },
+      { name: "four recent failures, limit five", expr: "allow_attempt([990, 991, 992, 993], 1000, 5, 60) == True" },
+      { name: "five recent failures, limit five", expr: "allow_attempt([990, 991, 992, 993, 994], 1000, 5, 60) == False" },
+      { name: "old failures no longer count", expr: "allow_attempt([100, 101, 102, 103, 104], 1000, 5, 60) == True" },
+      { name: "a mix of old and recent", expr: "allow_attempt([100, 101, 990, 991, 992, 993, 994], 1000, 5, 60) == False" },
+      { name: "a failure exactly one window ago has expired", expr: "allow_attempt([940, 995, 996, 997, 998], 1000, 5, 60) == True" },
+    ],
+    solution: "def allow_attempt(failures, now, limit, window):\n    recent = 0\n    for t in failures:\n        if now - t < window:\n            recent += 1\n    return recent < limit\n",
+  },
+  {
+    id: "can-read-note",
+    prompt: "Write can_read(user, note): user is a dict with 'id' and 'role', and note is a dict with 'owner_id'. Return True when the user owns the note or has the role 'admin'. When user is None, nobody is logged in: return False.",
+    starter: "def can_read(user, note):\n    # Your code here.\n    return True\n",
+    tests: [
+      { name: "the owner can read", expr: "can_read({'id': 2, 'role': 'user'}, {'owner_id': 2}) == True" },
+      { name: "another user cannot", expr: "can_read({'id': 2, 'role': 'user'}, {'owner_id': 1}) == False" },
+      { name: "an admin can read any note", expr: "can_read({'id': 9, 'role': 'admin'}, {'owner_id': 1}) == True" },
+      { name: "nobody logged in cannot", expr: "can_read(None, {'owner_id': 1}) == False" },
+      { name: "a role that only looks like admin does not count", expr: "can_read({'id': 3, 'role': 'administrator-wannabe'}, {'owner_id': 1}) == False" },
+    ],
+    solution: "def can_read(user, note):\n    if user is None:\n        return False\n    return user['id'] == note['owner_id'] or user['role'] == 'admin'\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

@@ -84,8 +84,8 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 21 mentions in 11 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ○ | ◐ | openssl s_client (tool) | 1 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
+| ● | ● | curl (tool) | 38 mentions in 13 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ○ | ◐ | openssl s_client (tool) | 3 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 9 mentions in 6 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 5 mentions in 3 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
 | ○ | ◐ | scapy and hping: crafted packets (tool) | None. *Tools table and a reading link only.* | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -112,7 +112,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ○ | ● | Scan timing, rate and how each looks to a defender | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Nmap Scripting Engine | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | masscan, RustScan, ZMap (tool) | None. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ◐ | ● | Service and OS fingerprinting | 9 mentions in 6 docs, most in 0038-hashes-and-symmetric-crypto, practice 3. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ◐ | ● | Service and OS fingerprinting | 10 mentions in 6 docs, most in 0038-hashes-and-symmetric-crypto, practice 3. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ●* | ● | Detecting scans | None. *Lesson 22, 'What a defender sees'.* |  |
 
 ### Proxies, pivoting, tunnelling
@@ -242,12 +242,12 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | AES as a user | 11 mentions in 4 docs, most in 0038-hashes-and-symmetric-crypto, practice 2. *Lesson 38, 'Symmetric encryption'.* | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
+| ●* | ● | AES as a user | 14 mentions in 5 docs, most in 0038-hashes-and-symmetric-crypto, practice 2. *Lesson 38, 'Symmetric encryption'.* | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
 | ○ | ● | Block cipher internals: S-boxes, SPN, key schedule | None. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
-| ◐ | ● | Modes of operation: ECB, CBC, CTR, GCM | 8 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto, practice 5. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
+| ◐ | ● | Modes of operation: ECB, CBC, CTR, GCM | 10 mentions in 2 docs, most in 0038-hashes-and-symmetric-crypto, practice 5. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
 | ◐ | ● | Stream ciphers, ChaCha20 | 7 mentions in 3 docs, most in 0044-kerberos-and-ntlm, practice 4. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
 | ◐ | ● | AEAD | 3 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto, practice 1. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
-| ●* | ● | MACs and HMAC | 5 mentions in 3 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'HMAC: integrity with a key'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ●* | ● | MACs and HMAC | 6 mentions in 3 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'HMAC: integrity with a key'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 
 ### Hashing
 
@@ -256,8 +256,8 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 34 mentions in 11 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 27 mentions in 3 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 44 mentions in 11 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 36 mentions in 3 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
 ### Asymmetric
@@ -267,7 +267,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ◐* | ● | RSA | 2 mentions in 1 docs, most in 0039-public-keys-and-tls. *A glossary line and 'Two keys' in lesson 39. The mathematics isn't taught.* | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ○ | ● | RSA padding and attacks: OAEP, Bleichenbacher | None. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ●* | ● | Diffie-Hellman and forward secrecy | 4 mentions in 1 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Key exchange'.* | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
-| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 7 mentions in 4 docs, most in 0025-hardening-linux, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
+| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 8 mentions in 4 docs, most in 0025-hardening-linux, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
 | ○ | ● | Nonce misuse | 1 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
 | ●* | ● | Digital signatures | 5 mentions in 3 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Digital signatures'.* |  |
 
@@ -284,7 +284,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | TLS 1.3 handshake | 10 mentions in 3 docs, most in 0039-public-keys-and-tls. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
+| ● | ● | TLS 1.3 handshake | 11 mentions in 3 docs, most in 0039-public-keys-and-tls. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Key schedule and HKDF | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | History of TLS attacks | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Downgrade attacks | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
@@ -304,9 +304,9 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ◐ | ● | Post-quantum cryptography | 3 mentions in 1 docs, most in 0039-public-keys-and-tls. | [The crypto frontier](modules/03-cryptography/12-modern-crypto-frontier.md) |
 | ○ | ● | End-to-end encryption, Signal protocol | None. | [The crypto frontier](modules/03-cryptography/12-modern-crypto-frontier.md) |
 | ○ | ● | Zero knowledge, MPC, homomorphic encryption | None. | [The crypto frontier](modules/03-cryptography/12-modern-crypto-frontier.md) |
-| ○ | ● | openssl (tool) | 1 mentions in 1 docs, most in 0039-public-keys-and-tls. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
+| ○ | ● | openssl (tool) | 11 mentions in 1 docs, most in 0039-public-keys-and-tls. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ◐ | ● | GnuPG, age (tool) | 11 mentions in 2 docs, most in P06. | [Key management](modules/03-cryptography/11-key-management.md) |
-| ◐ | ◐ | CyberChef (tool) | 10 mentions in 4 docs, most in P02. |  |
+| ◐ | ◐ | CyberChef (tool) | 12 mentions in 5 docs, most in P02. |  |
 
 ## 04 Web security
 
@@ -317,11 +317,11 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | HTTP requests, methods, status codes | 9 mentions in 2 docs, most in 0035-how-the-web-works, practice 2. |  |
-| ● | ● | Same-origin policy | 6 mentions in 1 docs, most in 0036-sessions-and-the-browser. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
-| ● | ● | CORS | 7 mentions in 1 docs, most in 0036-sessions-and-the-browser. |  |
-| ●* | ● | Cookies and flags: Secure, HttpOnly, SameSite | 15 mentions in 5 docs, most in 0036-sessions-and-the-browser, practice 6. *Lesson 36, 'Cookie flags'.* | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
+| ● | ● | Same-origin policy | 8 mentions in 1 docs, most in 0036-sessions-and-the-browser. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
+| ● | ● | CORS | 8 mentions in 1 docs, most in 0036-sessions-and-the-browser. |  |
+| ●* | ● | Cookies and flags: Secure, HttpOnly, SameSite | 22 mentions in 5 docs, most in 0036-sessions-and-the-browser, practice 6. *Lesson 36, 'Cookie flags'.* | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
 | ◐ | ● | Security headers and CSP | 3 mentions in 2 docs, most in 0047-keeping-input-out-of-the-code, practice 2. | [Browser defences and CSP](modules/04-web/01-browser-defences-and-csp.md) |
-| ●* | ● | Session management | 11 mentions in 6 docs, most in 0036-sessions-and-the-browser, practice 7. *Lesson 36, 'Sessions'.* | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
+| ●* | ● | Session management | 13 mentions in 6 docs, most in 0036-sessions-and-the-browser, practice 7. *Lesson 36, 'Sessions'.* | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
 
 ### OWASP Top 10:2025
 
@@ -331,7 +331,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ◐* | ● | A02 Security Misconfiguration | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
 | ●* | ● | A03 Software Supply Chain Failures | 2 mentions in 2 docs, most in 0046-how-web-applications-fail. *Lesson 69 is about exactly this, under other words.* |  |
 | ●* | ● | A04 Cryptographic Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 38 to 40.* |  |
-| ● | ● | A05 Injection | 57 mentions in 19 docs, most in 0047-keeping-input-out-of-the-code, practice 45. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | A05 Injection | 59 mentions in 19 docs, most in 0047-keeping-input-out-of-the-code, practice 45. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ●* | ● | A06 Insecure Design | 2 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lesson 68.* |  |
 | ●* | ● | A07 Authentication Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 40 to 42.* |  |
 | ◐* | ● | A08 Software or Data Integrity Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
@@ -342,7 +342,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | SQL injection basics | 16 mentions in 7 docs, most in 0037-databases-and-sql, practice 23. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | SQL injection basics | 17 mentions in 7 docs, most in 0037-databases-and-sql, practice 23. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | SQLi variants: union, blind, time-based, second-order | None. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ◐ | sqlmap (tool) | None. *Named in the tools table, for labs. Not taught.* | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ○ | ● | NoSQL injection | Practice only (3). *Section 'NoSQL'.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
@@ -358,7 +358,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 |---|---|---|---|---|
 | ● | ● | XSS: reflected, stored, DOM | 17 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 21. | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
 | ◐ | ● | DOM XSS and sinks specifically | 3 mentions in 1 docs, most in 0047-keeping-input-out-of-the-code. | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
-| ● | ● | CSRF and defences | 12 mentions in 2 docs, most in 0048-access-control-that-holds, practice 5. |  |
+| ● | ● | CSRF and defences | 15 mentions in 2 docs, most in 0036-sessions-and-the-browser, practice 5. |  |
 | ○ | ● | Clickjacking | None. | [Client-side web security](modules/04-web/05-client-side-attacks.md) |
 | ○ | ● | Open redirects | Practice only (4). | [Client-side web security](modules/04-web/05-client-side-attacks.md) |
 | ○ | ● | Prototype pollution | None. | [Client-side web security](modules/04-web/05-client-side-attacks.md) |
@@ -378,7 +378,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ○ | ● | Race conditions and TOCTOU in web apps | None. | [Business logic and race conditions](modules/04-web/11-logic-flaws-and-races.md) |
 | ◐ | ● | Business logic flaws | 3 mentions in 3 docs, most in c1-the-jobs. *The module's main subject.* | [Business logic and race conditions](modules/04-web/11-logic-flaws-and-races.md) |
 | ●* | ● | Mass assignment | 3 mentions in 1 docs, most in 0048-access-control-that-holds, practice 7. *Lesson 48, 'Saving what you shouldn't', with practice.* |  |
-| ●* | ● | Resource exhaustion and rate limiting (CWE-770) | 19 mentions in 8 docs, most in 0028-apis-and-secrets, practice 1. *Lesson 49, 'Limits'.* | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
+| ●* | ● | Resource exhaustion and rate limiting (CWE-770) | 21 mentions in 8 docs, most in 0028-apis-and-secrets, practice 1. *Lesson 49, 'Limits'.* | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
 
 ### APIs
 
@@ -386,7 +386,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 |---|---|---|---|---|
 | ●* | ● | OWASP API Security Top 10 | 1 mentions in 1 docs, most in 0049-apis-uploads-and-outbound-requests. *Lesson 49, 'The API Top 10'.* |  |
 | ◐ | ● | JWT attacks: alg, key confusion, weak secrets | 3 mentions in 3 docs, most in 0036-sessions-and-the-browser, practice 4. | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
-| ● | ● | JWT structure | 13 mentions in 3 docs, most in 0036-sessions-and-the-browser, practice 9. | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
+| ● | ● | JWT structure | 16 mentions in 3 docs, most in 0036-sessions-and-the-browser, practice 9. | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
 | ○ | ● | GraphQL | Practice only (17). | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
 | ○ | ● | gRPC | None. | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
 
@@ -405,7 +405,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | Parameterised queries | 10 mentions in 5 docs, most in 0037-databases-and-sql, practice 10. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
+| ●* | ● | Parameterised queries | 11 mentions in 5 docs, most in 0037-databases-and-sql, practice 10. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
 | ●* | ● | Output encoding | 7 mentions in 3 docs, most in h4-interviews, practice 5. *Lesson 47, 'XSS: encoding on output'.* |  |
 | ●* | ● | Input validation | 14 mentions in 7 docs, most in 0047-keeping-input-out-of-the-code, practice 21. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 | ● | ● | OWASP ASVS | 11 mentions in 5 docs, most in 0068-threat-modeling-and-secure-sdlc. |  |
@@ -689,7 +689,7 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 | ◐* | ● | MISP, OpenCTI (tool) | 7 mentions in 2 docs, most in P12. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ● | ● | Traffic Light Protocol | 16 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ◐ | ● | Attribution and its limits | 5 mentions in 2 docs, most in 0066-threat-intelligence. | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
-| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 29 mentions in 8 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
+| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 30 mentions in 9 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ○ | ● | The underground economy: IABs, RaaS | None. *Section 'Crime as a supply chain'.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 
 ### OSINT and recon (ATT&CK Reconnaissance)
@@ -772,7 +772,7 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 | ●* | ● | Least privilege, separation of duties | 15 mentions in 10 docs, most in 0007-users-and-permissions, practice 3. *Lesson 7, 'Least privilege', and lesson 41.* |  |
 | ●* | ● | Privileged access management, just-in-time | 4 mentions in 1 docs, most in 0041-identity-and-access. *Lesson 41, 'Reducing standing privilege'.* |  |
 | ●* | ● | Identity governance: joiner-mover-leaver, SCIM | 3 mentions in 1 docs, most in 0041-identity-and-access. *Lesson 41, 'The identity lifecycle'.* |  |
-| ○ | ● | NIST SP 800-63 password guidance | 3 mentions in 1 docs, most in 0040-storing-passwords. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
+| ○ | ● | NIST SP 800-63 password guidance | 6 mentions in 1 docs, most in 0040-storing-passwords. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
 ### Authentication
 
