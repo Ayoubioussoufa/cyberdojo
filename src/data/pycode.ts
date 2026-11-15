@@ -1060,6 +1060,62 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def summarize_count(events, field):\n    counts = {}\n    for event in events:\n        if field in event:\n            counts[event[field]] = counts.get(event[field], 0) + 1\n    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))\n",
   },
+  {
+    id: "indicator-kind",
+    prompt: "Write indicator_kind(value): return 'hash' when value is 32, 40 or 64 hex characters, 'ip' when ipaddress.ip_address accepts it, 'domain' when it contains a dot, has no spaces or slashes, and its last part is made only of letters, and 'other' for anything else. Check in that order.",
+    starter: "import ipaddress\n\ndef indicator_kind(value):\n    # Your code here.\n    return \"other\"\n",
+    tests: [
+      { name: "a SHA-256", expr: "indicator_kind('2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824') == 'hash'" },
+      { name: "an MD5", expr: "indicator_kind('5d41402abc4b2a76b9719d911017c592') == 'hash'" },
+      { name: "an IPv4 address", expr: "indicator_kind('203.0.113.7') == 'ip'" },
+      { name: "an IPv6 address", expr: "indicator_kind('2001:db8::1') == 'ip'" },
+      { name: "a domain", expr: "indicator_kind('cdn-sync.example') == 'domain'" },
+      { name: "a domain with a subdomain", expr: "indicator_kind('login.cdn-sync.example') == 'domain'" },
+      { name: "a sentence is not an indicator", expr: "indicator_kind('Office starts PowerShell.') == 'other'" },
+      { name: "a file path is not a domain", expr: "indicator_kind('C:/Users/Public/update.exe') == 'other'" },
+      { name: "a number with dots that is not an address", expr: "indicator_kind('999.1.2') == 'other'" },
+    ],
+    solution: "import ipaddress\n\ndef indicator_kind(value):\n    text = value.strip().lower()\n    if len(text) in (32, 40, 64) and all(c in '0123456789abcdef' for c in text):\n        return 'hash'\n    try:\n        ipaddress.ip_address(text)\n        return 'ip'\n    except ValueError:\n        pass\n    if '.' in text and ' ' not in text and '/' not in text and text.split('.')[-1].isalpha():\n        return 'domain'\n    return 'other'\n",
+  },
+  {
+    id: "pyramid-sort",
+    prompt: "Write pyramid_sort(indicators): indicators is a list of dicts with 'value' and 'level', one of 'hash', 'ip', 'domain', 'artifact', 'tool' or 'ttp'. Return the values ordered from the top of the Pyramid of Pain to the bottom: ttp, tool, artifact, domain, ip, hash. Indicators on the same level keep their original order.",
+    starter: "def pyramid_sort(indicators):\n    order = ['ttp', 'tool', 'artifact', 'domain', 'ip', 'hash']\n    # Your code here. sorted keeps the original order of items that compare equal.\n    return [i['value'] for i in indicators]\n",
+    tests: [
+      { name: "the six clues from the lesson", expr: "pyramid_sort([{'value': '203.0.113.7', 'level': 'ip'}, {'value': 'Office starts a script interpreter', 'level': 'ttp'}, {'value': '2cf24d...', 'level': 'hash'}, {'value': 'cdn-sync.example', 'level': 'domain'}, {'value': 'SyncClient/2.1', 'level': 'artifact'}, {'value': 'a remote-control tool', 'level': 'tool'}]) == ['Office starts a script interpreter', 'a remote-control tool', 'SyncClient/2.1', 'cdn-sync.example', '203.0.113.7', '2cf24d...']" },
+      { name: "the behaviour always comes first", expr: "pyramid_sort([{'value': '203.0.113.7', 'level': 'ip'}, {'value': 'Office starts a script interpreter', 'level': 'ttp'}, {'value': '2cf24d...', 'level': 'hash'}, {'value': 'cdn-sync.example', 'level': 'domain'}, {'value': 'SyncClient/2.1', 'level': 'artifact'}, {'value': 'a remote-control tool', 'level': 'tool'}])[0] == 'Office starts a script interpreter'" },
+      { name: "two on the same level keep their order", expr: "pyramid_sort([{'value': 'b.example', 'level': 'domain'}, {'value': 'a.example', 'level': 'domain'}]) == ['b.example', 'a.example']" },
+      { name: "an empty list", expr: "pyramid_sort([]) == []" },
+    ],
+    solution: "def pyramid_sort(indicators):\n    order = ['ttp', 'tool', 'artifact', 'domain', 'ip', 'hash']\n    ranked = sorted(indicators, key=lambda i: order.index(i['level']))\n    return [i['value'] for i in ranked]\n",
+  },
+  {
+    id: "office-spawns-script",
+    prompt: "Write office_spawns_script(events): events is a list of process-creation events, each a dict with 'parent' and 'image', both full Windows paths. Return the events where the parent's file name is winword.exe, excel.exe, powerpnt.exe or outlook.exe and the image's file name is powershell.exe, cmd.exe, wscript.exe, cscript.exe or mshta.exe. Ignore upper and lower case. The file name is the part after the last backslash.",
+    starter: "OFFICE = {'winword.exe', 'excel.exe', 'powerpnt.exe', 'outlook.exe'}\nSCRIPT = {'powershell.exe', 'cmd.exe', 'wscript.exe', 'cscript.exe', 'mshta.exe'}\n\ndef file_name(path):\n    return path.split('\\\\')[-1].lower()\n\ndef office_spawns_script(events):\n    # Your code here.\n    return []\n",
+    tests: [
+      { name: "two of the four events match", expr: "len(office_spawns_script([{'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\WINWORD.EXE', 'image': 'C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe'}, {'parent': 'C:\\\\Windows\\\\explorer.exe', 'image': 'C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe'}, {'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\EXCEL.EXE', 'image': 'C:\\\\Windows\\\\System32\\\\wscript.exe'}, {'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\WINWORD.EXE', 'image': 'C:\\\\Windows\\\\splwow64.exe'}])) == 2" },
+      { name: "Word starting PowerShell matches", expr: "office_spawns_script([{'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\WINWORD.EXE', 'image': 'C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe'}, {'parent': 'C:\\\\Windows\\\\explorer.exe', 'image': 'C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe'}, {'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\EXCEL.EXE', 'image': 'C:\\\\Windows\\\\System32\\\\wscript.exe'}, {'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\WINWORD.EXE', 'image': 'C:\\\\Windows\\\\splwow64.exe'}])[0]['parent'].endswith('WINWORD.EXE')" },
+      { name: "Excel starting wscript matches", expr: "office_spawns_script([{'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\WINWORD.EXE', 'image': 'C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe'}, {'parent': 'C:\\\\Windows\\\\explorer.exe', 'image': 'C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe'}, {'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\EXCEL.EXE', 'image': 'C:\\\\Windows\\\\System32\\\\wscript.exe'}, {'parent': 'C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\WINWORD.EXE', 'image': 'C:\\\\Windows\\\\splwow64.exe'}])[1]['image'].endswith('wscript.exe')" },
+      { name: "PowerShell started from the desktop does not", expr: "office_spawns_script([{'parent': 'C:\\\\Windows\\\\explorer.exe', 'image': 'C:\\\\Windows\\\\System32\\\\cmd.exe'}]) == []" },
+      { name: "Word starting its print helper does not", expr: "office_spawns_script([{'parent': 'C:\\\\x\\\\WINWORD.EXE', 'image': 'C:\\\\Windows\\\\splwow64.exe'}]) == []" },
+      { name: "a folder named like Word is not Word", expr: "office_spawns_script([{'parent': 'C:\\\\winword.exe\\\\notes.exe', 'image': 'C:\\\\Windows\\\\System32\\\\cmd.exe'}]) == []" },
+    ],
+    solution: "OFFICE = {'winword.exe', 'excel.exe', 'powerpnt.exe', 'outlook.exe'}\nSCRIPT = {'powershell.exe', 'cmd.exe', 'wscript.exe', 'cscript.exe', 'mshta.exe'}\n\ndef file_name(path):\n    return path.split('\\\\')[-1].lower()\n\ndef office_spawns_script(events):\n    return [e for e in events if file_name(e['parent']) in OFFICE and file_name(e['image']) in SCRIPT]\n",
+  },
+  {
+    id: "coverage-gaps",
+    prompt: "Write coverage_gaps(wanted, detections): wanted is a list of technique IDs you care about, and detections is a list of dicts with 'name' and 'technique'. A wanted technique is covered when a detection has exactly that ID, or has its parent: a detection for 'T1059' covers 'T1059.001'. Return the wanted IDs that are not covered, in their original order.",
+    starter: "def coverage_gaps(wanted, detections):\n    covered = {d['technique'] for d in detections}\n    # Your code here. 'T1059.001'.split('.')[0] gives the parent.\n    return wanted\n",
+    tests: [
+      { name: "two of four techniques have no detection", expr: "coverage_gaps(['T1059.001', 'T1053.005', 'T1110', 'T1547.001'], [{'name': 'Office spawns script', 'technique': 'T1059.001'}, {'name': 'Brute force', 'technique': 'T1110'}]) == ['T1053.005', 'T1547.001']" },
+      { name: "a parent detection covers its sub-technique", expr: "coverage_gaps(['T1059.001', 'T1059.003'], [{'name': 'Any script interpreter', 'technique': 'T1059'}]) == []" },
+      { name: "a sub-technique detection does not cover its siblings", expr: "coverage_gaps(['T1059.001', 'T1059.003'], [{'name': 'PowerShell', 'technique': 'T1059.001'}]) == ['T1059.003']" },
+      { name: "no detections at all", expr: "coverage_gaps(['T1110'], []) == ['T1110']" },
+      { name: "nothing wanted", expr: "coverage_gaps([], [{'name': 'x', 'technique': 'T1110'}]) == []" },
+    ],
+    solution: "def coverage_gaps(wanted, detections):\n    covered = {d['technique'] for d in detections}\n    gaps = []\n    for technique in wanted:\n        if technique in covered or technique.split('.')[0] in covered:\n            continue\n        gaps.append(technique)\n    return gaps\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

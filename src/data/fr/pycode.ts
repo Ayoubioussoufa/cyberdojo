@@ -712,4 +712,43 @@ export const PY_FR: Record<string, PyChallengeFr> = {
     prompt: "Écrivez summarize_count(events, field) : events est une liste de dicts. Comptez combien d'événements ont chaque valeur du champ donné, et renvoyez une liste de paires (valeur, compte) triée du compte le plus élevé au plus bas. Les paires de même compte sont rangées par valeur. Sautez les événements qui n'ont pas le champ.",
     tests: ["les échecs par adresse source", "les mêmes événements regroupés par utilisateur", "les événements sans le champ sont sautés", "aucun événement"],
   },
+  "indicator-kind": {
+    prompt: "Écrivez indicator_kind(value) : renvoyez 'hash' quand value fait 32, 40 ou 64 caractères hexadécimaux, 'ip' quand ipaddress.ip_address l'accepte, 'domain' quand il contient un point, n'a ni espace ni barre oblique, et que sa dernière partie n'est faite que de lettres, et 'other' pour tout le reste. Vérifiez dans cet ordre.",
+    tests: [
+      "un SHA-256",
+      "un MD5",
+      "une adresse IPv4",
+      "une adresse IPv6",
+      "un domaine",
+      "un domaine avec un sous-domaine",
+      "une phrase n'est pas un indicateur",
+      "un chemin de fichier n'est pas un domaine",
+      "un nombre à points qui n'est pas une adresse",
+    ],
+  },
+  "pyramid-sort": {
+    prompt: "Écrivez pyramid_sort(indicators) : indicators est une liste de dicts avec 'value' et 'level', qui vaut 'hash', 'ip', 'domain', 'artifact', 'tool' ou 'ttp'. Renvoyez les valeurs rangées du sommet de la pyramide de la douleur vers la base : ttp, tool, artifact, domain, ip, hash. Les indicateurs de même niveau gardent leur ordre d'origine.",
+    tests: ["les six indices de la leçon", "le comportement vient toujours en premier", "deux indices de même niveau gardent leur ordre", "une liste vide"],
+  },
+  "office-spawns-script": {
+    prompt: "Écrivez office_spawns_script(events) : events est une liste d'événements de création de processus, chacun étant un dict avec 'parent' et 'image', deux chemins Windows complets. Renvoyez les événements où le nom de fichier du parent est winword.exe, excel.exe, powerpnt.exe ou outlook.exe et où le nom de fichier de l'image est powershell.exe, cmd.exe, wscript.exe, cscript.exe ou mshta.exe. Ignorez les majuscules et les minuscules. Le nom de fichier est la partie après la dernière barre oblique inverse.",
+    tests: [
+      "deux des quatre événements correspondent",
+      "Word qui lance PowerShell correspond",
+      "Excel qui lance wscript correspond",
+      "PowerShell lancé depuis le bureau ne correspond pas",
+      "Word qui lance son assistant d'impression ne correspond pas",
+      "un dossier nommé comme Word n'est pas Word",
+    ],
+  },
+  "coverage-gaps": {
+    prompt: "Écrivez coverage_gaps(wanted, detections) : wanted est la liste des identifiants de techniques qui vous importent, et detections est une liste de dicts avec 'name' et 'technique'. Une technique voulue est couverte quand une détection a exactement cet identifiant, ou celui de son parent : une détection pour 'T1059' couvre 'T1059.001'. Renvoyez les identifiants voulus qui ne sont pas couverts, dans leur ordre d'origine.",
+    tests: [
+      "deux techniques sur quatre n'ont aucune détection",
+      "une détection sur le parent couvre sa sous-technique",
+      "une détection sur une sous-technique ne couvre pas ses sœurs",
+      "aucune détection",
+      "rien de voulu",
+    ],
+  },
 };
