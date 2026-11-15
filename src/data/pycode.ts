@@ -675,6 +675,50 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def decide(signin):\n    if signin['risk'] == 'high':\n        return 'block'\n    if signin['is_admin'] and not signin['compliant_device']:\n        return 'block'\n    if not signin['mfa_done']:\n        return 'require mfa'\n    return 'allow'\n",
   },
+  {
+    id: "server-side-price",
+    prompt: "Write order_total(cart, catalog): cart is what the browser sent, a list of dicts with 'item', 'quantity' and 'price'. catalog is the server's own dict of item to price. Return the total using the catalog's prices only. Return None when an item is not in the catalog. The starter trusts the price the browser sent.",
+    starter: "def order_total(cart, catalog):\n    total = 0\n    for line in cart:\n        total += line['price'] * line['quantity']\n    return total\n",
+    tests: [
+      { name: "an honest cart", expr: "order_total([{'item': 'mug', 'quantity': 2, 'price': 8}, {'item': 'poster', 'quantity': 1, 'price': 15}], {'mug': 8, 'poster': 15, 'laptop': 900}) == 31" },
+      { name: "a laptop sent with a price of 1", expr: "order_total([{'item': 'laptop', 'quantity': 1, 'price': 1}], {'mug': 8, 'poster': 15, 'laptop': 900}) == 900" },
+      { name: "a negative price is ignored too", expr: "order_total([{'item': 'mug', 'quantity': 3, 'price': -50}], {'mug': 8, 'poster': 15, 'laptop': 900}) == 24" },
+      { name: "an item the shop does not sell", expr: "order_total([{'item': 'yacht', 'quantity': 1, 'price': 5}], {'mug': 8, 'poster': 15, 'laptop': 900}) is None" },
+      { name: "an empty cart costs nothing", expr: "order_total([], {'mug': 8, 'poster': 15, 'laptop': 900}) == 0" },
+    ],
+    solution: "def order_total(cart, catalog):\n    total = 0\n    for line in cart:\n        if line['item'] not in catalog:\n            return None\n        total += catalog[line['item']] * line['quantity']\n    return total\n",
+  },
+  {
+    id: "valid-quantity",
+    prompt: "Write valid_quantity(text): text is what arrived in a form field. Return the quantity as a whole number when text is made only of the digits 0 to 9 and its value is from 1 to 99. Return None for anything else. Use text.isascii() and text.isdigit() together: isdigit alone also accepts characters such as '\u00b2'.",
+    starter: "def valid_quantity(text):\n    # Your code here.\n    return int(text)\n",
+    tests: [
+      { name: "an ordinary quantity", expr: "valid_quantity('3') == 3" },
+      { name: "the largest allowed", expr: "valid_quantity('99') == 99" },
+      { name: "zero is refused", expr: "valid_quantity('0') is None" },
+      { name: "a hundred is refused", expr: "valid_quantity('100') is None" },
+      { name: "a negative number is refused", expr: "valid_quantity('-1') is None" },
+      { name: "text is refused", expr: "valid_quantity('two') is None" },
+      { name: "the empty field is refused", expr: "valid_quantity('') is None" },
+      { name: "a superscript two is refused, without an error", expr: "valid_quantity('\u00b2') is None" },
+      { name: "spaces are refused", expr: "valid_quantity(' 5') is None" },
+    ],
+    solution: "def valid_quantity(text):\n    if not (text.isascii() and text.isdigit()):\n        return None\n    value = int(text)\n    if value < 1 or value > 99:\n        return None\n    return value\n",
+  },
+  {
+    id: "sequential-ids",
+    prompt: "Write longest_run(paths): paths is the list of paths one user requested, in order, such as '/invoices/1043'. Return the length of the longest run of requests in which each number is exactly one more than the one before. A single request is a run of 1, and an empty list gives 0. The number is the last part of the path.",
+    starter: "def longest_run(paths):\n    # int(path.split('/')[-1]) gives the number at the end of a path.\n    return 0\n",
+    tests: [
+      { name: "five in a row", expr: "longest_run(['/invoices/1000', '/invoices/1001', '/invoices/1002', '/invoices/1003', '/invoices/1004']) == 5" },
+      { name: "ordinary browsing", expr: "longest_run(['/invoices/1043', '/invoices/88', '/invoices/1044']) == 1" },
+      { name: "a run in the middle", expr: "longest_run(['/invoices/7', '/invoices/20', '/invoices/21', '/invoices/22', '/invoices/5']) == 3" },
+      { name: "the same invoice twice is not a run", expr: "longest_run(['/invoices/9', '/invoices/9']) == 1" },
+      { name: "one request", expr: "longest_run(['/invoices/1']) == 1" },
+      { name: "no requests", expr: "longest_run([]) == 0" },
+    ],
+    solution: "def longest_run(paths):\n    best = 0\n    current = 0\n    previous = None\n    for path in paths:\n        number = int(path.split('/')[-1])\n        if previous is not None and number == previous + 1:\n            current += 1\n        else:\n            current = 1\n        if current > best:\n            best = current\n        previous = number\n    return best\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

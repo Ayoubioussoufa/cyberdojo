@@ -430,4 +430,32 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un administrateur sur un appareil conforme avec la MFA est autorisé",
     ],
   },
+  "server-side-price": {
+    prompt: "Écrivez order_total(cart, catalog) : cart est ce que le navigateur a envoyé, une liste de dicts avec 'item', 'quantity' et 'price'. catalog est le dict du serveur, qui associe chaque article à son prix. Renvoyez le total en n'utilisant que les prix du catalogue. Renvoyez None quand un article n'est pas dans le catalogue. Le code de départ fait confiance au prix envoyé par le navigateur.",
+    tests: [
+      "un panier honnête",
+      "un ordinateur envoyé avec un prix de 1",
+      "un prix négatif est ignoré lui aussi",
+      "un article que la boutique ne vend pas",
+      "un panier vide ne coûte rien",
+    ],
+  },
+  "valid-quantity": {
+    prompt: "Écrivez valid_quantity(text) : text est ce qui est arrivé dans un champ de formulaire. Renvoyez la quantité sous forme de nombre entier quand text n'est fait que des chiffres 0 à 9 et que sa valeur va de 1 à 99. Renvoyez None pour tout le reste. Utilisez text.isascii() et text.isdigit() ensemble : isdigit seul accepte aussi des caractères comme '²'.",
+    tests: [
+      "une quantité ordinaire",
+      "la plus grande autorisée",
+      "zéro est refusé",
+      "cent est refusé",
+      "un nombre négatif est refusé",
+      "du texte est refusé",
+      "le champ vide est refusé",
+      "un deux en exposant est refusé, sans erreur",
+      "les espaces sont refusées",
+    ],
+  },
+  "sequential-ids": {
+    prompt: "Écrivez longest_run(paths) : paths est la liste des chemins qu'un utilisateur a demandés, dans l'ordre, comme '/invoices/1043'. Renvoyez la longueur de la plus longue série de requêtes où chaque numéro vaut exactement un de plus que le précédent. Une seule requête est une série de 1, et une liste vide donne 0. Le numéro est la dernière partie du chemin.",
+    tests: ["cinq à la suite", "une navigation ordinaire", "une série au milieu", "la même facture deux fois n'est pas une série", "une seule requête", "aucune requête"],
+  },
 };
