@@ -435,6 +435,34 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import hmac, hashlib\n\ndef verify(key, message, tag):\n    expected = hmac.new(key, message, hashlib.sha256).hexdigest()\n    return hmac.compare_digest(expected, tag)\n",
   },
+  {
+    id: "dh-shared",
+    prompt: "Write two functions for a Diffie-Hellman exchange with base g and modulus p. public_value(g, secret, p) returns the number a side sends in the open. shared_secret(their_public, my_secret, p) returns the secret that side computes. Both are one call to pow with three arguments.",
+    starter: "def public_value(g, secret, p):\n    # Your code here.\n    return 0\n\ndef shared_secret(their_public, my_secret, p):\n    # Your code here.\n    return 0\n",
+    tests: [
+      { name: "Ana sends 8", expr: "public_value(5, 6, 23) == 8" },
+      { name: "Bo sends 19", expr: "public_value(5, 15, 23) == 19" },
+      { name: "Ana computes 2", expr: "shared_secret(19, 6, 23) == 2" },
+      { name: "Bo computes 2", expr: "shared_secret(8, 15, 23) == 2" },
+      { name: "both sides always agree", expr: "shared_secret(public_value(7, 91, 7919), 44, 7919) == shared_secret(public_value(7, 44, 7919), 91, 7919)" },
+    ],
+    solution: "def public_value(g, secret, p):\n    return pow(g, secret, p)\n\ndef shared_secret(their_public, my_secret, p):\n    return pow(their_public, my_secret, p)\n",
+  },
+  {
+    id: "cert-name-matches",
+    prompt: "Write name_matches(host, pattern): return True when a certificate name covers the host. An ordinary name must equal the host. A name that starts with *. covers the host only when the host is exactly one label followed by the rest of the name. Ignore upper and lower case.",
+    starter: "def name_matches(host, pattern):\n    # Your code here.\n    return host == pattern\n",
+    tests: [
+      { name: "an exact name", expr: "name_matches('shop.example', 'shop.example') == True" },
+      { name: "a different name", expr: "name_matches('shop.example', 'bank.example') == False" },
+      { name: "a wildcard covers one label", expr: "name_matches('api.shop.example', '*.shop.example') == True" },
+      { name: "a wildcard does not cover the bare domain", expr: "name_matches('shop.example', '*.shop.example') == False" },
+      { name: "a wildcard does not cover two labels", expr: "name_matches('a.b.shop.example', '*.shop.example') == False" },
+      { name: "case is ignored", expr: "name_matches('API.Shop.Example', '*.shop.example') == True" },
+      { name: "a lookalike ending is not a match", expr: "name_matches('api.myshop.example', '*.shop.example') == False" },
+    ],
+    solution: "def name_matches(host, pattern):\n    host, pattern = host.lower(), pattern.lower()\n    if not pattern.startswith('*.'):\n        return host == pattern\n    rest = pattern[2:]\n    first, _, tail = host.partition('.')\n    return first != '' and tail == rest\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

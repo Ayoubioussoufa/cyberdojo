@@ -260,4 +260,20 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un code vide",
     ],
   },
+  "dh-shared": {
+    prompt: "Écrivez deux fonctions pour un échange Diffie-Hellman de base g et de module p. public_value(g, secret, p) renvoie le nombre qu'un côté envoie en clair. shared_secret(their_public, my_secret, p) renvoie le secret que ce côté calcule. Chacune est un seul appel à pow avec trois arguments.",
+    tests: ["Ana envoie 8", "Bo envoie 19", "Ana calcule 2", "Bo calcule 2", "les deux côtés sont toujours d'accord"],
+  },
+  "cert-name-matches": {
+    prompt: "Écrivez name_matches(host, pattern) : renvoyez True quand un nom de certificat couvre l'hôte. Un nom ordinaire doit être égal à l'hôte. Un nom qui commence par *. ne couvre l'hôte que si l'hôte est exactement un label suivi du reste du nom. Ignorez les majuscules et les minuscules.",
+    tests: [
+      "un nom exact",
+      "un nom différent",
+      "un joker couvre un label",
+      "un joker ne couvre pas le domaine nu",
+      "un joker ne couvre pas deux labels",
+      "la casse est ignorée",
+      "une fin ressemblante ne correspond pas",
+    ],
+  },
 };
