@@ -180,7 +180,7 @@ Enable auditing, then log in and open a file share on the DC. Find 4768, 4769 an
 Three things from a morning's Security log. Decide what each one means before you read the choices.
 
 ?? In one minute, the account `tom` produces forty 4769 events, each for a different service account, all with encryption type `0x17`. What does that look like?
-+ Kerberoasting: tickets gathered to be cracked offline
++ Kerberoasting: tickets collected to be cracked later
 - A normal login: one ticket per service
 - A clock problem: requests keep being refused
 - A golden ticket: forged on the DC

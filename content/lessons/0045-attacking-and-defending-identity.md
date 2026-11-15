@@ -2,7 +2,7 @@
 title: Identity attacks and Entra ID
 summary: BloodHound attack paths, cloud identity with Entra ID, Conditional Access, and reviewing your lab's identity attack surface.
 month: 7
-minutes: 45
+minutes: 65
 builds: three BloodHound paths explained, and an Entra tenant with MFA enforced, finishing P04
 source: BloodHound Community Edition documentation | https://bloodhound.specterops.io/
 words: attack path, Entra ID, Conditional Access
@@ -39,6 +39,34 @@ In plain words: Ana is in HelpDesk, which can reset `svc_sql`'s password. That a
 | `AddMember` | Can add people to the group |
 | `HasSession` | That user is logged in on that machine |
 
+A graph is only two kinds of thing: **nodes**, which here are users, groups and computers, and **edges**, which are the relationships between them. Write the path above as a list of edges and it becomes data you can reason about:
+
+```python
+edges = [
+    ("ana", "HelpDesk"),          # MemberOf
+    ("HelpDesk", "svc_sql"),      # ForceChangePassword
+    ("svc_sql", "SRV1"),          # AdminTo
+    ("SRV1", "dadmin"),           # HasSession
+    ("dadmin", "Domain Admins"),  # MemberOf
+]
+```
+
+Finding a path means starting at one node and repeatedly following edges until you reach the target or run out of new places to go. That's the whole of what the tool does, on a graph with hundreds of thousands of edges. Write it once on a small one and the picture stops being mysterious.
+
+@code find-path
+
+Now the defender's question. Of all the edges on the way, which single ones, if removed, leave no path at all? Those are the fixes worth making first, and you find them by removing each edge in turn and searching again.
+
+@code choke-points
+
+You don't need a graph tool to see individual edges. Group membership, including groups inside groups, is one command, and the permissions on any object are on its **Security** tab in `dsa.msc` once you switch on **View → Advanced Features**:
+
+```powershell
+Get-ADGroupMember "Domain Admins" -Recursive | Select-Object Name, objectClass
+```
+
+`-Recursive` matters. A group that contains another group passes its power down, and nested membership is where most surprise administrators come from.
+
 The defender's use is the same: fix the edges. Remove a permission or a session, and the path falls.
 
 @term PingCastle = A free tool that gives a score of an Active Directory's security posture.
@@ -71,6 +99,32 @@ Many companies run **hybrid**: on-premises AD synced to Entra. So a compromise c
 Create a free [Microsoft Entra](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) tenant. Add users and groups, enforce MFA, sign in, and read the sign-in logs. See what a failed login looks like, and what a successful one records.
 :::
 
+A Conditional Access policy is a sentence with two halves, and the portal lays it out that way:
+
+| Half | Setting | Example |
+|---|---|---|
+| **If** | Users | Everyone in the Admins group, except the emergency account |
+| **If** | Target resources | All cloud apps |
+| **If** | Conditions | Any location, any device |
+| **Then** | Grant | Require phishing-resistant MFA and a compliant device |
+
+Two habits keep a new policy from locking the company out. Switch it on in **report-only** mode first: it then records what it would have done without enforcing anything, and you read the result in the sign-in logs. And keep one **emergency access account** outside every policy, with a long random password stored offline, for the day a policy or the MFA service itself goes wrong.
+
+Each line of the sign-in log is one attempt, and it answers the same questions as a Windows 4624:
+
+```
+User: ana@corp.example     Application: Office 365 Exchange Online
+IP address: 203.0.113.50   Location: Lyon, FR
+Status: Success            Conditional Access: Success
+Authentication requirement: Multifactor authentication
+```
+
+Who, into what, from where, whether it worked, and which policy applied. The portal lets you filter on any of those, and "Status: Failure" grouped by IP address is the first search worth saving.
+
+A policy engine is a list of rules checked in order. Writing a tiny one shows why the order matters.
+
+@code access-decision
+
 ?? Is Entra ID simply Active Directory in the cloud?
 + No, it's a different web-based system
 - Yes, it's the same relocated database
@@ -97,6 +151,35 @@ Create a free [Microsoft Entra](https://www.microsoft.com/en-us/security/busines
 - Spraying never touches the authentication service itself
 - Passwords with symbols are excluded from lockout
 => It stays under the threshold per account. You need detection across accounts, like many 4625s from one source.
+
+## Review the identity surface
+
+Three findings from a review of a hybrid environment. Decide what each means before you read the choices.
+
+```
+ana → MemberOf → HelpDesk → ForceChangePassword → svc_sql → AdminTo → SRV1 → HasSession → dadmin
+```
+
+?? Which change removes the last step of that path?
++ Domain Admins stop logging on to SRV1
+- Ana chooses a very much longer password
+- SRV1 is renamed to something else entirely
+- HelpDesk gets a brand new group description
+=> `HasSession` exists because a Domain Admin logs on to an ordinary server. Under the tier model that account only ever logs on to domain controllers, and the edge disappears.
+
+?? The sign-in log shows one IP address failing once each against 60 accounts, then succeeding against one. What do you do first?
++ Reset that account and review its activity
+- Block the 60 accounts that held firm
+- Ignore it, since most of them failed
+- Turn off the sign-in log for quiet
+=> That's a spray that found one weak password. The 59 failures are the evidence, and the one success is the incident.
+
+?? You've written a Conditional Access policy that requires a compliant device for all users. How do you turn it on safely?
++ Report-only first, with an emergency account excluded
+- Enforced at once, for every single account
+- Enforced on Friday evening, just before leaving
+- Report-only forever, so that nothing ever breaks
+=> Report-only shows who would have been blocked before anyone is. The excluded emergency account is the way back in if the policy is wrong.
 
 ## Finish P04
 

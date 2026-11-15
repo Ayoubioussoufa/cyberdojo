@@ -49,7 +49,7 @@ Study first: [Networking and protocols](../01-networking/README.md).
 - ◐ Kerberoasting
 - ◐ AS-REP roasting
 - ◐ Pass-the-hash and pass-the-ticket
-- ○ Golden and silver tickets
+- ◐ Golden and silver tickets
 - ◐ DCSync
 - ○ NTLM relay
 - ○ Kerberos delegation

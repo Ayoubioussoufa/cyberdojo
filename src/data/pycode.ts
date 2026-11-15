@@ -635,6 +635,46 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def spray_suspects(failures, min_accounts):\n    accounts = {}\n    for f in failures:\n        accounts.setdefault(f['source'], set()).add(f['account'])\n    return {source: len(found) for source, found in accounts.items() if len(found) >= min_accounts}\n",
   },
+  {
+    id: "find-path",
+    prompt: "Write find_path(edges, start, target): edges is a list of (from, to) pairs. Return a shortest path from start to target as a list of nodes, start and target included, or None when there is no path. Edges only go one way. Keep a list of paths to extend and a set of nodes already seen, and always extend the oldest path first.",
+    starter: "def find_path(edges, start, target):\n    queue = [[start]]   # paths still to extend, oldest first\n    seen = {start}\n    while queue:\n        path = queue.pop(0)\n        node = path[-1]\n        # Your code here: return path if node is the target;\n        # otherwise add a longer path for each edge that leaves node for an unseen node.\n    return None\n",
+    tests: [
+      { name: "the path from the lesson", expr: "find_path([('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins'), ('sam', 'Staff'), ('Staff', 'Printers')], 'ana', 'Domain Admins') == ['ana', 'HelpDesk', 'svc_sql', 'SRV1', 'dadmin', 'Domain Admins']" },
+      { name: "a user with no way there", expr: "find_path([('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins'), ('sam', 'Staff'), ('Staff', 'Printers')], 'sam', 'Domain Admins') is None" },
+      { name: "edges only go one way", expr: "find_path([('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins'), ('sam', 'Staff'), ('Staff', 'Printers')], 'Domain Admins', 'ana') is None" },
+      { name: "a node reaches itself", expr: "find_path([('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins'), ('sam', 'Staff'), ('Staff', 'Printers')], 'ana', 'ana') == ['ana']" },
+      { name: "the shortest of two routes has four nodes", expr: "len(find_path([('ana', 'A'), ('ana', 'B'), ('A', 'C'), ('B', 'C'), ('C', 'Domain Admins')], 'ana', 'Domain Admins')) == 4" },
+      { name: "a loop does not hang the search", expr: "find_path([('a', 'b'), ('b', 'a')], 'a', 'z') is None" },
+    ],
+    solution: "def find_path(edges, start, target):\n    queue = [[start]]\n    seen = {start}\n    while queue:\n        path = queue.pop(0)\n        node = path[-1]\n        if node == target:\n            return path\n        for a, b in edges:\n            if a == node and b not in seen:\n                seen.add(b)\n                queue.append(path + [b])\n    return None\n",
+  },
+  {
+    id: "choke-points",
+    prompt: "Write choke_points(edges, start, target): return the list of edges, in their original order, whose removal alone leaves no path from start to target. A working find_path is given. If there is no path to begin with, return an empty list.",
+    starter: "def find_path(edges, start, target):\n    queue = [[start]]\n    seen = {start}\n    while queue:\n        path = queue.pop(0)\n        node = path[-1]\n        if node == target:\n            return path\n        for a, b in edges:\n            if a == node and b not in seen:\n                seen.add(b)\n                queue.append(path + [b])\n    return None\n\ndef choke_points(edges, start, target):\n    found = []\n    # Your code here: try the graph without each edge in turn.\n    return found\n",
+    tests: [
+      { name: "on a single chain, every edge on the path is one", expr: "choke_points([('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins'), ('sam', 'Staff'), ('Staff', 'Printers')], 'ana', 'Domain Admins') == [('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins')]" },
+      { name: "with two routes, only the shared edge is one", expr: "choke_points([('ana', 'A'), ('ana', 'B'), ('A', 'C'), ('B', 'C'), ('C', 'Domain Admins')], 'ana', 'Domain Admins') == [('C', 'Domain Admins')]" },
+      { name: "edges off the path are never listed", expr: "('sam', 'Staff') not in choke_points([('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins'), ('sam', 'Staff'), ('Staff', 'Printers')], 'ana', 'Domain Admins')" },
+      { name: "no path to begin with gives nothing", expr: "choke_points([('ana', 'HelpDesk'), ('HelpDesk', 'svc_sql'), ('svc_sql', 'SRV1'), ('SRV1', 'dadmin'), ('dadmin', 'Domain Admins'), ('sam', 'Staff'), ('Staff', 'Printers')], 'sam', 'Domain Admins') == []" },
+    ],
+    solution: "def find_path(edges, start, target):\n    queue = [[start]]\n    seen = {start}\n    while queue:\n        path = queue.pop(0)\n        node = path[-1]\n        if node == target:\n            return path\n        for a, b in edges:\n            if a == node and b not in seen:\n                seen.add(b)\n                queue.append(path + [b])\n    return None\n\ndef choke_points(edges, start, target):\n    if find_path(edges, start, target) is None:\n        return []\n    found = []\n    for edge in edges:\n        rest = [e for e in edges if e != edge]\n        if find_path(rest, start, target) is None:\n            found.append(edge)\n    return found\n",
+  },
+  {
+    id: "access-decision",
+    prompt: "Write decide(signin): signin is a dict with 'is_admin', 'compliant_device' and 'mfa_done' (each True or False) and 'risk' ('low', 'medium' or 'high'). Apply these rules in order and return the first that fits: 'block' when risk is 'high'; 'block' when an admin is on a device that is not compliant; 'require mfa' when MFA has not been done; otherwise 'allow'.",
+    starter: "def decide(signin):\n    # Your code here.\n    return \"allow\"\n",
+    tests: [
+      { name: "an ordinary sign-in with MFA done", expr: "decide({'is_admin': False, 'compliant_device': True, 'mfa_done': True, 'risk': 'low'}) == 'allow'" },
+      { name: "MFA not done yet", expr: "decide({'is_admin': False, 'compliant_device': True, 'mfa_done': False, 'risk': 'low'}) == 'require mfa'" },
+      { name: "high risk is blocked even with MFA", expr: "decide({'is_admin': False, 'compliant_device': True, 'mfa_done': True, 'risk': 'high'}) == 'block'" },
+      { name: "an admin on an unmanaged device is blocked", expr: "decide({'is_admin': True, 'compliant_device': False, 'mfa_done': True, 'risk': 'low'}) == 'block'" },
+      { name: "a user on an unmanaged device is only asked for MFA", expr: "decide({'is_admin': False, 'compliant_device': False, 'mfa_done': False, 'risk': 'medium'}) == 'require mfa'" },
+      { name: "an admin on a compliant device with MFA is allowed", expr: "decide({'is_admin': True, 'compliant_device': True, 'mfa_done': True, 'risk': 'medium'}) == 'allow'" },
+    ],
+    solution: "def decide(signin):\n    if signin['risk'] == 'high':\n        return 'block'\n    if signin['is_admin'] and not signin['compliant_device']:\n        return 'block'\n    if not signin['mfa_done']:\n        return 'require mfa'\n    return 'allow'\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

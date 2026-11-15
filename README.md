@@ -44,12 +44,12 @@ Offensive topics are covered from the defender's side. Active Directory attack t
 ### Coverage matrix
 
 <!-- coverage:start -->
-**534 topics.** Before the modules: 162 present, 125 partial, 247 missing. Now: **504 present, 25 partial, 5 missing.** Every row and its evidence is in [COVERAGE.md](COVERAGE.md).
+**534 topics.** Before the modules: 162 present, 125 partial, 247 missing. Now: **504 present, 26 partial, 4 missing.** Every row and its evidence is in [COVERAGE.md](COVERAGE.md).
 
 | Domain | Before ● ◐ ○ | Now ● ◐ ○ | Modules |
 |---|---|---|---|
 | [01 Networking and protocols](modules/01-networking/README.md) | 17 · 20 · 31 | 66 · 2 · 0 | 14 |
-| [02 Operating systems and privilege escalation](modules/02-operating-systems/README.md) | 18 · 20 · 26 | 52 · 8 · 4 | 10 |
+| [02 Operating systems and privilege escalation](modules/02-operating-systems/README.md) | 18 · 20 · 26 | 52 · 9 · 3 | 10 |
 | [03 Cryptography](modules/03-cryptography/README.md) | 8 · 11 · 25 | 43 · 1 · 0 | 12 |
 | [04 Web security](modules/04-web/README.md) | 26 · 14 · 20 | 57 · 3 · 0 | 14 |
 | [05 Application and binary security](modules/05-binary/README.md) | 1 · 4 · 36 | 34 · 6 · 1 | 10 |

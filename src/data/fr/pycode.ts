@@ -399,4 +399,35 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "aucun échec",
     ],
   },
+  "find-path": {
+    prompt: "Écrivez find_path(edges, start, target) : edges est une liste de paires (départ, arrivée). Renvoyez un plus court chemin de start à target sous forme de liste de nœuds, start et target compris, ou None quand il n'y a pas de chemin. Les arêtes ne vont que dans un sens. Gardez une liste de chemins à prolonger et un ensemble de nœuds déjà vus, et prolongez toujours le chemin le plus ancien d'abord.",
+    tests: [
+      "le chemin de la leçon",
+      "un utilisateur sans aucun accès",
+      "les arêtes ne vont que dans un sens",
+      "un nœud s'atteint lui-même",
+      "la plus courte de deux routes a quatre nœuds",
+      "une boucle ne bloque pas la recherche",
+    ],
+  },
+  "choke-points": {
+    prompt: "Écrivez choke_points(edges, start, target) : renvoyez la liste des arêtes, dans leur ordre d'origine, dont le seul retrait ne laisse aucun chemin de start à target. Un find_path qui fonctionne est fourni. S'il n'y a pas de chemin au départ, renvoyez une liste vide.",
+    tests: [
+      "sur une chaîne unique, chaque arête du chemin en est une",
+      "avec deux routes, seule l'arête commune en est une",
+      "les arêtes hors du chemin ne sont jamais listées",
+      "pas de chemin au départ ne donne rien",
+    ],
+  },
+  "access-decision": {
+    prompt: "Écrivez decide(signin) : signin est un dict avec 'is_admin', 'compliant_device' et 'mfa_done' (chacun True ou False) et 'risk' ('low', 'medium' ou 'high'). Appliquez ces règles dans l'ordre et renvoyez la première qui convient : 'block' quand risk vaut 'high' ; 'block' quand un administrateur est sur un appareil non conforme ; 'require mfa' quand la MFA n'a pas été faite ; sinon 'allow'.",
+    tests: [
+      "une connexion ordinaire avec la MFA faite",
+      "la MFA pas encore faite",
+      "un risque élevé est bloqué même avec la MFA",
+      "un administrateur sur un appareil non géré est bloqué",
+      "un utilisateur sur un appareil non géré reçoit seulement une demande de MFA",
+      "un administrateur sur un appareil conforme avec la MFA est autorisé",
+    ],
+  },
 };
