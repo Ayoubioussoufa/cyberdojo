@@ -236,4 +236,28 @@ export const PY_FR: Record<string, PyChallengeFr> = {
     prompt: "Écrivez big_spenders(db, minimum) : renvoyez (name, spent) pour chaque utilisateur dont les commandes dépassent minimum au total, où spent est la somme de ses totaux, le plus élevé d'abord. Utilisez GROUP BY et HAVING, et passez minimum en paramètre.",
     tests: ["plus de 50", "plus de 10 garde les deux acheteurs, le plus élevé d'abord", "plus de 100 ne garde personne", "exactement 40 n'est pas plus que 40"],
   },
+  "hash-kind": {
+    prompt: "Écrivez hash_kind(value) : renvoyez 'MD5' pour 32 caractères hexadécimaux, 'SHA-1' pour 40, 'SHA-256' pour 64, et 'unknown' pour tout le reste. Les caractères hexadécimaux sont 0-9 et a-f, en majuscules ou en minuscules.",
+    tests: ["un MD5", "un SHA-1", "un SHA-256", "les majuscules restent de l'hexadécimal", "32 caractères qui ne sont pas de l'hexadécimal", "la mauvaise longueur"],
+  },
+  "matches-hash": {
+    prompt: "Écrivez matches_hash(data, expected) : data est une suite d'octets et expected un SHA-256 écrit en hexadécimal. Renvoyez True quand l'empreinte de data est égale à expected. Ignorez les majuscules et les minuscules, ainsi que les espaces autour de expected.",
+    tests: [
+      "la bonne empreinte correspond",
+      "une lettre changée ne correspond pas",
+      "les majuscules correspondent aussi",
+      "les espaces autour de l'empreinte sont ignorées",
+      "une empreinte attendue vide ne correspond jamais",
+    ],
+  },
+  "verify-hmac": {
+    prompt: "Écrivez verify(key, message, tag) : key et message sont des octets, tag est un texte hexadécimal. Renvoyez True quand tag est le HMAC-SHA256 de message avec la clé key. Comparez avec hmac.compare_digest.",
+    tests: [
+      "un message authentique",
+      "un message modifié avec l'ancien code",
+      "le bon message avec la mauvaise clé",
+      "un simple SHA-256 n'est pas un HMAC",
+      "un code vide",
+    ],
+  },
 };

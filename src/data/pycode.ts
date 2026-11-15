@@ -395,6 +395,46 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import sqlite3\n\ndef make_db():\n    # A small shop database, built in memory. Leave this function as it is.\n    db = sqlite3.connect(':memory:')\n    db.executescript(\"\"\"\n        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, role TEXT);\n        CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total INTEGER);\n        INSERT INTO users VALUES (1, 'ana', 'admin'), (2, 'sam', 'user'), (3, 'tom', 'user');\n        INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);\n    \"\"\")\n    return db\n\ndef big_spenders(db, minimum):\n    return db.execute(\"SELECT users.name, SUM(orders.total) AS spent FROM orders JOIN users ON orders.user_id = users.id GROUP BY users.id HAVING SUM(orders.total) > ? ORDER BY spent DESC\", (minimum,)).fetchall()\n",
   },
+  {
+    id: "hash-kind",
+    prompt: "Write hash_kind(value): return 'MD5' for 32 hex characters, 'SHA-1' for 40, 'SHA-256' for 64, and 'unknown' for anything else. Hex characters are 0-9 and a-f, in either case.",
+    starter: "def hash_kind(value):\n    # Your code here.\n    return \"unknown\"\n",
+    tests: [
+      { name: "an MD5", expr: "hash_kind('5d41402abc4b2a76b9719d911017c592') == 'MD5'" },
+      { name: "a SHA-1", expr: "hash_kind('aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d') == 'SHA-1'" },
+      { name: "a SHA-256", expr: "hash_kind('2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824') == 'SHA-256'" },
+      { name: "upper case is still hex", expr: "hash_kind('5D41402ABC4B2A76B9719D911017C592') == 'MD5'" },
+      { name: "32 characters that are not hex", expr: "hash_kind('z' * 32) == 'unknown'" },
+      { name: "the wrong length", expr: "hash_kind('abc123') == 'unknown'" },
+    ],
+    solution: "def hash_kind(value):\n    text = value.lower()\n    for ch in text:\n        if ch not in '0123456789abcdef':\n            return 'unknown'\n    kinds = {32: 'MD5', 40: 'SHA-1', 64: 'SHA-256'}\n    return kinds.get(len(text), 'unknown')\n",
+  },
+  {
+    id: "matches-hash",
+    prompt: "Write matches_hash(data, expected): data is bytes and expected is a SHA-256 written in hex. Return True when the hash of data equals expected. Ignore upper or lower case and any spaces around expected.",
+    starter: "import hashlib\n\ndef matches_hash(data, expected):\n    # Your code here.\n    return False\n",
+    tests: [
+      { name: "the right hash matches", expr: "matches_hash(b'hello', '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824') == True" },
+      { name: "one changed letter does not", expr: "matches_hash(b'hellp', '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824') == False" },
+      { name: "upper case still matches", expr: "matches_hash(b'hello', '2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824') == True" },
+      { name: "spaces around the hash are ignored", expr: "matches_hash(b'hello', '  2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\\n') == True" },
+      { name: "an empty expected hash never matches", expr: "matches_hash(b'hello', '') == False" },
+    ],
+    solution: "import hashlib\n\ndef matches_hash(data, expected):\n    return hashlib.sha256(data).hexdigest() == expected.strip().lower()\n",
+  },
+  {
+    id: "verify-hmac",
+    prompt: "Write verify(key, message, tag): key and message are bytes, tag is hex text. Return True when tag is the HMAC-SHA256 of message under key. Compare with hmac.compare_digest.",
+    starter: "import hmac, hashlib\n\ndef verify(key, message, tag):\n    # Your code here.\n    return True\n",
+    tests: [
+      { name: "a genuine message", expr: "verify(b'k3y', b'amount=100', '7a9c5ea080b9ca5ac916cc47557769a1189824f3892120b2487d45ead0480caf') == True" },
+      { name: "a changed message with the old tag", expr: "verify(b'k3y', b'amount=900', '7a9c5ea080b9ca5ac916cc47557769a1189824f3892120b2487d45ead0480caf') == False" },
+      { name: "the right message under the wrong key", expr: "verify(b'other', b'amount=100', '7a9c5ea080b9ca5ac916cc47557769a1189824f3892120b2487d45ead0480caf') == False" },
+      { name: "a plain SHA-256 is not an HMAC", expr: "verify(b'k3y', b'hello', '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824') == False" },
+      { name: "an empty tag", expr: "verify(b'k3y', b'amount=100', '') == False" },
+    ],
+    solution: "import hmac, hashlib\n\ndef verify(key, message, tag):\n    expected = hmac.new(key, message, hashlib.sha256).hexdigest()\n    return hmac.compare_digest(expected, tag)\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
