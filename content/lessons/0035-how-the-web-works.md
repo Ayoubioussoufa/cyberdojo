@@ -2,7 +2,7 @@
 title: How the web works
 summary: HTTP in depth: requests, responses, methods, status codes and headers, seen with curl and browser DevTools.
 month: 6
-minutes: 35
+minutes: 60
 builds: read and craft raw HTTP requests by hand
 source: MDN, An overview of HTTP | https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview
 words: HTTP request, status code, reverse proxy
@@ -56,6 +56,33 @@ Cookie: session=abc123
 username=ana&password=hunter2            body
 ```
 
+The first line of a request comes from the URL you typed, so learn to take a URL apart:
+
+```
+https://shop.example:443/search?q=red%20boots&page=2#reviews
+└─┬─┘   └────┬─────┘ └┬┘└──┬──┘ └────────┬─────────┘ └──┬──┘
+scheme     host     port  path      query string      fragment
+```
+
+| Part | Meaning |
+|---|---|
+| Scheme | The protocol: `https` is HTTP inside TLS |
+| Host | Which server. It's resolved by DNS, then sent again in the `Host` header |
+| Port | 443 for `https` and 80 for `http` unless written |
+| Path | Which resource on that server |
+| Query string | Parameters, as `name=value` pairs joined by `&` |
+| Fragment | A place inside the page. The browser keeps it and never sends it to the server |
+
+A URL may only contain certain characters, so the rest are **percent-encoded**: a space becomes `%20`, and `/` inside a value becomes `%2F`. The server decodes them before use. Attackers encode their input for the same reason you do, and sometimes twice to slip past a filter, so always decode a URL from a log before you judge it.
+
+Python's standard library does the splitting and the decoding. Write a function with it.
+
+@code query-params
+
+Since a request is only text, you can take one apart with the string tools from Month 4. The first line has three parts separated by spaces, and each header is a name, a colon and a value.
+
+@code parse-request
+
 ::: key The client can't be trusted
 Every part of that request is under the sender's control: the method, the headers, the cookies, the body. Your browser's forms are only one way of sending it. Tools like `curl` and Burp can send anything. Nearly all of web security follows from that one fact.
 :::
@@ -80,6 +107,20 @@ Every part of that request is under the sender's control: the method, the header
 
 GET should never change anything. Values in a URL also end up in logs and browser history, so secrets never belong there.
 
+Headers carry everything that isn't the address or the body. You'll read these in every investigation:
+
+| Header | Direction | What it tells you |
+|---|---|---|
+| `Host` | Request | Which site on the server |
+| `User-Agent` | Request | What the client says it is. It can say anything |
+| `Cookie` | Request | Values the server asked the browser to keep, sent back each time |
+| `Authorization` | Request | Credentials, such as an API token |
+| `Referer` | Request | The page the user came from |
+| `Content-Type` | Both | What format the body is in |
+| `Set-Cookie` | Response | A value for the browser to store |
+| `Location` | Response | Where to go next, with a 3xx status |
+| `Server` | Response | What software answered, if it chooses to say |
+
 ?? Why shouldn't secrets go in a URL?
 + URLs end up in logs and history
 - URLs can't safely contain letters or numbers
@@ -97,6 +138,10 @@ GET should never change anything. Values in a URL also end up in logs and browse
 | 5xx | The server has a problem | 500, 502, 503 |
 
 Remember: **401** means "who are you?" and **403** means "I know who you are, and no".
+
+The first digit is the part to read first, because it tells you who has to act: nobody for 2, the client for 3 and 4, the server's owner for 5.
+
+@code status-class
 
 @drill http-status
 
@@ -139,6 +184,71 @@ Then open your browser's DevTools (F12), go to the Network tab, and load any sit
 - Which OS the client uses
 - Which database stores shop data
 => One server can host many sites, so the `Host` header says which one. It's required in HTTP/1.1.
+
+## Run a server and watch it
+
+You've been the client. Now be the server, on your own machine, and watch requests arrive. Python includes a small web server that serves the files in the current folder. Bind it to `127.0.0.1` so that only your machine can reach it:
+
+```
+mkdir web && cd web
+echo "hello" > index.html
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+Leave it running. In a second terminal, send three requests, then look back at the first terminal:
+
+```
+curl -i http://127.0.0.1:8000/
+curl -i http://127.0.0.1:8000/nope
+curl -i -X POST -d "a=1" http://127.0.0.1:8000/
+```
+
+```
+127.0.0.1 - - [15/Nov/2026 11:17:53] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 11:17:53] "GET /nope HTTP/1.1" 404 -
+127.0.0.1 - - [15/Nov/2026 11:17:53] "POST / HTTP/1.1" 501 -
+```
+
+Each line is one request as the server saw it: who asked, when, the request line itself, and the status sent back. The file that exists got 200, the one that doesn't got 404, and this simple server can't handle POST at all, so it answered 501, "not implemented". Stop it with Ctrl+C.
+
+A production server writes the same story with more columns. This is one line of an nginx **access log**, the single most common piece of evidence in web investigations:
+
+```
+203.0.113.7 - - [15/Nov/2026:10:14:02 +0100] "GET /admin HTTP/1.1" 403 153 "-" "curl/8.5.0"
+```
+
+| Field | Value here |
+|---|---|
+| Client address | `203.0.113.7` |
+| Time | 15 November, 10:14:02, one hour ahead of UTC |
+| Request line | `GET /admin HTTP/1.1` |
+| Status | `403` |
+| Bytes sent | `153` |
+| Referer | `-`, so none was given |
+| User-Agent | `curl/8.5.0` |
+
+Everything inside the quotes was written by the client. The address, the time and the status were written by your server. That split tells you which fields you can lean on.
+
+?? What happened in that access log line?
++ The server refused a request for `/admin`
+- The server sent the admin page back
+- The client asked for a missing page
+- The server crashed while it was answering
+=> 403 means the server understood the request and refused it. A missing page would be 404, and a crash would be a 5xx.
+
+?? One address requests 300 different paths in a minute, and nearly all get 404. What is the likeliest explanation?
++ Something is guessing paths to find pages
+- A visitor is reading the site slowly
+- The site's own links are all broken
+- A search engine is indexing one page
+=> A person follows links that exist. A burst of misses from one source is a tool trying names from a list, and the few that return 200 are what it found.
+
+?? `GET /account` returns `302` with `Location: /login`. What is the server saying?
++ Go to the login page first
+- The account page has been deleted
+- The request body was badly formed
+- The server is too busy now
+=> A 3xx status sends the client elsewhere, and `Location` says where. Sites answer this way when a page needs a session you don't have.
 
 ?! Why can't a server trust the `User-Agent` header? What does that imply for any security check based on it?
 

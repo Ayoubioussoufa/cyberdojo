@@ -245,6 +245,51 @@ export const PY_CHALLENGES: PyChallenge[] = [
     solution:
       "def spots_bugs(parse_port):\n    cases = [('22', 22), ('1', 1), ('65535', 65535), ('0', None), ('65536', None), ('ssh', None), ('', None)]\n    for text, expected in cases:\n        if parse_port(text) != expected:\n            return False\n    return True\n",
   },
+  {
+    id: "query-params",
+    prompt: "Write query_params(url): return a dict of the parameters in the URL's query string, with percent-encoding decoded. A URL with no query string gives an empty dict. Use urllib.parse: urlsplit(url).query gives the query string, and parse_qsl turns it into pairs.",
+    starter: "from urllib.parse import urlsplit, parse_qsl\n\ndef query_params(url):\n    # Your code here.\n    return {}\n",
+    tests: [
+      { name: "two parameters", expr: "query_params('https://shop.example/search?q=boots&page=2') == {'q': 'boots', 'page': '2'}" },
+      { name: "%20 becomes a space", expr: "query_params('https://shop.example/search?q=red%20boots') == {'q': 'red boots'}" },
+      { name: "no query string gives an empty dict", expr: "query_params('https://shop.example/about') == {}" },
+      { name: "the fragment is not a parameter", expr: "query_params('https://shop.example/item?id=7#reviews') == {'id': '7'}" },
+      { name: "an encoded slash is decoded", expr: "query_params('https://shop.example/go?next=%2Fhome') == {'next': '/home'}" },
+    ],
+    solution: "from urllib.parse import urlsplit, parse_qsl\n\ndef query_params(url):\n    return dict(parse_qsl(urlsplit(url).query))\n",
+  },
+  {
+    id: "parse-request",
+    prompt: "Write parse_request(text): text is a raw HTTP request whose lines are separated by \\n. Return (method, path, headers): the first two words of the first line, and a dict of the header lines up to the first empty line. Header names go in lower case, and values have the spaces around them removed.",
+    starter: "def parse_request(text):\n    lines = text.split(\"\\n\")\n    # Your code here.\n    return \"\", \"\", {}\n",
+    tests: [
+      { name: "reads the method", expr: "parse_request('GET /index.html HTTP/1.1\\nHost: shop.example\\n\\n')[0] == 'GET'" },
+      { name: "reads the path, query string included", expr: "parse_request('POST /login?next=/home HTTP/1.1\\nHost: shop.example\\n\\n')[1] == '/login?next=/home'" },
+      { name: "reads the headers", expr: "parse_request('GET / HTTP/1.1\\nHost: shop.example\\nCookie: session=abc123\\n\\n')[2] == {'host': 'shop.example', 'cookie': 'session=abc123'}" },
+      { name: "header names are lower-cased", expr: "'user-agent' in parse_request('GET / HTTP/1.1\\nUser-Agent: curl/8.5.0\\n\\n')[2]" },
+      { name: "the body is not read as a header", expr: "parse_request('POST /login HTTP/1.1\\nHost: shop.example\\n\\nnote: this is the body')[2] == {'host': 'shop.example'}" },
+      { name: "a value may contain a colon", expr: "parse_request('GET / HTTP/1.1\\nReferer: https://a.example/x\\n\\n')[2] == {'referer': 'https://a.example/x'}" },
+    ],
+    solution:
+      "def parse_request(text):\n    lines = text.split(\"\\n\")\n    method, path = lines[0].split(\" \")[0], lines[0].split(\" \")[1]\n    headers = {}\n    for line in lines[1:]:\n        if line.strip() == \"\":\n            break\n        name, value = line.split(\":\", 1)\n        headers[name.strip().lower()] = value.strip()\n    return method, path, headers\n",
+  },
+  {
+    id: "status-class",
+    prompt: "Write status_class(code): given an HTTP status code as a whole number, return 'success' for 200 to 299, 'redirect' for 300 to 399, 'client error' for 400 to 499, 'server error' for 500 to 599, and 'other' for anything else.",
+    starter: "def status_class(code):\n    # Your code here.\n    return \"other\"\n",
+    tests: [
+      { name: "200 is a success", expr: "status_class(200) == 'success'" },
+      { name: "201 is a success", expr: "status_class(201) == 'success'" },
+      { name: "302 is a redirect", expr: "status_class(302) == 'redirect'" },
+      { name: "404 is a client error", expr: "status_class(404) == 'client error'" },
+      { name: "429 is a client error", expr: "status_class(429) == 'client error'" },
+      { name: "503 is a server error", expr: "status_class(503) == 'server error'" },
+      { name: "599 is still a server error", expr: "status_class(599) == 'server error'" },
+      { name: "100 and 600 are other", expr: "status_class(100) == 'other' and status_class(600) == 'other'" },
+    ],
+    solution:
+      "def status_class(code):\n    if 200 <= code <= 299:\n        return 'success'\n    if 300 <= code <= 399:\n        return 'redirect'\n    if 400 <= code <= 499:\n        return 'client error'\n    if 500 <= code <= 599:\n        return 'server error'\n    return 'other'\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

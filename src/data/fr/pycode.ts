@@ -146,4 +146,38 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "repère une version qui renvoie 0 pour du texte",
     ],
   },
+  "query-params": {
+    prompt: "Écrivez query_params(url) : renvoyez un dict des paramètres de la chaîne de requête de l'URL, avec l'encodage en pourcentage décodé. Une URL sans chaîne de requête donne un dict vide. Utilisez urllib.parse : urlsplit(url).query donne la chaîne de requête, et parse_qsl la transforme en paires.",
+    tests: [
+      "deux paramètres",
+      "%20 devient une espace",
+      "pas de chaîne de requête donne un dict vide",
+      "le fragment n'est pas un paramètre",
+      "une barre oblique encodée est décodée",
+    ],
+  },
+  "parse-request": {
+    prompt: "Écrivez parse_request(text) : text est une requête HTTP brute dont les lignes sont séparées par \\n. Renvoyez (method, path, headers) : les deux premiers mots de la première ligne, et un dict des lignes d'en-tête jusqu'à la première ligne vide. Les noms d'en-tête passent en minuscules, et les valeurs perdent les espaces qui les entourent.",
+    tests: [
+      "lit la méthode",
+      "lit le chemin, chaîne de requête comprise",
+      "lit les en-têtes",
+      "les noms d'en-tête sont en minuscules",
+      "le corps n'est pas lu comme un en-tête",
+      "une valeur peut contenir un deux-points",
+    ],
+  },
+  "status-class": {
+    prompt: "Écrivez status_class(code) : à partir d'un code d'état HTTP sous forme de nombre entier, renvoyez 'success' de 200 à 299, 'redirect' de 300 à 399, 'client error' de 400 à 499, 'server error' de 500 à 599, et 'other' pour tout le reste.",
+    tests: [
+      "200 est un succès",
+      "201 est un succès",
+      "302 est une redirection",
+      "404 est une erreur du client",
+      "429 est une erreur du client",
+      "503 est une erreur du serveur",
+      "599 reste une erreur du serveur",
+      "100 et 600 sont autre chose",
+    ],
+  },
 };
