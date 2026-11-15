@@ -584,6 +584,31 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def id_token_problems(claims, issuer, client_id, now):\n    problems = []\n    if claims['iss'] != issuer:\n        problems.append('wrong issuer')\n    if claims['aud'] != client_id:\n        problems.append('wrong audience')\n    if claims['exp'] <= now:\n        problems.append('expired')\n    return problems\n",
   },
+  {
+    id: "parse-dn",
+    prompt: "Write parse_dn(dn): given a distinguished name such as 'CN=Ana Diaz,OU=Finance,OU=Staff,DC=corp,DC=lab', return a dict with three keys: 'cn' is the common name, 'ous' is the list of OU names in the order written, and 'domain' is the DC parts joined by dots. Parts are separated by commas, and each part is a type, an equals sign and a value.",
+    starter: "def parse_dn(dn):\n    cn = \"\"\n    ous = []\n    dcs = []\n    for part in dn.split(','):\n        kind, value = part.split('=', 1)\n        # Your code here: put value in the right place according to kind.\n    return {'cn': cn, 'ous': ous, 'domain': '.'.join(dcs)}\n",
+    tests: [
+      { name: "a user in two OUs", expr: "parse_dn('CN=Ana Diaz,OU=Finance,OU=Staff,DC=corp,DC=lab') == {'cn': 'Ana Diaz', 'ous': ['Finance', 'Staff'], 'domain': 'corp.lab'}" },
+      { name: "an object with no OU", expr: "parse_dn('CN=Administrator,DC=corp,DC=lab') == {'cn': 'Administrator', 'ous': [], 'domain': 'corp.lab'}" },
+      { name: "a three-part domain", expr: "parse_dn('CN=srv1,OU=Servers,DC=eu,DC=corp,DC=example')['domain'] == 'eu.corp.example'" },
+      { name: "lower-case types are accepted", expr: "parse_dn('cn=svc_sql,ou=Service Accounts,dc=corp,dc=lab') == {'cn': 'svc_sql', 'ous': ['Service Accounts'], 'domain': 'corp.lab'}" },
+    ],
+    solution: "def parse_dn(dn):\n    cn = \"\"\n    ous = []\n    dcs = []\n    for part in dn.split(','):\n        kind, value = part.split('=', 1)\n        kind = kind.strip().upper()\n        if kind == 'CN':\n            cn = value\n        elif kind == 'OU':\n            ous.append(value)\n        elif kind == 'DC':\n            dcs.append(value)\n    return {'cn': cn, 'ous': ous, 'domain': '.'.join(dcs)}\n",
+  },
+  {
+    id: "risky-service-accounts",
+    prompt: "Write risky_service_accounts(accounts, today, max_age): accounts is a list of dicts with 'name', 'spn' (text, or None when the account has no SPN), 'password_set' (a date as 'YYYY-MM-DD') and 'groups'. Look only at accounts that have an SPN. Return a list of (name, reason) pairs, in order: reason is 'old password' when the password was set more than max_age days before today, and 'domain admin' when 'Domain Admins' is in groups. An account can give both, old password first.",
+    starter: "from datetime import date\n\ndef risky_service_accounts(accounts, today, max_age):\n    findings = []\n    # Your code here.\n    return findings\n",
+    tests: [
+      { name: "the full review", expr: "risky_service_accounts([{'name': 'svc_sql', 'spn': 'MSSQLSvc/srv1.corp.lab:1433', 'password_set': '2019-03-14', 'groups': ['Domain Admins']}, {'name': 'svc_web', 'spn': 'HTTP/web1.corp.lab', 'password_set': '2026-10-01', 'groups': []}, {'name': 'ana.diaz', 'spn': None, 'password_set': '2018-01-01', 'groups': ['Domain Admins']}, {'name': 'svc_old', 'spn': 'HOST/old1.corp.lab', 'password_set': '2024-01-01', 'groups': []}], '2026-11-15', 365) == [('svc_sql', 'old password'), ('svc_sql', 'domain admin'), ('svc_old', 'old password')]" },
+      { name: "a person without an SPN is not a service account", expr: "'ana.diaz' not in [name for name, reason in risky_service_accounts([{'name': 'svc_sql', 'spn': 'MSSQLSvc/srv1.corp.lab:1433', 'password_set': '2019-03-14', 'groups': ['Domain Admins']}, {'name': 'svc_web', 'spn': 'HTTP/web1.corp.lab', 'password_set': '2026-10-01', 'groups': []}, {'name': 'ana.diaz', 'spn': None, 'password_set': '2018-01-01', 'groups': ['Domain Admins']}, {'name': 'svc_old', 'spn': 'HOST/old1.corp.lab', 'password_set': '2024-01-01', 'groups': []}], '2026-11-15', 365)]" },
+      { name: "a recent password and no powerful group is clean", expr: "'svc_web' not in [name for name, reason in risky_service_accounts([{'name': 'svc_sql', 'spn': 'MSSQLSvc/srv1.corp.lab:1433', 'password_set': '2019-03-14', 'groups': ['Domain Admins']}, {'name': 'svc_web', 'spn': 'HTTP/web1.corp.lab', 'password_set': '2026-10-01', 'groups': []}, {'name': 'ana.diaz', 'spn': None, 'password_set': '2018-01-01', 'groups': ['Domain Admins']}, {'name': 'svc_old', 'spn': 'HOST/old1.corp.lab', 'password_set': '2024-01-01', 'groups': []}], '2026-11-15', 365)]" },
+      { name: "a stricter limit catches more", expr: "('svc_web', 'old password') in risky_service_accounts([{'name': 'svc_sql', 'spn': 'MSSQLSvc/srv1.corp.lab:1433', 'password_set': '2019-03-14', 'groups': ['Domain Admins']}, {'name': 'svc_web', 'spn': 'HTTP/web1.corp.lab', 'password_set': '2026-10-01', 'groups': []}, {'name': 'ana.diaz', 'spn': None, 'password_set': '2018-01-01', 'groups': ['Domain Admins']}, {'name': 'svc_old', 'spn': 'HOST/old1.corp.lab', 'password_set': '2024-01-01', 'groups': []}], '2026-11-15', 30)" },
+      { name: "no accounts, no findings", expr: "risky_service_accounts([], '2026-11-15', 365) == []" },
+    ],
+    solution: "from datetime import date\n\ndef risky_service_accounts(accounts, today, max_age):\n    now = date.fromisoformat(today)\n    findings = []\n    for account in accounts:\n        if not account['spn']:\n            continue\n        if (now - date.fromisoformat(account['password_set'])).days > max_age:\n            findings.append((account['name'], 'old password'))\n        if 'Domain Admins' in account['groups']:\n            findings.append((account['name'], 'domain admin'))\n    return findings\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

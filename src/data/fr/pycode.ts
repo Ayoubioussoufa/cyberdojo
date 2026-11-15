@@ -365,4 +365,18 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "tout est faux, dans l'ordre",
     ],
   },
+  "parse-dn": {
+    prompt: "Écrivez parse_dn(dn) : à partir d'un nom distinctif tel que 'CN=Ana Diaz,OU=Finance,OU=Staff,DC=corp,DC=lab', renvoyez un dict à trois clés : 'cn' est le nom commun, 'ous' est la liste des noms d'OU dans l'ordre écrit, et 'domain' est l'ensemble des parties DC reliées par des points. Les parties sont séparées par des virgules, et chaque partie est un type, un signe égal et une valeur.",
+    tests: ["un utilisateur dans deux OU", "un objet sans OU", "un domaine en trois parties", "les types en minuscules sont acceptés"],
+  },
+  "risky-service-accounts": {
+    prompt: "Écrivez risky_service_accounts(accounts, today, max_age) : accounts est une liste de dicts avec 'name', 'spn' (du texte, ou None quand le compte n'a pas de SPN), 'password_set' (une date sous la forme 'AAAA-MM-JJ') et 'groups'. Ne regardez que les comptes qui ont un SPN. Renvoyez une liste de paires (name, reason), dans l'ordre : reason vaut 'old password' quand le mot de passe a été défini plus de max_age jours avant today, et 'domain admin' quand 'Domain Admins' figure dans groups. Un compte peut donner les deux, 'old password' d'abord.",
+    tests: [
+      "la revue complète",
+      "une personne sans SPN n'est pas un compte de service",
+      "un mot de passe récent sans groupe puissant est propre",
+      "une limite plus stricte en attrape davantage",
+      "pas de compte, pas de constat",
+    ],
+  },
 };
