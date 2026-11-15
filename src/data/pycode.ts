@@ -270,6 +270,8 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution:
       "def ps_flags(cmdline):\n    text = cmdline.lower()\n    flags = []\n    if '-enc' in text:\n        flags.append('encoded')\n    if '-w hidden' in text:\n        flags.append('hidden')\n    if '-nop' in text:\n        flags.append('noprofile')\n    return flags\n",
+  },
+  {
     id: "query-params",
     prompt: "Write query_params(url): return a dict of the parameters in the URL's query string, with percent-encoding decoded. A URL with no query string gives an empty dict. Use urllib.parse: urlsplit(url).query gives the query string, and parse_qsl turns it into pairs.",
     starter: "from urllib.parse import urlsplit, parse_qsl\n\ndef query_params(url):\n    # Your code here.\n    return {}\n",
