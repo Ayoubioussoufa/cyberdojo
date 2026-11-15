@@ -19,7 +19,7 @@ Basis: Brief 1, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | OSI and TCP/IP layering, encapsulation | 11 mentions in 3 docs, most in 0017-ethernet-arp-layers, practice 1. *Lesson 17, 'Layers: envelopes inside envelopes'.* |  |
-| ● | ● | Ethernet frames and switching | 24 mentions in 4 docs, most in 0017-ethernet-arp-layers, practice 3. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
+| ● | ● | Ethernet frames and switching | 26 mentions in 5 docs, most in 0017-ethernet-arp-layers, practice 3. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ● | ● | ARP mechanics | 19 mentions in 4 docs, most in 0017-ethernet-arp-layers, practice 2. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ● | ● | ARP spoofing and on-path attacks | 7 mentions in 3 docs, most in 0017-ethernet-arp-layers. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ◐* | ● | VLANs and 802.1Q trunking | 3 mentions in 1 docs, most in 0017-ethernet-arp-layers. *Lesson 17 has a VLANs section, with no tagging or trunk mechanics.* | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
@@ -30,7 +30,7 @@ Basis: Brief 1, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | IPv4 addressing and subnetting | 25 mentions in 7 docs, most in 0016-subnetting, practice 5. |  |
-| ● | ● | NAT and private ranges | 18 mentions in 7 docs, most in 0012-build-your-lab. | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
+| ● | ● | NAT and private ranges | 19 mentions in 7 docs, most in 0021-firewalls-and-segmentation. | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
 | ○* | ● | IP header fields, TTL, fragmentation | 7 mentions in 1 docs, most in 0019-dns-and-dhcp. *All seven hits are DNS cache TTLs, not the IP header field.* | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
 | ● | ● | ICMP, ping, traceroute | 10 mentions in 3 docs, most in 0020-reading-packets, practice 2. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
 | ◐* | ● | IPv6 addressing, NDP, SLAAC | 6 mentions in 2 docs, most in 0015-bits-and-ip-addresses. *One section titled 'IPv6, briefly'. No NDP or SLAAC mechanics.* | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
@@ -42,7 +42,7 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | TCP handshake and connection states | 12 mentions in 4 docs, most in 0018-tcp-udp-and-ports, practice 1. |  |
+| ● | ● | TCP handshake and connection states | 14 mentions in 5 docs, most in 0018-tcp-udp-and-ports, practice 1. |  |
 | ◐ | ● | TCP internals: sequence numbers, windows, retransmission, congestion | 2 mentions in 1 docs, most in 0018-tcp-udp-and-ports, practice 1. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ○ | ● | TCP attacks: SYN flood, SYN cookies, RST injection, hijacking | None. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | UDP amplification and reflection | 6 mentions in 3 docs, most in 0018-tcp-udp-and-ports. | [Denial of service](modules/01-networking/13-denial-of-service.md) |
@@ -71,7 +71,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ●* | ● | Email transport: SMTP, IMAP, POP3 | 6 mentions in 2 docs, most in ports, practice 3. *Lesson 54, 'How email really travels'.* |  |
 | ● | ● | SPF, DKIM, DMARC | 33 mentions in 3 docs, most in 0054-phishing-analysis, practice 7. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ◐ | ● | SMB and file shares | 3 mentions in 3 docs, most in s2-memorising-what-must-be-instant, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
-| ◐ | ● | Cleartext legacy: FTP, Telnet | 2 mentions in 1 docs, most in ports, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
+| ◐ | ● | Cleartext legacy: FTP, Telnet | 3 mentions in 2 docs, most in ports, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ◐ | ● | SNMP | 1 mentions in 1 docs, most in ports, practice 1. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | NFS | 1 mentions in 1 docs, most in ports. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ◐ | ● | RDP | 3 mentions in 3 docs, most in 0034-powershell, practice 3. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
@@ -86,8 +86,8 @@ Basis: Brief 1, CyBOK Network Security.
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ● | ● | curl (tool) | 18 mentions in 10 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 1 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
-| ◐ | ● | ss, netstat, lsof (tool) | 6 mentions in 5 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
-| ◐ | ● | ip, ifconfig, route tables (tool) | 4 mentions in 2 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
+| ◐ | ● | ss, netstat, lsof (tool) | 9 mentions in 6 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
+| ◐ | ● | ip, ifconfig, route tables (tool) | 5 mentions in 3 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
 | ○ | ◐ | scapy and hping: crafted packets (tool) | None. *Tools table and a reading link only.* | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
 
 ### Packet analysis
@@ -96,8 +96,8 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ◐ | ● | tcpdump (tool) | 11 mentions in 4 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | BPF capture filters | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ● | ● | Wireshark (tool) | 36 mentions in 7 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ●* | ● | Display filters and following streams | 8 mentions in 2 docs, most in 0020-reading-packets. *Lesson 20, 'Reading Wireshark'.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ● | ● | Wireshark (tool) | 37 mentions in 8 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ●* | ● | Display filters and following streams | 11 mentions in 3 docs, most in 0020-reading-packets. *Lesson 20, 'Reading Wireshark'.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | tshark (tool) | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | Decrypting TLS in a capture | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | Encrypted traffic analysis, JA3/JA4 | 1 mentions in 1 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
@@ -107,10 +107,10 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Nmap (tool) | 47 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ● | ● | Nmap (tool) | 71 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 3 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ○ | ● | Scan timing, rate and how each looks to a defender | None. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ○ | ● | Nmap Scripting Engine | 2 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ○ | ● | Scan timing, rate and how each looks to a defender | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ○ | ● | Nmap Scripting Engine | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | masscan, RustScan, ZMap (tool) | None. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ◐ | ● | Service and OS fingerprinting | 9 mentions in 6 docs, most in 0038-hashes-and-symmetric-crypto, practice 3. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ●* | ● | Detecting scans | None. *Lesson 22, 'What a defender sees'.* |  |
@@ -140,7 +140,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ● | ● | Virtual memory and page tables | 6 mentions in 1 docs, most in 0030-how-operating-systems-work. |  |
 | ○ | ● | The /proc filesystem | 2 mentions in 1 docs, most in 0009-processes-and-signals. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
 | ○ | ● | Inodes and file descriptors | Practice only (2). | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
-| ◐ | ● | Boot, init and systemd | 4 mentions in 3 docs, most in 0025-hardening-linux. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
+| ◐ | ● | Boot, init and systemd | 7 mentions in 3 docs, most in 0025-hardening-linux. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
 | ○ | ● | Dynamic linking, LD_PRELOAD | Practice only (1). | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
 | ○ | ● | PAM | None. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
 | ◐ | ● | /etc/passwd and /etc/shadow | 5 mentions in 4 docs, most in 0008-suid-sticky-umask, practice 2. | [Linux boot, linking and login](modules/02-operating-systems/02-linux-boot-and-linking.md) |
@@ -162,8 +162,8 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ◐ | ● | Cron, PATH and wildcard abuse | 4 mentions in 3 docs, most in 0025-hardening-linux, practice 5. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ○ | ● | Kernel privilege escalation classes | None. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ○ | ● | The docker group as root | None. *Section 'Groups that equal root'.* | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
-| ◐ | ● | Enumeration tools: LinPEAS, LinEnum, Lynis (tool) | 9 mentions in 2 docs, most in P01. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
-| ◐ | ● | Linux persistence: keys, cron, systemd | 4 mentions in 4 docs, most in 0013-ssh-and-your-first-wargame, practice 10. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
+| ◐ | ● | Enumeration tools: LinPEAS, LinEnum, Lynis (tool) | 11 mentions in 2 docs, most in P01. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
+| ◐ | ● | Linux persistence: keys, cron, systemd | 5 mentions in 4 docs, most in 0025-hardening-linux, practice 10. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 
 ### Windows internals
 
@@ -267,7 +267,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ◐* | ● | RSA | 2 mentions in 1 docs, most in 0039-public-keys-and-tls. *A glossary line and 'Two keys' in lesson 39. The mathematics isn't taught.* | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ○ | ● | RSA padding and attacks: OAEP, Bleichenbacher | None. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ●* | ● | Diffie-Hellman and forward secrecy | 4 mentions in 1 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Key exchange'.* | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
-| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 4 mentions in 3 docs, most in P01, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
+| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 7 mentions in 4 docs, most in 0025-hardening-linux, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
 | ○ | ● | Nonce misuse | 1 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
 | ●* | ● | Digital signatures | 5 mentions in 3 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Digital signatures'.* |  |
 
@@ -458,7 +458,7 @@ Basis: Brief 5, CyBOK Software Security, CWE Top 25.
 | ○ | ● | DEP / NX | None. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
 | ○ | ● | Stack canaries | None. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
 | ○ | ● | RELRO | None. | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
-| ○ | ● | CFI, Intel CET, shadow stacks | None. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
+| ○ | ● | CFI, Intel CET, shadow stacks | 3 mentions in 3 docs, most in 0022-scanning-with-nmap. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
 | ○ | ● | Memory tagging and pointer authentication | None. | [Exploit mitigations](modules/05-binary/06-exploit-mitigations.md) |
 | ○ | ● | Sanitizers: ASan, UBSan | None. | [Stack memory safety](modules/05-binary/03-stack-memory-corruption.md) |
 | ○ | ● | Memory-safe languages | None. | [Stack memory safety](modules/05-binary/03-stack-memory-corruption.md) |
@@ -547,8 +547,8 @@ Basis: Brief 7, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Stateful firewalls and rule logic | 13 mentions in 4 docs, most in 0021-firewalls-and-segmentation. | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
-| ●* | ● | ufw (tool) | 16 mentions in 2 docs, most in 0025-hardening-linux. *Lesson 25, 'The host firewall'.* | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
+| ● | ● | Stateful firewalls and rule logic | 17 mentions in 4 docs, most in 0021-firewalls-and-segmentation. | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
+| ●* | ● | ufw (tool) | 23 mentions in 3 docs, most in 0025-hardening-linux. *Lesson 25, 'The host firewall'.* | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
 | ◐ | ● | iptables and nftables (tool) | 3 mentions in 1 docs, most in 0025-hardening-linux. | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
 | ● | ● | pfSense and OPNsense (tool) | 19 mentions in 3 docs, most in P01. |  |
 | ○ | ● | Next-generation firewalls | None. | [Sensors and TLS inspection](modules/07-network-security/03-sensors-and-tls-inspection.md) |
@@ -559,10 +559,10 @@ Basis: Brief 7, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | IDS versus IPS | 21 mentions in 2 docs, most in 0023-ids-and-network-monitoring, practice 11. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ● | ● | Suricata (tool) | 12 mentions in 1 docs, most in 0023-ids-and-network-monitoring. | [Writing IDS rules](modules/07-network-security/02-ids-rule-writing.md) |
+| ● | ● | Suricata (tool) | 27 mentions in 1 docs, most in 0023-ids-and-network-monitoring. | [Writing IDS rules](modules/07-network-security/02-ids-rule-writing.md) |
 | ○ | ● | Snort (tool) | None. | [Writing IDS rules](modules/07-network-security/02-ids-rule-writing.md) |
-| ● | ● | Zeek (tool) | 6 mentions in 1 docs, most in 0023-ids-and-network-monitoring. | [Writing IDS rules](modules/07-network-security/02-ids-rule-writing.md) |
-| ◐ | ● | Writing IDS signatures | 4 mentions in 1 docs, most in 0023-ids-and-network-monitoring. | [Writing IDS rules](modules/07-network-security/02-ids-rule-writing.md) |
+| ● | ● | Zeek (tool) | 9 mentions in 1 docs, most in 0023-ids-and-network-monitoring. | [Writing IDS rules](modules/07-network-security/02-ids-rule-writing.md) |
+| ◐ | ● | Writing IDS signatures | 7 mentions in 1 docs, most in 0023-ids-and-network-monitoring. | [Writing IDS rules](modules/07-network-security/02-ids-rule-writing.md) |
 | ○ | ● | TAP and SPAN placement | None. | [Sensors and TLS inspection](modules/07-network-security/03-sensors-and-tls-inspection.md) |
 | ○ | ● | TLS inspection trade-offs | None. | [Sensors and TLS inspection](modules/07-network-security/03-sensors-and-tls-inspection.md) |
 
@@ -570,7 +570,7 @@ Basis: Brief 7, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Segmentation and DMZ | 40 mentions in 4 docs, most in P01. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
+| ● | ● | Segmentation and DMZ | 48 mentions in 4 docs, most in 0021-firewalls-and-segmentation. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
 | ○ | ● | Microsegmentation | None. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
 | ○ | ● | Bastion hosts and jump boxes | None. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
 | ○ | ● | Network access control, 802.1X | None. | [Network security architecture](modules/07-network-security/04-network-architecture.md) |
@@ -609,7 +609,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 | ◐ | ● | Splunk and SPL (tool) | 9 mentions in 2 docs, most in P08. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ◐ | ● | Elastic stack and KQL (tool) | 8 mentions in 4 docs, most in e1-platforms, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ○ | ● | Microsoft Sentinel (tool) | 1 mentions in 1 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | Writing correlation rules, tuning false positives | 31 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
+| ● | ● | Writing correlation rules, tuning false positives | 32 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
 | ●* | ● | Sigma (tool) | 17 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | SOAR and playbooks | 18 mentions in 8 docs, most in P06, practice 1. |  |
 
@@ -645,7 +645,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 | ◐ | ● | Volatility (tool) | 6 mentions in 4 docs, most in 0065-forensic-principles. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
 | ●* | ● | Windows artifacts: Prefetch, Amcache, ShimCache, LNK | 14 mentions in 2 docs, most in 0065-forensic-principles, practice 1. *Lesson 65, 'Windows artifacts'.* | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ◐ | ● | NTFS forensics: MFT, USN, timestamps | 4 mentions in 2 docs, most in 0065-forensic-principles, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
-| ◐ | ● | Linux forensic artifacts | 29 mentions in 13 docs, most in 0025-hardening-linux, practice 36. | [Linux forensics](modules/08-blue-team/07-linux-forensics.md) |
+| ◐ | ● | Linux forensic artifacts | 34 mentions in 13 docs, most in 0025-hardening-linux, practice 36. | [Linux forensics](modules/08-blue-team/07-linux-forensics.md) |
 | ● | ● | Timeline analysis | 15 mentions in 2 docs, most in P11. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ○ | ● | Network forensics | None. *Section on working a capture.* | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ○ | ● | Cloud forensics | None. *Sections on cloud evidence and response.* | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
@@ -689,7 +689,7 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 | ◐* | ● | MISP, OpenCTI (tool) | 7 mentions in 2 docs, most in P12. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ● | ● | Traffic Light Protocol | 16 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ◐ | ● | Attribution and its limits | 5 mentions in 2 docs, most in 0066-threat-intelligence. | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
-| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 19 mentions in 4 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
+| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 28 mentions in 7 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ○ | ● | The underground economy: IABs, RaaS | None. *Section 'Crime as a supply chain'.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 
 ### OSINT and recon (ATT&CK Reconnaissance)
