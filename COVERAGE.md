@@ -84,7 +84,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 41 mentions in 15 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ● | ● | curl (tool) | 43 mentions in 16 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 3 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 9 mentions in 6 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 5 mentions in 3 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -125,7 +125,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ○ | ● | Pivoting through a compromised host | 2 mentions in 1 docs, most in 0066-threat-intelligence. | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
 | ○ | ● | Bind and reverse shells | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | Protocol tunnelling and its detection | None. *Section 'hiding in protocols' and the detection list.* | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
-| ◐ | ● | Denial of service classes | 5 mentions in 3 docs, most in 0001-what-security-protects, practice 5. | [Denial of service](modules/01-networking/13-denial-of-service.md) |
+| ◐ | ● | Denial of service classes | 6 mentions in 4 docs, most in 0001-what-security-protects, practice 5. | [Denial of service](modules/01-networking/13-denial-of-service.md) |
 
 ## 02 Operating systems and privilege escalation
 
@@ -157,8 +157,8 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | SUID and SGID abuse | 29 mentions in 8 docs, most in 0008-suid-sticky-umask, practice 23. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
-| ◐ | ● | sudo misconfiguration, GTFOBins | 12 mentions in 5 docs, most in 0057-auditing-for-privilege-escalation, practice 9. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
+| ● | ● | SUID and SGID abuse | 34 mentions in 8 docs, most in 0008-suid-sticky-umask, practice 23. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
+| ◐ | ● | sudo misconfiguration, GTFOBins | 13 mentions in 5 docs, most in 0057-auditing-for-privilege-escalation, practice 9. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ◐ | ● | Cron, PATH and wildcard abuse | 4 mentions in 3 docs, most in 0025-hardening-linux, practice 5. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ○ | ● | Kernel privilege escalation classes | None. | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
 | ○ | ● | The docker group as root | None. *Section 'Groups that equal root'.* | [Linux privilege escalation](modules/02-operating-systems/04-linux-privilege-escalation.md) |
@@ -275,7 +275,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | X.509, CAs and chains of trust | 24 mentions in 14 docs, most in 0039-public-keys-and-tls, practice 4. *Lesson 39, 'Certificates and the chain of trust'.* | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
+| ●* | ● | X.509, CAs and chains of trust | 25 mentions in 15 docs, most in 0039-public-keys-and-tls, practice 4. *Lesson 39, 'Certificates and the chain of trust'.* | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | Revocation: CRL, OCSP | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | Certificate Transparency | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | ACME and automated certificates | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
@@ -287,7 +287,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ● | ● | TLS 1.3 handshake | 11 mentions in 3 docs, most in 0039-public-keys-and-tls. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Key schedule and HKDF | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | History of TLS attacks | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
-| ○ | ● | Downgrade attacks | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
+| ○ | ● | Downgrade attacks | 1 mentions in 1 docs, most in 0056-how-a-pentest-works. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Mutual TLS | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | Certificate pinning | Practice only (1). *Explained with its risks. The word count credited dependency pinning by mistake.* | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | testssl.sh, sslyze, SSL Labs (tool) | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
@@ -581,7 +581,7 @@ Basis: Brief 7, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | VPN concepts | 16 mentions in 8 docs, most in 0021-firewalls-and-segmentation, practice 6. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
+| ● | ● | VPN concepts | 18 mentions in 8 docs, most in 0021-firewalls-and-segmentation, practice 6. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | WireGuard (tool) | 2 mentions in 1 docs, most in 0021-firewalls-and-segmentation. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | IPsec: IKE, ESP, tunnel versus transport | 1 mentions in 1 docs, most in 0021-firewalls-and-segmentation. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | OpenVPN (tool) | None. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
@@ -604,12 +604,12 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 |---|---|---|---|---|
 | ● | ● | SOC tiers and alert triage | 68 mentions in 28 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ●* | ● | Log sources and pipelines | 15 mentions in 7 docs, most in P06. *Lesson 52, 'What each log proves'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | SIEM concepts | 37 mentions in 16 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ● | ● | SIEM concepts | 40 mentions in 16 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Wazuh (tool) | 20 mentions in 5 docs, most in P06, practice 1. |  |
 | ◐ | ● | Splunk and SPL (tool) | 10 mentions in 2 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ◐ | ● | Elastic stack and KQL (tool) | 10 mentions in 4 docs, most in 0052-logs-and-siem, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ○ | ● | Microsoft Sentinel (tool) | 1 mentions in 1 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | Writing correlation rules, tuning false positives | 33 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
+| ● | ● | Writing correlation rules, tuning false positives | 34 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
 | ●* | ● | Sigma (tool) | 17 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | SOAR and playbooks | 18 mentions in 8 docs, most in P06, practice 1. |  |
 
@@ -631,7 +631,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 | ●* | ● | Containment decisions | 10 mentions in 8 docs, most in n1-templates, practice 1. *Lesson 59, 'Containment is a trade-off'.* |  |
 | ◐ | ● | Tabletop exercises | 7 mentions in 3 docs, most in 0059-incident-response. | [Tabletop exercises](modules/08-blue-team/04-tabletop-exercises.md) |
 | ●* | ● | Post-incident review | 2 mentions in 2 docs, most in h3-write-ups-and-reports. *Lesson 59, 'After the incident'.* |  |
-| ● | ● | Vulnerability management: CVSS, EPSS, KEV, SSVC | 47 mentions in 7 docs, most in 0055-vulnerability-management, practice 19. | [Assessing exploitability](modules/05-binary/05-exploitation-concepts.md) |
+| ● | ● | Vulnerability management: CVSS, EPSS, KEV, SSVC | 56 mentions in 7 docs, most in 0055-vulnerability-management, practice 19. | [Assessing exploitability](modules/05-binary/05-exploitation-concepts.md) |
 
 ### Forensics
 
@@ -689,7 +689,7 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 | ◐* | ● | MISP, OpenCTI (tool) | 7 mentions in 2 docs, most in P12. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ● | ● | Traffic Light Protocol | 16 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ◐ | ● | Attribution and its limits | 5 mentions in 2 docs, most in 0066-threat-intelligence. | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
-| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 30 mentions in 9 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
+| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 32 mentions in 10 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ○ | ● | The underground economy: IABs, RaaS | None. *Section 'Crime as a supply chain'.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 
 ### OSINT and recon (ATT&CK Reconnaissance)
@@ -844,7 +844,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | Authorisation, scope and rules of engagement | 8 mentions in 7 docs, most in P07, practice 2. *Lessons 2 and 56.* |  |
+| ●* | ● | Authorisation, scope and rules of engagement | 10 mentions in 7 docs, most in 0056-how-a-pentest-works, practice 2. *Lessons 2 and 56.* |  |
 | ○ | ● | Coordinated vulnerability disclosure | 1 mentions in 1 docs, most in h2-networking-and-internships. | [Disclosure and professional ethics](modules/12-grc/02-disclosure-and-ethics.md) |
 | ◐ | ● | Bug bounty practice and safe harbour | 8 mentions in 3 docs, most in 0002-the-rules-of-the-game. | [Disclosure and professional ethics](modules/12-grc/02-disclosure-and-ethics.md) |
 | ○ | ● | Codes of ethics | None. *Section on ethics beyond the rules.* | [Disclosure and professional ethics](modules/12-grc/02-disclosure-and-ethics.md) |
@@ -875,7 +875,7 @@ Basis: Added: CyBOK Secure Software Lifecycle, OWASP A03:2025.
 | ●* | ● | Syft, OSV-Scanner, dependabot (tool) | 6 mentions in 1 docs, most in P14. *Syft is walked through in P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ◐ | ● | CI/CD attacks: poisoned pipelines, runner abuse | 4 mentions in 4 docs, most in a2-how-to-use-this-plan. | [CI/CD pipeline security](modules/13-supply-chain/02-cicd-attacks.md) |
 | ●* | ● | Secrets scanning | 26 mentions in 8 docs, most in P03, practice 4. *Walked through in project P03.* | [Key management](modules/03-cryptography/11-key-management.md) |
-| ◐ | ● | Case studies: SolarWinds, xz, log4j | 4 mentions in 2 docs, most in 0069-supply-chain-and-pipelines. | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
+| ◐ | ● | Case studies: SolarWinds, xz, log4j | 5 mentions in 2 docs, most in 0069-supply-chain-and-pipelines. | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 
 ## 14 AI and machine-learning security
 

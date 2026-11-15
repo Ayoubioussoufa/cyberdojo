@@ -887,4 +887,57 @@ export const PY_FR: Record<string, PyChallengeFr> = {
     prompt: "Écrivez due_dates(findings, report_date) : findings est une liste de dicts avec 'title' et 'severity' ('critical', 'high', 'medium' ou 'low'), et report_date est de la forme 'AAAA-MM-JJ'. Un constat critique est à corriger 7 jours après le rapport, un constat élevé 30, moyen 90 et faible 180. Renvoyez une liste de paires (échéance, titre), l'échéance étant un texte 'AAAA-MM-JJ', triée par date. date.fromisoformat(texte) + timedelta(days=n) donne une date, et .isoformat() la retransforme en texte.",
     tests: ["les trois constats de la leçon", "un constat faible est dû dans 180 jours", "les dates passent la fin de l'année", "aucun constat"],
   },
+  "uid-zero-accounts": {
+    prompt: "Écrivez extra_root_accounts(passwd_text) : passwd_text est le contenu de /etc/passwd, un compte par ligne, avec des champs séparés par des deux-points. Le premier champ est le nom et le troisième est l'UID. Renvoyez la liste des noms, dans l'ordre, qui ont l'UID 0 et ne s'appellent pas root. Sautez les lignes vides et les lignes de moins de trois champs.",
+    tests: [
+      "un second compte d'UID 0",
+      "un fichier propre",
+      "un UID qui commence seulement par 0 n'est pas 0",
+      "un GID de 0 n'est pas un UID de 0",
+      "un fichier vide",
+    ],
+  },
+  "risky-sudo-rule": {
+    prompt: "Écrivez sudo_risks(rule) : rule est une ligne de la sortie de sudo -l, comme '(root) NOPASSWD: /usr/bin/vim /etc/hosts'. Renvoyez la liste des raisons pour lesquelles elle mérite une revue, dans cet ordre : 'no password' quand elle contient NOPASSWD:, 'all commands' quand la partie commande est exactement ALL, et 'wildcard' quand la partie commande contient *. La partie commande est ce qui suit la parenthèse fermante, une fois NOPASSWD: retiré et les espaces enlevées aux extrémités.",
+    tests: [
+      "une commande exacte convient",
+      "aucun mot de passe demandé",
+      "tout, en tant que n'importe qui",
+      "tout, sans mot de passe",
+      "un joker dans le chemin",
+      "un programme dont le nom contient ALL n'est pas ALL",
+    ],
+  },
+  "world-writable": {
+    prompt: "Écrivez world_writable(listing) : listing est une ligne de la sortie de ls -l, comme '-rwxrwxrwx 1 root root 120 Nov 12 03:14 /opt/job.sh'. Les dix premiers caractères sont le type et les permissions, et le neuvième est w quand tout le monde peut écrire. Renvoyez True pour un fichier ordinaire ou un dossier modifiable par tous, et False pour tout le reste, y compris les liens symboliques, dont la ligne commence par l.",
+    tests: [
+      "un script que tout le monde peut modifier",
+      "un programme ordinaire",
+      "modifiable par le groupe seulement",
+      "un dossier modifiable par tous",
+      "un lien symbolique affiche toujours rwx et n'est pas un constat",
+      "un programme SUID que les autres ne peuvent pas modifier",
+    ],
+  },
+  "unquoted-service-path": {
+    prompt: "Écrivez unquoted_risk(path) : path est le PathName d'un service Windows. Renvoyez True quand le chemin du programme contient une espace et ne commence pas par un guillemet double. Le chemin du programme est tout ce qui va jusqu'au premier '.exe' compris (majuscules ou minuscules). Un chemin sans '.exe' donne False.",
+    tests: [
+      "des espaces dans les dossiers, pas de guillemets",
+      "le même chemin, entre guillemets",
+      "aucune espace",
+      "des espaces dans les seuls arguments sont sans danger",
+      "des espaces dans les dossiers, et des arguments ensuite",
+      "un chemin de pilote sans .exe",
+    ],
+  },
+  "audit-diff": {
+    prompt: "Écrivez audit_diff(before, after) : chaque argument est la liste des lignes d'une exécution d'un audit, par exemple des chemins de fichiers SUID. Renvoyez une paire (added, removed) : la liste triée des lignes qui ne sont que dans after, et la liste triée des lignes qui ne sont que dans before.",
+    tests: [
+      "un nouveau fichier SUID",
+      "rien n'a changé",
+      "un retiré et deux ajoutés, triés",
+      "une première exécution a tout en ajouté",
+      "les lignes répétées comptent une fois",
+    ],
+  },
 };

@@ -2,7 +2,7 @@
 title: Auditing for privilege escalation
 summary: The defender's checklists for Linux, Windows and Active Directory: what lets a normal user become an admin, how to find it first, and how each path looks in logs.
 month: 10
-minutes: 50
+minutes: 70
 builds: privilege audit checklists in your own words for Linux and Windows
 source: CIS Benchmarks | https://www.cisecurity.org/cis-benchmarks
 words: privilege escalation, least privilege, tiering
@@ -49,6 +49,39 @@ Run these as a normal user, on your own systems, and fix what you find.
 | Secrets in files | `grep -rl password /etc /opt` | Move to a secrets manager |
 | Missing patches | `apt list --upgradable` | Patch the kernel and setuid programs |
 
+A table of commands only helps once you can read what they print. Take three of them.
+
+**`sudo -l`** lists what the current user may run as someone else:
+
+```
+User sam may run the following commands on web1:
+    (root) /usr/bin/systemctl restart nginx
+    (root) NOPASSWD: /usr/bin/vim /etc/hosts
+    (ALL : ALL) ALL
+```
+
+The brackets say who the command runs as, and what follows is the command allowed. The first line is a good rule: one exact command. The second looks narrow and isn't, as the question below explains. The third means "anything, as anyone", and it belongs to administrators only.
+
+**The SUID search** prints paths. On a fresh Ubuntu there are a dozen or so, all in system folders: `passwd`, `sudo`, `su`, `mount` and their relatives. Learn that list on a clean machine, because the finding is whatever isn't on it. Look closer with `ls -l`:
+
+```
+-rwsr-xr-x 1 root root 59976 Feb  6  2024 /usr/bin/passwd
+```
+
+The `s` where the owner's `x` would be is the SUID bit: whoever runs this file, it runs as its owner, root. For `passwd` that's intended, since it has to edit a file only root can write. The same letters on a file in `/home`, `/tmp` or `/opt` need an explanation today.
+
+**The UID check** reads `/etc/passwd`, where the third field is the user's number. Only `root` should have 0, because the kernel treats any account with UID 0 as root, whatever it's called. It's the simplest of these checks to write yourself.
+
+@code uid-zero-accounts
+
+Sudo rules are text with a regular shape, so the dangerous patterns can be searched for.
+
+@code risky-sudo-rule
+
+And the permission string from `ls -l` tells you, in one fixed position, whether everybody can write to a file.
+
+@code world-writable
+
 A sudo rule for a harmless-looking program can be as good as full root, because many programs can start a shell or write files. [GTFOBins](https://gtfobins.org/) documents these, and defenders use it to review their rules.
 
 @range audit
@@ -72,6 +105,23 @@ The same idea, with different names.
 | Admins logging on to workstations | Their credentials sit in memory there | Tiering |
 | Credentials in memory | LSASS can be read | Credential Guard, and LSA protection |
 | Stored secrets | Passwords in scripts or shares | Remove and rotate |
+
+The first two rows can be checked from PowerShell on your own lab machines:
+
+```powershell
+Get-CimInstance Win32_Service |
+  Where-Object { $_.PathName -notlike '"*' -and $_.PathName -like '* *' } |
+  Select-Object Name, StartName, PathName
+
+icacls "C:\Program Files\Acme Tools\agent.exe"
+Get-LocalGroupMember Administrators
+```
+
+The first command lists services whose path contains a space and doesn't begin with a quote. Many of those are harmless paths followed by arguments, so read each one: the risky case is a space inside the folder names themselves, such as `C:\Program Files\Acme Tools\agent.exe`. Without quotes, Windows tries `C:\Program.exe` first, then `C:\Program Files\Acme.exe`, and runs the first that exists. The fix is a pair of quotes around the path.
+
+`icacls` answers the other question, who can change the file. `(F)` is full control, `(M)` modify and `(RX)` read and execute. `BUILTIN\Users:(M)` on a program that runs as `SYSTEM` is the Windows twin of the mode 777 script.
+
+@code unquoted-service-path
 
 **Tiering** matters the most. If a Domain Admin never logs on to a normal laptop, stealing that laptop's memory won't give an attacker Domain Admin.
 
@@ -107,12 +157,62 @@ The [Keystone machine](/machines/keystone/) lets you follow one of these chains 
 
 An audit run once goes stale. Script these checks, as you did in Month 3, run them on a schedule, and compare with the last result. Any new SUID file, sudo rule or local admin is either a change someone can explain, or an incident.
 
+On Linux, the whole habit is three lines. Save today's list under today's date, and compare it with the last one:
+
+```
+sudo find / -perm -4000 -type f 2>/dev/null | sort > suid-$(date +%F).txt
+comm -13 suid-2026-11-08.txt suid-2026-11-15.txt       lines only in the new file
+comm -23 suid-2026-11-08.txt suid-2026-11-15.txt       lines only in the old file
+```
+
+`comm` compares two sorted files. An empty result is the answer you want. Any line it prints is a SUID program that appeared or vanished in a week, and somebody should be able to say why. The same three lines work for sudo rules, for members of the `sudo` group and for listening ports.
+
+@code audit-diff
+
 ?? What makes a privilege audit worth more over time?
 + Automatically comparing the results with the last run
 - Printing the output and filing it away somewhere
 - Running it once a decade on one server
 - Keeping the results secret from the admin team
 => The change between two runs is the signal. A new SUID file nobody can explain deserves attention.
+
+## Read an audit
+
+Three results from this week's run on a server you look after. Decide what each means before you read the choices.
+
+```
+-rwsr-xr-x 1 root root 16384 Nov 12 03:14 /home/sam/.cache/helper
+```
+
+?? What does that line of the SUID search tell you?
++ A root-owned SUID program in a user's home
+- A normal system tool in its usual place
+- A plain text file that anyone may read
+- A folder that belongs to the root user
+=> Nothing in a home directory should run as root. The hidden folder and the time, three in the morning, make it more than a mistake: treat it as an incident.
+
+```
+$ comm -13 suid-2026-11-08.txt suid-2026-11-15.txt
+/usr/local/bin/backup-helper
+```
+
+?? What's the right next step?
++ Ask who installed it, and check the record
+- Delete it at once, without telling anyone else
+- Ignore it, since the name sounds quite harmless
+- Add it to the baseline and move on
+=> It appeared this week. Either a colleague can point to the change that added it, or nobody can, and then it's something to investigate.
+
+```
+C:\Program Files\Acme Tools\agent.exe BUILTIN\Users:(M)
+```
+
+?? That file is the program of a service that runs as `SYSTEM`. What can an ordinary user do?
++ Replace the program that `SYSTEM` will run
+- Read the program, but never change it
+- Stop Windows from starting up at all
+- Nothing, because the service is properly signed
+=> `(M)` is modify. Whoever can change the file decides what runs with the highest rights at the next restart. Remove the permission, and check whether the file has already been altered.
 
 ?! Write your own Linux privilege audit checklist: ten checks, each with a command, and what a bad result looks like.
 
