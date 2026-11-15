@@ -2,7 +2,7 @@
 title: Firewalls, NAT and segmentation
 summary: How firewalls decide, why default deny matters, and how to split a network so one breach doesn't become all of it.
 month: 3
-minutes: 30
+minutes: 45
 builds: design a segmented network with a justified rule for every flow
 source: OPNsense documentation | https://docs.opnsense.org/
 words: firewall, default deny, DMZ
@@ -32,8 +32,37 @@ A firewall reads rules from the top, and the first match wins. A rule says: from
 
 A **stateful** firewall remembers connections, so that when a staff laptop opens a connection to a site, the replies come back automatically. You write rules for who starts the conversation, and the state table handles the rest.
 
+Read one rule as a sentence. Rule 3 says: "if the packet comes from the admin host, is going to the DMZ web server, and is aimed at port 22, let it through". A packet has to match every column of a rule, not just one. If any column doesn't fit, the firewall moves down to the next rule.
+
+Now follow two packets through the table by hand, the way the firewall does:
+
+| Packet | Rule 1 | Rule 2 | Rule 3 | Rule 4 | Result |
+|---|---|---|---|---|---|
+| A staff laptop to a news site on 443 | No: wrong destination | Match | not read | not read | Allowed |
+| A staff laptop to the DMZ web server on 22 | No: wrong port | No: wrong port | No: wrong source | Match | Blocked |
+
+The second packet is the important one. Nobody wrote "block staff SSH to the web server". It's blocked because nobody allowed it, and the last rule catches whatever is left. That's the whole idea of the next box.
+
 ::: key Default deny
 List what's allowed, and block everything else. The opposite, allowing everything and blocking known-bad, fails the moment something new appears. The roadmap asks for a one-line reason on every rule, because a rule nobody can justify is a rule that should go.
+:::
+
+### The same idea on your own Linux machine
+
+A firewall isn't only a box at the edge of a network. Every Linux machine has one built into the kernel, and on Ubuntu the simplest way to drive it is `ufw`, the "uncomplicated firewall". Try it in your VM, never on a machine you reach only over the network.
+
+```
+sudo ufw default deny incoming     block every connection that others start
+sudo ufw default allow outgoing    let this machine start its own connections
+sudo ufw allow 22/tcp              one exception: SSH, so you can still get in
+sudo ufw enable                    switch the firewall on
+sudo ufw status verbose            show the defaults and the rules
+```
+
+Line by line: the first two lines set the defaults, which are the answer for any packet that no rule mentions. The third adds one allow rule. The fourth turns it all on, and the last shows you what you built. `ufw` is stateful, so replies to connections that your machine started come back in without a rule. The [Ubuntu firewall documentation](https://documentation.ubuntu.com/server/how-to/security/firewalls/) covers the rest.
+
+::: trap Don't lock yourself out
+If you're connected to a machine over SSH and you enable a deny-by-default firewall before allowing port 22, your own session is the first thing it blocks. Allow your way in first, then enable.
 :::
 
 ?? Rule 1 allows port 443 from anywhere. Rule 2 denies everything from `203.0.113.7`. Does that IP reach port 443?
@@ -46,6 +75,15 @@ List what's allowed, and block everything else. The opposite, allowing everythin
 ## NAT and port forwarding
 
 **NAT** lets many private addresses share one public address. The router rewrites the source address on the way out, and it remembers the mapping so that replies find their way back. Described in [RFC 3022](https://www.rfc-editor.org/rfc/rfc3022).
+
+Here is what the router's table looks like while two laptops browse at the same time. Both use the one public address, `198.51.100.9`, and the router tells their replies apart by the port number it picked on the way out:
+
+| Inside address and port | Rewritten to | Talking to |
+|---|---|---|
+| `192.168.1.20:51000` | `198.51.100.9:40001` | `203.0.113.5:443` |
+| `192.168.1.31:51000` | `198.51.100.9:40002` | `203.0.113.5:443` |
+
+When a reply arrives for port 40002, the router looks it up, rewrites the destination to `192.168.1.31:51000` and passes it on. A packet from outside that matches no line has nowhere to go, so the router drops it. That's why a home network seems protected: not because NAT judges traffic, but because nothing inside asked for it.
 
 NAT isn't a security feature, though it hides internal addresses as a side effect. **Port forwarding** goes the other way: "traffic to my public IP on 443 goes to this internal server". Every forward is a hole through your defences, so each one is a decision.
 
@@ -93,6 +131,34 @@ A **proxy** makes web requests for users, so it can filter and log them. Proxy l
 - Their password is sent over the internet unencrypted
 - Their laptop stops receiving any more security updates
 => A VPN protects the connection, but it can give wide network access. That's why zero trust grants narrowly.
+
+## Read a design like a reviewer
+
+Before you build, practise the check a reviewer does on any firewall design: take one flow at a time and ask who starts it, where it goes, on which port, and which rule allows it. If you can't point at a rule, the flow is blocked. If you can't say why a rule exists, the rule is the problem.
+
+Use this small company. Staff are on the LAN, the public website is in the DMZ, and the database is in the Servers zone.
+
+```
+#  ACTION  SOURCE     DESTINATION   PORT   WHY
+1  ALLOW   any        DMZ web       443    Public website
+2  ALLOW   DMZ web    database      5432   The site reads its data
+3  ALLOW   LAN        any           443    Staff browsing
+4  DENY    any        any           any    Default deny
+```
+
+?? An attacker takes over the DMZ web server. What can it reach in the Servers zone?
++ Only the database, and only on port 5432
+- Every server there, and on every open port
+- Nothing at all, since the DMZ is isolated
+- Only the file servers, over the SSH port
+=> Rule 2 is the one door out of the DMZ. That's still a risk, so the database needs its own login and its own logs, but the attacker can't scan or reach anything else.
+
+?? A staff member can't open the database from their laptop on port 5432. Which rule decides that?
++ Rule 4, because no earlier rule matches it
+- Rule 2, because it names the database port
+- Rule 3, because it covers the staff LAN
+- Rule 1, because it comes first in order
+=> Rule 2 has the right port but the wrong source, and rule 3 has the right source but the wrong port. A rule must match on every column, so the packet falls to the default deny.
 
 ## Your lab: the start of P01
 
