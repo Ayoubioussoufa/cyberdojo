@@ -1239,6 +1239,63 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def still_open(marked_fixed, rescan):\n    found = set(rescan)\n    return sorted(pair for pair in set(marked_fixed) if pair in found)\n",
   },
+  {
+    id: "in-scope",
+    prompt: "Write in_scope(address, scope, excluded): scope is a list of networks such as '192.168.56.0/24', and excluded is a list of single addresses that are off limits. Return True when address is inside one of the networks and is not excluded. Return False for text that is not an IP address. ipaddress.ip_address(a) in ipaddress.ip_network(n) tests membership.",
+    starter: "import ipaddress\n\ndef in_scope(address, scope, excluded):\n    # Your code here.\n    return True\n",
+    tests: [
+      { name: "an address inside the lab network", expr: "in_scope('192.168.56.20', ['192.168.56.0/24'], ['192.168.56.1']) == True" },
+      { name: "the excluded host machine", expr: "in_scope('192.168.56.1', ['192.168.56.0/24'], ['192.168.56.1']) == False" },
+      { name: "the network next door", expr: "in_scope('192.168.57.10', ['192.168.56.0/24'], ['192.168.56.1']) == False" },
+      { name: "an internet address", expr: "in_scope('93.184.216.34', ['192.168.56.0/24'], []) == False" },
+      { name: "a second network in the scope", expr: "in_scope('10.10.4.9', ['192.168.56.0/24', '10.10.4.0/28'], []) == True" },
+      { name: "just past the end of a small network", expr: "in_scope('10.10.4.16', ['10.10.4.0/28'], []) == False" },
+      { name: "a name is not an address", expr: "in_scope('fileserver', ['192.168.56.0/24'], []) == False" },
+    ],
+    solution: "import ipaddress\n\ndef in_scope(address, scope, excluded):\n    try:\n        ip = ipaddress.ip_address(address)\n    except ValueError:\n        return False\n    if address in excluded:\n        return False\n    for network in scope:\n        if ip in ipaddress.ip_network(network):\n            return True\n    return False\n",
+  },
+  {
+    id: "test-window",
+    prompt: "Write in_window(hour, start, end): hour is the current hour from 0 to 23. Testing is allowed from start up to, but not including, end. When start is less than end the window is inside one day, such as 18 to 23. When start is greater than end it crosses midnight, such as 22 to 6. Return True when hour is inside the window.",
+    starter: "def in_window(hour, start, end):\n    # Your code here.\n    return True\n",
+    tests: [
+      { name: "inside an evening window", expr: "in_window(20, 18, 23) == True" },
+      { name: "the first hour counts", expr: "in_window(18, 18, 23) == True" },
+      { name: "the end hour does not", expr: "in_window(23, 18, 23) == False" },
+      { name: "noon is outside an evening window", expr: "in_window(12, 18, 23) == False" },
+      { name: "late evening in a window that crosses midnight", expr: "in_window(23, 22, 6) == True" },
+      { name: "early morning in a window that crosses midnight", expr: "in_window(3, 22, 6) == True" },
+      { name: "six o'clock ends it", expr: "in_window(6, 22, 6) == False" },
+      { name: "the afternoon is outside it", expr: "in_window(15, 22, 6) == False" },
+    ],
+    solution: "def in_window(hour, start, end):\n    if start < end:\n        return start <= hour < end\n    return hour >= start or hour < end\n",
+  },
+  {
+    id: "undetected-actions",
+    prompt: "Write undetected(actions, alerts, minutes): actions is the tester's timeline, a list of dicts with 'time' (minutes since midnight), 'host' and 'action'. alerts is a list of dicts with 'time' and 'host'. An action counts as detected when an alert on the same host was raised at the action's time or up to minutes later. Return the 'action' text of each undetected action, in order.",
+    starter: "def undetected(actions, alerts, minutes):\n    missed = []\n    # Your code here.\n    return missed\n",
+    tests: [
+      { name: "the afternoon from the lesson", expr: "undetected([{'time': 842, 'host': 'all', 'action': 'network scan'}, {'time': 860, 'host': 'web1', 'action': 'password list'}, {'time': 885, 'host': 'web1', 'action': 'login with found password'}, {'time': 910, 'host': 'web1', 'action': 'new admin account'}, {'time': 930, 'host': 'fs1', 'action': 'remote session'}], [{'time': 843, 'host': 'all'}, {'time': 861, 'host': 'web1'}, {'time': 1000, 'host': 'fs1'}], 5) == ['login with found password', 'new admin account', 'remote session']" },
+      { name: "an alert that came far too late does not count", expr: "'remote session' in undetected([{'time': 842, 'host': 'all', 'action': 'network scan'}, {'time': 860, 'host': 'web1', 'action': 'password list'}, {'time': 885, 'host': 'web1', 'action': 'login with found password'}, {'time': 910, 'host': 'web1', 'action': 'new admin account'}, {'time': 930, 'host': 'fs1', 'action': 'remote session'}], [{'time': 843, 'host': 'all'}, {'time': 861, 'host': 'web1'}, {'time': 1000, 'host': 'fs1'}], 30)" },
+      { name: "with a very generous delay it does", expr: "'remote session' not in undetected([{'time': 842, 'host': 'all', 'action': 'network scan'}, {'time': 860, 'host': 'web1', 'action': 'password list'}, {'time': 885, 'host': 'web1', 'action': 'login with found password'}, {'time': 910, 'host': 'web1', 'action': 'new admin account'}, {'time': 930, 'host': 'fs1', 'action': 'remote session'}], [{'time': 843, 'host': 'all'}, {'time': 861, 'host': 'web1'}, {'time': 1000, 'host': 'fs1'}], 120)" },
+      { name: "an alert on another host does not count", expr: "undetected([{'time': 10, 'host': 'web1', 'action': 'x'}], [{'time': 11, 'host': 'db1'}], 5) == ['x']" },
+      { name: "an alert from before the action does not count", expr: "undetected([{'time': 10, 'host': 'web1', 'action': 'x'}], [{'time': 9, 'host': 'web1'}], 5) == ['x']" },
+      { name: "no actions", expr: "undetected([], [{'time': 843, 'host': 'all'}, {'time': 861, 'host': 'web1'}, {'time': 1000, 'host': 'fs1'}], 5) == []" },
+    ],
+    solution: "def undetected(actions, alerts, minutes):\n    missed = []\n    for a in actions:\n        seen = False\n        for alert in alerts:\n            if alert['host'] == a['host'] and a['time'] <= alert['time'] <= a['time'] + minutes:\n                seen = True\n        if not seen:\n            missed.append(a['action'])\n    return missed\n",
+  },
+  {
+    id: "remediation-dates",
+    prompt: "Write due_dates(findings, report_date): findings is a list of dicts with 'title' and 'severity' ('critical', 'high', 'medium' or 'low'), and report_date is 'YYYY-MM-DD'. A critical finding is due 7 days after the report, high 30, medium 90 and low 180. Return a list of (due, title) pairs, with due as 'YYYY-MM-DD' text, sorted by date. date.fromisoformat(text) + timedelta(days=n) gives a date, and .isoformat() turns it back into text.",
+    starter: "from datetime import date, timedelta\n\ndef due_dates(findings, report_date):\n    days = {'critical': 7, 'high': 30, 'medium': 90, 'low': 180}\n    # Your code here.\n    return []\n",
+    tests: [
+      { name: "the three findings from the lesson", expr: "due_dates([{'title': 'TLS 1.0 on mail gateway', 'severity': 'medium'}, {'title': 'Default admin password', 'severity': 'critical'}, {'title': 'Missing ownership check', 'severity': 'high'}], '2026-11-15') == [('2026-11-22', 'Default admin password'), ('2026-12-15', 'Missing ownership check'), ('2027-02-13', 'TLS 1.0 on mail gateway')]" },
+      { name: "a low finding is due in 180 days", expr: "due_dates([{'title': 'Banner shows version', 'severity': 'low'}], '2026-01-01') == [('2026-06-30', 'Banner shows version')]" },
+      { name: "dates roll over the end of a year", expr: "due_dates([{'title': 'x', 'severity': 'critical'}], '2026-12-28') == [('2027-01-04', 'x')]" },
+      { name: "no findings", expr: "due_dates([], '2026-11-15') == []" },
+    ],
+    solution: "from datetime import date, timedelta\n\ndef due_dates(findings, report_date):\n    days = {'critical': 7, 'high': 30, 'medium': 90, 'low': 180}\n    start = date.fromisoformat(report_date)\n    result = []\n    for f in findings:\n        due = start + timedelta(days=days[f['severity']])\n        result.append((due.isoformat(), f['title']))\n    return sorted(result)\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

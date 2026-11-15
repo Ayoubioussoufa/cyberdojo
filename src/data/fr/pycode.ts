@@ -847,4 +847,44 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "plusieurs reviennent triés",
     ],
   },
+  "in-scope": {
+    prompt: "Écrivez in_scope(address, scope, excluded) : scope est une liste de réseaux comme '192.168.56.0/24', et excluded est une liste d'adresses isolées qui sont interdites. Renvoyez True quand address est dans l'un des réseaux et n'est pas exclue. Renvoyez False pour un texte qui n'est pas une adresse IP. ipaddress.ip_address(a) in ipaddress.ip_network(n) teste l'appartenance.",
+    tests: [
+      "une adresse dans le réseau du labo",
+      "la machine hôte, exclue",
+      "le réseau d'à côté",
+      "une adresse d'Internet",
+      "un second réseau du périmètre",
+      "juste après la fin d'un petit réseau",
+      "un nom n'est pas une adresse",
+    ],
+  },
+  "test-window": {
+    prompt: "Écrivez in_window(hour, start, end) : hour est l'heure actuelle, de 0 à 23. Les tests sont autorisés de start jusqu'à end, non compris. Quand start est inférieur à end, la plage tient dans une journée, comme 18 à 23. Quand start est supérieur à end, elle traverse minuit, comme 22 à 6. Renvoyez True quand hour est dans la plage.",
+    tests: [
+      "dans une plage de soirée",
+      "la première heure compte",
+      "l'heure de fin ne compte pas",
+      "midi est hors d'une plage de soirée",
+      "fin de soirée dans une plage qui traverse minuit",
+      "petit matin dans une plage qui traverse minuit",
+      "six heures y met fin",
+      "l'après-midi est en dehors",
+    ],
+  },
+  "undetected-actions": {
+    prompt: "Écrivez undetected(actions, alerts, minutes) : actions est la chronologie du testeur, une liste de dicts avec 'time' (les minutes depuis minuit), 'host' et 'action'. alerts est une liste de dicts avec 'time' et 'host'. Une action compte comme détectée quand une alerte sur le même hôte a été levée à l'heure de l'action ou jusqu'à minutes plus tard. Renvoyez le texte 'action' de chaque action non détectée, dans l'ordre.",
+    tests: [
+      "l'après-midi de la leçon",
+      "une alerte venue bien trop tard ne compte pas",
+      "avec un délai très généreux, elle compte",
+      "une alerte sur un autre hôte ne compte pas",
+      "une alerte antérieure à l'action ne compte pas",
+      "aucune action",
+    ],
+  },
+  "remediation-dates": {
+    prompt: "Écrivez due_dates(findings, report_date) : findings est une liste de dicts avec 'title' et 'severity' ('critical', 'high', 'medium' ou 'low'), et report_date est de la forme 'AAAA-MM-JJ'. Un constat critique est à corriger 7 jours après le rapport, un constat élevé 30, moyen 90 et faible 180. Renvoyez une liste de paires (échéance, titre), l'échéance étant un texte 'AAAA-MM-JJ', triée par date. date.fromisoformat(texte) + timedelta(days=n) donne une date, et .isoformat() la retransforme en texte.",
+    tests: ["les trois constats de la leçon", "un constat faible est dû dans 180 jours", "les dates passent la fin de l'année", "aucun constat"],
+  },
 };
