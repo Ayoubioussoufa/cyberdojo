@@ -231,6 +231,20 @@ export const PY_CHALLENGES: PyChallenge[] = [
     solution:
       "def read_score(body):\n    if not isinstance(body, dict):\n        return None\n    data = body.get('data')\n    if not isinstance(data, dict):\n        return None\n    return data.get('abuseConfidenceScore')\n",
   },
+  {
+    id: "spot-the-bugs",
+    prompt: "parse_port(text) should return the port as a whole number for '1' to '65535', and None for anything else. Write spots_bugs(parse_port): you are handed one version of that function. Call it on inputs of your choice and return True if every answer is right, False as soon as one is wrong. The tests give you a correct version and four buggy ones.",
+    starter: "def spots_bugs(parse_port):\n    # One check is written for you. Add the ones that catch the bugs.\n    if parse_port('22') != 22:\n        return False\n    return True\n",
+    tests: [
+      { name: "accepts a correct parse_port", expr: "spots_bugs(lambda t: (int(t) if t.isdigit() and 1 <= int(t) <= 65535 else None)) == True" },
+      { name: "catches a version that accepts port 0", expr: "spots_bugs(lambda t: (int(t) if t.isdigit() and 0 <= int(t) <= 65535 else None)) == False" },
+      { name: "catches a version that rejects port 65535", expr: "spots_bugs(lambda t: (int(t) if t.isdigit() and 1 <= int(t) <= 65534 else None)) == False" },
+      { name: "catches a version that rejects port 1", expr: "spots_bugs(lambda t: (int(t) if t.isdigit() and 2 <= int(t) <= 65535 else None)) == False" },
+      { name: "catches a version that returns 0 for text", expr: "spots_bugs(lambda t: (int(t) if t.isdigit() and 1 <= int(t) <= 65535 else 0)) == False" },
+    ],
+    solution:
+      "def spots_bugs(parse_port):\n    cases = [('22', 22), ('1', 1), ('65535', 65535), ('0', None), ('65536', None), ('ssh', None), ('', None)]\n    for text, expected in cases:\n        if parse_port(text) != expected:\n            return False\n    return True\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

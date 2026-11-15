@@ -84,7 +84,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 18 mentions in 10 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ● | ● | curl (tool) | 20 mentions in 11 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 1 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 9 mentions in 6 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 5 mentions in 3 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 31 mentions in 10 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 33 mentions in 10 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 27 mentions in 3 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -316,7 +316,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | HTTP requests, methods, status codes | 6 mentions in 2 docs, most in 0035-how-the-web-works, practice 2. |  |
+| ● | ● | HTTP requests, methods, status codes | 9 mentions in 2 docs, most in 0035-how-the-web-works, practice 2. |  |
 | ● | ● | Same-origin policy | 6 mentions in 1 docs, most in 0036-sessions-and-the-browser. | [DNS in depth](modules/01-networking/05-dns-in-depth.md) |
 | ● | ● | CORS | 7 mentions in 1 docs, most in 0036-sessions-and-the-browser. |  |
 | ●* | ● | Cookies and flags: Secure, HttpOnly, SameSite | 15 mentions in 5 docs, most in 0036-sessions-and-the-browser, practice 6. *Lesson 36, 'Cookie flags'.* | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
@@ -378,7 +378,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ○ | ● | Race conditions and TOCTOU in web apps | None. | [Business logic and race conditions](modules/04-web/11-logic-flaws-and-races.md) |
 | ◐ | ● | Business logic flaws | 3 mentions in 3 docs, most in c1-the-jobs. *The module's main subject.* | [Business logic and race conditions](modules/04-web/11-logic-flaws-and-races.md) |
 | ●* | ● | Mass assignment | 3 mentions in 1 docs, most in 0048-access-control-that-holds, practice 7. *Lesson 48, 'Saving what you shouldn't', with practice.* |  |
-| ●* | ● | Resource exhaustion and rate limiting (CWE-770) | 18 mentions in 8 docs, most in 0028-apis-and-secrets, practice 1. *Lesson 49, 'Limits'.* | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
+| ●* | ● | Resource exhaustion and rate limiting (CWE-770) | 19 mentions in 8 docs, most in 0028-apis-and-secrets, practice 1. *Lesson 49, 'Limits'.* | [API security, GraphQL and gRPC](modules/04-web/12-api-security-graphql-grpc.md) |
 
 ### APIs
 
@@ -732,7 +732,7 @@ Basis: Brief 10.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ◐ | ● | How containers isolate | 7 mentions in 2 docs, most in 0029-tests-and-docker, practice 1. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ●* | ● | Dockerfile and image hardening | 23 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
+| ●* | ● | Dockerfile and image hardening | 25 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 | ◐ | ● | Container escape classes | 2 mentions in 1 docs, most in P14, practice 2. *Causes and defences, deliberately not techniques.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 | ●* | ● | Trivy, Grype (tool) | 9 mentions in 3 docs, most in P14. *Walked through in project P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ○ | ● | Container runtime security | None. | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |

@@ -136,4 +136,14 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un corps qui est une liste donne None",
     ],
   },
+  "spot-the-bugs": {
+    prompt: "parse_port(text) doit renvoyer le port sous forme de nombre entier pour '1' à '65535', et None pour tout le reste. Écrivez spots_bugs(parse_port) : vous recevez une version de cette fonction. Appelez-la sur les entrées de votre choix et renvoyez True si chaque réponse est juste, False dès qu'une réponse est fausse. Les tests vous donnent une version correcte et quatre versions boguées.",
+    tests: [
+      "accepte un parse_port correct",
+      "repère une version qui accepte le port 0",
+      "repère une version qui refuse le port 65535",
+      "repère une version qui refuse le port 1",
+      "repère une version qui renvoie 0 pour du texte",
+    ],
+  },
 };

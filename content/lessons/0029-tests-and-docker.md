@@ -2,7 +2,7 @@
 title: Tests, packaging and Docker
 summary: Prove your tool works with pytest, package it, containerise it and run it anywhere.
 month: 4
-minutes: 55
+minutes: 75
 builds: finish P03 with tests, a Dockerfile and a README a stranger can follow
 source: pytest documentation | https://docs.pytest.org/
 words: unit test, container, image
@@ -37,6 +37,48 @@ def test_handles_invalid_user_lines():
 
 Run `pytest`. Each test sets up a small input, runs your code and asserts the result. Keep small **fixture files** with real-looking lines, including the weird ones you've seen.
 
+If you've never written a test, here is what's happening. A test is an ordinary function whose name starts with `test_`. Inside, `assert` checks that something is true: if it is, nothing happens, and if it isn't, the test fails and pytest shows you the two values. Install pytest in your virtual environment with `pip install pytest`, then run `pytest` in the project folder. It finds every file named `test_*.py` and runs every `test_` function inside, with no list to maintain.
+
+A fixture file is just a small text file you write by hand. `tests/fixtures/invalid_user.log` could be a single line:
+
+```
+Nov 15 10:14:09 ubuntu-lab sshd[812]: Failed password for invalid user admin from 198.51.100.23 port 51212 ssh2
+```
+
+Now read what pytest prints when one test passes and one fails:
+
+```
+$ pytest
+========================= test session starts =========================
+collected 2 items
+
+test_logparse.py .F                                              [100%]
+
+============================== FAILURES ===============================
+__________________ test_handles_invalid_user_lines ___________________
+
+    def test_handles_invalid_user_lines():
+        failures, _ = parse("tests/fixtures/invalid_user.log")
+>       assert failures["198.51.100.23"] == 1
+E       assert 0 == 1
+
+test_logparse.py:10: AssertionError
+===================== 1 failed, 1 passed in 0.03s =====================
+```
+
+| Part | What it tells you |
+|---|---|
+| `.F` | One character per test: a dot passed, an `F` failed |
+| The line marked `>` | The exact `assert` that failed |
+| The line marked `E` | What your code gave, and what the test expected: here 0 failures where there should be 1 |
+| The last line | The summary. This is the line CI reads |
+
+The parser returned 0 for a line that clearly holds a failure, so the pattern doesn't handle `invalid user`. The test found the bug and told you where to look.
+
+Good tests check the edges, not only the easy case. For a function that accepts ports from 1 to 65535, the interesting inputs are 1, 65535, 0, 65536 and something that isn't a number: the two ends, one step past each end, and rubbish. In the challenge below you write the checks, and they're judged on whether they catch three buggy versions of the function.
+
+@code spot-the-bugs
+
 ::: key Add a test for each bug
 Whenever you fix a bug, first write a test that fails because of it. That's how you stop it coming back. In Month 8 you'll use the same idea to prove a security fix works.
 :::
@@ -62,7 +104,44 @@ toolkit/
 └── .gitignore
 ```
 
+`pyproject.toml` is the file that makes the folder installable. It names the package, lists what it depends on, and says which command to create:
+
+```toml
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toolkit"
+version = "0.1.0"
+dependencies = ["requests"]
+
+[project.scripts]
+logparse = "toolkit.logparse:main"
+```
+
+The last line is why you can type `logparse` after `pip install .`: it creates a command of that name which calls the `main` function in `toolkit/logparse.py`.
+
 Work in branches and open pull requests, even alone. Add a [GitHub Actions](https://docs.github.com/en/actions) workflow that runs your tests on every push: that's **CI**, and the green badge is visible proof.
+
+The whole workflow is one small file, `.github/workflows/tests.yml`:
+
+```yaml
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install . pytest
+      - run: pytest
+```
+
+Read it top to bottom: on every push and pull request, start a fresh Ubuntu machine, fetch the code, install Python, install your tool and pytest, and run the tests. The machine has never seen your laptop, so a pass there means the project really contains everything it needs.
 
 ?? What does CI do for your project?
 + Runs your tests on every push
@@ -183,6 +262,49 @@ You will use exactly this in the [Workshop](/workshop/), where a lab stands up a
 
 ::: ai Roadmap exercise
 Write the tool yourself first. Then ask an LLM to review it and to explain every suggestion. Accept only changes you can justify, and add a test for each accepted fix. Track bugs caught by your tests, bugs caught by the AI, and AI suggestions that were wrong.
+:::
+
+## Find your way around Docker
+
+Before the Dockerfile means anything, check that Docker itself works. After installing it from [Docker's instructions](https://docs.docker.com/engine/install/), run the smallest container there is:
+
+```
+docker run hello-world
+```
+
+Docker looks for the `hello-world` image on your machine, doesn't find it, downloads it, starts a container from it, prints a greeting and exits. That one line exercised the whole chain. These are the commands you'll use every day after that:
+
+| Command | What it shows or does |
+|---|---|
+| `docker ps` | Containers running now |
+| `docker ps -a` | All containers, including stopped ones |
+| `docker images` | Images stored on this machine |
+| `docker logs NAME` | What a container has printed |
+| `docker exec -it NAME sh` | Opens a shell inside a running container |
+| `docker stop NAME` then `docker rm NAME` | Stops a container, then deletes it |
+| `docker image rm IMAGE` | Deletes an image |
+
+`docker exec -it NAME sh` is how you look around inside the box. Run `whoami` there on your own image and you should see `nobody`, which is `USER nobody` proving itself.
+
+?? `docker ps` shows nothing, but `docker ps -a` lists your container. What does that tell you?
++ The container exists, but it has stopped
+- The image was deleted from this machine
+- The container runs as the root user
+- The Docker service itself is not running
+=> `ps` lists running containers and `-a` adds the stopped ones. `docker logs` on its name usually says why it ended.
+
+?? You change one line of `logparse.py` and rebuild the image. Why is the rebuild fast?
++ Docker reuses the cached layers above the change
+- Docker skips the build when files look similar
+- Docker only rebuilds images once in every hour
+- Docker compiles the Python into machine code first
+=> Each Dockerfile line is a layer. Layers before the first changed line are reused, which is why the lines that rarely change go first.
+
+::: try Prove it runs anywhere
+1. Run `docker run hello-world` to confirm Docker works.
+2. Build your image with `docker build -t toolkit .`, then run it on a fixture log with the `docker run` line from above.
+3. Start it with a shell instead of the tool: `docker run --rm -it --entrypoint sh toolkit`. Run `whoami` and `ls /app`, then leave with `exit`.
+4. Delete your virtual environment and run the tool again through Docker. It still works, because the image carries its own Python.
 :::
 
 ## The Month 4 gate
