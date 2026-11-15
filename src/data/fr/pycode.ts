@@ -379,4 +379,24 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "pas de compte, pas de constat",
     ],
   },
+  "kerberoast-suspects": {
+    prompt: "Écrivez kerberoast_suspects(events, threshold) : events est une liste d'événements 4769, chacun étant un dict avec 'user', 'service' et 'etype'. Comptez, pour chaque utilisateur, combien de services différents il a demandés avec l'etype '0x17'. Renvoyez la liste triée des utilisateurs dont le compte atteint au moins threshold.",
+    tests: [
+      "trois services différents en RC4",
+      "le même service trois fois ne fait pas trois services",
+      "les demandes en AES ne sont pas comptées",
+      "un seuil de un liste tous ceux qui utilisent RC4, triés",
+      "pas d'événement, pas de suspect",
+    ],
+  },
+  "spray-suspects": {
+    prompt: "Écrivez spray_suspects(failures, min_accounts) : failures est une liste d'échecs d'ouverture de session, chacun étant un dict avec 'source' et 'account'. Renvoyez un dict qui associe chaque source au nombre de comptes différents contre lesquels elle a échoué, en ne gardant que les sources où ce nombre atteint au moins min_accounts.",
+    tests: [
+      "une source, quatre comptes",
+      "cinq échecs sur un seul compte ne font pas une pulvérisation",
+      "un seuil de un garde les deux sources",
+      "un seuil que personne n'atteint",
+      "aucun échec",
+    ],
+  },
 };
