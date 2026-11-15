@@ -308,4 +308,126 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un rôle qui ressemble seulement à admin ne compte pas",
     ],
   },
+  "extra-access": {
+    prompt: "Écrivez extra_access(users, allowed) : users est une liste de dicts avec 'name', 'department' et 'groups'. allowed associe chaque service aux groupes que ses membres peuvent avoir. Renvoyez une liste de paires (name, group) pour chaque groupe qu'un utilisateur possède et que son service n'autorise pas, dans l'ordre où vous les rencontrez.",
+    tests: [
+      "une personne mutée qui a gardé l'ancien groupe",
+      "un compte propre ne donne rien",
+      "deux utilisateurs, constats dans l'ordre",
+      "un service inconnu n'autorise rien",
+      "pas d'utilisateur, pas de constat",
+    ],
+  },
+  "stale-accounts": {
+    prompt: "Écrivez stale_accounts(accounts, today, days) : accounts est une liste de dicts avec 'name' et 'last_login', une date sous la forme 'AAAA-MM-JJ' ou None si le compte ne s'est jamais connecté. today est une date sous la même forme. Renvoyez les noms dont la dernière connexion remonte à plus de days jours avant today, ou qui ne se sont jamais connectés. date.fromisoformat(texte) transforme le texte en date, et soustraire deux dates donne une valeur qui a un nombre .days.",
+    tests: [
+      "une vieille connexion est périmée",
+      "une connexion récente ne l'est pas",
+      "ne jamais s'être connecté compte comme périmé",
+      "il y a exactement 90 jours, ce n'est pas plus de 90",
+      "il y a 91 jours, si",
+      "une liste mélangée garde son ordre",
+    ],
+  },
+  "hotp-code": {
+    prompt: "Écrivez hotp(secret, counter) : renvoyez le code à usage unique de six chiffres pour un secret (des octets) et un compteur (un nombre entier), sous forme de texte en gardant les zéros de tête. Le HMAC est calculé pour vous. Prenez les 4 derniers bits du condensat comme position, lisez 4 octets à partir de là comme un nombre gros-boutiste, effacez son bit de poids fort avec & 0x7fffffff, et gardez les six derniers chiffres décimaux.",
+    tests: [
+      "le premier code du secret de test de la RFC 4226",
+      "le deuxième",
+      "le troisième",
+      "un zéro de tête est conservé",
+      "un autre secret donne un autre code",
+    ],
+  },
+  "pkce-challenge": {
+    prompt: "Écrivez pkce_challenge(verifier) : renvoyez le défi PKCE (code challenge) d'un vérificateur donné sous forme de texte. C'est le SHA-256 du vérificateur, encodé avec base64.urlsafe_b64encode, sans le remplissage =, sous forme de texte.",
+    tests: ["l'exemple de la RFC 7636", "un autre vérificateur", "il ne reste aucun remplissage", "toujours 43 caractères"],
+  },
+  "redirect-allowed": {
+    prompt: "Écrivez redirect_allowed(uri, registered) : renvoyez True seulement quand uri est exactement l'une des adresses de la liste registered. Le code de départ accepte tout ce qui commence comme une adresse enregistrée, et les tests montrent pourquoi cela ne suffit pas.",
+    tests: [
+      "une adresse enregistrée",
+      "la seconde adresse enregistrée",
+      "un site inconnu",
+      "un hôte plus long qui commence pareil",
+      "du chemin en plus après l'adresse enregistrée",
+      "la même adresse en http",
+    ],
+  },
+  "id-token-problems": {
+    prompt: "Écrivez id_token_problems(claims, issuer, client_id, now) : claims est la charge utile décodée d'un jeton d'identité, un dict avec 'iss', 'aud' et 'exp'. Renvoyez la liste de ce qui ne va pas, dans cet ordre : 'wrong issuer' si iss n'est pas issuer, 'wrong audience' si aud n'est pas client_id, 'expired' si exp n'est pas postérieur à now. Un bon jeton donne une liste vide.",
+    tests: [
+      "un bon jeton",
+      "délivré à une autre application",
+      "venu d'un autre fournisseur",
+      "expiré",
+      "expirer à la seconde même compte comme expiré",
+      "tout est faux, dans l'ordre",
+    ],
+  },
+  "parse-dn": {
+    prompt: "Écrivez parse_dn(dn) : à partir d'un nom distinctif tel que 'CN=Ana Diaz,OU=Finance,OU=Staff,DC=corp,DC=lab', renvoyez un dict à trois clés : 'cn' est le nom commun, 'ous' est la liste des noms d'OU dans l'ordre écrit, et 'domain' est l'ensemble des parties DC reliées par des points. Les parties sont séparées par des virgules, et chaque partie est un type, un signe égal et une valeur.",
+    tests: ["un utilisateur dans deux OU", "un objet sans OU", "un domaine en trois parties", "les types en minuscules sont acceptés"],
+  },
+  "risky-service-accounts": {
+    prompt: "Écrivez risky_service_accounts(accounts, today, max_age) : accounts est une liste de dicts avec 'name', 'spn' (du texte, ou None quand le compte n'a pas de SPN), 'password_set' (une date sous la forme 'AAAA-MM-JJ') et 'groups'. Ne regardez que les comptes qui ont un SPN. Renvoyez une liste de paires (name, reason), dans l'ordre : reason vaut 'old password' quand le mot de passe a été défini plus de max_age jours avant today, et 'domain admin' quand 'Domain Admins' figure dans groups. Un compte peut donner les deux, 'old password' d'abord.",
+    tests: [
+      "la revue complète",
+      "une personne sans SPN n'est pas un compte de service",
+      "un mot de passe récent sans groupe puissant est propre",
+      "une limite plus stricte en attrape davantage",
+      "pas de compte, pas de constat",
+    ],
+  },
+  "kerberoast-suspects": {
+    prompt: "Écrivez kerberoast_suspects(events, threshold) : events est une liste d'événements 4769, chacun étant un dict avec 'user', 'service' et 'etype'. Comptez, pour chaque utilisateur, combien de services différents il a demandés avec l'etype '0x17'. Renvoyez la liste triée des utilisateurs dont le compte atteint au moins threshold.",
+    tests: [
+      "trois services différents en RC4",
+      "le même service trois fois ne fait pas trois services",
+      "les demandes en AES ne sont pas comptées",
+      "un seuil de un liste tous ceux qui utilisent RC4, triés",
+      "pas d'événement, pas de suspect",
+    ],
+  },
+  "spray-suspects": {
+    prompt: "Écrivez spray_suspects(failures, min_accounts) : failures est une liste d'échecs d'ouverture de session, chacun étant un dict avec 'source' et 'account'. Renvoyez un dict qui associe chaque source au nombre de comptes différents contre lesquels elle a échoué, en ne gardant que les sources où ce nombre atteint au moins min_accounts.",
+    tests: [
+      "une source, quatre comptes",
+      "cinq échecs sur un seul compte ne font pas une pulvérisation",
+      "un seuil de un garde les deux sources",
+      "un seuil que personne n'atteint",
+      "aucun échec",
+    ],
+  },
+  "find-path": {
+    prompt: "Écrivez find_path(edges, start, target) : edges est une liste de paires (départ, arrivée). Renvoyez un plus court chemin de start à target sous forme de liste de nœuds, start et target compris, ou None quand il n'y a pas de chemin. Les arêtes ne vont que dans un sens. Gardez une liste de chemins à prolonger et un ensemble de nœuds déjà vus, et prolongez toujours le chemin le plus ancien d'abord.",
+    tests: [
+      "le chemin de la leçon",
+      "un utilisateur sans aucun accès",
+      "les arêtes ne vont que dans un sens",
+      "un nœud s'atteint lui-même",
+      "la plus courte de deux routes a quatre nœuds",
+      "une boucle ne bloque pas la recherche",
+    ],
+  },
+  "choke-points": {
+    prompt: "Écrivez choke_points(edges, start, target) : renvoyez la liste des arêtes, dans leur ordre d'origine, dont le seul retrait ne laisse aucun chemin de start à target. Un find_path qui fonctionne est fourni. S'il n'y a pas de chemin au départ, renvoyez une liste vide.",
+    tests: [
+      "sur une chaîne unique, chaque arête du chemin en est une",
+      "avec deux routes, seule l'arête commune en est une",
+      "les arêtes hors du chemin ne sont jamais listées",
+      "pas de chemin au départ ne donne rien",
+    ],
+  },
+  "access-decision": {
+    prompt: "Écrivez decide(signin) : signin est un dict avec 'is_admin', 'compliant_device' et 'mfa_done' (chacun True ou False) et 'risk' ('low', 'medium' ou 'high'). Appliquez ces règles dans l'ordre et renvoyez la première qui convient : 'block' quand risk vaut 'high' ; 'block' quand un administrateur est sur un appareil non conforme ; 'require mfa' quand la MFA n'a pas été faite ; sinon 'allow'.",
+    tests: [
+      "une connexion ordinaire avec la MFA faite",
+      "la MFA pas encore faite",
+      "un risque élevé est bloqué même avec la MFA",
+      "un administrateur sur un appareil non géré est bloqué",
+      "un utilisateur sur un appareil non géré reçoit seulement une demande de MFA",
+      "un administrateur sur un appareil conforme avec la MFA est autorisé",
+    ],
+  },
 };

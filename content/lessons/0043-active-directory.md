@@ -2,7 +2,7 @@
 title: Active Directory
 summary: Domains, forests, OUs, GPOs, LDAP and why AD runs most enterprises, with a lab you build and script yourself.
 month: 7
-minutes: 60
+minutes: 80
 builds: a domain with users, groups and GPOs, the start of P04
 source: GOAD, Game of Active Directory | https://github.com/Orange-Cyberdefense/GOAD
 words: domain, domain controller, GPO
@@ -47,6 +47,39 @@ Get-ADGroupMember "Domain Admins"
 Get-ADComputer -Filter *
 ```
 
+Every object in the directory has a full address called a **distinguished name**, and you'll see them in tools, logs and scripts. Read one from right to left, from the domain down to the object:
+
+```
+CN=Ana Diaz,OU=Finance,OU=Staff,DC=corp,DC=lab
+```
+
+| Part | Stands for | Here |
+|---|---|---|
+| `DC` | Domain component | `corp` and `lab` together make the domain `corp.lab` |
+| `OU` | Organizational unit | `Staff`, and inside it `Finance` |
+| `CN` | Common name | The object itself, the user Ana Diaz |
+
+So this is the user Ana Diaz, in the Finance OU, inside the Staff OU, in the domain `corp.lab`. The position matters, because GPOs linked to `Staff` and to `Finance` both apply to her.
+
+@code parse-dn
+
+The three commands above return objects, like everything in PowerShell, and each object has far more properties than the default view shows. Ask for the ones a reviewer cares about:
+
+```powershell
+Get-ADUser ana.diaz -Properties MemberOf, LastLogonDate, PasswordLastSet, Enabled
+```
+
+On a domain controller you can also browse the same data with a mouse: run `dsa.msc` to open **Active Directory Users and Computers**. Use it to learn the shape of the tree, and use PowerShell for anything you'll need to repeat or prove.
+
+Since logins depend on DNS, two commands on a client tell you whether it can find a domain controller at all:
+
+```
+nslookup -type=SRV _ldap._tcp.dc._msdcs.corp.lab
+nltest /dsgetdc:corp.lab
+```
+
+The first asks DNS for the record that lists the DCs. The second asks Windows to locate one and prints its name and address. If the first returns nothing, the client's DNS setting doesn't point at the DC, and no login will work until it does.
+
 ?? Why is a domain controller such a high-value target?
 + It stores every single account's password material
 - It runs the company's public marketing website
@@ -58,6 +91,16 @@ Get-ADComputer -Filter *
 
 A GPO can install software or run scripts on every machine under an OU. So write access to a GPO linked to the Workstations OU means code execution on every workstation. Permissions in AD are as important as those on files, and they're invisible unless you look. That's what [BloodHound](https://bloodhound.specterops.io/) is for.
 
+Three commands cover most GPO questions:
+
+| Command | Where | Shows or does |
+|---|---|---|
+| `Get-GPO -All` | Domain controller | Every GPO in the domain |
+| `gpresult /r` | Any member machine | Which GPOs actually applied to this computer and this user |
+| `gpupdate /force` | Any member machine | Fetches and applies policy now, without waiting |
+
+A GPO does nothing until it's **linked** to an OU, and then it applies to the objects inside that OU and below it. When a setting "isn't working", `gpresult /r` on the affected machine is the first thing to read: either the GPO is in the list or it isn't, and if it isn't, the computer is in an OU the GPO isn't linked to.
+
 ?? Why is write access to a GPO so dangerous?
 + It can run code on many machines
 - It only changes the desktop background picture
@@ -68,6 +111,25 @@ A GPO can install software or run scripts on every machine under an OU. So write
 ## Service accounts and SPNs
 
 Programs like SQL Server run under **service accounts**. An **SPN** ties a service to its account. These accounts often have weak, never-changed passwords and too many rights. Remember that: it's what makes Kerberoasting work, two lessons from now.
+
+Finding these accounts is a defender's job before it's anyone else's. This lists every account that has an SPN, with the two facts that decide how risky it is:
+
+```powershell
+Get-ADUser -Filter 'ServicePrincipalName -like "*"' -Properties ServicePrincipalName, PasswordLastSet, MemberOf |
+  Select-Object Name, PasswordLastSet, MemberOf
+```
+
+A password last set years ago was probably chosen by a person and never rotated. Membership of a powerful group means the account can do far more than run one service. The modern fix is a **group managed service account**, where the domain itself generates a long random password and changes it automatically, so there's no human-chosen secret at all.
+
+A few more one-line audits belong in the same script. Each one answers a question an attacker would ask about your domain, so ask first:
+
+```powershell
+Get-ADGroupMember "Domain Admins"                                  # who holds the keys?
+Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00 -UsersOnly  # who hasn't logged in for 90 days?
+Get-ADUser -Filter 'PasswordNeverExpires -eq $true'                 # whose password never changes?
+```
+
+@code risky-service-accounts
 
 ?? What's an SPN?
 + A name tying a service to its account
@@ -120,5 +182,35 @@ The gate asks you to rebuild it from your own script, so write the script as you
 - It removes them from the Domain Admins
 - It stops domain controllers from answering requests
 => An attacker on that laptop can harvest them. That's the problem the tier model exists to prevent.
+
+## Audit your own domain
+
+Once the lab exists, review it the way you'd review a client's. Three findings to interpret:
+
+```
+Name     PasswordLastSet        MemberOf
+svc_sql  03/14/2019 09:12:44    {CN=Domain Admins,CN=Users,DC=corp,DC=lab}
+```
+
+?? What's wrong with that account?
++ An old password and too much power
+- A new password and too little power
+- A name that doesn't follow the standard
+- A login that happened outside office hours
+=> It's a service account whose password hasn't changed in years, and it's a Domain Admin. Running one database doesn't need control of the whole domain.
+
+?? A new workstation can't log anyone in, and `nslookup -type=SRV _ldap._tcp.dc._msdcs.corp.lab` returns no answer. Where do you look first?
++ The workstation's DNS server setting
+- The user's password expiry date
+- The domain controller's disk space
+- The workstation's desktop background GPO
+=> Clients find domain controllers through DNS. If the SRV lookup fails, the machine is asking the wrong DNS server, usually the router's.
+
+?? You linked a new GPO to the `Workstations` OU, but `gpresult /r` on one laptop doesn't list it, even after `gpupdate /force`. What's the likeliest cause?
++ The laptop's account sits in another OU
+- The GPO needs one day to copy
+- The laptop needs more than 8 GB
+- The GPO only applies to Domain Admins
+=> A GPO applies to the objects in the OU it's linked to. New computers land in the default `Computers` container until someone moves them.
 
 ?! Explain the difference between a domain, a forest and an OU, as if to a new colleague.
