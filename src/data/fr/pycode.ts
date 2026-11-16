@@ -1248,4 +1248,92 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "aucun constat",
     ],
   },
+  "timestomp-check": {
+    prompt: "Écrivez timestomp_suspects(files) : files est une liste de dicts avec 'path', 'si_created' et 'fn_created', les heures de création tirées de $STANDARD_INFORMATION et de $FILE_NAME, écrites 'YYYY-MM-DD HH:MM:SS.fffffff' (sept chiffres après le point). Renvoyez une liste de paires (path, raison) dans l'ordre des fichiers : 'si before fn' quand l'heure de $STANDARD_INFORMATION est plus ancienne, puis 'whole second' quand la fraction de $STANDARD_INFORMATION ne contient que des zéros.",
+    tests: [
+      "un document ordinaire",
+      "une date de création reculée de plusieurs années",
+      "une heure tombant sur une seconde exacte",
+      "les deux signes sur un fichier, dans l'ordre",
+      "une heure $STANDARD_INFORMATION plus récente n'est pas un signe",
+      "un dossier entier",
+    ],
+  },
+  "process-tree": {
+    prompt: "Écrivez tree_anomalies(procs) : procs est une liste de processus, des dicts avec 'pid', 'ppid' et 'name'. Comparez les noms sans tenir compte de la casse. Renvoyez une liste de paires (pid, raison) dans l'ordre de la liste. Pour chaque processus, d'abord 'duplicate' quand c'est wininit.exe, services.exe ou lsass.exe et qu'un processus du même nom est apparu plus tôt dans la liste ; puis 'unexpected parent' quand c'est services.exe ou lsass.exe et que son parent n'est pas wininit.exe, ou svchost.exe et que son parent n'est pas services.exe. Un parent absent de la liste compte comme inattendu.",
+    tests: [
+      "une machine saine",
+      "svchost lancé par explorer",
+      "un second lsass",
+      "des noms dans n'importe quelle casse",
+      "un parent qui a disparu",
+      "une liste vide",
+    ],
+  },
+  "injection-candidates": {
+    prompt: "Écrivez injection_candidates(regions, jit) : regions est une liste de zones mémoire, des dicts avec 'pid', 'process', 'protection', 'mapped_file' (None quand aucun fichier n'est derrière) et 'first_bytes'. jit liste les processus qui écrivent du code pendant qu'ils tournent, comme les navigateurs. Ne regardez que les zones dont la protection vaut PAGE_EXECUTE_READWRITE et qu'aucun fichier ne soutient. Renvoyez une liste de (pid, process, kind) dans l'ordre des zones : kind vaut 'MZ' quand la zone commence par les octets MZ, dans n'importe quel processus, et 'code' sinon, sauf que les zones sans MZ d'un processus jit sont ignorées.",
+    tests: [
+      "un programme chargé dans la mémoire de notepad",
+      "une mémoire soutenue par un fichier n'est pas candidate",
+      "un navigateur qui écrit du code, c'est attendu",
+      "un programme entier dans un navigateur, ça ne l'est pas",
+      "du code dans rundll32",
+      "accessible en écriture mais pas exécutable",
+      "un mélange, dans l'ordre",
+    ],
+  },
+  "timeline-window": {
+    prompt: "Écrivez around(events, pivot, minutes) : events est une liste de tuples (time, source, what) dont les heures s'écrivent 'YYYY-MM-DD HH:MM:SS'. Renvoyez les événements situés à au plus minutes de l'heure pivot, avant ou après elle, triés par heure.",
+    tests: [
+      "cinq minutes autour de la connexion",
+      "une fenêtre étroite",
+      "le bord de la fenêtre compte",
+      "à cheval sur minuit",
+      "rien à proximité",
+    ],
+  },
+  "diamond-pivot": {
+    prompt: "Écrivez pivot(events, infrastructure) : events est une liste de dicts avec 'victim', 'infrastructure' et 'capability'. Renvoyez un dict avec 'victims', les victimes triées des événements qui ont utilisé cette infrastructure, et 'related', les infrastructures triées (autres que celle donnée) vues dans un événement dont la capacité a été utilisée avec cette infrastructure. Chaque nom apparaît une fois.",
+    tests: [
+      "à partir du domaine",
+      "à partir d'une adresse utilisée avec deux capacités",
+      "une capacité que personne d'autre n'a utilisée",
+      "une infrastructure jamais vue",
+      "une victime touchée deux fois est listée une fois",
+    ],
+  },
+  "tlp-share": {
+    prompt: "Écrivez may_share(label, audience) : label est une étiquette TLP 2.0 comme 'TLP:AMBER', dans n'importe quelle casse et peut-être entourée d'espaces. audience est l'un de 'named recipients', 'own organisation', 'clients', 'community' ou 'public'. Renvoyez True quand l'étiquette permet le partage avec ce public. Traitez une étiquette inconnue comme TLP:RED, le choix le plus sûr.",
+    tests: [
+      "RED reste chez les destinataires nommés",
+      "AMBER+STRICT reste dans l'organisation",
+      "AMBER atteint les clients, pas la communauté",
+      "GREEN atteint la communauté, pas le public",
+      "CLEAR va partout",
+      "des étiquettes écrites sans soin",
+      "une étiquette inconnue est traitée comme RED",
+    ],
+  },
+  "extract-iocs": {
+    prompt: "Écrivez extract_iocs(text) : réarmez le texte (remplacez [.] par . et hxxp par http), puis renvoyez un dict avec 'ips' (les adresses IPv4), 'sha256' (les empreintes hexadécimales de 64 caractères, en minuscules) et 'urls' (les URL http ou https, sans . , ; ou ) final). Chaque liste est triée, avec chaque valeur une seule fois.",
+    tests: [
+      "les adresses du rapport",
+      "l'empreinte, en minuscules",
+      "les URL, réarmées et sans le point final",
+      "une URL entre parenthèses",
+      "une empreinte citée deux fois est listée une fois",
+      "un texte qui n'en contient aucun",
+    ],
+  },
+  "indicator-age": {
+    prompt: "Écrivez still_active(indicators, today) : indicators est une liste de dicts avec 'value', 'type' ('ip', 'domain' ou 'sha256') et 'last_seen', une date 'YYYY-MM-DD'. Un indicateur reste actif 30 jours après sa dernière observation si c'est une ip, 90 jours pour un domaine et 365 jours pour un sha256, dernier jour compris. Renvoyez les valeurs triées des indicateurs encore actifs à la date today.",
+    tests: [
+      "une adresse récente",
+      "une adresse non vue depuis huit semaines",
+      "un domaine vu le même jour dure plus longtemps",
+      "une empreinte dure un an",
+      "le dernier jour compte encore",
+      "une liste entière, triée",
+    ],
+  },
 };
