@@ -1507,4 +1507,46 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un utilisateur sans groupe n'obtient rien",
     ],
   },
+  "trifecta-check": {
+    prompt: "Écrivez trifecta(tools) : tools est une liste de dicts avec 'name' et trois drapeaux, 'reads_private', 'reads_untrusted' et 'sends_out'. Renvoyez (legs, danger) : legs est la liste triée des pieds présents dans au moins un outil, avec les noms 'private data', 'untrusted content' et 'way out', et danger vaut True quand les trois sont présents.",
+    tests: [
+      "l'assistant de messagerie",
+      "sans l'outil de courriel",
+      "un outil peut porter deux pieds",
+      "un seul outil avec tout",
+      "aucun outil",
+    ],
+  },
+  "exfil-links": {
+    prompt: "Écrivez blocked_urls(markdown, allowed) : trouvez chaque image ![texte](url) et chaque lien [texte](url) dans la réponse Markdown d'un modèle. Renvoyez, dans leur ordre d'apparition, les URL dont l'hôte n'est pas dans allowed. Les hôtes se comparent en minuscules, et une URL sans hôte, comme un chemin relatif, est autorisée.",
+    tests: [
+      "le pixel de la leçon",
+      "vos propres images sont correctes",
+      "les liens comptent aussi",
+      "des hôtes en majuscules",
+      "un lien relatif n'a pas d'hôte",
+      "du texte sans lien",
+    ],
+  },
+  "tool-gate": {
+    prompt: "Écrivez gate(call, user) : call est un appel d'outil proposé par le modèle, un dict avec 'tool' et 'args'. orders est fourni. Renvoyez 'allow' pour get_order quand la commande existe et que son propriétaire est user, 'deny' pour get_order sinon, 'needs approval' pour send_email, 'allow' pour search_help, et 'deny' pour tout autre outil.",
+    tests: [
+      "Ana lit sa propre commande",
+      "Ana demande la commande de Li",
+      "une commande qui n'existe pas",
+      "le courriel attend toujours une personne",
+      "la recherche d'aide est inoffensive",
+      "un outil que personne n'a construit",
+    ],
+  },
+  "attack-rates": {
+    prompt: "Écrivez attack_rates(trials) : trials est une liste de dicts avec 'case' et 'success' (True ou False), un par tentative. Renvoyez une liste de tuples (case, successes, attempts, rate) triée par cas, où rate vaut successes divisé par attempts, arrondi à 2 décimales.",
+    tests: [
+      "deux cas",
+      "un succès sur vingt n'est pas zéro",
+      "chaque tentative fonctionne",
+      "un taux qu'il faut arrondir",
+      "aucun essai",
+    ],
+  },
 };

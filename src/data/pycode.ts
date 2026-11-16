@@ -2087,6 +2087,60 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import math\n\ndef cosine(a, b):\n    dot = sum(x * y for x, y in zip(a, b))\n    size = lambda v: math.sqrt(sum(x * x for x in v))\n    return dot / (size(a) * size(b))\n\ndef retrieve(query, docs, user_groups, k):\n    allowed = [d for d in docs if set(d['groups']) & set(user_groups)]\n    ranked = sorted(allowed, key=lambda d: cosine(query, d['vector']), reverse=True)\n    return [d['id'] for d in ranked[:k]]\n",
   },
+  {
+    id: "trifecta-check",
+    prompt: "Write trifecta(tools): tools is a list of dicts with 'name' and three flags, 'reads_private', 'reads_untrusted' and 'sends_out'. Return (legs, danger): legs is the sorted list of the legs present in any tool, using the names 'private data', 'untrusted content' and 'way out', and danger is True when all three are present.",
+    starter: "def trifecta(tools):\n    legs = set()\n    # Look at every tool: each flag that is True adds its leg.\n    return sorted(legs), False\n",
+    tests: [
+      { name: "the email assistant", expr: "trifecta([{'name': 'read_inbox', 'reads_private': False, 'reads_untrusted': True, 'sends_out': False}, {'name': 'search_crm', 'reads_private': True, 'reads_untrusted': False, 'sends_out': False}, {'name': 'send_email', 'reads_private': False, 'reads_untrusted': False, 'sends_out': True}]) == (['private data', 'untrusted content', 'way out'], True)" },
+      { name: "without the email tool", expr: "trifecta([{'name': 'read_inbox', 'reads_private': False, 'reads_untrusted': True, 'sends_out': False}, {'name': 'search_crm', 'reads_private': True, 'reads_untrusted': False, 'sends_out': False}]) == (['private data', 'untrusted content'], False)" },
+      { name: "one tool can carry two legs", expr: "trifecta([{'name': 'browse', 'reads_private': False, 'reads_untrusted': True, 'sends_out': True}]) == (['untrusted content', 'way out'], False)" },
+      { name: "a single tool with everything", expr: "trifecta([{'name': 'agent', 'reads_private': True, 'reads_untrusted': True, 'sends_out': True}])[1] == True" },
+      { name: "no tools", expr: "trifecta([]) == ([], False)" },
+    ],
+    solution: "def trifecta(tools):\n    legs = set()\n    for t in tools:\n        if t['reads_private']:\n            legs.add('private data')\n        if t['reads_untrusted']:\n            legs.add('untrusted content')\n        if t['sends_out']:\n            legs.add('way out')\n    return sorted(legs), len(legs) == 3\n",
+  },
+  {
+    id: "exfil-links",
+    prompt: "Write blocked_urls(markdown, allowed): find every image ![text](url) and link [text](url) in a model's Markdown answer. Return, in order of appearance, the URLs whose host is not in allowed. Hosts are compared in lower case, and a URL with no host, such as a relative path, is allowed.",
+    starter: "import re\nfrom urllib.parse import urlsplit\n\ndef blocked_urls(markdown, allowed):\n    urls = re.findall(r'!?\\[[^\\]]*\\]\\(([^)\\s]+)\\)', markdown)\n    # urlsplit(url).hostname gives the host in lower case, or None.\n    return []\n",
+    tests: [
+      { name: "the pixel from the lesson", expr: "blocked_urls('Done. ![status](https://collector.example/pixel.png?d=ana%40example.com)', ['shop.example']) == ['https://collector.example/pixel.png?d=ana%40example.com']" },
+      { name: "your own images are fine", expr: "blocked_urls('![logo](https://shop.example/logo.png)', ['shop.example']) == []" },
+      { name: "links count too", expr: "blocked_urls('See [your order](https://shop.example/o/4471) or [this](http://evil.example/x)', ['shop.example']) == ['http://evil.example/x']" },
+      { name: "hosts in capitals", expr: "blocked_urls('![a](https://SHOP.example/a.png)', ['shop.example']) == []" },
+      { name: "a relative link has no host", expr: "blocked_urls('[help](/help)', ['shop.example']) == []" },
+      { name: "plain text with no links", expr: "blocked_urls('Your refund is on its way.', ['shop.example']) == []" },
+    ],
+    solution: "import re\nfrom urllib.parse import urlsplit\n\ndef blocked_urls(markdown, allowed):\n    urls = re.findall(r'!?\\[[^\\]]*\\]\\(([^)\\s]+)\\)', markdown)\n    allowed = [a.lower() for a in allowed]\n    return [u for u in urls if urlsplit(u).hostname and urlsplit(u).hostname not in allowed]\n",
+  },
+  {
+    id: "tool-gate",
+    prompt: "Write gate(call, user): call is a tool call proposed by the model, a dict with 'tool' and 'args'. orders is given. Return 'allow' for get_order when the order exists and its owner is user, 'deny' for get_order otherwise, 'needs approval' for send_email, 'allow' for search_help, and 'deny' for any other tool.",
+    starter: "orders = {'4471': {'owner': 'ana'}, '5120': {'owner': 'li'}}\n\ndef gate(call, user):\n    # Decide from facts the model can't change.\n    return 'allow'\n",
+    tests: [
+      { name: "Ana reads her own order", expr: "gate({'tool': 'get_order', 'args': {'order_id': '4471'}}, 'ana') == 'allow'" },
+      { name: "Ana asks for Li's order", expr: "gate({'tool': 'get_order', 'args': {'order_id': '5120'}}, 'ana') == 'deny'" },
+      { name: "an order that doesn't exist", expr: "gate({'tool': 'get_order', 'args': {'order_id': '9999'}}, 'ana') == 'deny'" },
+      { name: "email always waits for a person", expr: "gate({'tool': 'send_email', 'args': {'to': 'ana@example.com'}}, 'ana') == 'needs approval'" },
+      { name: "help search is harmless", expr: "gate({'tool': 'search_help', 'args': {'q': 'refunds'}}, 'ana') == 'allow'" },
+      { name: "a tool nobody built", expr: "gate({'tool': 'delete_account', 'args': {}}, 'ana') == 'deny'" },
+    ],
+    solution: "orders = {'4471': {'owner': 'ana'}, '5120': {'owner': 'li'}}\n\ndef gate(call, user):\n    tool = call['tool']\n    if tool == 'get_order':\n        order = orders.get(call['args'].get('order_id'))\n        return 'allow' if order and order['owner'] == user else 'deny'\n    if tool == 'send_email':\n        return 'needs approval'\n    if tool == 'search_help':\n        return 'allow'\n    return 'deny'\n",
+  },
+  {
+    id: "attack-rates",
+    prompt: "Write attack_rates(trials): trials is a list of dicts with 'case' and 'success' (True or False), one per attempt. Return a list of (case, successes, attempts, rate) tuples sorted by case, where rate is successes divided by attempts, rounded to 2 decimal places.",
+    starter: "def attack_rates(trials):\n    counts = {}  # case -> [successes, attempts]\n    for t in trials:\n        # Your code here.\n        pass\n    return []\n",
+    tests: [
+      { name: "two cases", expr: "attack_rates([{'case': 'ticket', 'success': True}, {'case': 'ticket', 'success': False}, {'case': 'ticket', 'success': True}, {'case': 'ticket', 'success': False}, {'case': 'direct', 'success': False}, {'case': 'direct', 'success': False}]) == [('direct', 0, 2, 0.0), ('ticket', 2, 4, 0.5)]" },
+      { name: "one success in twenty is not zero", expr: "attack_rates([{'case': 'direct', 'success': i == 7} for i in range(20)]) == [('direct', 1, 20, 0.05)]" },
+      { name: "every attempt works", expr: "attack_rates([{'case': 'image', 'success': True}] * 3) == [('image', 3, 3, 1.0)]" },
+      { name: "a rate that needs rounding", expr: "attack_rates([{'case': 'a', 'success': True}, {'case': 'a', 'success': False}, {'case': 'a', 'success': False}]) == [('a', 1, 3, 0.33)]" },
+      { name: "no trials", expr: "attack_rates([]) == []" },
+    ],
+    solution: "def attack_rates(trials):\n    counts = {}\n    for t in trials:\n        c = counts.setdefault(t['case'], [0, 0])\n        c[1] += 1\n        if t['success']:\n            c[0] += 1\n    return [(case, s, n, round(s / n, 2)) for case, (s, n) in sorted(counts.items())]\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
