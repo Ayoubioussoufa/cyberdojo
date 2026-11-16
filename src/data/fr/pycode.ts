@@ -1204,4 +1204,48 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "la même politique d'administrateur sur un autre service",
     ],
   },
+  "denied-bursts": {
+    prompt: "Écrivez denied_bursts(records, threshold) : records est une liste d'événements CloudTrail sous forme de dicts. Un appel échoué a une clé 'errorCode', et le nom de l'appelant est dans record['userIdentity']['userName'] (utilisez 'unknown' quand cette clé manque). Renvoyez les noms triés des appelants qui ont au moins threshold événements dont errorCode vaut 'AccessDenied'.",
+    tests: [
+      "une clé que l'on essaie",
+      "un seul refus reste sous le seuil",
+      "les autres erreurs ne comptent pas",
+      "plusieurs appelants, triés",
+      "un événement sans nom d'utilisateur",
+      "aucun enregistrement",
+    ],
+  },
+  "trail-watchlist": {
+    prompt: "Écrivez trail_watchlist(records) : records est une liste d'événements CloudTrail avec 'eventTime', 'eventName', 'userIdentity' (avec 'userName') et parfois 'requestParameters'. Renvoyez une liste de paires (eventTime, raison) dans l'ordre des enregistrements : 'logging stopped' pour StopLogging ou DeleteTrail, 'bucket policy changed' pour PutBucketPolicy, et 'key for another user' pour un CreateAccessKey dont les requestParameters nomment un userName différent de celui de l'appelant.",
+    tests: [
+      "l'événement de la leçon",
+      "supprimer le trail compte aussi",
+      "une clé créée pour quelqu'un d'autre",
+      "renouveler sa propre clé est normal",
+      "un changement de politique de bucket",
+      "les événements ordinaires ne lèvent rien",
+      "une nuit entière, dans l'ordre",
+    ],
+  },
+  "key-scope": {
+    prompt: "Écrivez key_scope(records, key_id) : gardez les événements CloudTrail dont record['userIdentity']['accessKeyId'] vaut key_id. Renvoyez None s'il n'y en a aucun. Sinon, renvoyez un dict avec 'first' et 'last' (le plus ancien et le plus récent eventTime), 'ips' (les adresses sources triées, chacune une fois) et 'events' (les noms d'événements triés, chacun une fois). Les heures écrites comme 2026-10-27T02:06:02Z se comparent correctement comme du texte.",
+    tests: [
+      "une nuit d'utilisation",
+      "les autres clés sont écartées",
+      "deux adresses, chacune listée une fois",
+      "un seul événement est à la fois le premier et le dernier",
+      "une clé jamais utilisée",
+      "les événements signés sans clé sont ignorés",
+    ],
+  },
+  "rank-findings": {
+    prompt: "Écrivez rank_findings(findings) : findings est une liste de dicts avec 'title', 'exposed' et 'sensitive' (True ou False). Donnez à chacun une priorité : 'now' quand il est exposé et sensible, 'soon' quand il est sensible mais pas exposé, 'review' quand il est exposé mais pas sensible, et 'later' sinon. Renvoyez une liste de paires (priorité, titre) dans l'ordre now, soon, review, later, en gardant l'ordre d'origine à l'intérieur de chaque priorité.",
+    tests: [
+      "les trois lignes de la leçon",
+      "sensible mais interne passe bientôt",
+      "soon passe avant review",
+      "les égalités gardent leur ordre",
+      "aucun constat",
+    ],
+  },
 };

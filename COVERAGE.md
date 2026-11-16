@@ -611,7 +611,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 | ○ | ● | Microsoft Sentinel (tool) | 1 mentions in 1 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Writing correlation rules, tuning false positives | 34 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
 | ●* | ● | Sigma (tool) | 20 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | SOAR and playbooks | 20 mentions in 8 docs, most in P06, practice 1. |  |
+| ● | ● | SOAR and playbooks | 21 mentions in 9 docs, most in P06, practice 1. |  |
 
 ### Threat hunting
 
@@ -716,13 +716,13 @@ Basis: Brief 10.
 | ○ | ● | AWS privilege escalation paths | None. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ◐ | ● | AWS S3 exposure | 15 mentions in 3 docs, most in 0063-cloud-foundations-and-iam, practice 3. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ◐ | ● | Instance metadata and IMDSv2 | 19 mentions in 6 docs, most in 0063-cloud-foundations-and-iam, practice 15. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
-| ● | ● | CloudTrail and GuardDuty | 30 mentions in 6 docs, most in 0064-cloud-detection-and-posture, practice 8. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
+| ● | ● | CloudTrail and GuardDuty | 32 mentions in 6 docs, most in 0064-cloud-detection-and-posture, practice 8. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ◐* | ● | Azure: Entra ID, RBAC, managed identity | 28 mentions in 12 docs, most in 0045-attacking-and-defending-identity. *Entra ID has a section. Azure RBAC is one table cell, and managed identities are absent.* | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | Azure logging and Defender for Cloud | 2 mentions in 1 docs, most in 0064-cloud-detection-and-posture. | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | GCP: IAM, service accounts | 2 mentions in 1 docs, most in 0064-cloud-detection-and-posture. | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
 | ◐ | ● | GCP audit logs and SCC | 4 mentions in 2 docs, most in 0064-cloud-detection-and-posture. | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
 | ○ | ● | Multi-cloud comparison | None. | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
-| ●* | ● | Prowler, ScoutSuite (tool) | 10 mentions in 3 docs, most in P10. *Walked through in project P10.* | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
+| ●* | ● | Prowler, ScoutSuite (tool) | 12 mentions in 3 docs, most in 0064-cloud-detection-and-posture. *Walked through in project P10.* | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
 | ◐ | ● | Pacu, Stratus Red Team, CloudGoat (lab) (tool) | 4 mentions in 3 docs, most in P10. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ○ | ● | Serverless security | None. | [Serverless and secrets management](modules/10-cloud/04-serverless-and-secrets.md) |
 | ○ | ● | Secrets management: Vault, Secrets Manager | 1 mentions in 1 docs, most in 0057-auditing-for-privilege-escalation. | [Serverless and secrets management](modules/10-cloud/04-serverless-and-secrets.md) |
