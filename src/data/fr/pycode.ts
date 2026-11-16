@@ -1248,4 +1248,48 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "aucun constat",
     ],
   },
+  "timestomp-check": {
+    prompt: "Écrivez timestomp_suspects(files) : files est une liste de dicts avec 'path', 'si_created' et 'fn_created', les heures de création tirées de $STANDARD_INFORMATION et de $FILE_NAME, écrites 'YYYY-MM-DD HH:MM:SS.fffffff' (sept chiffres après le point). Renvoyez une liste de paires (path, raison) dans l'ordre des fichiers : 'si before fn' quand l'heure de $STANDARD_INFORMATION est plus ancienne, puis 'whole second' quand la fraction de $STANDARD_INFORMATION ne contient que des zéros.",
+    tests: [
+      "un document ordinaire",
+      "une date de création reculée de plusieurs années",
+      "une heure tombant sur une seconde exacte",
+      "les deux signes sur un fichier, dans l'ordre",
+      "une heure $STANDARD_INFORMATION plus récente n'est pas un signe",
+      "un dossier entier",
+    ],
+  },
+  "process-tree": {
+    prompt: "Écrivez tree_anomalies(procs) : procs est une liste de processus, des dicts avec 'pid', 'ppid' et 'name'. Comparez les noms sans tenir compte de la casse. Renvoyez une liste de paires (pid, raison) dans l'ordre de la liste. Pour chaque processus, d'abord 'duplicate' quand c'est wininit.exe, services.exe ou lsass.exe et qu'un processus du même nom est apparu plus tôt dans la liste ; puis 'unexpected parent' quand c'est services.exe ou lsass.exe et que son parent n'est pas wininit.exe, ou svchost.exe et que son parent n'est pas services.exe. Un parent absent de la liste compte comme inattendu.",
+    tests: [
+      "une machine saine",
+      "svchost lancé par explorer",
+      "un second lsass",
+      "des noms dans n'importe quelle casse",
+      "un parent qui a disparu",
+      "une liste vide",
+    ],
+  },
+  "injection-candidates": {
+    prompt: "Écrivez injection_candidates(regions, jit) : regions est une liste de zones mémoire, des dicts avec 'pid', 'process', 'protection', 'mapped_file' (None quand aucun fichier n'est derrière) et 'first_bytes'. jit liste les processus qui écrivent du code pendant qu'ils tournent, comme les navigateurs. Ne regardez que les zones dont la protection vaut PAGE_EXECUTE_READWRITE et qu'aucun fichier ne soutient. Renvoyez une liste de (pid, process, kind) dans l'ordre des zones : kind vaut 'MZ' quand la zone commence par les octets MZ, dans n'importe quel processus, et 'code' sinon, sauf que les zones sans MZ d'un processus jit sont ignorées.",
+    tests: [
+      "un programme chargé dans la mémoire de notepad",
+      "une mémoire soutenue par un fichier n'est pas candidate",
+      "un navigateur qui écrit du code, c'est attendu",
+      "un programme entier dans un navigateur, ça ne l'est pas",
+      "du code dans rundll32",
+      "accessible en écriture mais pas exécutable",
+      "un mélange, dans l'ordre",
+    ],
+  },
+  "timeline-window": {
+    prompt: "Écrivez around(events, pivot, minutes) : events est une liste de tuples (time, source, what) dont les heures s'écrivent 'YYYY-MM-DD HH:MM:SS'. Renvoyez les événements situés à au plus minutes de l'heure pivot, avant ou après elle, triés par heure.",
+    tests: [
+      "cinq minutes autour de la connexion",
+      "une fenêtre étroite",
+      "le bord de la fenêtre compte",
+      "à cheval sur minuit",
+      "rien à proximité",
+    ],
+  },
 };
