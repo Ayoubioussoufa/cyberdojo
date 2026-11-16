@@ -1681,4 +1681,47 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "une ressource inconnue",
     ],
   },
+  "untrusted-fields": {
+    prompt: "Écrivez prepare(event, trusted, limit) : event est un dict de champs de journal, et trusted liste les champs que vos propres systèmes ont enregistrés. Renvoyez un dict avec 'facts', les champs de confiance avec leurs valeurs inchangées, et 'untrusted', tous les autres champs convertis en texte et coupés à au plus limit caractères. Gardez les clés dans l'ordre de l'événement.",
+    tests: [
+      "la ligne de journal de la leçon",
+      "une valeur courte est gardée entière",
+      "les valeurs de confiance gardent leur type",
+      "les nombres non fiables deviennent du texte",
+      "un énorme user agent est coupé",
+    ],
+  },
+  "redact-incident": {
+    prompt: "Écrivez redact(text) : remplacez chaque adresse électronique par [EMAIL], chaque adresse IPv4 par [IP], et chaque identifiant de clé d'accès AWS (AKIA ou ASIA suivi de 16 lettres majuscules ou chiffres) par [KEY]. Traitez d'abord les clés, puis les adresses électroniques, puis les adresses IP.",
+    tests: [
+      "une adresse électronique",
+      "une adresse IP",
+      "une clé d'accès",
+      "une clé temporaire",
+      "tout à la fois",
+      "rien à cacher",
+    ],
+  },
+  "verdict-check": {
+    prompt: "Écrivez verdict_problems(text, alert_lines) : text est la réponse du modèle, censée être du JSON avec 'verdict', 'confidence' et 'evidence'. alert_lines liste les identifiants des lignes de journal de cette alerte. Renvoyez la liste des problèmes : ['not json'] seul si le texte n'est pas un objet JSON valide. Sinon, dans cet ordre : 'bad verdict' sauf si le verdict vaut malicious, benign ou unknown ; 'bad confidence' sauf si c'est un nombre de 0 à 1 ; 'no evidence' quand la liste des preuves est vide et que le verdict n'est pas unknown ; et 'unknown line: ' suivi de chaque identifiant de preuve absent de alert_lines.",
+    tests: [
+      "un verdict solide",
+      "de la prose au lieu du JSON",
+      "un verdict inventé",
+      "une confiance écrite en pourcentage",
+      "une ligne de journal qui n'existe pas",
+      "unknown ne demande aucune preuve",
+      "un verdict assuré sans aucune preuve",
+    ],
+  },
+  "bias-report": {
+    prompt: "Écrivez bias_report(cases) : cases est une liste de verdicts (assistant, analyste, vérité) pour des alertes closes. Renvoyez un dict avec 'assistant_accuracy' et 'analyst_accuracy', la part des cas que chacun a eus justes, et 'followed_wrong', la part des cas où l'assistant avait tort dans lesquels l'analyste a été d'accord avec lui, chacune arrondie à 2 décimales. Utilisez 0 pour une part dont le total vaut zéro.",
+    tests: [
+      "cinq alertes",
+      "un assistant qui a toujours raison",
+      "des analystes toujours d'accord",
+      "des analystes qui repèrent chaque erreur",
+      "aucun cas",
+    ],
+  },
 };
