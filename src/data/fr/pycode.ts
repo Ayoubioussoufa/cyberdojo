@@ -984,4 +984,46 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "une règle vide manque de tout",
     ],
   },
+  "hosts-in-scope": {
+    prompt: "Écrivez hosts_in_scope(logins, first_host, start) : logins est une liste de dicts avec 'time' (en minutes depuis minuit), 'src' et 'dst'. first_host a été compromis à l'instant start. Une connexion fait entrer sa destination dans le périmètre quand sa source y est déjà à ce moment-là. Renvoyez la liste triée des hôtes du périmètre, first_host compris.",
+    tests: [
+      "les connexions de la leçon",
+      "une compromission plus ancienne fait entrer le serveur de messagerie",
+      "sans connexion, seulement le premier hôte",
+      "une connexion faite avant que sa source soit atteinte ne compte pas",
+      "une chaîne donnée dans le désordre est quand même suivie",
+      "une connexion vers le premier hôte n'ajoute pas sa source",
+    ],
+  },
+  "evidence-intact": {
+    prompt: "Écrivez tampered(items) : items est une liste de dicts avec 'name', 'sha256' (l'empreinte notée à la collecte, en texte hexadécimal) et 'data' (les octets détenus maintenant). Renvoyez les noms triés des éléments dont les données ne donnent plus l'empreinte notée. Majuscules et minuscules se valent dans l'empreinte notée.",
+    tests: [
+      "une preuve inchangée",
+      "un octet modifié",
+      "seul l'élément modifié est nommé",
+      "une empreinte écrite en majuscules correspond quand même",
+      "les noms reviennent triés",
+      "un fichier vidé est repéré",
+    ],
+  },
+  "merge-timeline": {
+    prompt: "Écrivez merge_timeline(events) : events est une liste de dicts avec 'time' (un texte comme 2026-10-27T10:02:11+01:00, avec son décalage par rapport à UTC), 'source' et 'what'. Renvoyez une liste de tuples (time, source, what) triée par heure, où time est le même instant en UTC, écrit 'YYYY-MM-DD HH:MM:SS'.",
+    tests: [
+      "les deux journaux de la leçon",
+      "un décalage peut faire reculer la date",
+      "un décalage négatif s'ajoute",
+      "l'ordre des horloges locales n'est pas l'ordre réel",
+      "aucun événement",
+    ],
+  },
+  "breach-clock": {
+    prompt: "Écrivez breach_clock(aware, now) : les deux sont des heures UTC écrites 'YYYY-MM-DD HH:MM'. aware est le moment où l'équipe a pris connaissance de la violation. Renvoyez (deadline, minutes_left) : deadline tombe 72 heures après aware, dans le même format, et minutes_left est le nombre entier de minutes entre now et l'échéance, négatif une fois celle-ci passée.",
+    tests: [
+      "six heures après",
+      "l'horloge tourne pendant le week-end",
+      "à cheval sur une fin de mois",
+      "une heure de retard",
+      "exactement à l'échéance",
+    ],
+  },
 };

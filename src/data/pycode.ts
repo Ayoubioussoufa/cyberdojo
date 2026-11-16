@@ -1420,6 +1420,60 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def lint(rule):\n    problems = []\n    for key in ['title', 'id', 'logsource', 'detection']:\n        if not rule.get(key):\n            problems.append('no ' + key)\n    if rule.get('detection') and 'condition' not in rule['detection']:\n        problems.append('no condition')\n    if rule.get('level') not in ['informational', 'low', 'medium', 'high', 'critical']:\n        problems.append('bad level')\n    return problems\n",
   },
+  {
+    id: "hosts-in-scope",
+    prompt: "Write hosts_in_scope(logins, first_host, start): logins is a list of dicts with 'time' (minutes since midnight), 'src' and 'dst'. first_host was compromised at time start. A login puts its destination in scope when its source is already in scope at that time. Return the sorted list of hosts in scope, first_host included.",
+    starter: "def hosts_in_scope(logins, first_host, start):\n    since = {first_host: start}  # host -> the time it came into scope\n    for login in sorted(logins, key=lambda l: l['time']):\n        # Your code here: when the source is already in scope at this time, add the destination.\n        pass\n    return sorted(since)\n",
+    tests: [
+      { name: "the logins from the lesson", expr: "hosts_in_scope([{'time': 545, 'src': 'HR-LAP-12', 'dst': 'FILE-01'}, {'time': 580, 'src': 'FILE-01', 'dst': 'DB-02'}, {'time': 490, 'src': 'HR-LAP-12', 'dst': 'MAIL-01'}, {'time': 615, 'src': 'DEV-07', 'dst': 'DB-02'}], 'HR-LAP-12', 540) == ['DB-02', 'FILE-01', 'HR-LAP-12']" },
+      { name: "an earlier compromise brings in the mail server", expr: "hosts_in_scope([{'time': 545, 'src': 'HR-LAP-12', 'dst': 'FILE-01'}, {'time': 580, 'src': 'FILE-01', 'dst': 'DB-02'}, {'time': 490, 'src': 'HR-LAP-12', 'dst': 'MAIL-01'}, {'time': 615, 'src': 'DEV-07', 'dst': 'DB-02'}], 'HR-LAP-12', 480) == ['DB-02', 'FILE-01', 'HR-LAP-12', 'MAIL-01']" },
+      { name: "with no logins, only the first host", expr: "hosts_in_scope([], 'HR-LAP-12', 540) == ['HR-LAP-12']" },
+      { name: "a login made before its source was reached does not count", expr: "hosts_in_scope([{'time': 10, 'src': 'B', 'dst': 'C'}, {'time': 20, 'src': 'A', 'dst': 'B'}], 'A', 0) == ['A', 'B']" },
+      { name: "a chain given out of order is still followed", expr: "hosts_in_scope([{'time': 30, 'src': 'B', 'dst': 'C'}, {'time': 20, 'src': 'A', 'dst': 'B'}], 'A', 0) == ['A', 'B', 'C']" },
+      { name: "a login into the first host does not add its source", expr: "hosts_in_scope([{'time': 20, 'src': 'X', 'dst': 'A'}], 'A', 0) == ['A']" },
+    ],
+    solution: "def hosts_in_scope(logins, first_host, start):\n    since = {first_host: start}\n    for login in sorted(logins, key=lambda l: l['time']):\n        src, dst = login['src'], login['dst']\n        if src in since and login['time'] >= since[src] and dst not in since:\n            since[dst] = login['time']\n    return sorted(since)\n",
+  },
+  {
+    id: "evidence-intact",
+    prompt: "Write tampered(items): items is a list of dicts with 'name', 'sha256' (the hash written down at collection, as hex text) and 'data' (the bytes held now). Return the sorted names of the items whose data no longer gives the recorded hash. Upper and lower case in the recorded hash are the same.",
+    starter: "import hashlib\n\ndef tampered(items):\n    # hashlib.sha256(data).hexdigest() gives the hash as lower-case hex text.\n    return []\n",
+    tests: [
+      { name: "unchanged evidence", expr: "tampered([{'name': 'memory.raw', 'sha256': '6fbafdfefd6d7194f9e2a269ea69322fa96a4f717cb3769282d2f6908e364ae7', 'data': b'memory of HR-LAP-12'}]) == []" },
+      { name: "one byte changed", expr: "tampered([{'name': 'memory.raw', 'sha256': '6fbafdfefd6d7194f9e2a269ea69322fa96a4f717cb3769282d2f6908e364ae7', 'data': b'memory of HR-LAP-13'}]) == ['memory.raw']" },
+      { name: "only the changed item is named", expr: "tampered([{'name': 'memory.raw', 'sha256': '6fbafdfefd6d7194f9e2a269ea69322fa96a4f717cb3769282d2f6908e364ae7', 'data': b'memory of HR-LAP-12'}, {'name': 'disk.img', 'sha256': '42c797fa4c17ded87feb438881fd18b4dd20d857f336e0fbe0e1fedb70f57b96', 'data': b'disk of FILE-02'}]) == ['disk.img']" },
+      { name: "a hash written in upper case still matches", expr: "tampered([{'name': 'disk.img', 'sha256': '42C797FA4C17DED87FEB438881FD18B4DD20D857F336E0FBE0E1FEDB70F57B96', 'data': b'disk of FILE-01'}]) == []" },
+      { name: "names come back sorted", expr: "tampered([{'name': 'memory.raw', 'sha256': '00', 'data': b'a'}, {'name': 'disk.img', 'sha256': '00', 'data': b'b'}]) == ['disk.img', 'memory.raw']" },
+      { name: "an emptied file is caught", expr: "tampered([{'name': 'disk.img', 'sha256': '42c797fa4c17ded87feb438881fd18b4dd20d857f336e0fbe0e1fedb70f57b96', 'data': b''}]) == ['disk.img']" },
+    ],
+    solution: "import hashlib\n\ndef tampered(items):\n    bad = []\n    for item in items:\n        if hashlib.sha256(item['data']).hexdigest() != item['sha256'].lower():\n            bad.append(item['name'])\n    return sorted(bad)\n",
+  },
+  {
+    id: "merge-timeline",
+    prompt: "Write merge_timeline(events): events is a list of dicts with 'time' (text like 2026-10-27T10:02:11+01:00, with its offset from UTC), 'source' and 'what'. Return a list of (time, source, what) tuples sorted by time, where time is the same moment in UTC, written as 'YYYY-MM-DD HH:MM:SS'.",
+    starter: "from datetime import datetime, timezone\n\ndef merge_timeline(events):\n    # datetime.fromisoformat(text) reads the time with its offset.\n    # .astimezone(timezone.utc) moves it to UTC, and .strftime('%Y-%m-%d %H:%M:%S') writes it.\n    return []\n",
+    tests: [
+      { name: "the two logs from the lesson", expr: "merge_timeline([{'time': '2026-10-27T10:02:11+01:00', 'source': 'firewall', 'what': 'allowed 203.0.113.7 to HR-LAP-12'}, {'time': '2026-10-27T09:01:40+00:00', 'source': 'cloud', 'what': 'ana signed in from 203.0.113.7'}]) == [('2026-10-27 09:01:40', 'cloud', 'ana signed in from 203.0.113.7'), ('2026-10-27 09:02:11', 'firewall', 'allowed 203.0.113.7 to HR-LAP-12')]" },
+      { name: "an offset can move the date back", expr: "merge_timeline([{'time': '2026-10-27T00:30:00+02:00', 'source': 'vpn', 'what': 'session opened'}]) == [('2026-10-26 22:30:00', 'vpn', 'session opened')]" },
+      { name: "a negative offset is added", expr: "merge_timeline([{'time': '2026-10-27T20:00:00-05:00', 'source': 'proxy', 'what': 'upload of 2 GB'}]) == [('2026-10-28 01:00:00', 'proxy', 'upload of 2 GB')]" },
+      { name: "local clock order is not the real order", expr: "[row[1] for row in merge_timeline([{'time': '2026-10-27T09:30:00+00:00', 'source': 'cloud', 'what': 'key created'}, {'time': '2026-10-27T10:15:00+01:00', 'source': 'firewall', 'what': 'first connection'}, {'time': '2026-10-27T04:20:00-05:00', 'source': 'proxy', 'what': 'page opened'}])] == ['firewall', 'proxy', 'cloud']" },
+      { name: "no events", expr: "merge_timeline([]) == []" },
+    ],
+    solution: "from datetime import datetime, timezone\n\ndef merge_timeline(events):\n    rows = []\n    for e in events:\n        utc = datetime.fromisoformat(e['time']).astimezone(timezone.utc)\n        rows.append((utc.strftime('%Y-%m-%d %H:%M:%S'), e['source'], e['what']))\n    return sorted(rows)\n",
+  },
+  {
+    id: "breach-clock",
+    prompt: "Write breach_clock(aware, now): both are UTC times written as 'YYYY-MM-DD HH:MM'. aware is when the team became aware of the breach. Return (deadline, minutes_left): deadline is 72 hours after aware, in the same format, and minutes_left is the whole number of minutes from now to the deadline, negative once it has passed.",
+    starter: "from datetime import datetime, timedelta\n\ndef breach_clock(aware, now):\n    fmt = '%Y-%m-%d %H:%M'\n    # datetime.strptime(text, fmt) reads a time, and .strftime(fmt) writes one.\n    return aware, 0\n",
+    tests: [
+      { name: "six hours in", expr: "breach_clock('2026-10-27 10:00', '2026-10-27 16:00') == ('2026-10-30 10:00', 3960)" },
+      { name: "the clock runs through a weekend", expr: "breach_clock('2026-10-30 17:30', '2026-11-02 09:00') == ('2026-11-02 17:30', 510)" },
+      { name: "across the end of a month", expr: "breach_clock('2026-11-29 08:15', '2026-11-29 08:15') == ('2026-12-02 08:15', 4320)" },
+      { name: "an hour late", expr: "breach_clock('2026-10-27 10:00', '2026-10-30 11:00') == ('2026-10-30 10:00', -60)" },
+      { name: "exactly at the deadline", expr: "breach_clock('2026-10-27 10:00', '2026-10-30 10:00') == ('2026-10-30 10:00', 0)" },
+    ],
+    solution: "from datetime import datetime, timedelta\n\ndef breach_clock(aware, now):\n    fmt = '%Y-%m-%d %H:%M'\n    deadline = datetime.strptime(aware, fmt) + timedelta(hours=72)\n    left = int((deadline - datetime.strptime(now, fmt)).total_seconds() // 60)\n    return deadline.strftime(fmt), left\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
