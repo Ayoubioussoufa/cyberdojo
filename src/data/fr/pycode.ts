@@ -1116,4 +1116,48 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "une analyse complète",
     ],
   },
+  "policy-problems": {
+    prompt: "Écrivez policy_problems(policy, today) : policy est un dict avec 'owner' (un texte), 'next_review' (une date 'YYYY-MM-DD'), 'exceptions' (un texte qui dit comment en obtenir une) et 'rules' (une liste de phrases). Renvoyez la liste des problèmes dans cet ordre : 'no owner' quand owner est vide, 'review overdue' quand next_review est avant today, 'no exception process' quand exceptions est vide, puis 'vague: ' suivi de la règle pour chaque règle qui contient une formule faible, quelle que soit la casse.",
+    tests: [
+      "la politique d'accès à distance",
+      "pas de responsable",
+      "une date de revue dépassée",
+      "aucun moyen d'obtenir une exception",
+      "une règle vague",
+      "les formules faibles, quelle que soit la casse",
+      "tout à la fois, dans l'ordre",
+    ],
+  },
+  "retention-overdue": {
+    prompt: "Écrivez retention_overdue(records, today) : records est une liste de dicts avec 'id', 'collected' (une date 'YYYY-MM-DD') et 'keep_days'. today est une date au même format. Renvoyez les id triés des enregistrements qui ont dépassé leur durée de conservation : collected plus keep_days tombe avant today.",
+    tests: [
+      "une vieille adresse de lettre d'information",
+      "un enregistrement récent reste",
+      "le dernier jour autorisé n'est pas un dépassement",
+      "un jour après la limite",
+      "les id reviennent triés",
+      "aucun enregistrement",
+    ],
+  },
+  "continuity-gaps": {
+    prompt: "Écrivez continuity_gaps(services) : services est une liste de dicts avec 'name', 'rpo_hours', 'backup_every_hours', 'rto_hours' et 'restore_hours' (la durée de la dernière restauration testée, ou None si elle n'a jamais été testée). Renvoyez une liste de paires (name, problème) dans l'ordre des services : 'rpo missed' quand les sauvegardes sont plus espacées que le RPO, puis 'restore untested' quand restore_hours vaut None, ou 'rto missed' quand la restauration a pris plus de temps que le RTO.",
+    tests: [
+      "le site web atteint les deux objectifs",
+      "la base des commandes manque les deux",
+      "une restauration jamais testée",
+      "pile sur l'objectif, c'est bon",
+      "tout le tableau de la leçon",
+    ],
+  },
+  "three-two-one": {
+    prompt: "Écrivez three_two_one(copies) : copies est une liste de dicts, un par copie des données (l'original compris), avec 'media' (comme 'disk', 'tape' ou 'cloud') et 'offsite' (True ou False). Renvoyez True quand la règle 3-2-1 est respectée : au moins trois copies, sur au moins deux types de support, dont au moins une hors site.",
+    tests: [
+      "un disque, un second disque et une copie cloud",
+      "seulement deux copies",
+      "trois copies sur un seul type de support",
+      "rien hors site",
+      "plus qu'il n'en faut",
+      "aucune copie",
+    ],
+  },
 };

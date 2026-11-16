@@ -2,7 +2,7 @@
 title: Policy, privacy and your midpoint
 summary: Policies people can follow, privacy law, vendors, continuity planning, and the Month 12 review that picks your provisional track.
 month: 12
-minutes: 45
+minutes: 70
 builds: three usable policies, and your midpoint review
 source: CNIL, GDPR guidance (in French) | https://www.cnil.fr/fr/reglement-europeen-protection-donnees
 words: policy, business continuity, data controller
@@ -30,6 +30,24 @@ A policy nobody reads protects nothing. And after 12 months, it's time to stop a
 
 Keeping these apart means that when technology changes, you update a procedure rather than reissuing a policy. Good policies are short, have an owner and a review date, and define how to get an exception.
 
+A whole policy fits on one page:
+
+```
+Remote Access Policy                 Owner: Head of IT
+Approved: 2026-03-01                 Next review: 2027-03-01
+
+Purpose     Keep remote connections to company systems safe.
+Scope       All staff and contractors, on any device.
+Rules       1. Remote access to internal systems must go through the company VPN.
+            2. Every remote sign-in must use MFA.
+            3. Devices used for remote access must have disk encryption turned on.
+Exceptions  Requested in writing from the owner, granted for 90 days at most, and logged.
+```
+
+Each rule says **must**, names who or what it applies to, and can be checked. Compare it with "staff should take care when working remotely, where possible". Nobody can follow that, and nobody can be shown to have broken it. Words like *should*, *where possible* and *as appropriate* are where policies go soft, and a program can find them.
+
+@code policy-problems
+
 ?? Where does "Laptops must use BitLocker with a 14-digit PIN" belong?
 + In a standard, because it's a specific rule
 - In a policy, because it's the top level
@@ -48,6 +66,20 @@ Security protects data from attackers. Privacy asks whether you should have that
 
 These change, so check the official source, and ask a lawyer for real decisions.
 
+The GDPR asks a controller to keep a **record of processing**. It's an inventory, like the one for assets, but of what you do with personal data:
+
+| Activity | Data | Lawful basis | Kept for | Shared with |
+|---|---|---|---|---|
+| Delivering orders | Name, address, phone | Contract | 3 years after the last order | The courier |
+| Newsletter | Email | Consent | Until consent is withdrawn | The mailing service |
+| Payroll | Bank details, salary | Legal obligation | As long as the law requires | The payroll provider |
+
+The GDPR lists six lawful bases: consent, contract, legal obligation, vital interests, public task and legitimate interests. Each activity needs one, chosen before you collect anything. The periods above are examples. The *kept for* column is the one most often left empty, and it's the easiest to check: anything older than its retention period should be gone.
+
+@code retention-overdue
+
+People also have rights over their data: to see it, to correct it, to have it erased and to take it elsewhere. A request must be answered within one month, so a company needs to know where each person's data lives before the first request arrives. That's one more use for the record above.
+
 ?? A Moroccan company sells online to customers in France. Does the GDPR matter to it?
 + Yes, it offers services to people there
 - No, the GDPR only covers European companies
@@ -58,6 +90,18 @@ These change, so check the official source, and ask a lawyer for real decisions.
 ## Suppliers and awareness
 
 **Third-party risk:** a supplier with access to your data is part of your attack surface. Ask for evidence such as ISO certificates or SOC 2 reports, limit what they can reach, put security duties in the contract, and know how to cut them off.
+
+Before a supplier gets access, five questions cover most of the risk:
+
+| Ask | A good answer |
+|---|---|
+| What data of ours will you hold, and where? | A list, and named countries |
+| Who audited you, and when? | A current ISO 27001 certificate or SOC 2 Type II report |
+| How fast will you tell us about a breach? | A number of hours, written into the contract |
+| Who are your own suppliers? | A list of sub-processors |
+| What happens to our data when we leave? | Returned or deleted, with written confirmation |
+
+When the supplier handles personal data for you, the contract isn't optional: Article 28 of the GDPR requires one between a controller and its processor.
 
 **Awareness:** a yearly slideshow changes little. Short, relevant training and a simple way to report work better, and you should thank reporters rather than punish clickers.
 
@@ -79,6 +123,22 @@ Two numbers drive recovery planning: **RTO**, how quickly it must be back, and *
 
 If you back up every night and the database dies at 23:00, you lose almost a whole day. So a nightly backup only suits an RPO of 24 hours or more. A common rule for backups is **3-2-1**: three copies, on two kinds of media, with one off-site. Keep one offline too, because ransomware goes after backups first.
 
+Write the targets and the reality side by side, with one row for each service:
+
+| Service | RPO | Backups every | RTO | Last tested restore took |
+|---|---|---|---|---|
+| Orders database | 1 h | 24 h | 4 h | 6 h |
+| File shares | 24 h | 24 h | 8 h | Never tested |
+| Website | 24 h | 12 h | 2 h | 1 h |
+
+Only the website meets both targets. The orders database misses both, and the file shares have a target that nobody has ever checked. A restore time that was never tested isn't a number.
+
+@code continuity-gaps
+
+The 3-2-1 rule can be checked the same way.
+
+@code three-two-one
+
 **Business continuity** keeps the business working, even on paper. **Disaster recovery** restores the IT behind it.
 
 @drill rto-rpo
@@ -89,6 +149,39 @@ If you back up every night and the database dies at 23:00, you lose almost a who
 - Nightly backups always corrupt the order database
 - Nothing, because backups exist and are recent
 => Worst case, you'd lose nearly a day of data against a limit of one hour. The schedule must match the target.
+
+## Review a policy
+
+A colleague asks you to look over this draft before it goes for approval.
+
+```
+Password Policy
+
+1. Staff should choose strong passwords where possible.
+2. Passwords must be at least 14 characters long on all company accounts.
+3. To change your password, open Settings, choose Security, then click Change.
+```
+
+?? What's wrong with rule 1?
++ Nobody can check whether it was followed
+- It is far too strict for staff
+- It names a product that might change
+- Policies can't mention passwords at all today
+=> "Should", "strong" and "where possible" leave everything open. Rule 2 says the same thing in a way you can test.
+
+?? Where does line 3 belong?
++ In a procedure, since it lists steps
+- In a standard, since it sets numbers
+- In the policy, since staff read it
+- In a contract, since suppliers need it
+=> Steps change every time the screen does. Kept in a procedure, they can be updated without anyone having to approve the policy again.
+
+?? The draft has no owner and no review date. What happens to a policy like that?
++ It will go stale and be ignored
+- It will be enforced by the regulator
+- It will update itself from the standard
+- It will apply only to new staff
+=> A document that nobody answers for stops matching reality within a year or two, and staff learn that policies don't describe how things are done.
 
 ## The midpoint: don't skip this
 

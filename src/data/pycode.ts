@@ -1588,6 +1588,62 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "PRIORITY = {'high': 0, 'medium': 1, 'low': 2}\nSTATUS = {'missing': 0, 'partial': 1}\n\ndef gap_plan(rows):\n    open_rows = [r for r in rows if r['status'] != 'done']\n    ordered = sorted(open_rows, key=lambda r: (PRIORITY[r['priority']], STATUS[r['status']]))\n    return [r['safeguard'] for r in ordered]\n",
   },
+  {
+    id: "policy-problems",
+    prompt: "Write policy_problems(policy, today): policy is a dict with 'owner' (text), 'next_review' (a date as 'YYYY-MM-DD'), 'exceptions' (text saying how to get one) and 'rules' (a list of sentences). Return a list of problems in this order: 'no owner' when owner is empty, 'review overdue' when next_review is before today, 'no exception process' when exceptions is empty, then 'vague: ' followed by the rule for each rule that contains a weak phrase, whatever its case.",
+    starter: "WEAK = ['should', 'where possible', 'as appropriate']\n\ndef policy_problems(policy, today):\n    problems = []\n    # Dates written as YYYY-MM-DD compare correctly as plain text.\n    return problems\n",
+    tests: [
+      { name: "the remote access policy", expr: "policy_problems({'owner': 'Head of IT', 'next_review': '2027-03-01', 'exceptions': 'In writing from the owner, 90 days at most', 'rules': ['Remote access must go through the company VPN.', 'Every remote sign-in must use MFA.']}, '2026-11-16') == []" },
+      { name: "no owner", expr: "policy_problems({'owner': '', 'next_review': '2027-03-01', 'exceptions': 'Ask the CISO', 'rules': ['Every remote sign-in must use MFA.']}, '2026-11-16') == ['no owner']" },
+      { name: "a review date that has passed", expr: "policy_problems({'owner': 'CISO', 'next_review': '2025-06-30', 'exceptions': 'Ask the CISO', 'rules': ['Every remote sign-in must use MFA.']}, '2026-11-16') == ['review overdue']" },
+      { name: "no way to get an exception", expr: "policy_problems({'owner': 'CISO', 'next_review': '2027-03-01', 'exceptions': '', 'rules': ['Every remote sign-in must use MFA.']}, '2026-11-16') == ['no exception process']" },
+      { name: "a vague rule", expr: "policy_problems({'owner': 'CISO', 'next_review': '2027-03-01', 'exceptions': 'Ask the CISO', 'rules': ['Staff should choose strong passwords where possible.', 'Passwords must be at least 14 characters long.']}, '2026-11-16') == ['vague: Staff should choose strong passwords where possible.']" },
+      { name: "weak phrases in any case", expr: "policy_problems({'owner': 'CISO', 'next_review': '2027-03-01', 'exceptions': 'Ask the CISO', 'rules': ['Should a device be lost, report it.', 'Logs are kept As Appropriate.']}, '2026-11-16') == ['vague: Should a device be lost, report it.', 'vague: Logs are kept As Appropriate.']" },
+      { name: "everything at once, in order", expr: "policy_problems({'owner': '', 'next_review': '2026-01-01', 'exceptions': '', 'rules': ['Laptops should be encrypted.']}, '2026-11-16') == ['no owner', 'review overdue', 'no exception process', 'vague: Laptops should be encrypted.']" },
+    ],
+    solution: "WEAK = ['should', 'where possible', 'as appropriate']\n\ndef policy_problems(policy, today):\n    problems = []\n    if not policy['owner']:\n        problems.append('no owner')\n    if policy['next_review'] < today:\n        problems.append('review overdue')\n    if not policy['exceptions']:\n        problems.append('no exception process')\n    for rule in policy['rules']:\n        if any(phrase in rule.lower() for phrase in WEAK):\n            problems.append('vague: ' + rule)\n    return problems\n",
+  },
+  {
+    id: "retention-overdue",
+    prompt: "Write retention_overdue(records, today): records is a list of dicts with 'id', 'collected' (a date as 'YYYY-MM-DD') and 'keep_days'. today is a date in the same format. Return the sorted ids of the records that are past their retention period: collected plus keep_days is before today.",
+    starter: "from datetime import date, timedelta\n\ndef retention_overdue(records, today):\n    now = date.fromisoformat(today)\n    # date.fromisoformat(text) + timedelta(days=n) gives the last day a record may be kept.\n    return []\n",
+    tests: [
+      { name: "an old newsletter address", expr: "retention_overdue([{'id': 'n-17', 'collected': '2023-01-10', 'keep_days': 365}], '2026-11-16') == ['n-17']" },
+      { name: "a recent record stays", expr: "retention_overdue([{'id': 'o-2', 'collected': '2026-06-01', 'keep_days': 1095}], '2026-11-16') == []" },
+      { name: "the last allowed day is not overdue", expr: "retention_overdue([{'id': 'o-3', 'collected': '2026-11-06', 'keep_days': 10}], '2026-11-16') == []" },
+      { name: "one day past the limit", expr: "retention_overdue([{'id': 'o-3', 'collected': '2026-11-05', 'keep_days': 10}], '2026-11-16') == ['o-3']" },
+      { name: "ids come back sorted", expr: "retention_overdue([{'id': 'p-9', 'collected': '2020-01-01', 'keep_days': 30}, {'id': 'a-1', 'collected': '2020-01-01', 'keep_days': 30}, {'id': 'k-4', 'collected': '2026-11-01', 'keep_days': 30}], '2026-11-16') == ['a-1', 'p-9']" },
+      { name: "no records", expr: "retention_overdue([], '2026-11-16') == []" },
+    ],
+    solution: "from datetime import date, timedelta\n\ndef retention_overdue(records, today):\n    now = date.fromisoformat(today)\n    late = []\n    for r in records:\n        last_day = date.fromisoformat(r['collected']) + timedelta(days=r['keep_days'])\n        if last_day < now:\n            late.append(r['id'])\n    return sorted(late)\n",
+  },
+  {
+    id: "continuity-gaps",
+    prompt: "Write continuity_gaps(services): services is a list of dicts with 'name', 'rpo_hours', 'backup_every_hours', 'rto_hours' and 'restore_hours' (how long the last tested restore took, or None if it was never tested). Return a list of (name, problem) pairs in service order: 'rpo missed' when backups are further apart than the RPO, then 'restore untested' when restore_hours is None, or 'rto missed' when the restore took longer than the RTO.",
+    starter: "def continuity_gaps(services):\n    gaps = []\n    for s in services:\n        # Your code here.\n        pass\n    return gaps\n",
+    tests: [
+      { name: "the website meets both targets", expr: "continuity_gaps([{'name': 'Website', 'rpo_hours': 24, 'backup_every_hours': 12, 'rto_hours': 2, 'restore_hours': 1}]) == []" },
+      { name: "the orders database misses both", expr: "continuity_gaps([{'name': 'Orders database', 'rpo_hours': 1, 'backup_every_hours': 24, 'rto_hours': 4, 'restore_hours': 6}]) == [('Orders database', 'rpo missed'), ('Orders database', 'rto missed')]" },
+      { name: "a restore that was never tested", expr: "continuity_gaps([{'name': 'File shares', 'rpo_hours': 24, 'backup_every_hours': 24, 'rto_hours': 8, 'restore_hours': None}]) == [('File shares', 'restore untested')]" },
+      { name: "exactly on target is fine", expr: "continuity_gaps([{'name': 'Mail', 'rpo_hours': 4, 'backup_every_hours': 4, 'rto_hours': 8, 'restore_hours': 8}]) == []" },
+      { name: "the whole table from the lesson", expr: "continuity_gaps([{'name': 'Orders database', 'rpo_hours': 1, 'backup_every_hours': 24, 'rto_hours': 4, 'restore_hours': 6}, {'name': 'File shares', 'rpo_hours': 24, 'backup_every_hours': 24, 'rto_hours': 8, 'restore_hours': None}, {'name': 'Website', 'rpo_hours': 24, 'backup_every_hours': 12, 'rto_hours': 2, 'restore_hours': 1}]) == [('Orders database', 'rpo missed'), ('Orders database', 'rto missed'), ('File shares', 'restore untested')]" },
+    ],
+    solution: "def continuity_gaps(services):\n    gaps = []\n    for s in services:\n        if s['backup_every_hours'] > s['rpo_hours']:\n            gaps.append((s['name'], 'rpo missed'))\n        if s['restore_hours'] is None:\n            gaps.append((s['name'], 'restore untested'))\n        elif s['restore_hours'] > s['rto_hours']:\n            gaps.append((s['name'], 'rto missed'))\n    return gaps\n",
+  },
+  {
+    id: "three-two-one",
+    prompt: "Write three_two_one(copies): copies is a list of dicts, one per copy of the data (the original included), with 'media' (such as 'disk', 'tape' or 'cloud') and 'offsite' (True or False). Return True when the 3-2-1 rule holds: at least three copies, on at least two kinds of media, with at least one off-site.",
+    starter: "def three_two_one(copies):\n    # Count the copies, the different media, and the off-site copies.\n    return False\n",
+    tests: [
+      { name: "disk, a second disk and a cloud copy", expr: "three_two_one([{'media': 'disk', 'offsite': False}, {'media': 'disk', 'offsite': False}, {'media': 'cloud', 'offsite': True}]) == True" },
+      { name: "only two copies", expr: "three_two_one([{'media': 'disk', 'offsite': False}, {'media': 'cloud', 'offsite': True}]) == False" },
+      { name: "three copies on one kind of media", expr: "three_two_one([{'media': 'disk', 'offsite': False}, {'media': 'disk', 'offsite': False}, {'media': 'disk', 'offsite': True}]) == False" },
+      { name: "nothing off-site", expr: "three_two_one([{'media': 'disk', 'offsite': False}, {'media': 'tape', 'offsite': False}, {'media': 'disk', 'offsite': False}]) == False" },
+      { name: "more than enough", expr: "three_two_one([{'media': 'disk', 'offsite': False}, {'media': 'tape', 'offsite': True}, {'media': 'cloud', 'offsite': True}, {'media': 'disk', 'offsite': False}]) == True" },
+      { name: "no copies at all", expr: "three_two_one([]) == False" },
+    ],
+    solution: "def three_two_one(copies):\n    media = set(c['media'] for c in copies)\n    offsite = [c for c in copies if c['offsite']]\n    return len(copies) >= 3 and len(media) >= 2 and len(offsite) >= 1\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
