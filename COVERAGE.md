@@ -122,7 +122,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ◐ | ● | Proxy types: forward, reverse, SOCKS, transparent | 3 mentions in 1 docs, most in 0035-how-the-web-works. | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
 | ○* | ● | SSH local, remote and dynamic forwarding | 4 mentions in 1 docs, most in 0021-firewalls-and-segmentation. *Every hit is NAT port forwarding on a firewall. SSH forwarding is never taught.* | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
 | ○ | ● | proxychains, chisel, ligolo-ng (tool) | None. | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
-| ○ | ● | Pivoting through a compromised host | 4 mentions in 2 docs, most in 0065-forensic-principles. | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
+| ○ | ● | Pivoting through a compromised host | 6 mentions in 2 docs, most in 0066-threat-intelligence. | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
 | ○ | ● | Bind and reverse shells | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | Protocol tunnelling and its detection | None. *Section 'hiding in protocols' and the detection list.* | [Proxies, pivoting and tunnels](modules/01-networking/10-proxies-pivoting-and-tunnels.md) |
 | ◐ | ● | Denial of service classes | 6 mentions in 4 docs, most in 0001-what-security-protects, practice 5. | [Denial of service](modules/01-networking/13-denial-of-service.md) |
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 52 mentions in 15 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 53 mentions in 15 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 37 mentions in 4 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -609,7 +609,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 | ◐ | ● | Splunk and SPL (tool) | 10 mentions in 2 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ◐ | ● | Elastic stack and KQL (tool) | 10 mentions in 4 docs, most in 0052-logs-and-siem, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ○ | ● | Microsoft Sentinel (tool) | 1 mentions in 1 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | Writing correlation rules, tuning false positives | 34 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
+| ● | ● | Writing correlation rules, tuning false positives | 35 mentions in 16 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
 | ●* | ● | Sigma (tool) | 20 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | SOAR and playbooks | 21 mentions in 9 docs, most in P06, practice 1. |  |
 
@@ -685,9 +685,9 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 |---|---|---|---|---|
 | ●* | ● | Intelligence lifecycle and levels | None. *Lesson 66, 'The cycle' and 'Levels'.* |  |
 | ●* | ● | IOCs versus TTPs | 9 mentions in 5 docs, most in 0053-attck-and-the-pyramid-of-pain. *Lesson 53, 'Clues and habits'.* |  |
-| ○ | ● | STIX and TAXII | 2 mentions in 1 docs, most in 0066-threat-intelligence. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
-| ◐* | ● | MISP, OpenCTI (tool) | 7 mentions in 2 docs, most in P12. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
-| ● | ● | Traffic Light Protocol | 16 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
+| ○ | ● | STIX and TAXII | 4 mentions in 1 docs, most in 0066-threat-intelligence. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
+| ◐* | ● | MISP, OpenCTI (tool) | 9 mentions in 2 docs, most in 0066-threat-intelligence. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
+| ● | ● | Traffic Light Protocol | 19 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ◐ | ● | Attribution and its limits | 5 mentions in 2 docs, most in 0066-threat-intelligence. | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 32 mentions in 10 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ○ | ● | The underground economy: IABs, RaaS | None. *Section 'Crime as a supply chain'.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
@@ -958,7 +958,7 @@ Basis: Added: CyBOK Human Factors, Privacy & Online Rights, Formal Methods, Dist
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ○ | ● | Social engineering principles | 1 mentions in 1 docs, most in 0069-supply-chain-and-pipelines. *Section 'why it works'. The word count credited the physical security module.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
-| ●* | ● | Phishing analysis | 38 mentions in 18 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
+| ●* | ● | Phishing analysis | 39 mentions in 18 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Pretexting, vishing, smishing | None. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ◐ | ● | Business email compromise | 3 mentions in 2 docs, most in 0054-phishing-analysis, practice 1. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Usable security | None. *The module's subject.* | [Usable security and culture](modules/16-human-privacy-research/02-usable-security.md) |

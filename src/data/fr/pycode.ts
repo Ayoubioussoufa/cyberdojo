@@ -1292,4 +1292,48 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "rien à proximité",
     ],
   },
+  "diamond-pivot": {
+    prompt: "Écrivez pivot(events, infrastructure) : events est une liste de dicts avec 'victim', 'infrastructure' et 'capability'. Renvoyez un dict avec 'victims', les victimes triées des événements qui ont utilisé cette infrastructure, et 'related', les infrastructures triées (autres que celle donnée) vues dans un événement dont la capacité a été utilisée avec cette infrastructure. Chaque nom apparaît une fois.",
+    tests: [
+      "à partir du domaine",
+      "à partir d'une adresse utilisée avec deux capacités",
+      "une capacité que personne d'autre n'a utilisée",
+      "une infrastructure jamais vue",
+      "une victime touchée deux fois est listée une fois",
+    ],
+  },
+  "tlp-share": {
+    prompt: "Écrivez may_share(label, audience) : label est une étiquette TLP 2.0 comme 'TLP:AMBER', dans n'importe quelle casse et peut-être entourée d'espaces. audience est l'un de 'named recipients', 'own organisation', 'clients', 'community' ou 'public'. Renvoyez True quand l'étiquette permet le partage avec ce public. Traitez une étiquette inconnue comme TLP:RED, le choix le plus sûr.",
+    tests: [
+      "RED reste chez les destinataires nommés",
+      "AMBER+STRICT reste dans l'organisation",
+      "AMBER atteint les clients, pas la communauté",
+      "GREEN atteint la communauté, pas le public",
+      "CLEAR va partout",
+      "des étiquettes écrites sans soin",
+      "une étiquette inconnue est traitée comme RED",
+    ],
+  },
+  "extract-iocs": {
+    prompt: "Écrivez extract_iocs(text) : réarmez le texte (remplacez [.] par . et hxxp par http), puis renvoyez un dict avec 'ips' (les adresses IPv4), 'sha256' (les empreintes hexadécimales de 64 caractères, en minuscules) et 'urls' (les URL http ou https, sans . , ; ou ) final). Chaque liste est triée, avec chaque valeur une seule fois.",
+    tests: [
+      "les adresses du rapport",
+      "l'empreinte, en minuscules",
+      "les URL, réarmées et sans le point final",
+      "une URL entre parenthèses",
+      "une empreinte citée deux fois est listée une fois",
+      "un texte qui n'en contient aucun",
+    ],
+  },
+  "indicator-age": {
+    prompt: "Écrivez still_active(indicators, today) : indicators est une liste de dicts avec 'value', 'type' ('ip', 'domain' ou 'sha256') et 'last_seen', une date 'YYYY-MM-DD'. Un indicateur reste actif 30 jours après sa dernière observation si c'est une ip, 90 jours pour un domaine et 365 jours pour un sha256, dernier jour compris. Renvoyez les valeurs triées des indicateurs encore actifs à la date today.",
+    tests: [
+      "une adresse récente",
+      "une adresse non vue depuis huit semaines",
+      "un domaine vu le même jour dure plus longtemps",
+      "une empreinte dure un an",
+      "le dernier jour compte encore",
+      "une liste entière, triée",
+    ],
+  },
 };
