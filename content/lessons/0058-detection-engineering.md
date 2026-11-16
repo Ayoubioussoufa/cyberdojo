@@ -2,7 +2,7 @@
 title: Detection engineering
 summary: The detection lifecycle, reading a Sigma rule line by line, detection as code, tuning false positives, and measuring coverage honestly.
 month: 11
-minutes: 55
+minutes: 80
 builds: write, test and tune a Sigma rule
 source: SigmaHQ, rules and specification | https://github.com/SigmaHQ/sigma
 words: detection, Sigma, purple team
@@ -81,7 +81,40 @@ tags:
 | `level` | How serious a match is |
 | `tags` | The ATT&CK mapping |
 
+`endswith` is one of a handful of modifiers, and they cover most rules you'll read:
+
+| Written as | Matches when the field… |
+|---|---|
+| `Image: 'C:\Windows\System32\cmd.exe'` | Equals the value |
+| `Image\|endswith: '\cmd.exe'` | Ends with it |
+| `Image\|startswith: 'C:\Users\'` | Starts with it |
+| `CommandLine\|contains: '-enc'` | Has it anywhere inside |
+| `CommandLine\|contains\|all:` then a list | Has every item of the list, not just one |
+
+Plain string matching in Sigma ignores upper and lower case, so `\WINWORD.EXE` also matches `\winword.exe`.
+
+The matching logic is small enough to write, and writing it removes all the mystery from the format. A selection is a dict. Every field in it must match, and a field given a list matches when any item does.
+
+@code sigma-selection
+
 [Sigma](https://github.com/SigmaHQ/sigma) is vendor-neutral, so tools convert one rule into your SIEM's language. The [sigma-cli](https://github.com/SigmaHQ/sigma-cli) tool does this with a command like `sigma convert -t splunk rule.yml`.
+
+Install the converter in a virtual environment and try it on the rule above:
+
+```
+pip install sigma-cli
+sigma plugin install splunk
+sigma check rule.yml
+sigma convert -t splunk -p sysmon rule.yml
+```
+
+`sigma check` reads the rule and reports mistakes in its structure, which is the first thing CI should run. `convert` needs a **target**, the query language, and usually a **pipeline**, which tells it what the fields are called in your data. `sigma list targets` and `sigma list pipelines` show what's installed. The output is an ordinary search in the target's language, roughly:
+
+```
+ParentImage IN ("*\\WINWORD.EXE", "*\\EXCEL.EXE") Image IN ("*\\cmd.exe", "*\\powershell.exe")
+```
+
+One rule, written once, becomes a query for whichever SIEM you're given.
 
 ?? In the rule above, how do the two lists under `selection` combine?
 + Any listed parent, and also any listed child
@@ -102,6 +135,19 @@ Run atomic tests only in your own lab, on a snapshot. Read each test before you 
 Let an LLM draft ten rules. Test each one, and keep only what fires without flooding you. Report drafted, valid and kept. AI drafts, tests decide.
 :::
 
+A test is a set of events for which you already know the right answer. Keep them beside the rule: some that must fire, and some that look similar and must not.
+
+| Event | Parent | Child | Should fire? |
+|---|---|---|---|
+| A document starts PowerShell | `WINWORD.EXE` | `powershell.exe` | Yes |
+| A spreadsheet starts a shell | `EXCEL.EXE` | `cmd.exe` | Yes |
+| An admin opens PowerShell from the desktop | `explorer.exe` | `powershell.exe` | No |
+| Word starts its print helper | `WINWORD.EXE` | `splwow64.exe` | No |
+
+Two numbers come out of a run. **Precision** asks: of the times the rule fired, how many were real? **Recall** asks: of the real cases, how many did it catch? A rule that fires on everything has perfect recall and useless precision, and a rule that never fires has the opposite problem. You need both, and you report both.
+
+@code precision-recall
+
 ?? A rule has never fired in six months. What does that tell you?
 + Nothing yet, so test whether it really works
 - The attacker has been scared off by it
@@ -117,6 +163,10 @@ Rules are code, so treat them like code. Keep them in Git, with a review for eac
 
 This gives you history (who changed what, and why), peer review, and a safe way to roll back a bad rule. It's the gate for [P08](/projects/P08/): 15 or more rules with test evidence, in a repository with CI.
 
+The first check CI runs is the cheapest: does every rule have the parts a rule needs? A missing `id` or an invented `level` should fail a pull request before a person spends time reviewing the logic.
+
+@code sigma-lint
+
 ?? Why keep detections in Git rather than editing them directly in the SIEM?
 + Changes get review, history and easy rollback
 - Git makes every rule run much faster
@@ -131,6 +181,27 @@ Noise kills detections. Tune by **context**, not by turning a rule off:
 - Exclude a specific, known-good parent and path, not a whole product.
 - Give every exclusion a reason and an expiry date.
 - Measure precision over time.
+
+In Sigma, an exclusion is a second selection, and the condition subtracts it:
+
+```yaml
+detection:
+  selection:
+    ParentImage|endswith:
+      - '\WINWORD.EXE'
+      - '\EXCEL.EXE'
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+  filter_addin:
+    ParentCommandLine|contains: '\Contoso\ReportAddin\'
+    Image|endswith: '\cmd.exe'
+  condition: selection and not filter_addin
+```
+
+Read the filter as narrowly as it's written: only this add-in's folder, and only when the child is `cmd.exe`. PowerShell from the same add-in still alerts. Every field you add to a filter makes the hole smaller, and a filter with one loose field, such as a user name, is a hiding place.
+
+@code sigma-filter
 
 ?? A rule fires 500 times a day on one signed backup tool. What's the best move?
 + Add a narrow, documented exclusion for it
@@ -155,5 +226,43 @@ An [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) layer ca
 - Coverage percentages are banned by the framework
 - Eighty percent is the highest score possible
 => A colour on a map isn't evidence. Honest coverage comes from tests, with each variation named.
+
+## Review a rule
+
+A colleague opens a pull request with a new detection and its test results. Three things you check.
+
+```yaml
+detection:
+  selection:
+    CommandLine|contains: 'powershell'
+  condition: selection
+```
+
+?? What's wrong with that selection?
++ It matches every single ordinary use of PowerShell
+- It can never match any event at all
+- It only matches command lines in upper case
+- It needs a second rule to convert it
+=> Administrators and management tools run PowerShell all day. A rule this broad buries the real cases in noise, and people stop reading its alerts.
+
+?? In testing, the rule fired on 8 events, and 6 of them were malicious. There were 10 malicious events in the test set. What's its precision?
++ `0.75`
+- `0.6`
+- `0.8`
+- `0.48`
+=> Precision is 6 real out of 8 fired. The 0.6 is its recall: 6 caught out of 10 that happened. Both belong in the pull request.
+
+```yaml
+  filter_backup:
+    User: 'svc_backup'
+  condition: selection and not filter_backup
+```
+
+?? Why should you push back on that exclusion?
++ Anything that account does is now invisible
+- Service accounts never appear in any logs
+- Filters are not allowed in Sigma rules
+- The account name is in lower case
+=> The filter trusts a whole account, so an attacker who obtains it can do anything this rule was written to catch. Narrow it to the backup tool's own program and path, and write down why.
 
 ?! Write the hypothesis, data source and known false positives for a detection of a new service being installed.

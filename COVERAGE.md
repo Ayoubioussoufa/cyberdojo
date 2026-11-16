@@ -604,13 +604,13 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 |---|---|---|---|---|
 | ● | ● | SOC tiers and alert triage | 68 mentions in 28 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ●* | ● | Log sources and pipelines | 15 mentions in 7 docs, most in P06. *Lesson 52, 'What each log proves'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | SIEM concepts | 40 mentions in 16 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ● | ● | SIEM concepts | 41 mentions in 16 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Wazuh (tool) | 20 mentions in 5 docs, most in P06, practice 1. |  |
 | ◐ | ● | Splunk and SPL (tool) | 10 mentions in 2 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ◐ | ● | Elastic stack and KQL (tool) | 10 mentions in 4 docs, most in 0052-logs-and-siem, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ○ | ● | Microsoft Sentinel (tool) | 1 mentions in 1 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Writing correlation rules, tuning false positives | 34 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
-| ●* | ● | Sigma (tool) | 17 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ●* | ● | Sigma (tool) | 20 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | SOAR and playbooks | 18 mentions in 8 docs, most in P06, practice 1. |  |
 
 ### Threat hunting

@@ -940,4 +940,48 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "les lignes répétées comptent une fois",
     ],
   },
+  "sigma-selection": {
+    prompt: "Écrivez matches(event, selection) : event est un dict qui associe des noms de champs à des valeurs. selection est un dict dont les clés sont un nom de champ, suivi éventuellement de | et d'un modificateur (endswith, startswith ou contains), et dont les valeurs sont une valeur voulue ou une liste de valeurs. Renvoyez True quand chaque clé correspond : l'événement a le champ, et au moins une valeur voulue lui correspond. value_matches est fourni et ignore la casse.",
+    tests: [
+      "Word qui lance PowerShell",
+      "Excel qui lance cmd, en minuscules",
+      "le bureau qui lance PowerShell",
+      "Word qui lance son assistant d'impression",
+      "un événement sans le champ ne correspond pas",
+      "une valeur seule avec contains",
+      "une clé simple signifie égal",
+    ],
+  },
+  "sigma-filter": {
+    prompt: "Écrivez rule_fires(event, selection, filters) : la règle se déclenche quand l'événement correspond à selection et ne correspond à aucun des filtres. filters est une liste de dicts de sélection, et peut être vide. Une fonction matches qui fonctionne est fournie.",
+    tests: [
+      "sans filtre, elle se comporte comme la sélection",
+      "le module qui lance cmd est exclu",
+      "le même module qui lance PowerShell déclenche encore la règle",
+      "un autre document qui lance cmd déclenche encore la règle",
+      "un événement qui n'a jamais correspondu à la sélection ne déclenche rien",
+    ],
+  },
+  "precision-recall": {
+    prompt: "Écrivez precision_recall(results) : results est une liste de paires (fired, malicious) de True ou False, une par événement de test. Renvoyez (précision, rappel). La précision est la part des événements déclenchés qui étaient malveillants, et le rappel est la part des événements malveillants qui ont déclenché la règle. Quand rien ne s'est déclenché, la précision vaut 0, et quand rien n'était malveillant, le rappel vaut 0.",
+    tests: [
+      "les nombres de la leçon",
+      "une règle parfaite",
+      "une règle qui se déclenche sur tout",
+      "une règle qui ne se déclenche jamais",
+      "aucun événement malveillant dans le jeu de test",
+      "aucun résultat",
+    ],
+  },
+  "sigma-lint": {
+    prompt: "Écrivez lint(rule) : rule est une règle Sigma déjà chargée dans un dict. Renvoyez la liste des problèmes, dans cet ordre : 'no title', 'no id', 'no logsource' et 'no detection' quand cette clé manque ou est vide ; 'no condition' quand detection est présent mais n'a pas de 'condition' ; et 'bad level' quand level n'est pas informational, low, medium, high ou critical. Une bonne règle donne une liste vide.",
+    tests: [
+      "une règle complète",
+      "un niveau inventé",
+      "pas d'id",
+      "une détection sans condition",
+      "un titre vide compte comme manquant",
+      "une règle vide manque de tout",
+    ],
+  },
 };
