@@ -496,7 +496,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Malware taxonomy: virus, worm, trojan, RAT, loader | 7 mentions in 3 docs, most in 0067-safe-malware-triage, practice 10. *Lesson 67, 'What malware does'.* | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
-| ◐ | ● | Ransomware and double extortion | 20 mentions in 10 docs, most in 0001-what-security-protects, practice 7. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
+| ◐ | ● | Ransomware and double extortion | 21 mentions in 11 docs, most in 0001-what-security-protects, practice 7. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Wipers | None. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Botnets | None. | [Firmware and IoT security](modules/15-wireless-mobile-hardware-ot/06-firmware-and-iot.md) |
 | ◐ | ● | Infostealers | 4 mentions in 1 docs, most in 0067-safe-malware-triage. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
@@ -814,11 +814,11 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Risk language: asset, threat, vulnerability, likelihood, impact | 10 mentions in 4 docs, most in 0010-the-language-of-risk, practice 8. *Lesson 10.* |  |
-| ●* | ● | Risk assessment methods | 18 mentions in 10 docs, most in P09, practice 4. *Lesson 60.* |  |
+| ●* | ● | Risk assessment methods | 20 mentions in 10 docs, most in 0061-frameworks, practice 4. *Lesson 60.* |  |
 | ○ | ● | Quantitative risk: FAIR | 6 mentions in 1 docs, most in 0060-risk-assessment. | [Quantitative risk with FAIR](modules/12-grc/03-quantitative-risk.md) |
-| ● | ● | NIST CSF 2.0 | 23 mentions in 9 docs, most in 0061-frameworks, practice 7. |  |
+| ● | ● | NIST CSF 2.0 | 32 mentions in 9 docs, most in 0061-frameworks, practice 7. |  |
 | ○ | ● | NIST RMF, SP 800-53 | 3 mentions in 3 docs, most in d1-ai-what-changed. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
-| ● | ● | ISO/IEC 27001 and 27002 | 20 mentions in 6 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
+| ● | ● | ISO/IEC 27001 and 27002 | 23 mentions in 6 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | CIS Controls and Benchmarks | 12 mentions in 4 docs, most in 0061-frameworks, practice 3. |  |
 | ● | ● | Security policies, standards, procedures | 31 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 9 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
@@ -947,7 +947,7 @@ Basis: Added: CyBOK Hardware, Cyber-Physical Systems, Physical Layer & Telecoms,
 | ○ | ● | ICS protocols: Modbus, DNP3 | None. | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
 | ○ | ● | IEC 62443 | None. *Named as the standard, with zones and conduits.* | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
 | ○ | ● | ATT&CK for ICS, Stuxnet, Industroyer | None. | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
-| ◐ | ● | Physical security | 5 mentions in 4 docs, most in P03, practice 2. | [Physical security](modules/15-wireless-mobile-hardware-ot/09-physical-security.md) |
+| ◐ | ● | Physical security | 6 mentions in 4 docs, most in 0061-frameworks, practice 2. | [Physical security](modules/15-wireless-mobile-hardware-ot/09-physical-security.md) |
 
 ## 16 Human factors, privacy and research foundations
 

@@ -1070,4 +1070,50 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "plusieurs problèmes, dans l'ordre",
     ],
   },
+  "csf-id": {
+    prompt: "Écrivez parse_csf(text) : text est un identifiant de sous-catégorie du NIST CSF 2.0, comme ID.AM-01. Renvoyez (fonction, catégorie, numéro) : le nom complet de la fonction en anglais (GV Govern, ID Identify, PR Protect, DE Detect, RS Respond, RC Recover), les deux lettres de la catégorie, et le numéro sous forme d'entier. Renvoyez None quand les lettres de la fonction ne sont pas l'une des six.",
+    tests: [
+      "l'inventaire du matériel",
+      "un résultat de Govern",
+      "la surveillance continue",
+      "un numéro à deux chiffres",
+      "respond et recover",
+      "une fonction inconnue",
+    ],
+  },
+  "annex-a-control": {
+    prompt: "Écrivez annex_theme(control) : control est un identifiant de l'Annexe A d'ISO/IEC 27001:2022, comme A.8.13. Renvoyez son thème : 'organisational' pour A.5 (mesures 1 à 37), 'people' pour A.6 (1 à 8), 'physical' pour A.7 (1 à 14) et 'technological' pour A.8 (1 à 34). Renvoyez None pour tout le reste : une clause hors de 5 à 8, un numéro hors plage, ou les identifiants en trois parties de l'édition 2013.",
+    tests: [
+      "la sauvegarde des informations",
+      "le contrôle d'accès",
+      "la sensibilisation",
+      "les accès physiques",
+      "la dernière mesure de chaque thème",
+      "une de plus que la dernière n'existe pas",
+      "une mesure inventée",
+      "la numérotation de 2013",
+    ],
+  },
+  "soa-problems": {
+    prompt: "Écrivez soa_problems(rows) : rows est une Déclaration d'applicabilité, une liste de dicts avec 'control', 'applies' (True ou False), 'reason' (un texte, parfois vide) et 'implemented' (True ou False). Renvoyez une liste de paires (control, problème) dans l'ordre des lignes : 'no reason' quand la raison est vide ou ne contient que des espaces, que la mesure s'applique ou non, puis 'not implemented' quand la mesure s'applique et n'est pas mise en œuvre.",
+    tests: [
+      "une ligne complète",
+      "une exclusion justifiée est correcte",
+      "une exclusion sans raison",
+      "des espaces ne sont pas une raison",
+      "applicable mais pas encore en place",
+      "les deux problèmes, sur plusieurs lignes",
+    ],
+  },
+  "gap-plan": {
+    prompt: "Écrivez gap_plan(rows) : rows est une analyse d'écarts, une liste de dicts avec 'safeguard', 'status' ('done', 'partial' ou 'missing') et 'priority' ('high', 'medium' ou 'low'). Renvoyez les noms des mesures qui ne sont pas faites, triés par priorité (high d'abord), puis missing avant partial, et sinon dans leur ordre d'origine.",
+    tests: [
+      "la ligne de la leçon",
+      "les lignes faites sont écartées",
+      "high passe avant low",
+      "missing passe avant partial",
+      "les égalités gardent leur ordre",
+      "une analyse complète",
+    ],
+  },
 };
