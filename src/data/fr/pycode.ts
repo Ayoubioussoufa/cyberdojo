@@ -1801,4 +1801,44 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un prix plus bas",
     ],
   },
+  "exam-ready": {
+    prompt: "Écrivez ready(scores, passing, needed) : scores est la liste de vos résultats aux examens blancs, du plus ancien au plus récent. Renvoyez True quand vous avez passé au moins needed examens et que les needed derniers sont tous au niveau de passing ou au-dessus.",
+    tests: [
+      "les deux derniers sont réussis",
+      "une bonne note après de mauvaises",
+      "une bonne note suivie d'une mauvaise",
+      "la note de passage exacte compte",
+      "pas encore assez d'examens",
+    ],
+  },
+  "follow-ups": {
+    prompt: "Écrivez follow_ups(apps, today) : apps est une liste de dicts avec 'company', 'applied' (une date 'YYYY-MM-DD'), 'status' et 'followed_up'. Renvoyez les entreprises triées à relancer aujourd'hui : status vaut 'no reply', aucune relance n'a été faite, et au moins 7 jours ont passé depuis la candidature.",
+    tests: [
+      "le journal de la leçon",
+      "trop tôt pour relancer",
+      "un entretien n'a pas besoin de relance",
+      "déjà relancée",
+      "pile sept jours",
+    ],
+  },
+  "skills-match": {
+    prompt: "Écrivez match(required, have) : les deux sont des listes de compétences. Comparez-les en minuscules. Renvoyez (percent, missing) : percent est la part des compétences demandées que vous avez, sous forme d'entier arrondi à l'inférieur, et missing est la liste triée des compétences demandées que vous n'avez pas, en minuscules. Les compétences que vous avez sans qu'elles soient demandées ne changent rien.",
+    tests: [
+      "l'annonce de la leçon",
+      "une correspondance parfaite",
+      "rien en commun",
+      "arrondi à l'inférieur",
+      "des compétences en plus ne montent pas le score",
+    ],
+  },
+  "star-check": {
+    prompt: "Écrivez star_problems(story) : story est un dict qui devrait contenir 'situation', 'task', 'action' et 'result'. Renvoyez les problèmes dans cet ordre : 'missing ' suivi du nom de chaque partie absente ou vide, dans l'ordre S, T, A, R, puis 'no number in result' quand le résultat est présent mais ne contient aucun chiffre.",
+    tests: [
+      "l'histoire de la leçon",
+      "aucun résultat",
+      "un résultat sans mesure",
+      "des parties vides",
+      "une histoire vide",
+    ],
+  },
 };
