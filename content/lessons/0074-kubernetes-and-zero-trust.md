@@ -2,7 +2,7 @@
 title: Kubernetes and zero trust
 summary: The cluster's moving parts, hardening with RBAC and policies, runtime detection, the idea of never trusting by location, and writing an ADR.
 month: 19
-minutes: 55
+minutes: 80
 builds: a hardened local cluster and one architecture decision record
 source: Kubernetes security checklist | https://kubernetes.io/docs/concepts/security/security-checklist/
 words: pod, zero trust, ADR
@@ -52,6 +52,59 @@ Default-deny NetworkPolicies are the same idea as your firewall in Month 3. Chec
 
 By default, every pod can usually reach every other pod, which turns one compromised pod into a foothold for the rest. And each pod has a **service account**, so a stolen token can call the API with whatever rights that account holds.
 
+Here's what the Restricted profile asks for, written into a pod:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+  namespace: shop
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: web
+      image: registry.example/shop@sha256:4f1a…
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+```
+
+Each line removes something an attacker inside the container would use: root, extra kernel capabilities, the chance to gain privileges through a setuid program, a writable filesystem, and a service-account token the web server never needed. Label the namespace `pod-security.kubernetes.io/enforce: restricted`, and the API server rejects pods that don't comply.
+
+@code pod-security-check
+
+A default-deny policy for a namespace is four lines of `spec`. An empty `podSelector` selects every pod in the namespace, and listing `Ingress` with no rules allows nothing in:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: shop
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+```
+
+Then you add one policy for each conversation that should happen, such as the API reaching the database. The rule is easy to get backwards: a pod that **no** policy selects accepts traffic from anywhere, and a pod that any policy selects accepts only what those policies allow.
+
+@code network-policy
+
+RBAC is checked the same way. A Role lists rules, and three patterns deserve a finding: a `*` in verbs or resources, reading `secrets`, and `pods/exec`, which is a shell in someone else's container. Ask the cluster what an identity can really do rather than reading YAML:
+
+```
+kubectl auth can-i --list --as=system:serviceaccount:shop:default -n shop
+```
+
+@code rbac-review
+
 @drill k8s-control
 
 ?? Which Pod Security Standard is the most locked down?
@@ -73,6 +126,18 @@ Have an LLM generate manifests, then validate them. Tally the insecure defaults:
 
 Prevention will sometimes fail. **Falco** watches what containers do at the system-call level, and it alerts on behaviour such as a shell starting inside a web server's container. Since containers should do one narrow job, unusual behaviour stands out clearly. It's the Pyramid of Pain again: detect behaviour.
 
+A Falco rule reads like a sentence:
+
+```yaml
+- rule: Shell in a web container
+  desc: A shell started inside a container
+  condition: spawned_process and container and proc.name in (bash, sh)
+  output: "Shell in container (user=%user.name container=%container.name cmd=%proc.cmdline)"
+  priority: WARNING
+```
+
+`spawned_process` and `container` are macros from Falco's default rules: a new process, inside a container. The output line pulls fields from the event, so the alert says who, where and what without anyone opening a log.
+
 ?? Why is detecting odd behaviour often easier in a container than on a laptop?
 + Containers do one narrow, predictable job
 - Containers cannot ever run a shell
@@ -87,6 +152,18 @@ Old thinking: inside the network means trusted. Think of a castle: once past the
 @flow Who are you? > Is the device healthy? > Is this allowed now? > Grant narrowly > Keep checking
 
 It's a direction, not a product. The [CISA maturity model](https://www.cisa.gov/zero-trust-maturity-model) helps you plan the steps.
+
+Written as code, a zero-trust decision looks at the request, not at the network it came from:
+
+| Check | If it fails |
+|---|---|
+| The role may use this resource | Deny |
+| The device is managed, for a sensitive resource | Deny |
+| MFA was completed recently | Ask for it again |
+
+The source network appears nowhere in that table. A request from the office and one from a café are judged by the same facts.
+
+@code zero-trust-decision
 
 ?? What does "zero trust" actually mean?
 + Nothing is trusted for its network location
@@ -114,5 +191,41 @@ Consequences: Slightly slower logins. Contractors need managed devices.
 - A complete copy of all the source code
 - The names of all the attendees' many pets
 => Six months on, nobody remembers why. The reasoning stops the team repeating a debate, or undoing a good decision.
+
+## Review a manifest
+
+A team asks you to approve this before it ships.
+
+```yaml
+spec:
+  containers:
+    - name: api
+      image: registry.example/api:latest
+      securityContext:
+        privileged: true
+```
+
+And the namespace has no NetworkPolicy at all.
+
+?? What does `privileged: true` give the container?
++ Nearly the power of root on its node
+- Faster access to the cluster's own internal network
+- A much larger share of the node's memory
+- Permission to read only its own log files
+=> A privileged container can reach the host's devices and kernel features, so escaping to the node is easy. The Restricted profile forbids it.
+
+?? What does the missing NetworkPolicy mean for this pod?
++ Any pod in the cluster can reach it
+- No pod at all can ever reach it
+- Only pods in its namespace can reach it
+- Only the API server itself can reach it
+=> A pod that no policy selects accepts traffic from everywhere. Add a default-deny policy, then allow only the callers it needs.
+
+?? Why is `:latest` a problem here?
++ Nobody can say which image is actually running
+- Kubernetes simply refuses every single image tagged latest
+- Latest images are always the slowest to start
+- The tag makes the container run as root
+=> `latest` moves each time someone pushes. Pin by digest, as in lesson 69, so that what was reviewed is what runs.
 
 ?! Write a short ADR: "Why our admin panel requires a managed device, rather than just a VPN."

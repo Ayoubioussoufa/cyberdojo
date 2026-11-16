@@ -147,7 +147,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ○ | ● | POSIX ACLs | None. *Section on discretionary access.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | Linux capabilities | None. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | SELinux and AppArmor | Practice only (1). | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ○* | ● | seccomp, namespaces, cgroups | 16 mentions in 3 docs, most in P14, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
+| ○* | ● | seccomp, namespaces, cgroups | 24 mentions in 3 docs, most in P14, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ● | ● | auditd (tool) | 11 mentions in 3 docs, most in P06. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | eBPF for security | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | Kernel modules | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
@@ -170,7 +170,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Processes, threads, handles, core system processes | 31 mentions in 4 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
-| ● | ● | The registry | 37 mentions in 13 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | The registry | 39 mentions in 14 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ● | ● | NTFS, $MFT, alternate data streams | 14 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ● | ● | Access tokens and SIDs | 23 mentions in 2 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 56 mentions in 17 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 57 mentions in 18 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 37 mentions in 4 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -731,9 +731,9 @@ Basis: Brief 10.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | How containers isolate | 7 mentions in 2 docs, most in 0029-tests-and-docker, practice 1. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
+| ◐ | ● | How containers isolate | 9 mentions in 2 docs, most in 0029-tests-and-docker, practice 1. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ●* | ● | Dockerfile and image hardening | 27 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
-| ◐ | ● | Container escape classes | 2 mentions in 1 docs, most in P14, practice 2. *Causes and defences, deliberately not techniques.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
+| ◐ | ● | Container escape classes | 3 mentions in 2 docs, most in P14, practice 2. *Causes and defences, deliberately not techniques.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 | ●* | ● | Trivy, Grype (tool) | 11 mentions in 3 docs, most in 0069-supply-chain-and-pipelines. *Walked through in project P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ○ | ● | Container runtime security | None. | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 
@@ -741,13 +741,13 @@ Basis: Brief 10.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Kubernetes architecture | 22 mentions in 8 docs, most in 0074-kubernetes-and-zero-trust, practice 6. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
+| ● | ● | Kubernetes architecture | 23 mentions in 8 docs, most in 0074-kubernetes-and-zero-trust, practice 6. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
 | ○ | ● | Kubernetes RBAC | Practice only (3). | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
 | ● | ● | Pod Security Standards and admission control | 27 mentions in 3 docs, most in P14, practice 3. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
-| ◐ | ● | NetworkPolicy | 5 mentions in 2 docs, most in P14, practice 3. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
+| ◐ | ● | NetworkPolicy | 8 mentions in 2 docs, most in 0074-kubernetes-and-zero-trust, practice 3. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
 | ◐ | ● | Kubernetes secrets and etcd | 5 mentions in 2 docs, most in 0074-kubernetes-and-zero-trust. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
 | ○ | ● | Kubernetes attack paths | None. *From the defender's side.* | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
-| ● | ● | kube-bench, Falco (tool) | 26 mentions in 2 docs, most in P14, practice 3. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
+| ● | ● | kube-bench, Falco (tool) | 28 mentions in 2 docs, most in P14, practice 3. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 
 ### Infrastructure as code
 
@@ -767,7 +767,7 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Authentication versus authorisation | 3 mentions in 3 docs, most in 0048-access-control-that-holds. *Lesson 41.* |  |
-| ● | ● | Access control models: RBAC, ABAC, ReBAC | 15 mentions in 5 docs, most in 0041-identity-and-access, practice 4. | [Azure security](modules/10-cloud/02-azure-security.md) |
+| ● | ● | Access control models: RBAC, ABAC, ReBAC | 16 mentions in 5 docs, most in 0041-identity-and-access, practice 4. | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | Formal models: Bell-LaPadula, Biba, Clark-Wilson | Practice only (2). | [Formal access control models](modules/11-identity/01-formal-access-models.md) |
 | ●* | ● | Least privilege, separation of duties | 15 mentions in 10 docs, most in 0007-users-and-permissions, practice 3. *Lesson 7, 'Least privilege', and lesson 41.* |  |
 | ●* | ● | Privileged access management, just-in-time | 4 mentions in 1 docs, most in 0041-identity-and-access. *Lesson 41, 'Reducing standing privilege'.* |  |
@@ -778,7 +778,7 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | MFA factors and strength | 62 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
+| ●* | ● | MFA factors and strength | 63 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ○ | ● | TOTP mechanics | None. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ● | ● | FIDO2, WebAuthn, passkeys | 13 mentions in 3 docs, most in 0041-identity-and-access. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ◐ | ● | Credential stuffing and spraying | 4 mentions in 3 docs, most in 0040-storing-passwords. *Section on guessing at scale.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
@@ -820,7 +820,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ○ | ● | NIST RMF, SP 800-53 | 3 mentions in 3 docs, most in d1-ai-what-changed. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | ISO/IEC 27001 and 27002 | 25 mentions in 8 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | CIS Controls and Benchmarks | 12 mentions in 4 docs, most in 0061-frameworks, practice 3. |  |
-| ● | ● | Security policies, standards, procedures | 36 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
+| ● | ● | Security policies, standards, procedures | 37 mentions in 14 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 11 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ◐ | ● | Security metrics and reporting to a board | 38 mentions in 20 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
