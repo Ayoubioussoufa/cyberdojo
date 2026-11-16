@@ -496,7 +496,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Malware taxonomy: virus, worm, trojan, RAT, loader | 7 mentions in 3 docs, most in 0067-safe-malware-triage, practice 10. *Lesson 67, 'What malware does'.* | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
-| ◐ | ● | Ransomware and double extortion | 20 mentions in 10 docs, most in 0001-what-security-protects, practice 7. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
+| ◐ | ● | Ransomware and double extortion | 21 mentions in 11 docs, most in 0001-what-security-protects, practice 7. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Wipers | None. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Botnets | None. | [Firmware and IoT security](modules/15-wireless-mobile-hardware-ot/06-firmware-and-iot.md) |
 | ◐ | ● | Infostealers | 4 mentions in 1 docs, most in 0067-safe-malware-triage. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
@@ -581,7 +581,7 @@ Basis: Brief 7, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | VPN concepts | 18 mentions in 8 docs, most in 0021-firewalls-and-segmentation, practice 6. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
+| ● | ● | VPN concepts | 19 mentions in 9 docs, most in 0021-firewalls-and-segmentation, practice 6. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | WireGuard (tool) | 2 mentions in 1 docs, most in 0021-firewalls-and-segmentation. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | IPsec: IKE, ESP, tunnel versus transport | 1 mentions in 1 docs, most in 0021-firewalls-and-segmentation. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
 | ○ | ● | OpenVPN (tool) | None. | [VPN internals](modules/07-network-security/06-vpn-internals.md) |
@@ -602,7 +602,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | SOC tiers and alert triage | 68 mentions in 28 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
+| ● | ● | SOC tiers and alert triage | 69 mentions in 28 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ●* | ● | Log sources and pipelines | 15 mentions in 7 docs, most in P06. *Lesson 52, 'What each log proves'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | SIEM concepts | 42 mentions in 17 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Wazuh (tool) | 20 mentions in 5 docs, most in P06, practice 1. |  |
@@ -778,7 +778,7 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | MFA factors and strength | 58 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
+| ●* | ● | MFA factors and strength | 61 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ○ | ● | TOTP mechanics | None. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ● | ● | FIDO2, WebAuthn, passkeys | 13 mentions in 3 docs, most in 0041-identity-and-access. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ◐ | ● | Credential stuffing and spraying | 4 mentions in 3 docs, most in 0040-storing-passwords. *Section on guessing at scale.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
@@ -814,23 +814,23 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Risk language: asset, threat, vulnerability, likelihood, impact | 10 mentions in 4 docs, most in 0010-the-language-of-risk, practice 8. *Lesson 10.* |  |
-| ●* | ● | Risk assessment methods | 18 mentions in 10 docs, most in P09, practice 4. *Lesson 60.* |  |
-| ○ | ● | Quantitative risk: FAIR | 1 mentions in 1 docs, most in 0060-risk-assessment. | [Quantitative risk with FAIR](modules/12-grc/03-quantitative-risk.md) |
-| ● | ● | NIST CSF 2.0 | 23 mentions in 9 docs, most in 0061-frameworks, practice 7. |  |
+| ●* | ● | Risk assessment methods | 20 mentions in 10 docs, most in 0061-frameworks, practice 4. *Lesson 60.* |  |
+| ○ | ● | Quantitative risk: FAIR | 6 mentions in 1 docs, most in 0060-risk-assessment. | [Quantitative risk with FAIR](modules/12-grc/03-quantitative-risk.md) |
+| ● | ● | NIST CSF 2.0 | 32 mentions in 9 docs, most in 0061-frameworks, practice 7. |  |
 | ○ | ● | NIST RMF, SP 800-53 | 3 mentions in 3 docs, most in d1-ai-what-changed. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
-| ● | ● | ISO/IEC 27001 and 27002 | 20 mentions in 6 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
+| ● | ● | ISO/IEC 27001 and 27002 | 24 mentions in 7 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | CIS Controls and Benchmarks | 12 mentions in 4 docs, most in 0061-frameworks, practice 3. |  |
-| ● | ● | Security policies, standards, procedures | 31 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
-| ● | ● | Business continuity and disaster recovery | 9 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
+| ● | ● | Security policies, standards, procedures | 34 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
+| ● | ● | Business continuity and disaster recovery | 11 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
-| ◐ | ● | Security metrics and reporting to a board | 34 mentions in 18 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
-| ● | ● | Audit and evidence | 6 mentions in 2 docs, most in 0061-frameworks, practice 3. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
+| ◐ | ● | Security metrics and reporting to a board | 36 mentions in 19 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
+| ● | ● | Audit and evidence | 7 mentions in 2 docs, most in 0061-frameworks, practice 3. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 
 ### Regulation
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | GDPR | 8 mentions in 4 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. | [EU security regulation](modules/12-grc/05-eu-regulation.md) |
+| ◐ | ● | GDPR | 11 mentions in 4 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. | [EU security regulation](modules/12-grc/05-eu-regulation.md) |
 | ◐ | ● | NIS2 | 3 mentions in 2 docs, most in h5-negotiation-and-offers. | [EU security regulation](modules/12-grc/05-eu-regulation.md) |
 | ◐ | ● | DORA and the EU AI Act | 8 mentions in 6 docs, most in 0062-policy-privacy-and-the-midpoint. | [EU security regulation](modules/12-grc/05-eu-regulation.md) |
 | ○ | ● | Cyber Resilience Act | None. | [EU security regulation](modules/12-grc/05-eu-regulation.md) |
@@ -947,7 +947,7 @@ Basis: Added: CyBOK Hardware, Cyber-Physical Systems, Physical Layer & Telecoms,
 | ○ | ● | ICS protocols: Modbus, DNP3 | None. | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
 | ○ | ● | IEC 62443 | None. *Named as the standard, with zones and conduits.* | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
 | ○ | ● | ATT&CK for ICS, Stuxnet, Industroyer | None. | [OT and industrial control systems](modules/15-wireless-mobile-hardware-ot/08-ot-and-ics.md) |
-| ◐ | ● | Physical security | 5 mentions in 4 docs, most in P03, practice 2. | [Physical security](modules/15-wireless-mobile-hardware-ot/09-physical-security.md) |
+| ◐ | ● | Physical security | 6 mentions in 4 docs, most in 0061-frameworks, practice 2. | [Physical security](modules/15-wireless-mobile-hardware-ot/09-physical-security.md) |
 
 ## 16 Human factors, privacy and research foundations
 
@@ -958,7 +958,7 @@ Basis: Added: CyBOK Human Factors, Privacy & Online Rights, Formal Methods, Dist
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ○ | ● | Social engineering principles | 1 mentions in 1 docs, most in 0069-supply-chain-and-pipelines. *Section 'why it works'. The word count credited the physical security module.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
-| ●* | ● | Phishing analysis | 37 mentions in 17 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
+| ●* | ● | Phishing analysis | 38 mentions in 18 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Pretexting, vishing, smishing | None. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ◐ | ● | Business email compromise | 3 mentions in 2 docs, most in 0054-phishing-analysis, practice 1. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Usable security | None. *The module's subject.* | [Usable security and culture](modules/16-human-privacy-research/02-usable-security.md) |
