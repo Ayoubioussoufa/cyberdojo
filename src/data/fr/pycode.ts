@@ -1465,4 +1465,46 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "tout faux, dans l'ordre",
     ],
   },
+  "fit-context": {
+    prompt: "Écrivez fit_context(system, messages, limit) : system est le texte des instructions, messages une liste de textes du plus ancien au plus récent, et limit la taille de la fenêtre en tokens. Estimez les tokens d'un texte comme le nombre de mots multiplié par 4, divisé par 3, arrondi au supérieur. Gardez toujours system. Gardez ensuite autant des messages les plus récents que possible dans ce qui reste, sans en sauter aucun. Renvoyez [system] suivi des messages gardés, du plus ancien au plus récent.",
+    tests: [
+      "tout tient",
+      "le message le plus ancien part en premier",
+      "pas de saut pour caser un vieux message plus court",
+      "les instructions sont toujours gardées",
+      "l'estimation des tokens arrondit au supérieur",
+      "aucun message",
+    ],
+  },
+  "softmax-temperature": {
+    prompt: "Écrivez probabilities(scores, temperature) : scores associe des tokens candidats à des nombres. Renvoyez un dict qui associe chaque token à sa probabilité, arrondie à 3 décimales : e à la puissance du score divisé par la température, divisé par le total de ces valeurs sur tous les tokens. Quand la température vaut 0, donnez 1.0 au token de plus haut score et 0.0 à tous les autres.",
+    tests: [
+      "des scores égaux se partagent également",
+      "une température normale",
+      "une température basse accentue",
+      "une température haute étale",
+      "une température 0 prend toujours le premier",
+      "les probabilités font environ 1 au total",
+    ],
+  },
+  "top-k": {
+    prompt: "Écrivez top_k(query, docs, k) : query est un vecteur, docs associe des noms de documents à des vecteurs, et k est le nombre à garder. Renvoyez les noms des k documents les plus proches de la requête selon la similarité cosinus, le plus proche en premier. Une fonction cosine qui fonctionne est fournie.",
+    tests: [
+      "les deux plus proches",
+      "le plus proche",
+      "k plus grand que le stock",
+      "une question sur la livraison",
+      "un stock vide",
+    ],
+  },
+  "rag-permissions": {
+    prompt: "Écrivez retrieve(query, docs, user_groups, k) : docs est une liste de dicts avec 'id', 'vector' et 'groups', les groupes autorisés à le lire. Un utilisateur peut lire un document quand il partage au moins un groupe avec lui. Ne gardez que les documents que cet utilisateur peut lire, puis renvoyez les id des k plus proches de la requête, le plus proche en premier. Une fonction cosine qui fonctionne est fournie.",
+    tests: [
+      "Ana voit son propre ticket, pas celui de Li",
+      "Li voit le sien",
+      "le personnel voit le guide d'exploitation",
+      "moins de k documents autorisés",
+      "un utilisateur sans groupe n'obtient rien",
+    ],
+  },
 };

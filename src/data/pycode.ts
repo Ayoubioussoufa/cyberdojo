@@ -2033,6 +2033,60 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def dockerfile_problems(text):\n    problems = []\n    lines = [l.strip() for l in text.splitlines() if l.strip()]\n    split = [(l.split(None, 1)[0].upper(), l.split(None, 1)[1] if len(l.split(None, 1)) > 1 else '') for l in lines]\n    for instruction, rest in split:\n        if instruction == 'FROM':\n            image = rest.split()[0]\n            name = image.rsplit('/', 1)[-1]\n            if '@sha256:' not in image and (':' not in name or name.endswith(':latest')):\n                problems.append('unpinned base')\n                break\n    users = [rest.strip() for instruction, rest in split if instruction == 'USER']\n    if not users or users[-1] in ('root', '0'):\n        problems.append('runs as root')\n    for instruction, rest in split:\n        if instruction == 'ENV' and any(w in rest.upper() for w in ('PASSWORD', 'SECRET', 'TOKEN', 'API_KEY')):\n            problems.append('secret in ENV')\n    return problems\n",
   },
+  {
+    id: "fit-context",
+    prompt: "Write fit_context(system, messages, limit): system is the instruction text, messages a list of texts from oldest to newest, and limit the window size in tokens. Estimate a text's tokens as the number of words times 4, divided by 3, rounded up. Always keep system. Then keep as many of the most recent messages as fit in what is left, without skipping any. Return [system] followed by the kept messages, oldest first.",
+    starter: "import math\n\ndef tokens(text):\n    return math.ceil(len(text.split()) * 4 / 3)\n\ndef fit_context(system, messages, limit):\n    left = limit - tokens(system)\n    kept = []\n    # Walk from the newest message backwards, and stop at the first that does not fit.\n    return [system] + kept\n",
+    tests: [
+      { name: "everything fits", expr: "fit_context('Be brief.', ['hi', 'how are you'], 100) == ['Be brief.', 'hi', 'how are you']" },
+      { name: "the oldest message is dropped first", expr: "fit_context('Be brief.', ['one two three four five six', 'seven eight', 'nine ten'], 12) == ['Be brief.', 'seven eight', 'nine ten']" },
+      { name: "no skipping to fit a smaller old message", expr: "fit_context('Be brief.', ['ok', 'a b c d e f g h i j', 'yes'], 9) == ['Be brief.', 'yes']" },
+      { name: "the instructions are always kept", expr: "fit_context('You are a support assistant for a shop.', ['hello'], 5) == ['You are a support assistant for a shop.']" },
+      { name: "the token estimate rounds up", expr: "tokens('one two') == 3 and tokens('a b c') == 4" },
+      { name: "no messages", expr: "fit_context('Be brief.', [], 50) == ['Be brief.']" },
+    ],
+    solution: "import math\n\ndef tokens(text):\n    return math.ceil(len(text.split()) * 4 / 3)\n\ndef fit_context(system, messages, limit):\n    left = limit - tokens(system)\n    kept = []\n    for message in reversed(messages):\n        cost = tokens(message)\n        if cost > left:\n            break\n        kept.insert(0, message)\n        left -= cost\n    return [system] + kept\n",
+  },
+  {
+    id: "softmax-temperature",
+    prompt: "Write probabilities(scores, temperature): scores maps candidate tokens to numbers. Return a dict mapping each token to its probability, rounded to 3 decimal places: e to the power of score divided by temperature, divided by the total of those values over all tokens. When temperature is 0, give the highest-scoring token 1.0 and every other token 0.0.",
+    starter: "import math\n\ndef probabilities(scores, temperature):\n    if temperature == 0:\n        best = max(scores, key=scores.get)\n        return {t: (1.0 if t == best else 0.0) for t in scores}\n    # Your code here.\n    return {}\n",
+    tests: [
+      { name: "equal scores share equally", expr: "probabilities({'Paris': 1.0, 'Lyon': 1.0}, 1) == {'Paris': 0.5, 'Lyon': 0.5}" },
+      { name: "a normal temperature", expr: "probabilities({'Paris': 3.0, 'Lyon': 1.0, 'Rome': 0.0}, 1) == {'Paris': 0.844, 'Lyon': 0.114, 'Rome': 0.042}" },
+      { name: "a low temperature sharpens", expr: "probabilities({'Paris': 3.0, 'Lyon': 1.0, 'Rome': 0.0}, 0.5)['Paris'] == 0.98" },
+      { name: "a high temperature spreads out", expr: "probabilities({'Paris': 3.0, 'Lyon': 1.0, 'Rome': 0.0}, 5)['Paris'] < 0.5" },
+      { name: "temperature 0 always takes the top", expr: "probabilities({'Paris': 3.0, 'Lyon': 1.0}, 0) == {'Paris': 1.0, 'Lyon': 0.0}" },
+      { name: "the probabilities add up to about 1", expr: "abs(sum(probabilities({'a': 2.0, 'b': 1.5, 'c': -1.0, 'd': 0.3}, 0.7).values()) - 1) < 0.01" },
+    ],
+    solution: "import math\n\ndef probabilities(scores, temperature):\n    if temperature == 0:\n        best = max(scores, key=scores.get)\n        return {t: (1.0 if t == best else 0.0) for t in scores}\n    raised = {t: math.exp(s / temperature) for t, s in scores.items()}\n    total = sum(raised.values())\n    return {t: round(v / total, 3) for t, v in raised.items()}\n",
+  },
+  {
+    id: "top-k",
+    prompt: "Write top_k(query, docs, k): query is a vector, docs maps document names to vectors, and k is how many to keep. Return the names of the k documents most similar to the query by cosine similarity, most similar first. A working cosine function is given.",
+    starter: "import math\n\ndef cosine(a, b):\n    dot = sum(x * y for x, y in zip(a, b))\n    size = lambda v: math.sqrt(sum(x * x for x in v))\n    return dot / (size(a) * size(b))\n\ndef top_k(query, docs, k):\n    # Score each document, then sort from the highest score down.\n    return []\n",
+    tests: [
+      { name: "the closest two", expr: "top_k([0.9, 0.1, 0.0], {'refund policy': [0.9, 0.1, 0.0], 'returns form': [0.8, 0.2, 0.1], 'firewall guide': [0.0, 0.1, 0.9], 'shipping times': [0.4, 0.8, 0.1]}, 2) == ['refund policy', 'returns form']" },
+      { name: "the closest one", expr: "top_k([0.0, 0.2, 0.9], {'refund policy': [0.9, 0.1, 0.0], 'returns form': [0.8, 0.2, 0.1], 'firewall guide': [0.0, 0.1, 0.9], 'shipping times': [0.4, 0.8, 0.1]}, 1) == ['firewall guide']" },
+      { name: "k larger than the store", expr: "len(top_k([0.5, 0.5, 0.0], {'refund policy': [0.9, 0.1, 0.0], 'returns form': [0.8, 0.2, 0.1], 'firewall guide': [0.0, 0.1, 0.9], 'shipping times': [0.4, 0.8, 0.1]}, 10)) == 4" },
+      { name: "a question about delivery", expr: "top_k([0.3, 0.9, 0.0], {'refund policy': [0.9, 0.1, 0.0], 'returns form': [0.8, 0.2, 0.1], 'firewall guide': [0.0, 0.1, 0.9], 'shipping times': [0.4, 0.8, 0.1]}, 1) == ['shipping times']" },
+      { name: "an empty store", expr: "top_k([1, 0, 0], {}, 3) == []" },
+    ],
+    solution: "import math\n\ndef cosine(a, b):\n    dot = sum(x * y for x, y in zip(a, b))\n    size = lambda v: math.sqrt(sum(x * x for x in v))\n    return dot / (size(a) * size(b))\n\ndef top_k(query, docs, k):\n    ranked = sorted(docs, key=lambda name: cosine(query, docs[name]), reverse=True)\n    return ranked[:k]\n",
+  },
+  {
+    id: "rag-permissions",
+    prompt: "Write retrieve(query, docs, user_groups, k): docs is a list of dicts with 'id', 'vector' and 'groups', the groups allowed to read it. A user may read a document when they share at least one group with it. Keep only the documents this user may read, then return the ids of the k most similar to the query, most similar first. A working cosine function is given.",
+    starter: "import math\n\ndef cosine(a, b):\n    dot = sum(x * y for x, y in zip(a, b))\n    size = lambda v: math.sqrt(sum(x * x for x in v))\n    return dot / (size(a) * size(b))\n\ndef retrieve(query, docs, user_groups, k):\n    # Filter first, then rank: a forbidden document must never be ranked at all.\n    ranked = sorted(docs, key=lambda d: cosine(query, d['vector']), reverse=True)\n    return [d['id'] for d in ranked[:k]]\n",
+    tests: [
+      { name: "Ana sees her own ticket, not Li's", expr: "retrieve([0.9, 0.1, 0.0], [{'id': 'ticket-ana-1', 'vector': [0.9, 0.1, 0.0], 'groups': ['customer:ana']}, {'id': 'ticket-li-7', 'vector': [0.95, 0.05, 0.0], 'groups': ['customer:li']}, {'id': 'refund-policy', 'vector': [0.8, 0.2, 0.1], 'groups': ['everyone']}, {'id': 'admin-runbook', 'vector': [0.85, 0.1, 0.1], 'groups': ['staff']}], ['customer:ana', 'everyone'], 2) == ['ticket-ana-1', 'refund-policy']" },
+      { name: "Li sees his own", expr: "retrieve([0.9, 0.1, 0.0], [{'id': 'ticket-ana-1', 'vector': [0.9, 0.1, 0.0], 'groups': ['customer:ana']}, {'id': 'ticket-li-7', 'vector': [0.95, 0.05, 0.0], 'groups': ['customer:li']}, {'id': 'refund-policy', 'vector': [0.8, 0.2, 0.1], 'groups': ['everyone']}, {'id': 'admin-runbook', 'vector': [0.85, 0.1, 0.1], 'groups': ['staff']}], ['customer:li', 'everyone'], 1) == ['ticket-li-7']" },
+      { name: "staff see the runbook", expr: "'admin-runbook' in retrieve([0.9, 0.1, 0.0], [{'id': 'ticket-ana-1', 'vector': [0.9, 0.1, 0.0], 'groups': ['customer:ana']}, {'id': 'ticket-li-7', 'vector': [0.95, 0.05, 0.0], 'groups': ['customer:li']}, {'id': 'refund-policy', 'vector': [0.8, 0.2, 0.1], 'groups': ['everyone']}, {'id': 'admin-runbook', 'vector': [0.85, 0.1, 0.1], 'groups': ['staff']}], ['staff', 'everyone'], 2)" },
+      { name: "fewer than k allowed documents", expr: "retrieve([0.9, 0.1, 0.0], [{'id': 'ticket-ana-1', 'vector': [0.9, 0.1, 0.0], 'groups': ['customer:ana']}, {'id': 'ticket-li-7', 'vector': [0.95, 0.05, 0.0], 'groups': ['customer:li']}, {'id': 'refund-policy', 'vector': [0.8, 0.2, 0.1], 'groups': ['everyone']}, {'id': 'admin-runbook', 'vector': [0.85, 0.1, 0.1], 'groups': ['staff']}], ['everyone'], 3) == ['refund-policy']" },
+      { name: "a user with no groups gets nothing", expr: "retrieve([0.9, 0.1, 0.0], [{'id': 'ticket-ana-1', 'vector': [0.9, 0.1, 0.0], 'groups': ['customer:ana']}, {'id': 'ticket-li-7', 'vector': [0.95, 0.05, 0.0], 'groups': ['customer:li']}, {'id': 'refund-policy', 'vector': [0.8, 0.2, 0.1], 'groups': ['everyone']}, {'id': 'admin-runbook', 'vector': [0.85, 0.1, 0.1], 'groups': ['staff']}], [], 3) == []" },
+    ],
+    solution: "import math\n\ndef cosine(a, b):\n    dot = sum(x * y for x, y in zip(a, b))\n    size = lambda v: math.sqrt(sum(x * x for x in v))\n    return dot / (size(a) * size(b))\n\ndef retrieve(query, docs, user_groups, k):\n    allowed = [d for d in docs if set(d['groups']) & set(user_groups)]\n    ranked = sorted(allowed, key=lambda d: cosine(query, d['vector']), reverse=True)\n    return [d['id'] for d in ranked[:k]]\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
