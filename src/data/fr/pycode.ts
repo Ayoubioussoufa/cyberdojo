@@ -1160,4 +1160,48 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "aucune copie",
     ],
   },
+  "parse-arn": {
+    prompt: "Écrivez parse_arn(text) : découpez un ARN en un dict avec 'partition', 'service', 'region', 'account' et 'resource'. Un ARN s'écrit arn:partition:service:region:account:resource, et seule la ressource peut contenir d'autres deux-points. Renvoyez None quand le texte ne commence pas par arn ou a trop peu de parties.",
+    tests: [
+      "un rôle IAM",
+      "un chemin d'objet S3",
+      "une ressource régionale",
+      "une ressource qui contient des deux-points",
+      "pas un ARN",
+      "trop peu de parties",
+    ],
+  },
+  "policy-wildcards": {
+    prompt: "Écrivez policy_wildcards(policy) : policy est une politique IAM sous forme de dict, avec une liste 'Statement'. Dans chaque déclaration, 'Action' et 'Resource' sont une chaîne ou une liste de chaînes. Ne regardez que les déclarations dont Effect vaut Allow, et renvoyez une liste de paires (indice, problème) : 'all actions' pour l'action *, 'whole service' pour une action qui se termine par :*, et 'all resources' pour la ressource *. Parcourez les déclarations dans l'ordre, et dans chacune, les actions avant les ressources.",
+    tests: [
+      "la politique de la leçon est correcte",
+      "administrateur en une ligne",
+      "un service entier sur tout",
+      "un joker dans une liste",
+      "une déclaration Deny n'est pas un constat",
+      "l'indice désigne la déclaration",
+    ],
+  },
+  "policy-decision": {
+    prompt: "Écrivez decide(action, resource, statements) : statements est une liste de déclarations de politique avec 'Effect', 'Action' et 'Resource'. Renvoyez 'explicit deny' quand une déclaration qui correspond est un Deny, sinon 'allow' quand une déclaration qui correspond est un Allow, sinon 'implicit deny'. applies(statement, action, resource) est fournie, et elle comprend le joker *.",
+    tests: [
+      "une lecture autorisée",
+      "une action que personne n'a mentionnée",
+      "la bonne action sur un autre bucket",
+      "un deny l'emporte sur un allow avec joker",
+      "l'ordre des déclarations ne compte pas",
+      "aucune déclaration",
+    ],
+  },
+  "scp-ceiling": {
+    prompt: "Écrivez allowed(action, resource, identity, scp) : identity contient les déclarations de la politique de l'identité, et scp celles de la politique de contrôle des services de l'organisation. Renvoyez True seulement quand les deux autorisent la requête. Une fonction decide qui fonctionne est fournie : elle renvoie 'allow', 'explicit deny' ou 'implicit deny'.",
+    tests: [
+      "autorisé par les deux",
+      "la SCP interdit de supprimer des buckets",
+      "une SCP n'accorde rien par elle-même",
+      "une SCP qui n'autorise qu'un service",
+      "une politique d'administrateur sous un garde-fou",
+      "la même politique d'administrateur sur un autre service",
+    ],
+  },
 };
