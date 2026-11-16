@@ -2465,6 +2465,58 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def value(runs, price_per_1k):\n    n = len(runs)\n    correct = sum(1 for r in runs if r['correct'])\n    cost = sum(r['tokens'] for r in runs) / 1000 * price_per_1k\n    per_correct = round(cost / correct, 4) if correct else None\n    mean_seconds = round(sum(r['seconds'] for r in runs) / n, 1)\n    return round(correct / n, 2), per_correct, mean_seconds\n",
   },
+  {
+    id: "exam-ready",
+    prompt: "Write ready(scores, passing, needed): scores is the list of your practice-exam results, oldest first. Return True when you have taken at least needed exams and the last needed of them are all at or above passing.",
+    starter: "def ready(scores, passing, needed):\n    # scores[-needed:] gives the last needed results.\n    return False\n",
+    tests: [
+      { name: "the last two pass", expr: "ready([55, 62, 68, 74, 77], 70, 2) == True" },
+      { name: "one good score after poor ones", expr: "ready([55, 58, 61, 75], 70, 2) == False" },
+      { name: "a good score that was followed by a bad one", expr: "ready([72, 75, 66], 70, 2) == False" },
+      { name: "exactly the passing mark counts", expr: "ready([70, 70], 70, 2) == True" },
+      { name: "not enough exams yet", expr: "ready([90], 70, 2) == False" },
+    ],
+    solution: "def ready(scores, passing, needed):\n    if len(scores) < needed:\n        return False\n    return all(s >= passing for s in scores[-needed:])\n",
+  },
+  {
+    id: "follow-ups",
+    prompt: "Write follow_ups(apps, today): apps is a list of dicts with 'company', 'applied' (a date as 'YYYY-MM-DD'), 'status' and 'followed_up'. Return the sorted companies to follow up today: status is 'no reply', there has been no follow-up, and at least 7 days have passed since applying.",
+    starter: "from datetime import date\n\ndef follow_ups(apps, today):\n    now = date.fromisoformat(today)\n    due = []\n    # (now - date.fromisoformat(text)).days gives the days since applying.\n    return sorted(due)\n",
+    tests: [
+      { name: "the log from the lesson", expr: "follow_ups([{'company': 'Atlas Freight', 'applied': '2026-11-02', 'status': 'no reply', 'followed_up': False}, {'company': 'Rif Transport', 'applied': '2026-11-12', 'status': 'no reply', 'followed_up': False}, {'company': 'Sahel Logistics', 'applied': '2026-10-28', 'status': 'interview', 'followed_up': False}, {'company': 'Nile Cargo', 'applied': '2026-10-20', 'status': 'no reply', 'followed_up': True}], '2026-11-16') == ['Atlas Freight']" },
+      { name: "too soon to follow up", expr: "follow_ups([{'company': 'Rif Transport', 'applied': '2026-11-12', 'status': 'no reply', 'followed_up': False}], '2026-11-16') == []" },
+      { name: "an interview needs no chasing", expr: "follow_ups([{'company': 'Sahel Logistics', 'applied': '2026-10-28', 'status': 'interview', 'followed_up': False}], '2026-11-16') == []" },
+      { name: "already followed up", expr: "follow_ups([{'company': 'Nile Cargo', 'applied': '2026-10-20', 'status': 'no reply', 'followed_up': True}], '2026-11-16') == []" },
+      { name: "exactly seven days", expr: "follow_ups([{'company': 'Oasis Bank', 'applied': '2026-11-09', 'status': 'no reply', 'followed_up': False}], '2026-11-16') == ['Oasis Bank']" },
+    ],
+    solution: "from datetime import date\n\ndef follow_ups(apps, today):\n    now = date.fromisoformat(today)\n    due = []\n    for a in apps:\n        days = (now - date.fromisoformat(a['applied'])).days\n        if a['status'] == 'no reply' and not a['followed_up'] and days >= 7:\n            due.append(a['company'])\n    return sorted(due)\n",
+  },
+  {
+    id: "skills-match",
+    prompt: "Write match(required, have): both are lists of skills. Compare them in lower case. Return (percent, missing): percent is the share of required skills you have, as a whole number rounded down, and missing is the sorted list of required skills you don't have, in lower case. Skills you have that aren't required change nothing.",
+    starter: "def match(required, have):\n    have = set(h.lower() for h in have)\n    # Your code here.\n    return 0, []\n",
+    tests: [
+      { name: "the advert from the lesson", expr: "match(['siem', 'python', 'linux', 'networking', 'sigma', 'cloud', 'incident response', 'splunk', 'scripting', 'french'], ['Python', 'Linux', 'Networking', 'Sigma', 'Incident Response', 'Scripting', 'French', 'Docker']) == (70, ['cloud', 'siem', 'splunk'])" },
+      { name: "a perfect match", expr: "match(['Python', 'Linux'], ['linux', 'python']) == (100, [])" },
+      { name: "nothing in common", expr: "match(['Go', 'Rust'], ['Python']) == (0, ['go', 'rust'])" },
+      { name: "rounded down", expr: "match(['a', 'b', 'c'], ['a', 'b']) == (66, ['c'])" },
+      { name: "extra skills don't raise the score", expr: "match(['a', 'b'], ['a', 'x', 'y', 'z']) == (50, ['b'])" },
+    ],
+    solution: "def match(required, have):\n    have = set(h.lower() for h in have)\n    req = [r.lower() for r in required]\n    got = [r for r in req if r in have]\n    missing = sorted(r for r in req if r not in have)\n    return len(got) * 100 // len(req), missing\n",
+  },
+  {
+    id: "star-check",
+    prompt: "Write star_problems(story): story is a dict that should have 'situation', 'task', 'action' and 'result'. Return the problems in this order: 'missing ' plus the name of each part that is absent or blank, in S, T, A, R order, then 'no number in result' when the result is present but contains no digit.",
+    starter: "def star_problems(story):\n    problems = []\n    for part in ['situation', 'task', 'action', 'result']:\n        # A part made only of spaces counts as missing.\n        pass\n    return problems\n",
+    tests: [
+      { name: "the story from the lesson", expr: "star_problems({'situation': 'Our lab SIEM produced 400 alerts a day.', 'task': 'Make the queue usable in two weeks.', 'action': 'Tuned three rules and removed two.', 'result': 'Alerts fell to 60 a day.'}) == []" },
+      { name: "no result at all", expr: "star_problems({'situation': 'Our lab SIEM produced 400 alerts a day.', 'task': 'Make the queue usable in two weeks.', 'action': 'Tuned three rules and removed two.'}) == ['missing result']" },
+      { name: "a result with no measurement", expr: "star_problems({'situation': 'Our lab SIEM produced 400 alerts a day.', 'task': 'Make the queue usable in two weeks.', 'action': 'Tuned three rules and removed two.', 'result': 'The alerts were much better.'}) == ['no number in result']" },
+      { name: "blank parts", expr: "star_problems({'situation': 'Our lab SIEM produced 400 alerts a day.', 'task': '  ', 'action': '', 'result': 'Alerts fell to 60 a day.'}) == ['missing task', 'missing action']" },
+      { name: "an empty story", expr: "star_problems({}) == ['missing situation', 'missing task', 'missing action', 'missing result']" },
+    ],
+    solution: "def star_problems(story):\n    problems = []\n    for part in ['situation', 'task', 'action', 'result']:\n        if not story.get(part, '').strip():\n            problems.append('missing ' + part)\n    result = story.get('result', '')\n    if result.strip() and not any(c.isdigit() for c in result):\n        problems.append('no number in result')\n    return problems\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

@@ -602,9 +602,9 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | SOC tiers and alert triage | 69 mentions in 28 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
+| ● | ● | SOC tiers and alert triage | 70 mentions in 29 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ●* | ● | Log sources and pipelines | 15 mentions in 7 docs, most in P06. *Lesson 52, 'What each log proves'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | SIEM concepts | 42 mentions in 17 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ● | ● | SIEM concepts | 43 mentions in 18 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Wazuh (tool) | 20 mentions in 5 docs, most in P06, practice 1. |  |
 | ◐ | ● | Splunk and SPL (tool) | 10 mentions in 2 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ◐ | ● | Elastic stack and KQL (tool) | 10 mentions in 4 docs, most in 0052-logs-and-siem, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
