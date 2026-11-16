@@ -1681,4 +1681,124 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "une ressource inconnue",
     ],
   },
+  "untrusted-fields": {
+    prompt: "Écrivez prepare(event, trusted, limit) : event est un dict de champs de journal, et trusted liste les champs que vos propres systèmes ont enregistrés. Renvoyez un dict avec 'facts', les champs de confiance avec leurs valeurs inchangées, et 'untrusted', tous les autres champs convertis en texte et coupés à au plus limit caractères. Gardez les clés dans l'ordre de l'événement.",
+    tests: [
+      "la ligne de journal de la leçon",
+      "une valeur courte est gardée entière",
+      "les valeurs de confiance gardent leur type",
+      "les nombres non fiables deviennent du texte",
+      "un énorme user agent est coupé",
+    ],
+  },
+  "redact-incident": {
+    prompt: "Écrivez redact(text) : remplacez chaque adresse électronique par [EMAIL], chaque adresse IPv4 par [IP], et chaque identifiant de clé d'accès AWS (AKIA ou ASIA suivi de 16 lettres majuscules ou chiffres) par [KEY]. Traitez d'abord les clés, puis les adresses électroniques, puis les adresses IP.",
+    tests: [
+      "une adresse électronique",
+      "une adresse IP",
+      "une clé d'accès",
+      "une clé temporaire",
+      "tout à la fois",
+      "rien à cacher",
+    ],
+  },
+  "verdict-check": {
+    prompt: "Écrivez verdict_problems(text, alert_lines) : text est la réponse du modèle, censée être du JSON avec 'verdict', 'confidence' et 'evidence'. alert_lines liste les identifiants des lignes de journal de cette alerte. Renvoyez la liste des problèmes : ['not json'] seul si le texte n'est pas un objet JSON valide. Sinon, dans cet ordre : 'bad verdict' sauf si le verdict vaut malicious, benign ou unknown ; 'bad confidence' sauf si c'est un nombre de 0 à 1 ; 'no evidence' quand la liste des preuves est vide et que le verdict n'est pas unknown ; et 'unknown line: ' suivi de chaque identifiant de preuve absent de alert_lines.",
+    tests: [
+      "un verdict solide",
+      "de la prose au lieu du JSON",
+      "un verdict inventé",
+      "une confiance écrite en pourcentage",
+      "une ligne de journal qui n'existe pas",
+      "unknown ne demande aucune preuve",
+      "un verdict assuré sans aucune preuve",
+    ],
+  },
+  "bias-report": {
+    prompt: "Écrivez bias_report(cases) : cases est une liste de verdicts (assistant, analyste, vérité) pour des alertes closes. Renvoyez un dict avec 'assistant_accuracy' et 'analyst_accuracy', la part des cas que chacun a eus justes, et 'followed_wrong', la part des cas où l'assistant avait tort dans lesquels l'analyste a été d'accord avec lui, chacune arrondie à 2 décimales. Utilisez 0 pour une part dont le total vaut zéro.",
+    tests: [
+      "cinq alertes",
+      "un assistant qui a toujours raison",
+      "des analystes toujours d'accord",
+      "des analystes qui repèrent chaque erreur",
+      "aucun cas",
+    ],
+  },
+  "url-features": {
+    prompt: "Écrivez features(url) : prenez l'hôte (la partie entre :// et le / suivant, ou tout le texte quand il n'y a pas de ://), en minuscules. Renvoyez un dict avec 'length' (le nombre de caractères de l'hôte), 'digits', 'hyphens', 'dots', 'is_ip' (True quand l'hôte est fait de quatre groupes de chiffres reliés par des points) et 'bait' (combien de mots de BAIT apparaissent quelque part dans l'hôte).",
+    tests: [
+      "un hôte à l'allure d'hameçonnage",
+      "un hôte ordinaire",
+      "une adresse IP nue",
+      "des majuscules et une faute volontaire",
+      "les mots du chemin ne comptent pas",
+    ],
+  },
+  "split-overlap": {
+    prompt: "Écrivez leaked(train, test) : les deux sont des listes d'URL. Comparez-les en minuscules. Renvoyez (shared, share) : shared est la liste triée des URL de test distinctes qui apparaissent aussi dans train, et share est la part des entrées de test (répétitions comprises) présentes dans train, arrondie à 2 décimales, ou 0 quand test est vide.",
+    tests: [
+      "une séparation propre",
+      "une adresse dans les deux moitiés",
+      "la casse ne cache pas un doublon",
+      "les répétitions du jeu de test comptent chaque fois",
+      "un jeu de test vide",
+    ],
+  },
+  "base-rate-calc": {
+    prompt: "Écrivez daily_alerts(events, attack_rate, recall, false_positive_rate) : events est le nombre d'événements par jour, attack_rate la part qui sont des attaques, recall la part des attaques que le détecteur attrape, et false_positive_rate la part des événements normaux qu'il signale à tort. Renvoyez (true_alerts, false_alerts, precision) : les deux nombres arrondis à l'entier, et la précision égale à true_alerts divisé par toutes les alertes, arrondie à 3 décimales, ou 0 quand il n'y a aucune alerte.",
+    tests: [
+      "le tableau de la leçon",
+      "un taux de faux positifs bien plus bas",
+      "le même détecteur sur des données de test équilibrées",
+      "aucune attaque",
+      "un détecteur parfait",
+    ],
+  },
+  "zscore-anomaly": {
+    prompt: "Écrivez unusual(baseline, today, threshold) : baseline associe des utilisateurs à des listes de comptes quotidiens passés, et today associe des utilisateurs au compte du jour. Renvoyez la liste triée des utilisateurs à examiner : ceux sans historique, ceux dont l'historique ne varie jamais et dont le compte du jour est différent, et ceux dont le score z, (aujourd'hui - moyenne) divisé par l'écart type de la population, dépasse threshold.",
+    tests: [
+      "une journée ordinaire",
+      "la journée chargée d'Ana",
+      "un nouvel utilisateur et une sauvegarde qui a changé",
+      "une journée calme n'est pas signalée",
+      "personne d'actif aujourd'hui",
+    ],
+  },
+  "label-agreement": {
+    prompt: "Écrivez kappa(first, second) : les étiquettes de deux personnes pour les mêmes éléments, sous forme de listes de même longueur. Renvoyez le kappa de Cohen arrondi à 2 décimales. po est la part des éléments sur lesquels elles sont d'accord. pe est la somme, sur chaque étiquette utilisée, de (combien de fois la première l'a utilisée) fois (combien de fois la seconde l'a fait), divisée par le nombre d'éléments au carré. kappa vaut (po - pe) / (1 - pe), et 1.0 quand pe vaut 1.",
+    tests: [
+      "deux analystes sur dix alertes",
+      "un accord parfait",
+      "à l'opposé sur chaque élément",
+      "90 % d'accord qui ne veulent rien dire",
+      "une seule étiquette utilisée par les deux partout",
+    ],
+  },
+  "failure-taxonomy": {
+    prompt: "Écrivez top_failures(cases) : cases est une liste de dicts avec 'id', 'correct' et 'failure' (un nom de catégorie, ou None quand la réponse est juste). Renvoyez une liste de (failure, count) pour les cas faux, le plus fréquent en premier, et par ordre alphabétique à égalité.",
+    tests: [
+      "huit alertes notées",
+      "tout est juste",
+      "les égalités sont alphabétiques",
+      "aucun cas",
+    ],
+  },
+  "regression-diff": {
+    prompt: "Écrivez diff_runs(before, after) : les deux associent des identifiants d'éléments à True (juste) ou False. Renvoyez (fixed, broken) : les identifiants triés qui étaient faux avant et justes après, et ceux qui étaient justes avant et faux après. Seuls les identifiants présents dans les deux exécutions comptent.",
+    tests: [
+      "trois corrigés, quatre cassés",
+      "rien n'a changé",
+      "une amélioration nette",
+      "les éléments d'une seule exécution sont ignorés",
+    ],
+  },
+  "cost-per-correct": {
+    prompt: "Écrivez value(runs, price_per_1k) : runs est une liste de dicts avec 'correct', 'tokens' et 'seconds', un par élément de test. price_per_1k est le prix de mille tokens. Renvoyez (accuracy, cost_per_correct, mean_seconds) : l'exactitude arrondie à 2 décimales, le coût total divisé par le nombre de bonnes réponses arrondi à 4 (ou None quand aucune n'est juste), et le temps moyen arrondi à 1.",
+    tests: [
+      "le petit modèle",
+      "le grand modèle",
+      "rien de juste",
+      "un prix plus bas",
+    ],
+  },
 };

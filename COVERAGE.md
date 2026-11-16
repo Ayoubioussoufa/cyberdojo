@@ -35,7 +35,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ● | ● | ICMP, ping, traceroute | 10 mentions in 3 docs, most in 0020-reading-packets, practice 2. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
 | ◐* | ● | IPv6 addressing, NDP, SLAAC | 6 mentions in 2 docs, most in 0015-bits-and-ip-addresses. *One section titled 'IPv6, briefly'. No NDP or SLAAC mechanics.* | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
 | ○ | ● | IPv6 attacks: rogue RA, dual-stack blind spots | None. | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
-| ○ | ● | Routing protocols: OSPF, BGP | None. | [Routing and BGP security](modules/01-networking/12-routing-and-bgp.md) |
+| ○ | ● | Routing protocols: OSPF, BGP | 1 mentions in 1 docs, most in 0076-machine-learning-for-detection. | [Routing and BGP security](modules/01-networking/12-routing-and-bgp.md) |
 | ○ | ● | BGP hijacking and RPKI | None. | [Routing and BGP security](modules/01-networking/12-routing-and-bgp.md) |
 
 ### Transport
@@ -331,7 +331,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ◐* | ● | A02 Security Misconfiguration | 2 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
 | ●* | ● | A03 Software Supply Chain Failures | 2 mentions in 2 docs, most in 0046-how-web-applications-fail. *Lesson 69 is about exactly this, under other words.* |  |
 | ●* | ● | A04 Cryptographic Failures | 2 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 38 to 40.* |  |
-| ● | ● | A05 Injection | 61 mentions in 19 docs, most in 0047-keeping-input-out-of-the-code, practice 45. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
+| ● | ● | A05 Injection | 62 mentions in 19 docs, most in 0047-keeping-input-out-of-the-code, practice 45. | [SQL injection in depth](modules/04-web/02-sql-injection-in-depth.md) |
 | ●* | ● | A06 Insecure Design | 2 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lesson 68.* |  |
 | ●* | ● | A07 Authentication Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Lessons 40 to 42.* |  |
 | ◐* | ● | A08 Software or Data Integrity Failures | 1 mentions in 1 docs, most in 0046-how-web-applications-fail. *Its own section.* | [The rest of the OWASP Top 10](modules/04-web/14-owasp-2025-gaps.md) |
@@ -552,7 +552,7 @@ Basis: Brief 7, CyBOK Network Security.
 | ◐ | ● | iptables and nftables (tool) | 3 mentions in 1 docs, most in 0025-hardening-linux. | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
 | ● | ● | pfSense and OPNsense (tool) | 19 mentions in 3 docs, most in P01. |  |
 | ○ | ● | Next-generation firewalls | None. | [Sensors and TLS inspection](modules/07-network-security/03-sensors-and-tls-inspection.md) |
-| ◐ | ● | Egress filtering | 13 mentions in 7 docs, most in 0050-spotting-attacks-and-writing-findings, practice 5. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ◐ | ● | Egress filtering | 15 mentions in 7 docs, most in 0050-spotting-attacks-and-writing-findings, practice 5. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 
 ### Detection on the network
 
@@ -899,7 +899,7 @@ Basis: Added: OWASP LLM Top 10 2025, MITRE ATLAS.
 | ◐* | ● | Data poisoning | 1 mentions in 1 docs, most in 0076-machine-learning-for-detection. *Section 'Poisoning and backdoors'.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ◐* | ● | Model extraction and membership inference | None. *Lesson 76, 'Attacks on models', is a short overview.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ◐ | ◐ | MITRE ATLAS | 6 mentions in 3 docs, most in 0071-securing-ai-applications. *Named and linked, not taught.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
-| ●* | ● | Machine learning for detection | 6 mentions in 2 docs, most in 0076-machine-learning-for-detection, practice 1. *Lesson 76.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
+| ●* | ● | Machine learning for detection | 7 mentions in 2 docs, most in 0076-machine-learning-for-detection, practice 1. *Lesson 76.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ●* | ● | AI-enabled offence: deepfakes, phishing at scale | 4 mentions in 4 docs, most in c1-the-jobs. *Lesson 75, 'What attackers do with it'.* |  |
 
 ## 15 Wireless, mobile, hardware, OT and physical
@@ -958,7 +958,7 @@ Basis: Added: CyBOK Human Factors, Privacy & Online Rights, Formal Methods, Dist
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ○ | ● | Social engineering principles | 1 mentions in 1 docs, most in 0069-supply-chain-and-pipelines. *Section 'why it works'. The word count credited the physical security module.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
-| ●* | ● | Phishing analysis | 39 mentions in 18 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
+| ●* | ● | Phishing analysis | 45 mentions in 18 docs, most in 0076-machine-learning-for-detection, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Pretexting, vishing, smishing | None. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ◐ | ● | Business email compromise | 3 mentions in 2 docs, most in 0054-phishing-analysis, practice 1. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Usable security | None. *The module's subject.* | [Usable security and culture](modules/16-human-privacy-research/02-usable-security.md) |
@@ -981,4 +981,4 @@ Basis: Added: CyBOK Human Factors, Privacy & Online Rights, Formal Methods, Dist
 | ○ | ● | Distributed systems security: consensus, Byzantine faults | None. | [Distributed systems and blockchain security](modules/16-human-privacy-research/06-distributed-systems-and-blockchain.md) |
 | ○ | ● | Blockchain and smart contract security | None. | [Distributed systems and blockchain security](modules/16-human-privacy-research/06-distributed-systems-and-blockchain.md) |
 | ○ | ● | Reading a security paper | None. | [Reading and doing security research](modules/16-human-privacy-research/07-reading-and-doing-research.md) |
-| ●* | ● | Measuring security: base rates, ROC curves | 3 mentions in 2 docs, most in 0077-evaluating-ai-and-your-capstone, practice 1. *Lessons 76 and 77.* |  |
+| ●* | ● | Measuring security: base rates, ROC curves | 4 mentions in 2 docs, most in 0077-evaluating-ai-and-your-capstone, practice 1. *Lessons 76 and 77.* |  |

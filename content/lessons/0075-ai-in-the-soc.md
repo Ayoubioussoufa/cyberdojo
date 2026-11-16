@@ -2,7 +2,7 @@
 title: AI in the SOC
 summary: How security teams really use AI, what attackers do with it, the new risks it brings, and how to design a triage assistant you can trust.
 month: 20
-minutes: 50
+minutes: 75
 builds: a design for a triage assistant, with its guardrails
 source: NIST AI Risk Management Framework | https://www.nist.gov/itl/ai-risk-management-framework
 words: copilot, automation bias, log injection
@@ -73,6 +73,16 @@ A SOC assistant can be told to close the alert about the attacker who wrote that
 
 **Data exposure** is the third. Pasting incident details into a public AI tool can break your contracts and laws. Know which tools are approved, and what they keep.
 
+Your code knows which fields an attacker can write. The source address of a connection was recorded by your own systems, but the user agent, the URL path and the username were typed by whoever sent the request. Keep the two apart when you build the prompt: facts in one block, untrusted text in another, labelled as such and cut to a sensible length so a ten-thousand-character user agent can't fill the window.
+
+@code untrusted-fields
+
+Labelling doesn't make injection impossible, as lesson 71 showed. It makes the model's job easier, and it keeps the long attacker-written strings from crowding out your instructions. The real protection is still that the assistant can't close anything by itself.
+
+For the third risk, remove what identifies people and systems before anything goes to a tool you don't control:
+
+@code redact-incident
+
 ?? Why are logs a risky input for an AI assistant?
 + Attackers control much of the text in logs
 - Logs are too short for models to read
@@ -95,6 +105,17 @@ Here's a design you could defend, and it's the shape of [P16](/projects/P16/).
 | Analyst decides, and that's recorded | You build ground truth as you go |
 | Runbooks from your own wiki via RAG | It answers using your procedures |
 
+A verdict in that format looks like this:
+
+```json
+{"verdict": "malicious", "confidence": 0.8, "evidence": ["L-104", "L-117"],
+ "summary": "Many failed logons for svc_web, then one success from the same address."}
+```
+
+Code can now check it before an analyst ever sees it: the verdict is one of the allowed words, the confidence is a number between 0 and 1, there's at least one piece of evidence unless the verdict is `unknown`, and every evidence ID names a log line that really belongs to this alert.
+
+@code verdict-check
+
 That third row is powerful. If the model cites evidence, your code can check that the line really exists. A hallucinated log line fails automatically.
 
 ?? How can code catch a triage assistant that invents evidence?
@@ -103,6 +124,19 @@ That third row is powerful. If the model cites evidence, your code can check tha
 - Use a larger font for the model's output
 - Add the word "accurate" to the system prompt
 => Citations turn a claim into something code can verify. Asking the model to grade itself proves nothing.
+
+## Measuring the people too
+
+The analyst's decision is recorded, so you can measure automation bias instead of guessing about it. Compare three things for each closed alert: what the assistant said, what the analyst decided, and what turned out to be true. The number to watch is how often the analyst agreed with the assistant when the assistant was **wrong**. If that's high, people are rubber-stamping, and the assistant's mistakes are becoming the team's.
+
+@code bias-report
+
+?? An assistant is right 90% of the time, and analysts agree with it on 99% of alerts. What does that suggest?
++ Analysts are approving its mistakes without checking them
+- The assistant became right on 99% of alerts
+- The analysts are far better than the assistant
+- Nothing, since agreement always shows very good teamwork
+=> If the assistant is wrong on 10% of alerts but people disagree on only 1%, most of its mistakes are being accepted. That's automation bias, measured.
 
 ## Will it take my job?
 
@@ -114,6 +148,37 @@ Routine Tier 1 work is shrinking, as the [AI guide](/guides/d1-ai-what-changed/)
 - Remembering every port number with no reference sheet
 - Formatting the same weekly report by hand again
 => When drafting is cheap, judgement is what's scarce. That's why fundamentals and verification pay off.
+
+## Review a deployment
+
+A team describes its live triage assistant.
+
+```
+1. The assistant reads raw alerts, including user agents and URLs, in one block of text.
+2. If its confidence is above 0.9 and the verdict is benign, the alert is closed automatically.
+3. Analysts paste full incident notes into a free public chatbot to get second opinions.
+```
+
+?? What's the risk in lines 1 and 2 together?
++ An attacker's text can close its own alert
+- Confidence values above 0.9 are never really possible
+- User agents are too short for the model
+- Benign alerts should always stay open for ever
+=> The user agent in the lesson tells the assistant to mark the alert benign, with confidence. Line 2 then closes the alert about the attacker who wrote it.
+
+?? What should change in line 2?
++ A person confirms before anything important closes
+- Raise the threshold to exactly 0.99 instead
+- Close the malicious alerts automatically as well
+- Let the assistant choose its own threshold
+=> A higher number is still a number the attacker's text can influence. Keep a person on the decision, at least for anything that matters.
+
+?? What's the problem with line 3?
++ Incident data leaves for a service nobody approved
+- Public chatbots can't read incident notes at all
+- Second opinions are never useful in security work
+- The notes are too long for any model
+=> Incident notes hold names, addresses and weaknesses. Use an approved tool, redact first, and know what the service keeps.
 
 ?! Design an assistant for one task in your track. What tools would it have, what could it never do, and how would you measure it?
 
