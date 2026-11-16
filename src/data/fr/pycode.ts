@@ -1595,4 +1595,45 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un jour de plus, c'est parti",
     ],
   },
+  "canary-leaks": {
+    prompt: "Écrivez leaks(trials, canaries) : trials est une liste de dicts avec 'id', 'answer' et 'tool_calls', une liste de dicts avec 'tool' et 'args'. Un canari fuit quand il apparaît dans la réponse ou dans la valeur d'un argument d'un appel d'outil, comparé sans tenir compte de la casse. Renvoyez une liste de (id de l'essai, canari, where) dans l'ordre des essais, puis des canaris, où where vaut 'answer' ou le nom de l'outil.",
+    tests: [
+      "un essai propre",
+      "le prompt système dans une réponse",
+      "une fuite par un appel d'outil",
+      "une fuite en minuscules compte quand même",
+      "une série complète, dans l'ordre",
+    ],
+  },
+  "catalogue-coverage": {
+    prompt: "Écrivez thin_categories(cases, categories, minimum) : cases est une liste de cas de test, des dicts avec 'id' et 'category'. categories liste les catégories que le catalogue doit couvrir. Renvoyez, dans l'ordre de categories, une paire (catégorie, nombre) pour chaque catégorie qui a moins de minimum cas.",
+    tests: [
+      "le catalogue de la leçon",
+      "une barre plus basse",
+      "les cas d'une catégorie non exigée sont ignorés",
+      "un catalogue équilibré",
+      "aucun cas",
+    ],
+  },
+  "wilson-interval": {
+    prompt: "Écrivez wilson(successes, trials) : renvoyez l'intervalle de score de Wilson à 95 % pour le taux de succès, sous la forme (low, high), chacun arrondi à 3 décimales. Avec p = successes / trials, n = trials et Z = 1.96 : centre = p + Z*Z/(2n), demi-largeur = Z * sqrt(p(1-p)/n + Z*Z/(4n*n)), et centre - demi-largeur comme centre + demi-largeur sont divisés par 1 + Z*Z/n. Gardez low à 0 ou plus et high à 1 ou moins. Sans aucun essai, renvoyez (0.0, 1.0).",
+    tests: [
+      "aucun sur vingt",
+      "aucun sur dix est bien moins sûr",
+      "quatorze sur vingt",
+      "six sur vingt",
+      "chaque tentative a fonctionné",
+      "plus d'essais resserrent l'intervalle",
+    ],
+  },
+  "compare-fixes": {
+    prompt: "Écrivez compare(before, after) : les deux associent des noms de cas au nombre de succès sur un même nombre d'essais. Renvoyez une liste de (cas, verdict) triée par cas : 'fixed' quand after vaut 0 et que before était supérieur à 0, 'improved' quand after est plus bas mais pas nul, 'worse' quand after est plus haut, et 'unchanged' sinon. Un cas absent de after vaut 'not rerun'.",
+    tests: [
+      "les trois lignes de la leçon 71",
+      "une correction qui a cassé un autre cas",
+      "rien n'a changé",
+      "zéro les deux fois, c'est inchangé, pas corrigé",
+      "un cas que personne n'a relancé",
+    ],
+  },
 };

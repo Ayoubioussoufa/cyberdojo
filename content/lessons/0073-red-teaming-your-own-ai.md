@@ -2,7 +2,7 @@
 title: Testing your own AI
 summary: How AI red teaming really works: scope, a test catalogue by category, repeated trials, scoring results, and a report with honest numbers.
 month: 18
-minutes: 50
+minutes: 75
 builds: an AI test plan with reproducibility statistics
 source: NIST AI Risk Management Framework | https://www.nist.gov/itl/ai-risk-management-framework
 words: red teaming, test catalogue, reproducibility
@@ -31,6 +31,10 @@ Ask what actually matters here. A support bot saying something silly is embarras
 | Wrong output | Bad advice given confidently | Medium |
 | Embarrassing output | Off-topic jokes | Lower |
 
+Make each canary unique to where you planted it: one in the system prompt, one in a customer record, one in a retrieved document, such as `CANARY-SYS-7f3a91` and `CANARY-CRM-2c8e04`. When one turns up, its name tells you which store leaked. Then search everything the system produced, the answers and the arguments of every tool call, because a leak through `send_email` never appears in the chat window.
+
+@code canary-leaks
+
 ?? Why plant a fake secret in your test system, rather than using real data?
 + A leak is provable, and it harms nobody
 - Real data can't be stored in any model
@@ -54,6 +58,10 @@ Organise by category, so that you can see what you've covered and what you haven
 | Unbounded consumption | Can someone run up your costs? |
 
 These map to the [OWASP lists](/guides/d2-llm-security-primer/). Each test case records its exact input, the expected safe behaviour, and how to tell that it failed. Failure must be checked by code wherever you can: did the canary appear? Was the tool called? Then there's no argument about the result.
+
+A catalogue is only useful if it's balanced. Ten clever cases for direct override and none for tool misuse leaves the most dangerous category untested. Count the cases per category before you run anything:
+
+@code catalogue-coverage
 
 ?? What makes a test case strong?
 + A failure condition that code can reliably check
@@ -96,9 +104,17 @@ After tool restrictions: 0 of 20 (0%)
 
 Be careful with that last line. Zero out of 20 doesn't mean that it's impossible. It means that it didn't happen in 20 tries. A useful rule of thumb, the "rule of three", says that with zero successes in N trials, the true rate could still be as high as about 3 ÷ N. So 0 of 20 still allows for about 15%. More trials shrink that.
 
+The rule of three covers zero successes. For any result, the **Wilson score interval** gives a range that the true rate probably lies in. With *p* the observed rate, *n* the number of trials and *z* = 1.96 for 95% confidence, the centre is *p* + *z*²/2*n*, the half-width is *z* × √(*p*(1 − *p*)/*n* + *z*²/4*n*²), and both ends are divided by 1 + *z*²/*n*. For 0 of 20 it gives an upper end of about 16%, close to the rule of three. For 14 of 20 it gives 48% to 86%, which is a more honest headline than "70%".
+
+@code wilson-interval
+
 Why did the tool restriction get to zero? Because it doesn't rely on persuading the model. A change in the numbers is only half of the report. Explain the mechanism too.
 
 @drill trifecta
+
+With the same trials before and after a change, each case lands in one of four places: fixed, improved, unchanged or worse. "Worse" happens more than people expect, because a stronger prompt for one case can weaken another, which is why every case is rerun after every change, not only the one you were fixing.
+
+@code compare-fixes
 
 ?? A fix gives 0 successes in 10 trials. What's the honest statement?
 + None in ten, so the true rate's uncertain
@@ -131,5 +147,36 @@ Use [Parrot](/machines/parrot/) to practise the whole loop in the browser. Then 
 - It's the model provider's problem and not yours
 - It isn't worth mentioning in a technical report
 => Honest residual risk builds trust. Designing for a fooled model is the mature position.
+
+## Review a test report
+
+A colleague's draft report begins like this.
+
+```
+Target:   a competitor's public support chatbot, to compare with ours
+Method:   one attempt per case; results judged by reading the replies
+Result:   "the model is secure" (no attack worked)
+```
+
+?? What's wrong with the target?
++ Nobody gave permission to test that system
+- Competitors' chatbots are always far too slow
+- Public chatbots can't be reached from labs
+- Comparisons are never useful in security work
+=> Testing a system you don't own, without written permission, isn't red teaming. Test your own, or one whose owner has agreed in writing.
+
+?? What would you change about the method?
++ Many trials per case, each judged by code
+- Fewer cases, with each one read more carefully
+- One attempt per case, but run at night
+- Ask the model to grade its own replies
+=> One attempt says nothing about a rate, and reading by eye invites argument. Repeat each case, and let a canary or a logged tool call decide.
+
+?? How should the result be worded?
++ No success in N trials, plus the interval
+- Secure, since nothing worked during the whole test
+- Insecure, since every model can always be fooled
+- Unknown, so the report should say nothing more
+=> State what was observed and how uncertain it is. "0 of 20, so the true rate is probably below 16%" is a result. "Secure" is a claim the test can't support.
 
 ?! Write five test cases for an AI assistant you know: the input idea, the safe behaviour you expect, and how code could detect a failure.
