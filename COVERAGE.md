@@ -321,7 +321,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 | ● | ● | CORS | 8 mentions in 1 docs, most in 0036-sessions-and-the-browser. |  |
 | ●* | ● | Cookies and flags: Secure, HttpOnly, SameSite | 22 mentions in 5 docs, most in 0036-sessions-and-the-browser, practice 6. *Lesson 36, 'Cookie flags'.* | [XSS in depth](modules/04-web/04-xss-in-depth.md) |
 | ◐ | ● | Security headers and CSP | 5 mentions in 2 docs, most in 0047-keeping-input-out-of-the-code, practice 2. | [Browser defences and CSP](modules/04-web/01-browser-defences-and-csp.md) |
-| ●* | ● | Session management | 13 mentions in 6 docs, most in 0036-sessions-and-the-browser, practice 7. *Lesson 36, 'Sessions'.* | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
+| ●* | ● | Session management | 14 mentions in 7 docs, most in 0036-sessions-and-the-browser, practice 7. *Lesson 36, 'Sessions'.* | [Authentication and JWT security](modules/04-web/06-authentication-and-jwt-attacks.md) |
 
 ### OWASP Top 10:2025
 
@@ -712,11 +712,11 @@ Basis: Brief 10.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Shared responsibility | 2 mentions in 1 docs, most in 0063-cloud-foundations-and-iam. *Lesson 63, 'Shared responsibility'.* |  |
-| ●* | ● | AWS IAM: policies, roles, evaluation | 9 mentions in 5 docs, most in 0063-cloud-foundations-and-iam, practice 3. *Lesson 63, 'Reading a policy' and 'How AWS decides'.* | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
+| ●* | ● | AWS IAM: policies, roles, evaluation | 11 mentions in 5 docs, most in 0063-cloud-foundations-and-iam, practice 3. *Lesson 63, 'Reading a policy' and 'How AWS decides'.* | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ○ | ● | AWS privilege escalation paths | None. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
-| ◐ | ● | AWS S3 exposure | 14 mentions in 3 docs, most in 0063-cloud-foundations-and-iam, practice 3. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
+| ◐ | ● | AWS S3 exposure | 15 mentions in 3 docs, most in 0063-cloud-foundations-and-iam, practice 3. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ◐ | ● | Instance metadata and IMDSv2 | 19 mentions in 6 docs, most in 0063-cloud-foundations-and-iam, practice 15. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
-| ● | ● | CloudTrail and GuardDuty | 29 mentions in 6 docs, most in 0064-cloud-detection-and-posture, practice 8. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
+| ● | ● | CloudTrail and GuardDuty | 30 mentions in 6 docs, most in 0064-cloud-detection-and-posture, practice 8. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ◐* | ● | Azure: Entra ID, RBAC, managed identity | 28 mentions in 12 docs, most in 0045-attacking-and-defending-identity. *Entra ID has a section. Azure RBAC is one table cell, and managed identities are absent.* | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | Azure logging and Defender for Cloud | 2 mentions in 1 docs, most in 0064-cloud-detection-and-posture. | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | GCP: IAM, service accounts | 2 mentions in 1 docs, most in 0064-cloud-detection-and-posture. | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
@@ -820,7 +820,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ○ | ● | NIST RMF, SP 800-53 | 3 mentions in 3 docs, most in d1-ai-what-changed. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | ISO/IEC 27001 and 27002 | 24 mentions in 7 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | CIS Controls and Benchmarks | 12 mentions in 4 docs, most in 0061-frameworks, practice 3. |  |
-| ● | ● | Security policies, standards, procedures | 34 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
+| ● | ● | Security policies, standards, procedures | 36 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 11 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ◐ | ● | Security metrics and reporting to a board | 36 mentions in 19 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |

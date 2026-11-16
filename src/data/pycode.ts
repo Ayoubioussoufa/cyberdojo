@@ -1644,6 +1644,62 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def three_two_one(copies):\n    media = set(c['media'] for c in copies)\n    offsite = [c for c in copies if c['offsite']]\n    return len(copies) >= 3 and len(media) >= 2 and len(offsite) >= 1\n",
   },
+  {
+    id: "parse-arn",
+    prompt: "Write parse_arn(text): split an ARN into a dict with 'partition', 'service', 'region', 'account' and 'resource'. An ARN is arn:partition:service:region:account:resource, and only the resource may contain more colons. Return None when the text does not start with arn or has too few parts.",
+    starter: "def parse_arn(text):\n    # text.split(':', 5) stops after five splits, so the resource stays whole.\n    return None\n",
+    tests: [
+      { name: "an IAM role", expr: "parse_arn('arn:aws:iam::123456789012:role/app-server') == {'partition': 'aws', 'service': 'iam', 'region': '', 'account': '123456789012', 'resource': 'role/app-server'}" },
+      { name: "an S3 object path", expr: "parse_arn('arn:aws:s3:::reports-bucket/*') == {'partition': 'aws', 'service': 's3', 'region': '', 'account': '', 'resource': 'reports-bucket/*'}" },
+      { name: "a regional resource", expr: "parse_arn('arn:aws:ec2:eu-west-1:123456789012:instance/i-0abc')['region'] == 'eu-west-1'" },
+      { name: "a resource that contains colons", expr: "parse_arn('arn:aws:logs:eu-west-1:123456789012:log-group:/app/web:*')['resource'] == 'log-group:/app/web:*'" },
+      { name: "not an ARN", expr: "parse_arn('reports-bucket') is None and parse_arn('urn:aws:s3:::x') is None" },
+      { name: "too few parts", expr: "parse_arn('arn:aws:s3') is None" },
+    ],
+    solution: "def parse_arn(text):\n    parts = text.split(':', 5)\n    if len(parts) != 6 or parts[0] != 'arn':\n        return None\n    return {'partition': parts[1], 'service': parts[2], 'region': parts[3], 'account': parts[4], 'resource': parts[5]}\n",
+  },
+  {
+    id: "policy-wildcards",
+    prompt: "Write policy_wildcards(policy): policy is an IAM policy as a dict, with a 'Statement' list. In each statement, 'Action' and 'Resource' are one string or a list of strings. Look only at statements whose Effect is Allow, and return a list of (index, problem) pairs: 'all actions' for the action *, 'whole service' for an action ending in :*, and 'all resources' for the resource *. Go through the statements in order, and inside one, actions before resources.",
+    starter: "def as_list(value):\n    return value if isinstance(value, list) else [value]\n\ndef policy_wildcards(policy):\n    problems = []\n    for index, statement in enumerate(policy['Statement']):\n        # Your code here.\n        pass\n    return problems\n",
+    tests: [
+      { name: "the policy from the lesson is fine", expr: "policy_wildcards({'Version': '2012-10-17', 'Statement': [{'Effect': 'Allow', 'Action': ['s3:GetObject'], 'Resource': 'arn:aws:s3:::reports-bucket/*'}]}) == []" },
+      { name: "admin in one line", expr: "policy_wildcards({'Statement': [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}]}) == [(0, 'all actions'), (0, 'all resources')]" },
+      { name: "a whole service on everything", expr: "policy_wildcards({'Statement': [{'Effect': 'Allow', 'Action': 's3:*', 'Resource': '*'}]}) == [(0, 'whole service'), (0, 'all resources')]" },
+      { name: "a wildcard inside a list", expr: "policy_wildcards({'Statement': [{'Effect': 'Allow', 'Action': ['s3:GetObject', 'iam:*'], 'Resource': ['arn:aws:s3:::reports-bucket/*']}]}) == [(0, 'whole service')]" },
+      { name: "a deny statement is not a finding", expr: "policy_wildcards({'Statement': [{'Effect': 'Deny', 'Action': '*', 'Resource': '*'}]}) == []" },
+      { name: "the index points at the statement", expr: "policy_wildcards({'Statement': [{'Effect': 'Allow', 'Action': 's3:GetObject', 'Resource': 'arn:aws:s3:::a/*'}, {'Effect': 'Allow', 'Action': 'ec2:DescribeInstances', 'Resource': '*'}]}) == [(1, 'all resources')]" },
+    ],
+    solution: "def as_list(value):\n    return value if isinstance(value, list) else [value]\n\ndef policy_wildcards(policy):\n    problems = []\n    for index, statement in enumerate(policy['Statement']):\n        if statement['Effect'] != 'Allow':\n            continue\n        for action in as_list(statement['Action']):\n            if action == '*':\n                problems.append((index, 'all actions'))\n            elif action.endswith(':*'):\n                problems.append((index, 'whole service'))\n        for resource in as_list(statement['Resource']):\n            if resource == '*':\n                problems.append((index, 'all resources'))\n    return problems\n",
+  },
+  {
+    id: "policy-decision",
+    prompt: "Write decide(action, resource, statements): statements is a list of policy statements with 'Effect', 'Action' and 'Resource'. Return 'explicit deny' when any matching statement is a Deny, otherwise 'allow' when any matching statement is an Allow, otherwise 'implicit deny'. applies(statement, action, resource) is given, and it understands the * wildcard.",
+    starter: "from fnmatch import fnmatchcase\n\ndef as_list(value):\n    return value if isinstance(value, list) else [value]\n\ndef applies(statement, action, resource):\n    return (any(fnmatchcase(action, a) for a in as_list(statement['Action']))\n            and any(fnmatchcase(resource, r) for r in as_list(statement['Resource'])))\n\ndef decide(action, resource, statements):\n    matching = [s for s in statements if applies(s, action, resource)]\n    # Your code here: a Deny wins, then an Allow, and the default is to deny.\n    return 'allow'\n",
+    tests: [
+      { name: "an allowed read", expr: "decide('s3:GetObject', 'arn:aws:s3:::reports-bucket/q3.pdf', [{'Effect': 'Allow', 'Action': ['s3:GetObject'], 'Resource': 'arn:aws:s3:::reports-bucket/*'}]) == 'allow'" },
+      { name: "an action nobody mentioned", expr: "decide('s3:DeleteObject', 'arn:aws:s3:::reports-bucket/q3.pdf', [{'Effect': 'Allow', 'Action': ['s3:GetObject'], 'Resource': 'arn:aws:s3:::reports-bucket/*'}]) == 'implicit deny'" },
+      { name: "the right action on another bucket", expr: "decide('s3:GetObject', 'arn:aws:s3:::payroll/may.csv', [{'Effect': 'Allow', 'Action': ['s3:GetObject'], 'Resource': 'arn:aws:s3:::reports-bucket/*'}]) == 'implicit deny'" },
+      { name: "a deny beats a wildcard allow", expr: "decide('s3:DeleteBucket', 'arn:aws:s3:::reports-bucket', [{'Effect': 'Allow', 'Action': 's3:*', 'Resource': '*'}, {'Effect': 'Deny', 'Action': 's3:DeleteBucket', 'Resource': '*'}]) == 'explicit deny'" },
+      { name: "the order of statements does not matter", expr: "decide('s3:DeleteBucket', 'arn:aws:s3:::reports-bucket', [{'Effect': 'Deny', 'Action': 's3:DeleteBucket', 'Resource': '*'}, {'Effect': 'Allow', 'Action': 's3:*', 'Resource': '*'}]) == 'explicit deny'" },
+      { name: "no statements at all", expr: "decide('ec2:RunInstances', '*', []) == 'implicit deny'" },
+    ],
+    solution: "from fnmatch import fnmatchcase\n\ndef as_list(value):\n    return value if isinstance(value, list) else [value]\n\ndef applies(statement, action, resource):\n    return (any(fnmatchcase(action, a) for a in as_list(statement['Action']))\n            and any(fnmatchcase(resource, r) for r in as_list(statement['Resource'])))\n\ndef decide(action, resource, statements):\n    matching = [s for s in statements if applies(s, action, resource)]\n    if any(s['Effect'] == 'Deny' for s in matching):\n        return 'explicit deny'\n    if any(s['Effect'] == 'Allow' for s in matching):\n        return 'allow'\n    return 'implicit deny'\n",
+  },
+  {
+    id: "scp-ceiling",
+    prompt: "Write allowed(action, resource, identity, scp): identity is the statements of the identity's policy, and scp is the statements of the organisation's service control policy. Return True only when both allow the request. A working decide function is given, which returns 'allow', 'explicit deny' or 'implicit deny'.",
+    starter: "from fnmatch import fnmatchcase\n\ndef as_list(value):\n    return value if isinstance(value, list) else [value]\n\ndef applies(statement, action, resource):\n    return (any(fnmatchcase(action, a) for a in as_list(statement['Action']))\n            and any(fnmatchcase(resource, r) for r in as_list(statement['Resource'])))\n\ndef decide(action, resource, statements):\n    matching = [s for s in statements if applies(s, action, resource)]\n    if any(s['Effect'] == 'Deny' for s in matching):\n        return 'explicit deny'\n    if any(s['Effect'] == 'Allow' for s in matching):\n        return 'allow'\n    return 'implicit deny'\n\ndef allowed(action, resource, identity, scp):\n    # Your code here.\n    return decide(action, resource, identity) == 'allow'\n",
+    tests: [
+      { name: "allowed by both", expr: "allowed('s3:GetObject', 'arn:aws:s3:::reports-bucket/q3.pdf', [{'Effect': 'Allow', 'Action': 's3:*', 'Resource': '*'}], [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}, {'Effect': 'Deny', 'Action': 's3:DeleteBucket', 'Resource': '*'}]) == True" },
+      { name: "the SCP denies deleting buckets", expr: "allowed('s3:DeleteBucket', 'arn:aws:s3:::reports-bucket', [{'Effect': 'Allow', 'Action': 's3:*', 'Resource': '*'}], [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}, {'Effect': 'Deny', 'Action': 's3:DeleteBucket', 'Resource': '*'}]) == False" },
+      { name: "an SCP grants nothing by itself", expr: "allowed('ec2:RunInstances', '*', [{'Effect': 'Allow', 'Action': 's3:*', 'Resource': '*'}], [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}, {'Effect': 'Deny', 'Action': 's3:DeleteBucket', 'Resource': '*'}]) == False" },
+      { name: "an SCP that only allows one service", expr: "allowed('s3:GetObject', 'arn:aws:s3:::reports-bucket/q3.pdf', [{'Effect': 'Allow', 'Action': 's3:*', 'Resource': '*'}], [{'Effect': 'Allow', 'Action': 'ec2:*', 'Resource': '*'}]) == False" },
+      { name: "an admin policy under a guardrail", expr: "allowed('iam:CreateUser', '*', [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}], [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}, {'Effect': 'Deny', 'Action': 'iam:*', 'Resource': '*'}]) == False" },
+      { name: "the same admin policy on another service", expr: "allowed('ec2:RunInstances', '*', [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}], [{'Effect': 'Allow', 'Action': '*', 'Resource': '*'}, {'Effect': 'Deny', 'Action': 'iam:*', 'Resource': '*'}]) == True" },
+    ],
+    solution: "from fnmatch import fnmatchcase\n\ndef as_list(value):\n    return value if isinstance(value, list) else [value]\n\ndef applies(statement, action, resource):\n    return (any(fnmatchcase(action, a) for a in as_list(statement['Action']))\n            and any(fnmatchcase(resource, r) for r in as_list(statement['Resource'])))\n\ndef decide(action, resource, statements):\n    matching = [s for s in statements if applies(s, action, resource)]\n    if any(s['Effect'] == 'Deny' for s in matching):\n        return 'explicit deny'\n    if any(s['Effect'] == 'Allow' for s in matching):\n        return 'allow'\n    return 'implicit deny'\n\ndef allowed(action, resource, identity, scp):\n    return decide(action, resource, identity) == 'allow' and decide(action, resource, scp) == 'allow'\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

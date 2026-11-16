@@ -2,7 +2,7 @@
 title: Cloud foundations and IAM
 summary: What the cloud really is, the shared responsibility model, a safe account baseline, how AWS decides whether a request is allowed, and the failures behind most cloud breaches.
 month: 13
-minutes: 60
+minutes: 85
 builds: a hardened AWS account, and policies you can reason about
 source: AWS, Policy evaluation logic | https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluationlogic.html
 words: shared responsibility, IAM policy, least privilege
@@ -81,6 +81,21 @@ There are two kinds of credentials. Long-lived **access keys** work until someon
 
 A role has two policies. Its **trust policy** says who may assume it. Its permissions policy says what it can do. Both matter, as you'll see in the missions.
 
+A trust policy is written like any other policy, with one extra field, the `Principal`:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": {"Service": "ec2.amazonaws.com"},
+    "Action": "sts:AssumeRole"
+  }]
+}
+```
+
+It says that EC2 servers may assume this role. What they get back has three parts, an access key ID, a secret key and a **session token**, plus an expiry time. The key ID tells you which kind you're looking at: temporary ones start with `ASIA`, and long-lived ones start with `AKIA`. In a leaked file, that prefix tells you how worried to be.
+
 ?? A developer asks to put an access key in a server's config file. What's a better design?
 + Give the server a role instead
 - Encode the key in base64 first
@@ -103,6 +118,43 @@ A role has two policies. Its **trust policy** says who may assume it. Its permis
 
 Who may do what, on which resource. `Effect` is allow or deny, `Action` is the API call, and `Resource` is an **ARN**, the object's full name. `2012-10-17` is the version of the policy language, not a date you should change. Watch out for `"Action": "*"` and `"Resource": "*"`: that's the most common failure, including in AI-written policies.
 
+An ARN reads from left to right, with colons between its parts:
+
+```
+arn:aws:iam::123456789012:role/app-server
+arn:aws:s3:::reports-bucket/*
+```
+
+| Part | First example | Second example |
+|---|---|---|
+| Partition | `aws` | `aws` |
+| Service | `iam` | `s3` |
+| Region | Empty, because IAM is global | Empty |
+| Account | `123456789012` | Empty, because bucket names are unique worldwide |
+| Resource | `role/app-server` | `reports-bucket/*`, every object in the bucket |
+
+An empty part still keeps its colon, which is why S3 ARNs have three in a row.
+
+@code parse-arn
+
+A statement can also carry a `Condition`, which narrows when it applies. This one refuses any request to the bucket that doesn't arrive over TLS:
+
+```json
+{
+  "Effect": "Deny",
+  "Principal": "*",
+  "Action": "s3:*",
+  "Resource": ["arn:aws:s3:::reports-bucket", "arn:aws:s3:::reports-bucket/*"],
+  "Condition": {"Bool": {"aws:SecureTransport": "false"}}
+}
+```
+
+It has a `Principal` because it's a **resource policy**, attached to the bucket, so it has to say who it's talking about. An identity policy has none, because it's attached to the identity itself.
+
+`Action` and `Resource` can each be one string or a list, so a program that reads policies has to handle both. Once it does, the wildcards are easy to find.
+
+@code policy-wildcards
+
 ?? What does `"Action": "s3:*", "Resource": "*"` allow?
 + Every S3 action on every bucket here
 - Reading one object in a single bucket
@@ -119,6 +171,26 @@ The order, in simple form. The [official logic](https://docs.aws.amazon.com/IAM/
 ::: key Two rules cover most cases
 Everything is denied unless something allows it. And **an explicit deny always wins**.
 :::
+
+You can write the core of that in a few lines. Collect the statements that match the request. If any of them is a Deny, the answer is deny. Otherwise, if any is an Allow, the answer is allow. And if nothing matched at all, it's an **implicit deny**, which is what "default: deny" means.
+
+@code policy-decision
+
+A guardrail adds one more condition. An SCP never grants anything. It only limits. So a request goes through when the identity policy allows it *and* the SCP allows it, and a deny in either one ends it.
+
+@code scp-ceiling
+
+Don't guess what a real policy does. Ask AWS:
+
+```
+aws sts get-caller-identity
+aws iam simulate-principal-policy \
+  --policy-source-arn arn:aws:iam::123456789012:role/app-server \
+  --action-names s3:GetObject s3:DeleteObject \
+  --resource-arns arn:aws:s3:::reports-bucket/q3.pdf
+```
+
+The first command tells you which identity your terminal is using, and it's worth running before anything else. The second evaluates the role's policies and prints `allowed`, `implicitDeny` or `explicitDeny` for each action.
 
 @drill iam-eval
 
@@ -153,6 +225,39 @@ Practise on your own lab account, or on platforms built for it, such as [flAWS](
 ## Read real permissions
 
 @range iam
+
+## Review a role
+
+A colleague asks you to approve a new role for a reporting job. These are its two statements.
+
+```json
+{ "Effect": "Allow", "Principal": {"AWS": "*"}, "Action": "sts:AssumeRole" }
+```
+
+```json
+{ "Effect": "Allow", "Action": "*", "Resource": "*" }
+```
+
+?? The first is the trust policy. Who can assume this role?
++ Any identity in any AWS account assumes it
+- Only the root user of this one account
+- Only EC2 servers running in this same account
+- Nobody, because a star matches no real principal
+=> A star as the principal means everyone, including accounts that aren't yours. A trust policy should name the one service or role that needs it.
+
+?? The organisation has an SCP that denies `iam:*`. Can this role create a new user?
++ No, an explicit deny beats every single allow
+- Yes, the role's own star outranks the guardrail
+- Yes, because an SCP never applies to roles
+- No, because a role can never call IAM
+=> The role's policy allows everything, and it still can't. That's what a guardrail is for: it holds even when a policy below it is badly written.
+
+?? A key ID starting with `AKIA` turns up in a public repository. What's the first move?
++ Deactivate it, then check what it did
+- Delete the repository and tell nobody else
+- Wait for it to expire by itself
+- Rename the file so scanners miss it
+=> `AKIA` marks a long-lived key, so it never expires. Deactivate it at once, then read CloudTrail for what it was used for. Removing the commit doesn't help, because the key has already been copied.
 
 ## Infrastructure as code
 
