@@ -35,7 +35,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ● | ● | ICMP, ping, traceroute | 10 mentions in 3 docs, most in 0020-reading-packets, practice 2. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
 | ◐* | ● | IPv6 addressing, NDP, SLAAC | 6 mentions in 2 docs, most in 0015-bits-and-ip-addresses. *One section titled 'IPv6, briefly'. No NDP or SLAAC mechanics.* | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
 | ○ | ● | IPv6 attacks: rogue RA, dual-stack blind spots | None. | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
-| ○ | ● | Routing protocols: OSPF, BGP | None. | [Routing and BGP security](modules/01-networking/12-routing-and-bgp.md) |
+| ○ | ● | Routing protocols: OSPF, BGP | 1 mentions in 1 docs, most in 0076-machine-learning-for-detection. | [Routing and BGP security](modules/01-networking/12-routing-and-bgp.md) |
 | ○ | ● | BGP hijacking and RPKI | None. | [Routing and BGP security](modules/01-networking/12-routing-and-bgp.md) |
 
 ### Transport
@@ -899,7 +899,7 @@ Basis: Added: OWASP LLM Top 10 2025, MITRE ATLAS.
 | ◐* | ● | Data poisoning | 1 mentions in 1 docs, most in 0076-machine-learning-for-detection. *Section 'Poisoning and backdoors'.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ◐* | ● | Model extraction and membership inference | None. *Lesson 76, 'Attacks on models', is a short overview.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ◐ | ◐ | MITRE ATLAS | 6 mentions in 3 docs, most in 0071-securing-ai-applications. *Named and linked, not taught.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
-| ●* | ● | Machine learning for detection | 6 mentions in 2 docs, most in 0076-machine-learning-for-detection, practice 1. *Lesson 76.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
+| ●* | ● | Machine learning for detection | 7 mentions in 2 docs, most in 0076-machine-learning-for-detection, practice 1. *Lesson 76.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ●* | ● | AI-enabled offence: deepfakes, phishing at scale | 4 mentions in 4 docs, most in c1-the-jobs. *Lesson 75, 'What attackers do with it'.* |  |
 
 ## 15 Wireless, mobile, hardware, OT and physical
@@ -958,7 +958,7 @@ Basis: Added: CyBOK Human Factors, Privacy & Online Rights, Formal Methods, Dist
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ○ | ● | Social engineering principles | 1 mentions in 1 docs, most in 0069-supply-chain-and-pipelines. *Section 'why it works'. The word count credited the physical security module.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
-| ●* | ● | Phishing analysis | 39 mentions in 18 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
+| ●* | ● | Phishing analysis | 45 mentions in 18 docs, most in 0076-machine-learning-for-detection, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Pretexting, vishing, smishing | None. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ◐ | ● | Business email compromise | 3 mentions in 2 docs, most in 0054-phishing-analysis, practice 1. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Usable security | None. *The module's subject.* | [Usable security and culture](modules/16-human-privacy-research/02-usable-security.md) |

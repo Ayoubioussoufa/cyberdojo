@@ -2364,6 +2364,58 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def bias_report(cases):\n    if not cases:\n        return {'assistant_accuracy': 0, 'analyst_accuracy': 0, 'followed_wrong': 0}\n    n = len(cases)\n    assistant_right = sum(1 for a, h, t in cases if a == t)\n    analyst_right = sum(1 for a, h, t in cases if h == t)\n    wrong = [(a, h) for a, h, t in cases if a != t]\n    followed = sum(1 for a, h in wrong if h == a)\n    return {\n        'assistant_accuracy': round(assistant_right / n, 2),\n        'analyst_accuracy': round(analyst_right / n, 2),\n        'followed_wrong': round(followed / len(wrong), 2) if wrong else 0,\n    }\n",
   },
+  {
+    id: "url-features",
+    prompt: "Write features(url): take the host (the part between :// and the next /, or the whole text when there is no ://), in lower case. Return a dict with 'length' (characters in the host), 'digits', 'hyphens', 'dots', 'is_ip' (True when the host is four groups of digits joined by dots) and 'bait' (how many words from BAIT appear anywhere in the host).",
+    starter: "import re\n\nBAIT = ['login', 'verify', 'secure', 'account', 'update', 'confirm', 'paypa1', 'reset']\n\ndef features(url):\n    host = url.split('://', 1)[1] if '://' in url else url\n    host = host.split('/')[0].lower()\n    # Your code here.\n    return {}\n",
+    tests: [
+      { name: "a phishing-shaped host", expr: "features('verify-login-204.example') == {'length': 24, 'digits': 3, 'hyphens': 2, 'dots': 1, 'is_ip': False, 'bait': 2}" },
+      { name: "an ordinary host", expr: "features('docs.oasis.example') == {'length': 18, 'digits': 0, 'hyphens': 0, 'dots': 2, 'is_ip': False, 'bait': 0}" },
+      { name: "a bare IP address", expr: "features('http://203.0.113.7/login') == {'length': 11, 'digits': 8, 'hyphens': 0, 'dots': 3, 'is_ip': True, 'bait': 0}" },
+      { name: "capitals and a misspelling", expr: "features('https://Secure-PAYPA1-update.example/x') == {'length': 28, 'digits': 1, 'hyphens': 2, 'dots': 1, 'is_ip': False, 'bait': 3}" },
+      { name: "words in the path don't count", expr: "features('https://docs.oasis.example/login/verify')['bait'] == 0" },
+    ],
+    solution: "import re\n\nBAIT = ['login', 'verify', 'secure', 'account', 'update', 'confirm', 'paypa1', 'reset']\n\ndef features(url):\n    host = url.split('://', 1)[1] if '://' in url else url\n    host = host.split('/')[0].lower()\n    return {\n        'length': len(host),\n        'digits': sum(c.isdigit() for c in host),\n        'hyphens': host.count('-'),\n        'dots': host.count('.'),\n        'is_ip': re.fullmatch(r'\\d+\\.\\d+\\.\\d+\\.\\d+', host) is not None,\n        'bait': sum(1 for w in BAIT if w in host),\n    }\n",
+  },
+  {
+    id: "split-overlap",
+    prompt: "Write leaked(train, test): both are lists of URLs. Compare them in lower case. Return (shared, share): shared is the sorted list of distinct test URLs that also appear in train, and share is the fraction of test entries (counting repeats) that appear in train, rounded to 2 decimal places, or 0 when test is empty.",
+    starter: "def leaked(train, test):\n    seen = set(u.lower() for u in train)\n    # Your code here.\n    return [], 0\n",
+    tests: [
+      { name: "a clean split", expr: "leaked(['a.example', 'b.example'], ['c.example', 'd.example']) == ([], 0.0)" },
+      { name: "one address in both halves", expr: "leaked(['verify-login-204.example', 'docs.oasis.example'], ['verify-login-204.example', 'mail.atlas.example']) == (['verify-login-204.example'], 0.5)" },
+      { name: "case doesn't hide a duplicate", expr: "leaked(['Docs.Oasis.Example'], ['docs.oasis.example']) == (['docs.oasis.example'], 1.0)" },
+      { name: "repeats in the test set count each time", expr: "leaked(['x.example'], ['x.example', 'x.example', 'y.example']) == (['x.example'], 0.67)" },
+      { name: "an empty test set", expr: "leaked(['x.example'], []) == ([], 0)" },
+    ],
+    solution: "def leaked(train, test):\n    seen = set(u.lower() for u in train)\n    hits = [u.lower() for u in test if u.lower() in seen]\n    share = round(len(hits) / len(test), 2) if test else 0\n    return sorted(set(hits)), share\n",
+  },
+  {
+    id: "base-rate-calc",
+    prompt: "Write daily_alerts(events, attack_rate, recall, false_positive_rate): events is how many events a day, attack_rate the share that are attacks, recall the share of attacks the detector catches, and false_positive_rate the share of normal events it wrongly flags. Return (true_alerts, false_alerts, precision): the two counts rounded to whole numbers, and precision as true_alerts divided by all alerts, rounded to 3 decimal places, or 0 when there are no alerts.",
+    starter: "def daily_alerts(events, attack_rate, recall, false_positive_rate):\n    attacks = events * attack_rate\n    normal = events - attacks\n    # Your code here.\n    return 0, 0, 0\n",
+    tests: [
+      { name: "the table from the lesson", expr: "daily_alerts(100000, 0.0001, 1.0, 0.01) == (10, 1000, 0.01)" },
+      { name: "a much lower false-positive rate", expr: "daily_alerts(100000, 0.0001, 0.9, 0.001) == (9, 100, 0.083)" },
+      { name: "the same detector on balanced test data", expr: "daily_alerts(100000, 0.5, 1.0, 0.01) == (50000, 500, 0.99)" },
+      { name: "no attacks at all", expr: "daily_alerts(1000, 0, 1.0, 0.01) == (0, 10, 0.0)" },
+      { name: "a perfect detector", expr: "daily_alerts(5000, 0.01, 1.0, 0) == (50, 0, 1.0)" },
+    ],
+    solution: "def daily_alerts(events, attack_rate, recall, false_positive_rate):\n    attacks = events * attack_rate\n    normal = events - attacks\n    tp = round(attacks * recall)\n    fp = round(normal * false_positive_rate)\n    precision = round(tp / (tp + fp), 3) if tp + fp else 0\n    return tp, fp, precision\n",
+  },
+  {
+    id: "zscore-anomaly",
+    prompt: "Write unusual(baseline, today, threshold): baseline maps users to lists of past daily counts, and today maps users to today's count. Return the sorted users to look at: those with no history, those whose history never varies and whose count today is different, and those whose z-score, (today - mean) divided by the population standard deviation, is above threshold.",
+    starter: "import statistics\n\ndef unusual(baseline, today, threshold):\n    flagged = []\n    for user, count in today.items():\n        history = baseline.get(user)\n        # statistics.mean(history) and statistics.pstdev(history) give the average and spread.\n    return sorted(flagged)\n",
+    tests: [
+      { name: "an ordinary day", expr: "unusual({'ana': [12, 15, 11, 14, 13], 'li': [40, 38, 45, 42, 41], 'svc_backup': [200, 200, 200, 200, 200]}, {'ana': 16, 'li': 44, 'svc_backup': 200}, 3) == []" },
+      { name: "Ana's busy day", expr: "unusual({'ana': [12, 15, 11, 14, 13], 'li': [40, 38, 45, 42, 41], 'svc_backup': [200, 200, 200, 200, 200]}, {'ana': 30, 'li': 44, 'svc_backup': 200}, 3) == ['ana']" },
+      { name: "a new user and a changed backup job", expr: "unusual({'ana': [12, 15, 11, 14, 13], 'li': [40, 38, 45, 42, 41], 'svc_backup': [200, 200, 200, 200, 200]}, {'ana': 13, 'li': 44, 'svc_backup': 260, 'omar': 5}, 3) == ['omar', 'svc_backup']" },
+      { name: "a quiet day is not flagged", expr: "unusual({'ana': [12, 15, 11, 14, 13], 'li': [40, 38, 45, 42, 41], 'svc_backup': [200, 200, 200, 200, 200]}, {'li': 10}, 3) == []" },
+      { name: "nobody active today", expr: "unusual({'ana': [12, 15, 11, 14, 13], 'li': [40, 38, 45, 42, 41], 'svc_backup': [200, 200, 200, 200, 200]}, {}, 3) == []" },
+    ],
+    solution: "import statistics\n\ndef unusual(baseline, today, threshold):\n    flagged = []\n    for user, count in today.items():\n        history = baseline.get(user)\n        if not history:\n            flagged.append(user)\n            continue\n        mean = statistics.mean(history)\n        spread = statistics.pstdev(history)\n        if spread == 0:\n            if count != mean:\n                flagged.append(user)\n        elif (count - mean) / spread > threshold:\n            flagged.append(user)\n    return sorted(flagged)\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

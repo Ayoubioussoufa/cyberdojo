@@ -2,7 +2,7 @@
 title: Machine learning for detection
 summary: Build a phishing URL classifier from scratch in plain Python, then learn why good scores lie: the base-rate trap, leakage, drift, and attacks on models.
 month: 20
-minutes: 60
+minutes: 85
 builds: a working classifier, and the judgement to distrust its score
 source: NIST AI 100-2, Adversarial Machine Learning | https://csrc.nist.gov/pubs/ai/100/2/e2025/final
 words: feature, overfitting, concept drift
@@ -115,7 +115,24 @@ safe
 safe
 ```
 
+The model above only sees words. Most real classifiers add **features** that describe the shape of the address, because shape survives when attackers change words. Each one is a number that a person could compute by hand:
+
+| Feature | Why it might help |
+|---|---|
+| Length of the host name | Phishing hosts are often long |
+| Number of digits | Random numbers pad out throwaway domains |
+| Number of hyphens | `verify-login-204` is built from glued pieces |
+| Number of dots | Deep subdomains imitate a real brand |
+| Is the host an IP address? | Real services rarely send you to a bare address |
+| Bait words present | `login`, `verify`, `secure` and their misspellings |
+
+@code url-features
+
 Notice the split. The model learned from 70% of the data, and it was tested on the 30% that it had never seen. Testing on your training data is like giving students the exam in advance.
+
+A split only works if nothing crosses it. If the same address appears in both halves, the model is graded on a question it has already seen, and the score rises for no good reason. With real data there's a second rule: split by **time**. Train on January to June and test on July, because that's the situation the model will face, judged on tomorrow's attacks.
+
+@code split-overlap
 
 ?? Why keep part of the data out of training?
 + To measure performance on examples it hasn't seen
@@ -162,6 +179,10 @@ This is the most important idea in the lesson. Suppose that a detector catches 1
 
 Ninety-nine in every hundred alerts are false. When attacks are rare, a small false-positive rate overwhelms them. That's why "99% accurate" means little in security, and why precision at the real rate is the number to ask for.
 
+The arithmetic is short enough to keep as a function, so you can try a vendor's numbers against your own traffic:
+
+@code base-rate-calc
+
 @drill base-rate
 
 ?? A vendor claims "99% accuracy". What should you ask next?
@@ -170,6 +191,26 @@ Ninety-nine in every hundred alerts are false. When attacks are rare, a small fa
 - How many other customers use the same logo?
 - Was the marketing page written by an engineer?
 => Accuracy on balanced test data says little. Ask how many alerts you'd get a day, and how many would be real.
+
+## Anomalies without labels
+
+The simplest anomaly detector needs no model at all. Take each user's history, compute the average and the **standard deviation**, which says how much the numbers usually vary, and flag a day that sits far above the usual. How far is measured in standard deviations, called a **z-score**: (today − average) ÷ standard deviation. A z-score above 3 is a common starting threshold.
+
+| User | Last five days | Average | Today | z-score |
+|---|---|---|---|---|
+| ana | 12, 15, 11, 14, 13 | 13 | 16 | 2.1 |
+| ana | 12, 15, 11, 14, 13 | 13 | 30 | 12.0 |
+
+Two cases need a decision. A user with no history has no average, so treat them as worth a look. And an account that does exactly the same thing every day, such as a backup job, has a standard deviation of zero, so any change at all is unusual.
+
+@code zscore-anomaly
+
+?? A new employee's first day of logins is flagged as anomalous. What does that show?
++ Unusual isn't the same thing as malicious
+- The new employee is certainly an attacker
+- Anomaly detection never works on real data
+- The threshold should be set to zero
+=> They have no history, so everything they do is new. Anomaly detection finds what's different, and a person still decides whether it matters.
 
 ## Attacks on models
 
@@ -190,6 +231,37 @@ The defences are mostly engineering. Control your training data, retrain and re-
 - Concept drift, a natural change over the years
 - Overfitting, memorising every file in the training set
 => The model didn't change, and the input did. Evasion is why classifiers need backup from behaviour-based detection.
+
+## Review a vendor's claim
+
+A vendor presents its phishing-URL detector.
+
+```
+- 99.9% accuracy on our benchmark
+- Trained and tested on the same public phishing feed, shuffled and split 80/20
+- Fully autonomous: blocks without review
+```
+
+?? What's wrong with the benchmark?
++ Similar URLs may sit on both sides of it
+- Public feeds never hold any phishing URLs at all
+- An 80/20 split is never allowed in machine learning
+- Accuracy simply can't be measured on URLs like these
+=> Phishing kits produce near-identical addresses. Shuffled at random, many of them land in both halves, and the model is graded on what it has seen. A split by time is the honest test.
+
+?? What number would you ask for instead of accuracy?
++ Precision at our own traffic's real attack rate
+- The size of the vendor's whole development team
+- The accuracy on the training data as well
+- How fast the model was trained last year
+=> At a real attack rate, even a tiny false-positive rate can mean that most blocks are mistakes. Ask what a day of your traffic would look like.
+
+?? Why push back on "fully autonomous"?
++ Its mistakes block real business with nobody checking
+- Autonomous systems are always more expensive to run
+- Models can't block anything without a person present
+- Blocking phishing is never really a good idea
+=> A detector with a modest false-positive rate will block legitimate sites every day. Start with alerts, measure, and automate only what has earned it.
 
 ?! Improve the classifier: add a feature, such as the URL's length or its count of digits, or better training data. What changed, and how would you know it helped in the real world?
 

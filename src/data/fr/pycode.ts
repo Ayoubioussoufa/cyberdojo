@@ -1724,4 +1724,44 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "aucun cas",
     ],
   },
+  "url-features": {
+    prompt: "Écrivez features(url) : prenez l'hôte (la partie entre :// et le / suivant, ou tout le texte quand il n'y a pas de ://), en minuscules. Renvoyez un dict avec 'length' (le nombre de caractères de l'hôte), 'digits', 'hyphens', 'dots', 'is_ip' (True quand l'hôte est fait de quatre groupes de chiffres reliés par des points) et 'bait' (combien de mots de BAIT apparaissent quelque part dans l'hôte).",
+    tests: [
+      "un hôte à l'allure d'hameçonnage",
+      "un hôte ordinaire",
+      "une adresse IP nue",
+      "des majuscules et une faute volontaire",
+      "les mots du chemin ne comptent pas",
+    ],
+  },
+  "split-overlap": {
+    prompt: "Écrivez leaked(train, test) : les deux sont des listes d'URL. Comparez-les en minuscules. Renvoyez (shared, share) : shared est la liste triée des URL de test distinctes qui apparaissent aussi dans train, et share est la part des entrées de test (répétitions comprises) présentes dans train, arrondie à 2 décimales, ou 0 quand test est vide.",
+    tests: [
+      "une séparation propre",
+      "une adresse dans les deux moitiés",
+      "la casse ne cache pas un doublon",
+      "les répétitions du jeu de test comptent chaque fois",
+      "un jeu de test vide",
+    ],
+  },
+  "base-rate-calc": {
+    prompt: "Écrivez daily_alerts(events, attack_rate, recall, false_positive_rate) : events est le nombre d'événements par jour, attack_rate la part qui sont des attaques, recall la part des attaques que le détecteur attrape, et false_positive_rate la part des événements normaux qu'il signale à tort. Renvoyez (true_alerts, false_alerts, precision) : les deux nombres arrondis à l'entier, et la précision égale à true_alerts divisé par toutes les alertes, arrondie à 3 décimales, ou 0 quand il n'y a aucune alerte.",
+    tests: [
+      "le tableau de la leçon",
+      "un taux de faux positifs bien plus bas",
+      "le même détecteur sur des données de test équilibrées",
+      "aucune attaque",
+      "un détecteur parfait",
+    ],
+  },
+  "zscore-anomaly": {
+    prompt: "Écrivez unusual(baseline, today, threshold) : baseline associe des utilisateurs à des listes de comptes quotidiens passés, et today associe des utilisateurs au compte du jour. Renvoyez la liste triée des utilisateurs à examiner : ceux sans historique, ceux dont l'historique ne varie jamais et dont le compte du jour est différent, et ceux dont le score z, (aujourd'hui - moyenne) divisé par l'écart type de la population, dépasse threshold.",
+    tests: [
+      "une journée ordinaire",
+      "la journée chargée d'Ana",
+      "un nouvel utilisateur et une sauvegarde qui a changé",
+      "une journée calme n'est pas signalée",
+      "personne d'actif aujourd'hui",
+    ],
+  },
 };
