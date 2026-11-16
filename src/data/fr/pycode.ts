@@ -1336,4 +1336,47 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "une liste entière, triée",
     ],
   },
+  "shannon-entropy": {
+    prompt: "Écrivez entropy(data) : data est une suite d'octets. Renvoyez son entropie de Shannon en bits par octet, arrondie à 2 décimales : pour chaque valeur d'octet présente, avec p sa part des données, ajoutez -p fois log2(p). Des données vides ont une entropie de 0.",
+    tests: [
+      "un seul octet répété",
+      "deux valeurs, mélangées à parts égales",
+      "chaque valeur d'octet une fois",
+      "un texte ordinaire",
+      "des données vides",
+      "un texte reste bien en dessous de données aléatoires",
+    ],
+  },
+  "printable-strings": {
+    prompt: "Écrivez printable_strings(data, minimum) : data est une suite d'octets. Renvoyez, dans l'ordre, chaque suite d'au moins minimum caractères ASCII imprimables (valeurs d'octet de 32 à 126), sous forme de texte. C'est ce que fait l'outil strings.",
+    tests: [
+      "une URL entre des octets binaires",
+      "les suites courtes sont écartées",
+      "une suite tout à la fin est gardée",
+      "plusieurs suites, dans l'ordre",
+      "la longueur minimum exacte compte",
+      "rien d'imprimable",
+    ],
+  },
+  "suspicious-imports": {
+    prompt: "Écrivez abilities(imports) : imports est une liste de noms de fonctions Windows. Renvoyez la liste triée des capacités qu'ils suggèrent : 'injection' quand VirtualAllocEx, WriteProcessMemory et CreateRemoteThread sont tous les trois présents, 'download' quand l'un de URLDownloadToFileW, InternetOpenUrlA ou WinHttpOpen l'est, 'persistence' pour RegSetValueExW ou CreateServiceW, 'keylogging' pour SetWindowsHookExW ou GetAsyncKeyState, et 'anti-analysis' pour IsDebuggerPresent.",
+    tests: [
+      "un programme ordinaire",
+      "les trois fonctions d'injection",
+      "deux sur trois ne suffisent pas",
+      "un téléchargeur qui survit aux redémarrages",
+      "tout à la fois, trié",
+      "aucun import",
+    ],
+  },
+  "enc-command-line": {
+    prompt: "Écrivez decode_command(line) : line est une ligne de commande PowerShell qui contient -EncodedCommand ou -enc (dans n'importe quelle casse) suivi d'un argument en base64. Renvoyez la commande décodée : décodez l'argument depuis le base64, puis lisez les octets en UTF-16LE. Renvoyez None quand la ligne n'a pas d'argument encodé. Le code ne fait que décoder du texte ; rien n'est exécuté.",
+    tests: [
+      "l'exemple de la leçon",
+      "le nom long de l'option, en casse mélangée",
+      "d'autres options autour",
+      "une commande simple",
+      "l'option sans rien après",
+    ],
+  },
 };
