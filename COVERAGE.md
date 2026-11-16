@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 47 mentions in 13 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 51 mentions in 14 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 37 mentions in 4 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -275,7 +275,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | X.509, CAs and chains of trust | 25 mentions in 15 docs, most in 0039-public-keys-and-tls, practice 4. *Lesson 39, 'Certificates and the chain of trust'.* | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
+| ●* | ● | X.509, CAs and chains of trust | 28 mentions in 15 docs, most in 0059-incident-response, practice 4. *Lesson 39, 'Certificates and the chain of trust'.* | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | Revocation: CRL, OCSP | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | Certificate Transparency | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | ACME and automated certificates | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
@@ -496,7 +496,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Malware taxonomy: virus, worm, trojan, RAT, loader | 7 mentions in 3 docs, most in 0067-safe-malware-triage, practice 10. *Lesson 67, 'What malware does'.* | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
-| ◐ | ● | Ransomware and double extortion | 19 mentions in 10 docs, most in 0001-what-security-protects, practice 7. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
+| ◐ | ● | Ransomware and double extortion | 20 mentions in 10 docs, most in 0001-what-security-protects, practice 7. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Wipers | None. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
 | ○ | ● | Botnets | None. | [Firmware and IoT security](modules/15-wireless-mobile-hardware-ot/06-firmware-and-iot.md) |
 | ◐ | ● | Infostealers | 4 mentions in 1 docs, most in 0067-safe-malware-triage. | [Malware families and economics](modules/06-malware-edr/01-malware-families-and-economics.md) |
@@ -604,14 +604,14 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 |---|---|---|---|---|
 | ● | ● | SOC tiers and alert triage | 68 mentions in 28 docs, most in c1-the-jobs, practice 9. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 | ●* | ● | Log sources and pipelines | 15 mentions in 7 docs, most in P06. *Lesson 52, 'What each log proves'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | SIEM concepts | 40 mentions in 16 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ● | ● | SIEM concepts | 42 mentions in 17 docs, most in 0052-logs-and-siem, practice 5. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Wazuh (tool) | 20 mentions in 5 docs, most in P06, practice 1. |  |
 | ◐ | ● | Splunk and SPL (tool) | 10 mentions in 2 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ◐ | ● | Elastic stack and KQL (tool) | 10 mentions in 4 docs, most in 0052-logs-and-siem, practice 1. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ○ | ● | Microsoft Sentinel (tool) | 1 mentions in 1 docs, most in 0052-logs-and-siem. | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
 | ● | ● | Writing correlation rules, tuning false positives | 34 mentions in 15 docs, most in 0023-ids-and-network-monitoring, practice 12. |  |
-| ●* | ● | Sigma (tool) | 17 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
-| ● | ● | SOAR and playbooks | 18 mentions in 8 docs, most in P06, practice 1. |  |
+| ●* | ● | Sigma (tool) | 20 mentions in 10 docs, most in 0058-detection-engineering. *Lesson 58, 'A Sigma rule, line by line'.* | [SIEM platforms and query languages](modules/08-blue-team/01-siem-query-languages.md) |
+| ● | ● | SOAR and playbooks | 20 mentions in 8 docs, most in P06, practice 1. |  |
 
 ### Threat hunting
 
@@ -637,7 +637,7 @@ Basis: Brief 8, CyBOK Security Operations & Incident Management, CyBOK Forensics
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | Order of volatility, chain of custody | 7 mentions in 4 docs, most in 0065-forensic-principles, practice 3. *Lesson 65, 'The principles'.* |  |
+| ●* | ● | Order of volatility, chain of custody | 8 mentions in 4 docs, most in 0059-incident-response, practice 3. *Lesson 65, 'The principles'.* |  |
 | ●* | ● | Disk imaging and write blocking | 10 mentions in 4 docs, most in 0065-forensic-principles, practice 2. *Lesson 65 and project P11.* | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ○ | ● | Autopsy and The Sleuth Kit (tool) | None. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ●* | ● | FTK Imager, KAPE, Eric Zimmerman tools (tool) | 14 mentions in 3 docs, most in P11. *Walked through in project P11.* | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
@@ -717,7 +717,7 @@ Basis: Brief 10.
 | ◐ | ● | AWS S3 exposure | 14 mentions in 3 docs, most in 0063-cloud-foundations-and-iam, practice 3. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ◐ | ● | Instance metadata and IMDSv2 | 19 mentions in 6 docs, most in 0063-cloud-foundations-and-iam, practice 15. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 | ● | ● | CloudTrail and GuardDuty | 29 mentions in 6 docs, most in 0064-cloud-detection-and-posture, practice 8. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
-| ◐* | ● | Azure: Entra ID, RBAC, managed identity | 27 mentions in 11 docs, most in 0045-attacking-and-defending-identity. *Entra ID has a section. Azure RBAC is one table cell, and managed identities are absent.* | [Azure security](modules/10-cloud/02-azure-security.md) |
+| ◐* | ● | Azure: Entra ID, RBAC, managed identity | 28 mentions in 12 docs, most in 0045-attacking-and-defending-identity. *Entra ID has a section. Azure RBAC is one table cell, and managed identities are absent.* | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | Azure logging and Defender for Cloud | 2 mentions in 1 docs, most in 0064-cloud-detection-and-posture. | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | GCP: IAM, service accounts | 2 mentions in 1 docs, most in 0064-cloud-detection-and-posture. | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
 | ◐ | ● | GCP audit logs and SCC | 4 mentions in 2 docs, most in 0064-cloud-detection-and-posture. | [Google Cloud and multi-cloud](modules/10-cloud/03-gcp-and-multi-cloud.md) |
@@ -778,7 +778,7 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | MFA factors and strength | 57 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
+| ●* | ● | MFA factors and strength | 58 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ○ | ● | TOTP mechanics | None. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ● | ● | FIDO2, WebAuthn, passkeys | 13 mentions in 3 docs, most in 0041-identity-and-access. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ◐ | ● | Credential stuffing and spraying | 4 mentions in 3 docs, most in 0040-storing-passwords. *Section on guessing at scale.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |

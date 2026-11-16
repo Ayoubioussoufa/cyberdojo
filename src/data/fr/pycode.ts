@@ -940,4 +940,90 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "les lignes répétées comptent une fois",
     ],
   },
+  "sigma-selection": {
+    prompt: "Écrivez matches(event, selection) : event est un dict qui associe des noms de champs à des valeurs. selection est un dict dont les clés sont un nom de champ, suivi éventuellement de | et d'un modificateur (endswith, startswith ou contains), et dont les valeurs sont une valeur voulue ou une liste de valeurs. Renvoyez True quand chaque clé correspond : l'événement a le champ, et au moins une valeur voulue lui correspond. value_matches est fourni et ignore la casse.",
+    tests: [
+      "Word qui lance PowerShell",
+      "Excel qui lance cmd, en minuscules",
+      "le bureau qui lance PowerShell",
+      "Word qui lance son assistant d'impression",
+      "un événement sans le champ ne correspond pas",
+      "une valeur seule avec contains",
+      "une clé simple signifie égal",
+    ],
+  },
+  "sigma-filter": {
+    prompt: "Écrivez rule_fires(event, selection, filters) : la règle se déclenche quand l'événement correspond à selection et ne correspond à aucun des filtres. filters est une liste de dicts de sélection, et peut être vide. Une fonction matches qui fonctionne est fournie.",
+    tests: [
+      "sans filtre, elle se comporte comme la sélection",
+      "le module qui lance cmd est exclu",
+      "le même module qui lance PowerShell déclenche encore la règle",
+      "un autre document qui lance cmd déclenche encore la règle",
+      "un événement qui n'a jamais correspondu à la sélection ne déclenche rien",
+    ],
+  },
+  "precision-recall": {
+    prompt: "Écrivez precision_recall(results) : results est une liste de paires (fired, malicious) de True ou False, une par événement de test. Renvoyez (précision, rappel). La précision est la part des événements déclenchés qui étaient malveillants, et le rappel est la part des événements malveillants qui ont déclenché la règle. Quand rien ne s'est déclenché, la précision vaut 0, et quand rien n'était malveillant, le rappel vaut 0.",
+    tests: [
+      "les nombres de la leçon",
+      "une règle parfaite",
+      "une règle qui se déclenche sur tout",
+      "une règle qui ne se déclenche jamais",
+      "aucun événement malveillant dans le jeu de test",
+      "aucun résultat",
+    ],
+  },
+  "sigma-lint": {
+    prompt: "Écrivez lint(rule) : rule est une règle Sigma déjà chargée dans un dict. Renvoyez la liste des problèmes, dans cet ordre : 'no title', 'no id', 'no logsource' et 'no detection' quand cette clé manque ou est vide ; 'no condition' quand detection est présent mais n'a pas de 'condition' ; et 'bad level' quand level n'est pas informational, low, medium, high ou critical. Une bonne règle donne une liste vide.",
+    tests: [
+      "une règle complète",
+      "un niveau inventé",
+      "pas d'id",
+      "une détection sans condition",
+      "un titre vide compte comme manquant",
+      "une règle vide manque de tout",
+    ],
+  },
+  "hosts-in-scope": {
+    prompt: "Écrivez hosts_in_scope(logins, first_host, start) : logins est une liste de dicts avec 'time' (en minutes depuis minuit), 'src' et 'dst'. first_host a été compromis à l'instant start. Une connexion fait entrer sa destination dans le périmètre quand sa source y est déjà à ce moment-là. Renvoyez la liste triée des hôtes du périmètre, first_host compris.",
+    tests: [
+      "les connexions de la leçon",
+      "une compromission plus ancienne fait entrer le serveur de messagerie",
+      "sans connexion, seulement le premier hôte",
+      "une connexion faite avant que sa source soit atteinte ne compte pas",
+      "une chaîne donnée dans le désordre est quand même suivie",
+      "une connexion vers le premier hôte n'ajoute pas sa source",
+    ],
+  },
+  "evidence-intact": {
+    prompt: "Écrivez tampered(items) : items est une liste de dicts avec 'name', 'sha256' (l'empreinte notée à la collecte, en texte hexadécimal) et 'data' (les octets détenus maintenant). Renvoyez les noms triés des éléments dont les données ne donnent plus l'empreinte notée. Majuscules et minuscules se valent dans l'empreinte notée.",
+    tests: [
+      "une preuve inchangée",
+      "un octet modifié",
+      "seul l'élément modifié est nommé",
+      "une empreinte écrite en majuscules correspond quand même",
+      "les noms reviennent triés",
+      "un fichier vidé est repéré",
+    ],
+  },
+  "merge-timeline": {
+    prompt: "Écrivez merge_timeline(events) : events est une liste de dicts avec 'time' (un texte comme 2026-10-27T10:02:11+01:00, avec son décalage par rapport à UTC), 'source' et 'what'. Renvoyez une liste de tuples (time, source, what) triée par heure, où time est le même instant en UTC, écrit 'YYYY-MM-DD HH:MM:SS'.",
+    tests: [
+      "les deux journaux de la leçon",
+      "un décalage peut faire reculer la date",
+      "un décalage négatif s'ajoute",
+      "l'ordre des horloges locales n'est pas l'ordre réel",
+      "aucun événement",
+    ],
+  },
+  "breach-clock": {
+    prompt: "Écrivez breach_clock(aware, now) : les deux sont des heures UTC écrites 'YYYY-MM-DD HH:MM'. aware est le moment où l'équipe a pris connaissance de la violation. Renvoyez (deadline, minutes_left) : deadline tombe 72 heures après aware, dans le même format, et minutes_left est le nombre entier de minutes entre now et l'échéance, négatif une fois celle-ci passée.",
+    tests: [
+      "six heures après",
+      "l'horloge tourne pendant le week-end",
+      "à cheval sur une fin de mois",
+      "une heure de retard",
+      "exactement à l'échéance",
+    ],
+  },
 };
