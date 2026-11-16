@@ -1379,4 +1379,90 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "l'option sans rien après",
     ],
   },
+  "stride-per-element": {
+    prompt: "Écrivez threats(kind, holds_logs) : kind vaut 'external entity', 'process', 'data store' ou 'data flow'. Renvoyez les lettres STRIDE à examiner, sous forme de chaîne dans l'ordre de STRIDE : SR pour une entité externe, STRIDE pour un processus, TID pour un flux de données, et TID pour un stockage de données, ou TRID quand holds_logs vaut True.",
+    tests: [
+      "un utilisateur est une entité externe",
+      "un processus reçoit toutes les lettres",
+      "une flèche",
+      "une base de données",
+      "un stockage de journaux ajoute la répudiation, à sa place",
+      "holds_logs ne change rien pour un processus",
+    ],
+  },
+  "boundary-crossings": {
+    prompt: "Écrivez crossings(levels, flows) : levels associe chaque élément d'un diagramme de flux de données à son niveau de confiance, un entier où plus grand veut dire plus fiable. flows est une liste de paires (source, destination). Renvoyez, dans l'ordre des flux, un tuple (source, destination, direction) pour chaque flux entre deux niveaux différents : direction vaut 'inbound' quand la destination est plus fiable, et 'outbound' sinon.",
+    tests: [
+      "le diagramme de connexion",
+      "deux éléments au même niveau",
+      "un saut de deux niveaux",
+      "aucun flux",
+    ],
+  },
+  "sql-string-builds": {
+    prompt: "Écrivez risky_queries(source) : source est du code Python sous forme de texte. Renvoyez les numéros de ligne, en comptant depuis 1, des lignes qui appellent execute( avec une requête construite comme une f-string (execute(f\" ou execute(f'), ou qui contiennent execute( avec un % ou un + après les guillemets de la requête. Les lignes qui passent les valeurs séparément sont correctes.",
+    tests: [
+      "le fichier de la leçon",
+      "une requête paramétrée est correcte",
+      "une f-string entre apostrophes",
+      "une f-string hors d'execute n'est pas une requête",
+      "aucun code",
+    ],
+  },
+  "route-audit": {
+    prompt: "Écrivez route_problems(routes, public) : routes est une liste de dicts avec 'method', 'path', 'login_required' et 'owner_check' (True ou False). public liste les chemins censés être ouverts. Renvoyez une liste de tuples (method, path, problème) dans l'ordre des routes : 'no login' quand la connexion n'est pas exigée et que le chemin n'est pas public, puis 'no object check' quand le chemin contient {id} et qu'il n'y a pas de vérification du propriétaire.",
+    tests: [
+      "une route avec les deux vérifications",
+      "la route PDF a oublié le propriétaire",
+      "créer une facture ne demande pas de vérification d'objet",
+      "une suppression sans aucune vérification",
+      "un contrôle de santé public est correct",
+      "toute l'application, dans l'ordre",
+    ],
+  },
+  "typosquat": {
+    prompt: "Écrivez lookalikes(requested, popular) : renvoyez les noms triés de requested qui ne sont pas eux-mêmes populaires mais se trouvent à une modification d'un nom populaire. Une modification, c'est un caractère ajouté, retiré ou remplacé. Comparez en minuscules.",
+    tests: [
+      "une lettre manquante",
+      "une lettre en trop",
+      "une lettre remplacée",
+      "les vrais noms sont corrects",
+      "deux modifications ne sont pas signalées",
+      "une liste mélangée, triée",
+    ],
+  },
+  "sbom-search": {
+    prompt: "Écrivez affected(sboms, package, fixed) : sboms associe le nom d'une application à son SBOM, un dict avec une liste 'components' de dicts contenant 'name' et 'version'. Les versions sont des nombres séparés par des points. Renvoyez les noms triés des applications qui contiennent package dans une version inférieure à fixed. Comparez les versions nombre par nombre, pas comme du texte.",
+    tests: [
+      "l'avis de la leçon",
+      "2.10.0 est plus récent que 2.4.1",
+      "la version corrigée elle-même est sûre",
+      "un paquet que personne n'utilise",
+      "des versions de longueurs différentes",
+    ],
+  },
+  "unpinned-actions": {
+    prompt: "Écrivez unpinned(workflow) : workflow est le texte d'un fichier GitHub Actions. Pour chaque ligne dont le contenu, après les espaces et un éventuel '- ', commence par uses:, prenez la valeur qui suit uses:. Les actions locales qui commencent par ./ sont correctes. Sinon, la partie après le dernier @ doit être un SHA de commit complet, 40 caractères hexadécimaux. Renvoyez une liste de (numéro de ligne, valeur) pour les autres, en comptant les lignes à partir de 1.",
+    tests: [
+      "le workflow de la leçon",
+      "un SHA est correct",
+      "un SHA court ne suffit pas",
+      "une action sans aucune version",
+      "une ligne uses sans tiret",
+      "aucune action",
+    ],
+  },
+  "dockerfile-lint": {
+    prompt: "Écrivez dockerfile_problems(text) : text est un Dockerfile. Renvoyez la liste des problèmes dans cet ordre : 'unpinned base' quand une image FROM n'a pas d'étiquette ou utilise :latest (un condensé @sha256: compte aussi comme épinglé) ; 'runs as root' quand il n'y a aucune ligne USER, ou que la dernière est USER root ou USER 0 ; et 'secret in ENV' pour chaque ligne ENV dont le texte contient PASSWORD, SECRET, TOKEN ou API_KEY, dans n'importe quelle casse. Les instructions sont reconnues dans n'importe quelle casse.",
+    tests: [
+      "le Dockerfile de la leçon",
+      "une image de base sans étiquette",
+      "latest n'est pas un épinglage",
+      "un condensé est un épinglage",
+      "aucune ligne USER",
+      "repasser en root à la fin",
+      "un jeton intégré à l'image",
+      "tout faux, dans l'ordre",
+    ],
+  },
 };
