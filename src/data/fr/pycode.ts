@@ -1636,4 +1636,49 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "un cas que personne n'a relancé",
     ],
   },
+  "pod-security-check": {
+    prompt: "Écrivez pod_problems(container) : container est un dict avec 'image' et 'securityContext', un dict qui peut contenir 'privileged', 'runAsNonRoot', 'allowPrivilegeEscalation' et 'drop_all'. Renvoyez les problèmes dans cet ordre : 'privileged' quand privileged vaut True, 'may run as root' sauf si runAsNonRoot vaut True, 'privilege escalation' sauf si allowPrivilegeEscalation vaut False, 'capabilities kept' sauf si drop_all vaut True, et 'unpinned image' quand l'image n'a pas de condensé @sha256:.",
+    tests: [
+      "le pod durci",
+      "un conteneur privilégié",
+      "aucun contexte de sécurité",
+      "l'élévation laissée active",
+      "une étiquette n'est pas un condensé",
+      "le manifeste de la relecture",
+    ],
+  },
+  "network-policy": {
+    prompt: "Écrivez allowed(source, destination, policies) : source et destination sont les dicts de labels de deux pods. policies est une liste de dicts avec 'select', les labels qu'un pod doit avoir pour être sélectionné, et 'allow_from', une liste de dicts de labels. Un sélecteur correspond à un pod quand chacune de ses clés et valeurs apparaît dans les labels du pod, donc un sélecteur vide correspond à tous les pods. Si aucune politique ne sélectionne la destination, renvoyez True. Sinon, renvoyez True seulement quand la source correspond à une entrée allow_from d'une politique qui sélectionne la destination.",
+    tests: [
+      "l'API atteint la base de données",
+      "le pod web, non",
+      "un pod qu'aucune politique ne sélectionne accepte tout",
+      "le refus par défaut sélectionne tout",
+      "le refus par défaut plus un chemin autorisé",
+      "un sélecteur exige chaque label",
+    ],
+  },
+  "rbac-review": {
+    prompt: "Écrivez rbac_findings(rules) : rules est la liste des règles d'un Role, des dicts avec 'verbs' et 'resources' (des listes). Renvoyez une liste de paires (indice, constat) dans l'ordre des règles, et dans une même règle dans cet ordre : 'wildcard verbs' quand '*' est dans verbs, 'wildcard resources' quand '*' est dans resources, 'reads secrets' quand resources contient secrets et que verbs contient get, list ou watch, et 'exec into pods' quand resources contient pods/exec.",
+    tests: [
+      "une règle étroite en lecture seule",
+      "administrateur en une règle",
+      "lire des secrets",
+      "créer des secrets n'est pas les lire",
+      "un shell dans d'autres pods",
+      "plusieurs règles, dans l'ordre",
+    ],
+  },
+  "zero-trust-decision": {
+    prompt: "Écrivez decide(request) : request est un dict avec 'resource', 'role', 'device_managed', 'minutes_since_mfa' et 'network'. RESOURCES donne pour chaque ressource les rôles autorisés et indique si elle est sensible. Renvoyez 'deny' quand la ressource est inconnue ou que le rôle n'est pas autorisé, 'deny' quand la ressource est sensible et que l'appareil n'est pas géré, 'step-up' quand la MFA date de plus de 60 minutes, et 'allow' sinon. Le réseau ne doit pas changer la réponse.",
+    tests: [
+      "les RH sur un portable géré",
+      "le mauvais rôle, même au bureau",
+      "la paie depuis un téléphone personnel",
+      "le wiki depuis un téléphone personnel",
+      "une MFA datant de ce matin",
+      "le réseau ne change rien",
+      "une ressource inconnue",
+    ],
+  },
 };

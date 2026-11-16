@@ -2252,6 +2252,63 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def compare(before, after):\n    verdicts = []\n    for case in sorted(before):\n        if case not in after:\n            verdicts.append((case, 'not rerun'))\n            continue\n        b, a = before[case], after[case]\n        if a == 0 and b > 0:\n            v = 'fixed'\n        elif a < b:\n            v = 'improved'\n        elif a > b:\n            v = 'worse'\n        else:\n            v = 'unchanged'\n        verdicts.append((case, v))\n    return verdicts\n",
   },
+  {
+    id: "pod-security-check",
+    prompt: "Write pod_problems(container): container is a dict with 'image' and 'securityContext', a dict that may have 'privileged', 'runAsNonRoot', 'allowPrivilegeEscalation' and 'drop_all'. Return the problems in this order: 'privileged' when privileged is True, 'may run as root' unless runAsNonRoot is True, 'privilege escalation' unless allowPrivilegeEscalation is False, 'capabilities kept' unless drop_all is True, and 'unpinned image' when the image has no @sha256: digest.",
+    starter: "def pod_problems(container):\n    sc = container.get('securityContext', {})\n    problems = []\n    # A missing key is as bad as the wrong value: use sc.get(...).\n    return problems\n",
+    tests: [
+      { name: "the hardened pod", expr: "pod_problems({'image': 'registry.example/shop@sha256:4f1a2b', 'securityContext': {'runAsNonRoot': True, 'allowPrivilegeEscalation': False, 'privileged': False, 'drop_all': True}}) == []" },
+      { name: "a privileged container", expr: "pod_problems({'image': 'registry.example/shop@sha256:4f1a2b', 'securityContext': {'runAsNonRoot': True, 'allowPrivilegeEscalation': False, 'privileged': True, 'drop_all': True}}) == ['privileged']" },
+      { name: "no security context at all", expr: "pod_problems({'image': 'registry.example/api:latest'}) == ['may run as root', 'privilege escalation', 'capabilities kept', 'unpinned image']" },
+      { name: "escalation left on", expr: "pod_problems({'image': 'registry.example/shop@sha256:4f1a2b', 'securityContext': {'runAsNonRoot': True, 'allowPrivilegeEscalation': True, 'privileged': False, 'drop_all': True}}) == ['privilege escalation']" },
+      { name: "a tag is not a digest", expr: "pod_problems({'image': 'registry.example/shop:1.4', 'securityContext': {'runAsNonRoot': True, 'allowPrivilegeEscalation': False, 'privileged': False, 'drop_all': True}}) == ['unpinned image']" },
+      { name: "the manifest from the review", expr: "pod_problems({'image': 'registry.example/api:latest', 'securityContext': {'privileged': True}}) == ['privileged', 'may run as root', 'privilege escalation', 'capabilities kept', 'unpinned image']" },
+    ],
+    solution: "def pod_problems(container):\n    sc = container.get('securityContext', {})\n    problems = []\n    if sc.get('privileged') is True:\n        problems.append('privileged')\n    if sc.get('runAsNonRoot') is not True:\n        problems.append('may run as root')\n    if sc.get('allowPrivilegeEscalation') is not False:\n        problems.append('privilege escalation')\n    if sc.get('drop_all') is not True:\n        problems.append('capabilities kept')\n    if '@sha256:' not in container['image']:\n        problems.append('unpinned image')\n    return problems\n",
+  },
+  {
+    id: "network-policy",
+    prompt: "Write allowed(source, destination, policies): source and destination are pods' label dicts. policies is a list of dicts with 'select', the labels a pod must have to be selected, and 'allow_from', a list of label dicts. A selector matches a pod when every key and value in it appears in the pod's labels, so an empty selector matches every pod. If no policy selects the destination, return True. Otherwise return True only when the source matches some allow_from entry of a policy that selects the destination.",
+    starter: "def matches(selector, labels):\n    return all(labels.get(k) == v for k, v in selector.items())\n\ndef allowed(source, destination, policies):\n    selecting = [p for p in policies if matches(p['select'], destination)]\n    # Your code here.\n    return True\n",
+    tests: [
+      { name: "the API reaches the database", expr: "allowed({'app': 'api'}, {'app': 'db'}, [{'select': {'app': 'db'}, 'allow_from': [{'app': 'api'}]}]) == True" },
+      { name: "the web pod does not", expr: "allowed({'app': 'web'}, {'app': 'db'}, [{'select': {'app': 'db'}, 'allow_from': [{'app': 'api'}]}]) == False" },
+      { name: "a pod no policy selects takes anything", expr: "allowed({'app': 'web'}, {'app': 'cache'}, [{'select': {'app': 'db'}, 'allow_from': [{'app': 'api'}]}]) == True" },
+      { name: "default deny selects everything", expr: "allowed({'app': 'api'}, {'app': 'cache'}, [{'select': {'app': 'db'}, 'allow_from': [{'app': 'api'}]}, {'select': {}, 'allow_from': []}]) == False" },
+      { name: "default deny plus one allowed path", expr: "allowed({'app': 'api'}, {'app': 'db'}, [{'select': {'app': 'db'}, 'allow_from': [{'app': 'api'}]}, {'select': {}, 'allow_from': []}]) == True" },
+      { name: "a selector needs every label", expr: "allowed({'app': 'api', 'tier': 'test'}, {'app': 'db'}, [{'select': {'app': 'db'}, 'allow_from': [{'app': 'api', 'tier': 'prod'}]}]) == False" },
+    ],
+    solution: "def matches(selector, labels):\n    return all(labels.get(k) == v for k, v in selector.items())\n\ndef allowed(source, destination, policies):\n    selecting = [p for p in policies if matches(p['select'], destination)]\n    if not selecting:\n        return True\n    return any(matches(sel, source) for p in selecting for sel in p['allow_from'])\n",
+  },
+  {
+    id: "rbac-review",
+    prompt: "Write rbac_findings(rules): rules is a Role's list of rules, dicts with 'verbs' and 'resources' (lists). Return a list of (index, finding) pairs in rule order, and inside one rule in this order: 'wildcard verbs' when '*' is in verbs, 'wildcard resources' when '*' is in resources, 'reads secrets' when resources includes secrets and verbs include get, list or watch, and 'exec into pods' when resources include pods/exec.",
+    starter: "def rbac_findings(rules):\n    found = []\n    for i, rule in enumerate(rules):\n        verbs, resources = rule['verbs'], rule['resources']\n        # Your code here.\n    return found\n",
+    tests: [
+      { name: "a narrow read-only rule", expr: "rbac_findings([{'verbs': ['get', 'list'], 'resources': ['pods', 'services']}]) == []" },
+      { name: "admin in one rule", expr: "rbac_findings([{'verbs': ['*'], 'resources': ['*']}]) == [(0, 'wildcard verbs'), (0, 'wildcard resources')]" },
+      { name: "reading secrets", expr: "rbac_findings([{'verbs': ['list'], 'resources': ['configmaps', 'secrets']}]) == [(0, 'reads secrets')]" },
+      { name: "creating secrets is not reading them", expr: "rbac_findings([{'verbs': ['create'], 'resources': ['secrets']}]) == []" },
+      { name: "a shell in other pods", expr: "rbac_findings([{'verbs': ['create'], 'resources': ['pods/exec']}]) == [(0, 'exec into pods')]" },
+      { name: "several rules, in order", expr: "rbac_findings([{'verbs': ['get'], 'resources': ['pods']}, {'verbs': ['watch'], 'resources': ['secrets', 'pods/exec']}]) == [(1, 'reads secrets'), (1, 'exec into pods')]" },
+    ],
+    solution: "def rbac_findings(rules):\n    found = []\n    for i, rule in enumerate(rules):\n        verbs, resources = rule['verbs'], rule['resources']\n        if '*' in verbs:\n            found.append((i, 'wildcard verbs'))\n        if '*' in resources:\n            found.append((i, 'wildcard resources'))\n        if 'secrets' in resources and any(v in verbs for v in ('get', 'list', 'watch')):\n            found.append((i, 'reads secrets'))\n        if 'pods/exec' in resources:\n            found.append((i, 'exec into pods'))\n    return found\n",
+  },
+  {
+    id: "zero-trust-decision",
+    prompt: "Write decide(request): request is a dict with 'resource', 'role', 'device_managed', 'minutes_since_mfa' and 'network'. RESOURCES gives each resource the roles allowed to use it and whether it is sensitive. Return 'deny' when the resource is unknown or the role isn't allowed, 'deny' when the resource is sensitive and the device isn't managed, 'step-up' when MFA was more than 60 minutes ago, and 'allow' otherwise. The network must not change the answer.",
+    starter: "RESOURCES = {'payroll': {'roles': ['hr'], 'sensitive': True}, 'wiki': {'roles': ['hr', 'staff'], 'sensitive': False}}\n\ndef decide(request):\n    resource = RESOURCES.get(request['resource'])\n    # Check in order: role, device, MFA. Never look at request['network'].\n    return 'allow'\n",
+    tests: [
+      { name: "HR on a managed laptop", expr: "decide({'resource': 'payroll', 'role': 'hr', 'device_managed': True, 'minutes_since_mfa': 10, 'network': 'office'}) == 'allow'" },
+      { name: "the wrong role, even in the office", expr: "decide({'resource': 'payroll', 'role': 'staff', 'device_managed': True, 'minutes_since_mfa': 10, 'network': 'office'}) == 'deny'" },
+      { name: "payroll from a personal phone", expr: "decide({'resource': 'payroll', 'role': 'hr', 'device_managed': False, 'minutes_since_mfa': 10, 'network': 'home'}) == 'deny'" },
+      { name: "the wiki from a personal phone", expr: "decide({'resource': 'wiki', 'role': 'staff', 'device_managed': False, 'minutes_since_mfa': 5, 'network': 'cafe'}) == 'allow'" },
+      { name: "MFA from this morning", expr: "decide({'resource': 'payroll', 'role': 'hr', 'device_managed': True, 'minutes_since_mfa': 240, 'network': 'office'}) == 'step-up'" },
+      { name: "the network changes nothing", expr: "decide({'resource': 'wiki', 'role': 'hr', 'device_managed': True, 'minutes_since_mfa': 90, 'network': 'office'}) == decide({'resource': 'wiki', 'role': 'hr', 'device_managed': True, 'minutes_since_mfa': 90, 'network': 'cafe'}) == 'step-up'" },
+      { name: "an unknown resource", expr: "decide({'resource': 'secrets-vault', 'role': 'hr', 'device_managed': True, 'minutes_since_mfa': 1, 'network': 'office'}) == 'deny'" },
+    ],
+    solution: "RESOURCES = {'payroll': {'roles': ['hr'], 'sensitive': True}, 'wiki': {'roles': ['hr', 'staff'], 'sensitive': False}}\n\ndef decide(request):\n    resource = RESOURCES.get(request['resource'])\n    if resource is None or request['role'] not in resource['roles']:\n        return 'deny'\n    if resource['sensitive'] and not request['device_managed']:\n        return 'deny'\n    if request['minutes_since_mfa'] > 60:\n        return 'step-up'\n    return 'allow'\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
