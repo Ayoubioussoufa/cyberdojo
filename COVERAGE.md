@@ -136,7 +136,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Kernel and user mode, system calls | 19 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
-| ○ | ● | Processes, fork and exec | 1 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
+| ○ | ● | Processes, fork and exec | 2 mentions in 2 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
 | ● | ● | Virtual memory and page tables | 9 mentions in 1 docs, most in 0030-how-operating-systems-work. |  |
 | ○ | ● | The /proc filesystem | 4 mentions in 2 docs, most in 0009-processes-and-signals. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
 | ○ | ● | Inodes and file descriptors | Practice only (2). | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
@@ -170,7 +170,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Processes, threads, handles, core system processes | 31 mentions in 4 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
-| ● | ● | The registry | 34 mentions in 13 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | The registry | 37 mentions in 13 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ● | ● | NTFS, $MFT, alternate data streams | 14 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ● | ● | Access tokens and SIDs | 23 mentions in 2 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 54 mentions in 16 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 56 mentions in 17 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 37 mentions in 4 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -289,7 +289,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ○ | ● | History of TLS attacks | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Downgrade attacks | 1 mentions in 1 docs, most in 0056-how-a-pentest-works. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Mutual TLS | None. | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
-| ○ | ● | Certificate pinning | Practice only (1). *Explained with its risks. The word count credited dependency pinning by mistake.* | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
+| ○ | ● | Certificate pinning | 3 mentions in 1 docs, most in 0069-supply-chain-and-pipelines, practice 1. *Explained with its risks. The word count credited dependency pinning by mistake.* | [PKI in depth](modules/03-cryptography/07-pki-in-depth.md) |
 | ○ | ● | testssl.sh, sslyze, SSL Labs (tool) | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 
 ### Flaws and practice
@@ -732,9 +732,9 @@ Basis: Brief 10.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ◐ | ● | How containers isolate | 7 mentions in 2 docs, most in 0029-tests-and-docker, practice 1. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ●* | ● | Dockerfile and image hardening | 25 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
+| ●* | ● | Dockerfile and image hardening | 27 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 | ◐ | ● | Container escape classes | 2 mentions in 1 docs, most in P14, practice 2. *Causes and defences, deliberately not techniques.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
-| ●* | ● | Trivy, Grype (tool) | 9 mentions in 3 docs, most in P14. *Walked through in project P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
+| ●* | ● | Trivy, Grype (tool) | 11 mentions in 3 docs, most in 0069-supply-chain-and-pipelines. *Walked through in project P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ○ | ● | Container runtime security | None. | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 
 ### Kubernetes
@@ -868,12 +868,12 @@ Basis: Added: CyBOK Secure Software Lifecycle, OWASP A03:2025.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | Dependency attacks: typosquatting, confusion | 1 mentions in 1 docs, most in 0069-supply-chain-and-pipelines, practice 2. | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
-| ● | ● | SBOM | 12 mentions in 3 docs, most in 0069-supply-chain-and-pipelines, practice 3. | [SLSA, SSDF and maturity models](modules/13-supply-chain/03-slsa-and-maturity.md) |
+| ◐ | ● | Dependency attacks: typosquatting, confusion | 3 mentions in 1 docs, most in 0069-supply-chain-and-pipelines, practice 2. | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
+| ● | ● | SBOM | 13 mentions in 3 docs, most in 0069-supply-chain-and-pipelines, practice 3. | [SLSA, SSDF and maturity models](modules/13-supply-chain/03-slsa-and-maturity.md) |
 | ○ | ● | SLSA provenance | 2 mentions in 1 docs, most in 0069-supply-chain-and-pipelines. | [SLSA, SSDF and maturity models](modules/13-supply-chain/03-slsa-and-maturity.md) |
-| ● | ● | Signing: Sigstore, cosign | 16 mentions in 2 docs, most in P14. | [SLSA, SSDF and maturity models](modules/13-supply-chain/03-slsa-and-maturity.md) |
-| ●* | ● | Syft, OSV-Scanner, dependabot (tool) | 6 mentions in 1 docs, most in P14. *Syft is walked through in P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
-| ◐ | ● | CI/CD attacks: poisoned pipelines, runner abuse | 4 mentions in 4 docs, most in a2-how-to-use-this-plan. | [CI/CD pipeline security](modules/13-supply-chain/02-cicd-attacks.md) |
+| ● | ● | Signing: Sigstore, cosign | 20 mentions in 2 docs, most in P14. | [SLSA, SSDF and maturity models](modules/13-supply-chain/03-slsa-and-maturity.md) |
+| ●* | ● | Syft, OSV-Scanner, dependabot (tool) | 7 mentions in 2 docs, most in P14. *Syft is walked through in P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
+| ◐ | ● | CI/CD attacks: poisoned pipelines, runner abuse | 7 mentions in 5 docs, most in 0069-supply-chain-and-pipelines. | [CI/CD pipeline security](modules/13-supply-chain/02-cicd-attacks.md) |
 | ●* | ● | Secrets scanning | 26 mentions in 8 docs, most in P03, practice 4. *Walked through in project P03.* | [Key management](modules/03-cryptography/11-key-management.md) |
 | ◐ | ● | Case studies: SolarWinds, xz, log4j | 5 mentions in 2 docs, most in 0069-supply-chain-and-pipelines. | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 

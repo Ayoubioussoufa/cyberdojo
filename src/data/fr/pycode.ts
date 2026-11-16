@@ -1420,4 +1420,49 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "toute l'application, dans l'ordre",
     ],
   },
+  "typosquat": {
+    prompt: "Écrivez lookalikes(requested, popular) : renvoyez les noms triés de requested qui ne sont pas eux-mêmes populaires mais se trouvent à une modification d'un nom populaire. Une modification, c'est un caractère ajouté, retiré ou remplacé. Comparez en minuscules.",
+    tests: [
+      "une lettre manquante",
+      "une lettre en trop",
+      "une lettre remplacée",
+      "les vrais noms sont corrects",
+      "deux modifications ne sont pas signalées",
+      "une liste mélangée, triée",
+    ],
+  },
+  "sbom-search": {
+    prompt: "Écrivez affected(sboms, package, fixed) : sboms associe le nom d'une application à son SBOM, un dict avec une liste 'components' de dicts contenant 'name' et 'version'. Les versions sont des nombres séparés par des points. Renvoyez les noms triés des applications qui contiennent package dans une version inférieure à fixed. Comparez les versions nombre par nombre, pas comme du texte.",
+    tests: [
+      "l'avis de la leçon",
+      "2.10.0 est plus récent que 2.4.1",
+      "la version corrigée elle-même est sûre",
+      "un paquet que personne n'utilise",
+      "des versions de longueurs différentes",
+    ],
+  },
+  "unpinned-actions": {
+    prompt: "Écrivez unpinned(workflow) : workflow est le texte d'un fichier GitHub Actions. Pour chaque ligne dont le contenu, après les espaces et un éventuel '- ', commence par uses:, prenez la valeur qui suit uses:. Les actions locales qui commencent par ./ sont correctes. Sinon, la partie après le dernier @ doit être un SHA de commit complet, 40 caractères hexadécimaux. Renvoyez une liste de (numéro de ligne, valeur) pour les autres, en comptant les lignes à partir de 1.",
+    tests: [
+      "le workflow de la leçon",
+      "un SHA est correct",
+      "un SHA court ne suffit pas",
+      "une action sans aucune version",
+      "une ligne uses sans tiret",
+      "aucune action",
+    ],
+  },
+  "dockerfile-lint": {
+    prompt: "Écrivez dockerfile_problems(text) : text est un Dockerfile. Renvoyez la liste des problèmes dans cet ordre : 'unpinned base' quand une image FROM n'a pas d'étiquette ou utilise :latest (un condensé @sha256: compte aussi comme épinglé) ; 'runs as root' quand il n'y a aucune ligne USER, ou que la dernière est USER root ou USER 0 ; et 'secret in ENV' pour chaque ligne ENV dont le texte contient PASSWORD, SECRET, TOKEN ou API_KEY, dans n'importe quelle casse. Les instructions sont reconnues dans n'importe quelle casse.",
+    tests: [
+      "le Dockerfile de la leçon",
+      "une image de base sans étiquette",
+      "latest n'est pas un épinglage",
+      "un condensé est un épinglage",
+      "aucune ligne USER",
+      "repasser en root à la fin",
+      "un jeton intégré à l'image",
+      "tout faux, dans l'ordre",
+    ],
+  },
 };

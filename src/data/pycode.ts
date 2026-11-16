@@ -1976,6 +1976,63 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "def route_problems(routes, public):\n    found = []\n    for r in routes:\n        if not r['login_required'] and r['path'] not in public:\n            found.append((r['method'], r['path'], 'no login'))\n        if '{id}' in r['path'] and not r['owner_check']:\n            found.append((r['method'], r['path'], 'no object check'))\n    return found\n",
   },
+  {
+    id: "typosquat",
+    prompt: "Write lookalikes(requested, popular): return the sorted names in requested that are not themselves popular but are one edit away from a popular name. One edit is one character added, removed or replaced. Compare in lower case.",
+    starter: "def one_edit_apart(a, b):\n    # True when a and b differ by exactly one added, removed or replaced character.\n    return False\n\ndef lookalikes(requested, popular):\n    found = []\n    return sorted(found)\n",
+    tests: [
+      { name: "a missing letter", expr: "lookalikes(['reqests'], ['requests', 'numpy', 'django', 'flask', 'urllib3']) == ['reqests']" },
+      { name: "an extra letter", expr: "lookalikes(['djangoo'], ['requests', 'numpy', 'django', 'flask', 'urllib3']) == ['djangoo']" },
+      { name: "a swapped-in letter", expr: "lookalikes(['nunpy'], ['requests', 'numpy', 'django', 'flask', 'urllib3']) == ['nunpy']" },
+      { name: "the real names are fine", expr: "lookalikes(['requests', 'Flask', 'numpy'], ['requests', 'numpy', 'django', 'flask', 'urllib3']) == []" },
+      { name: "two edits away is not flagged", expr: "lookalikes(['reqsts', 'urlib'], ['requests', 'numpy', 'django', 'flask', 'urllib3']) == []" },
+      { name: "a mixed list, sorted", expr: "lookalikes(['urllib4', 'pandas', 'flsk', 'django'], ['requests', 'numpy', 'django', 'flask', 'urllib3']) == ['flsk', 'urllib4']" },
+    ],
+    solution: "def one_edit_apart(a, b):\n    if a == b or abs(len(a) - len(b)) > 1:\n        return False\n    if len(a) == len(b):\n        return sum(x != y for x, y in zip(a, b)) == 1\n    short, long = (a, b) if len(a) < len(b) else (b, a)\n    for i in range(len(long)):\n        if long[:i] + long[i + 1:] == short:\n            return True\n    return False\n\ndef lookalikes(requested, popular):\n    popular = [p.lower() for p in popular]\n    found = []\n    for name in requested:\n        n = name.lower()\n        if n in popular:\n            continue\n        if any(one_edit_apart(n, p) for p in popular):\n            found.append(name)\n    return sorted(found)\n",
+  },
+  {
+    id: "sbom-search",
+    prompt: "Write affected(sboms, package, fixed): sboms maps an application's name to its SBOM, a dict with a 'components' list of dicts with 'name' and 'version'. Versions are numbers joined by dots. Return the sorted names of the applications that contain package at a version lower than fixed. Compare versions number by number, not as text.",
+    starter: "def version(text):\n    return tuple(int(part) for part in text.split('.'))\n\ndef affected(sboms, package, fixed):\n    hits = []\n    # version('2.10.0') > version('2.9.0') is True, unlike the text comparison.\n    return sorted(hits)\n",
+    tests: [
+      { name: "the advisory from the lesson", expr: "affected({'shop': {'components': [{'name': 'logkit', 'version': '2.3.9'}, {'name': 'requests', 'version': '2.32.3'}]}, 'billing': {'components': [{'name': 'logkit', 'version': '2.10.0'}]}, 'admin': {'components': [{'name': 'flask', 'version': '3.0.3'}]}, 'reports': {'components': [{'name': 'logkit', 'version': '2.4.0'}]}}, 'logkit', '2.4.1') == ['reports', 'shop']" },
+      { name: "2.10.0 is newer than 2.4.1", expr: "'billing' not in affected({'shop': {'components': [{'name': 'logkit', 'version': '2.3.9'}, {'name': 'requests', 'version': '2.32.3'}]}, 'billing': {'components': [{'name': 'logkit', 'version': '2.10.0'}]}, 'admin': {'components': [{'name': 'flask', 'version': '3.0.3'}]}, 'reports': {'components': [{'name': 'logkit', 'version': '2.4.0'}]}}, 'logkit', '2.4.1')" },
+      { name: "the fixed version itself is safe", expr: "affected({'a': {'components': [{'name': 'logkit', 'version': '2.4.1'}]}}, 'logkit', '2.4.1') == []" },
+      { name: "a package nobody uses", expr: "affected({'shop': {'components': [{'name': 'logkit', 'version': '2.3.9'}, {'name': 'requests', 'version': '2.32.3'}]}, 'billing': {'components': [{'name': 'logkit', 'version': '2.10.0'}]}, 'admin': {'components': [{'name': 'flask', 'version': '3.0.3'}]}, 'reports': {'components': [{'name': 'logkit', 'version': '2.4.0'}]}}, 'leftpad', '1.0.0') == []" },
+      { name: "versions of different lengths", expr: "affected({'a': {'components': [{'name': 'x', 'version': '1.2'}]}, 'b': {'components': [{'name': 'x', 'version': '1.2.0.1'}]}}, 'x', '1.2.0.1') == ['a']" },
+    ],
+    solution: "def version(text):\n    return tuple(int(part) for part in text.split('.'))\n\ndef affected(sboms, package, fixed):\n    hits = []\n    for app, sbom in sboms.items():\n        for c in sbom['components']:\n            if c['name'] == package and version(c['version']) < version(fixed):\n                hits.append(app)\n                break\n    return sorted(hits)\n",
+  },
+  {
+    id: "unpinned-actions",
+    prompt: "Write unpinned(workflow): workflow is the text of a GitHub Actions file. For every line whose content, after spaces and an optional '- ', starts with uses:, take the value after uses:. Local actions starting with ./ are fine. Otherwise the part after the last @ must be a full commit SHA, 40 hex characters. Return a list of (line number, value) for the others, counting lines from 1.",
+    starter: "import re\n\ndef unpinned(workflow):\n    found = []\n    for number, line in enumerate(workflow.splitlines(), start=1):\n        text = line.strip()\n        if text.startswith('- '):\n            text = text[2:]\n        # Your code here.\n    return found\n",
+    tests: [
+      { name: "the workflow from the lesson", expr: "unpinned('name: ci\\non: pull_request\\njobs:\\n  build:\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab\\n      - uses: actions/setup-node@v4\\n      - uses: ./.github/actions/lint\\n      - uses: some-org/deploy-action@main\\n      - run: npm ci\\n') == [(8, 'actions/setup-node@v4'), (10, 'some-org/deploy-action@main')]" },
+      { name: "a SHA is fine", expr: "unpinned('      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab') == []" },
+      { name: "a short SHA is not enough", expr: "unpinned('      - uses: actions/checkout@8e5e7e5') == [(1, 'actions/checkout@8e5e7e5')]" },
+      { name: "an action with no version at all", expr: "unpinned('    steps:\\n      - uses: some-org/tool') == [(2, 'some-org/tool')]" },
+      { name: "a uses line without the dash", expr: "unpinned('    uses: some-org/reusable/.github/workflows/build.yml@v2') == [(1, 'some-org/reusable/.github/workflows/build.yml@v2')]" },
+      { name: "no actions at all", expr: "unpinned('on: push\\njobs: {}') == []" },
+    ],
+    solution: "import re\n\ndef unpinned(workflow):\n    found = []\n    for number, line in enumerate(workflow.splitlines(), start=1):\n        text = line.strip()\n        if text.startswith('- '):\n            text = text[2:]\n        if not text.startswith('uses:'):\n            continue\n        value = text[len('uses:'):].strip()\n        if value.startswith('./'):\n            continue\n        ref = value.rsplit('@', 1)[1] if '@' in value else ''\n        if not re.fullmatch(r'[0-9a-f]{40}', ref):\n            found.append((number, value))\n    return found\n",
+  },
+  {
+    id: "dockerfile-lint",
+    prompt: "Write dockerfile_problems(text): text is a Dockerfile. Return the list of problems in this order: 'unpinned base' when any FROM image has no tag or uses :latest (a @sha256: digest also counts as pinned); 'runs as root' when there is no USER line, or the last one is USER root or USER 0; and 'secret in ENV' for each ENV line whose text contains PASSWORD, SECRET, TOKEN or API_KEY, in any case. Instructions are matched in any case.",
+    starter: "def dockerfile_problems(text):\n    problems = []\n    lines = [l.strip() for l in text.splitlines() if l.strip()]\n    # Split each line into its instruction (lines[i].split()[0].upper()) and the rest.\n    return problems\n",
+    tests: [
+      { name: "the Dockerfile from the lesson", expr: "dockerfile_problems('FROM python:3.13-slim\\nRUN useradd --create-home app\\nUSER app\\nCOPY . /home/app\\nCMD [\"python\", \"/home/app/main.py\"]\\n') == []" },
+      { name: "a base image with no tag", expr: "dockerfile_problems('FROM python\\nUSER app') == ['unpinned base']" },
+      { name: "latest is not a pin", expr: "dockerfile_problems('FROM node:latest\\nUSER node') == ['unpinned base']" },
+      { name: "a digest is a pin", expr: "dockerfile_problems('FROM python@sha256:4f1a2b3c\\nUSER app') == []" },
+      { name: "no USER line", expr: "dockerfile_problems('FROM python:3.13-slim\\nCOPY . /app') == ['runs as root']" },
+      { name: "switching back to root at the end", expr: "dockerfile_problems('FROM python:3.13-slim\\nUSER app\\nRUN true\\nUSER root') == ['runs as root']" },
+      { name: "a token baked into the image", expr: "dockerfile_problems('FROM python:3.13-slim\\nENV api_key=abc123\\nENV PORT=8080\\nUSER app') == ['secret in ENV']" },
+      { name: "everything wrong, in order", expr: "dockerfile_problems('from ubuntu\\nENV DB_PASSWORD=hunter2\\nENV GITHUB_TOKEN=x') == ['unpinned base', 'runs as root', 'secret in ENV', 'secret in ENV']" },
+    ],
+    solution: "def dockerfile_problems(text):\n    problems = []\n    lines = [l.strip() for l in text.splitlines() if l.strip()]\n    split = [(l.split(None, 1)[0].upper(), l.split(None, 1)[1] if len(l.split(None, 1)) > 1 else '') for l in lines]\n    for instruction, rest in split:\n        if instruction == 'FROM':\n            image = rest.split()[0]\n            name = image.rsplit('/', 1)[-1]\n            if '@sha256:' not in image and (':' not in name or name.endswith(':latest')):\n                problems.append('unpinned base')\n                break\n    users = [rest.strip() for instruction, rest in split if instruction == 'USER']\n    if not users or users[-1] in ('root', '0'):\n        problems.append('runs as root')\n    for instruction, rest in split:\n        if instruction == 'ENV' and any(w in rest.upper() for w in ('PASSWORD', 'SECRET', 'TOKEN', 'API_KEY')):\n            problems.append('secret in ENV')\n    return problems\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
