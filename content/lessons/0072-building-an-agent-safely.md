@@ -2,7 +2,7 @@
 title: Building an agent safely
 summary: Write a working agent loop in Python, with authorization outside the model, approval gates, limits and logs, then add retrieval and MCP without losing control.
 month: 18
-minutes: 60
+minutes: 85
 builds: a small tool-using agent whose rules survive a fooled model
 source: OWASP Top 10 for Agentic Applications | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
 words: agent loop, least-privilege tool, approval gate
@@ -111,6 +111,10 @@ The model tried to steal Omar's record and send it outside. Both attempts failed
 
 Notice that `user` is passed in by your program. If the model could supply it, then it could lie. Identity should always come from your session, never from the model's output.
 
+One gap remains in that loop: `TOOLS[name](user, **reply["args"])` passes whatever arguments the model wrote. A model can invent a field, leave one out, or send a list where your code expects text, and Python will either crash or, worse, accept it. Check every call against a small schema first: the fields that must be there, their types, and nothing else.
+
+@code tool-args
+
 @drill ai-control
 
 ?? Why must the user's identity not come from the model's own output?
@@ -132,12 +136,37 @@ Make tools small and specific. A bad tool is `run_sql(query)`, and a good one is
 
 Split reading from doing. Keep **approval gates** for anything hard to undo: payments, deletions, messages to outsiders. Show the person the real action, not the model's description of it, since that summary could be a lie as well.
 
+Which actions need a person? Write the rule down as code, so it doesn't depend on anyone's judgement at the moment, and certainly not the model's:
+
+| Action | Approval |
+|---|---|
+| Reading something the user may see | Never |
+| A reply inside the company's own domain | Never |
+| An email to an outside address | Always |
+| A refund above a set amount | Always |
+| Anything that deletes | Always |
+
+@code approval-rules
+
 ?? An agent needs order statuses. Which tool design is safest?
 + `get_order(id)`, checked against the signed-in user
 - `run_sql(query)`, with a prompt warning attached
 - `read_table(name)`, covering all the database tables
 - `http_get(url)`, reaching any internal web address
 => Narrow tools limit what a fooled model can do. The risk lives in what the tool allows.
+
+## Stopping a loop
+
+`MAX_STEPS` stops a loop that runs too long. Two more limits are worth adding. A **token budget** stops one expensive conversation from running up a bill, and a **repeat check** stops a model that keeps asking for the same failing call, which is a common way agents get stuck. Each stop should say why it happened, because "stopped" alone tells the person reading the logs nothing.
+
+@code loop-guard
+
+?? An agent calls the same tool with the same arguments three times in a row. What should the loop do?
++ Stop, and log that it was repeating
+- Keep going until it finally works out
+- Restart the conversation from the first step
+- Ask the model to apologise to users
+=> The same call gives the same result, so a fourth try won't help. Stopping with a reason saves money and points straight at the problem.
 
 ## Adding retrieval
 
@@ -149,6 +178,10 @@ RAG adds a new path for attackers, so apply your rules there too.
 - **Watch what gets indexed.** Whoever can add a document can add instructions.
 
 Long-term memory deserves the same suspicion. **Memory poisoning** means that a bad message today can quietly shape behaviour next week. Store what's needed, show users what's stored, and let them clear it.
+
+The same rules apply to memory as to retrieval: each user sees only their own, everything expires, and every entry records where it came from.
+
+@code memory-recall
 
 ?? Where should permission filtering happen in a RAG system?
 + In your code, before documents reach the model
@@ -184,6 +217,44 @@ To swap in a real model, replace `fake_model` with a call to your provider's API
 ::: try Start P15
 Extend this into a support assistant with one lookup tool and one action tool, then put it in a container you can reset. See [project P15](/projects/P15/). In the next lesson, you'll attack your own creation.
 :::
+
+?? You replace `fake_model` with a real provider's model. Which part of the loop must change?
++ Only the call that translates the model's format
+- Every tool, since real models need new permissions
+- The allow-list, since real models send more email
+- The logging, since real models keep their logs
+=> The controls live in your code, around the model, so they don't move. Only the adapter between the provider's format and `{"tool": ..., "args": ...}` is new.
+
+## Review an agent
+
+A colleague's agent design has three lines worth questioning.
+
+```
+Tools:    run_sql(query), send_email(to, body)
+Identity: the model passes "user" as an argument to each tool
+Limits:   none, the model decides when it's finished
+```
+
+?? What's wrong with `run_sql(query)`?
++ It lets a fooled model do anything
+- SQL is too slow for any agent
+- Models can't write SQL queries at all
+- It should simply be called database instead
+=> A tool that accepts any query hands the whole database to whoever controls the model's text. Replace it with narrow tools such as `get_order_status(order_id)`.
+
+?? Why move "user" out of the model's arguments?
++ The model could name any user it likes
+- User names make the prompt far too long
+- Tools are not allowed to know the user
+- It is faster to look the user up
+=> Identity has to come from the signed-in session in your code. A model told "act as admin" will happily write `"user": "admin"`.
+
+?? What could happen with no limits?
++ It loops for ever and runs up costs
+- It finishes every single task much more quickly
+- The model slowly learns to stop by itself
+- Nothing, since models always know when to stop
+=> A confused or manipulated model can repeat calls indefinitely. A step limit, a token budget and a repeat check each stop it, and say why.
 
 ?! Pick an action from your own life, such as paying a bill. If an agent did it, which rules from this lesson would you require, and why?
 

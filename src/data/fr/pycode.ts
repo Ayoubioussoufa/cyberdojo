@@ -1549,4 +1549,50 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "aucun essai",
     ],
   },
+  "tool-args": {
+    prompt: "Écrivez check_call(call) : call est un appel d'outil venant du modèle, un dict avec 'tool' et 'args'. SCHEMAS associe chaque outil à ses champs et à leurs types. Renvoyez une liste de problèmes dans cet ordre : 'unknown tool' seul si l'outil n'est pas dans SCHEMAS ; sinon 'missing: ' suivi de chaque champ requis absent, dans l'ordre du schéma, puis 'wrong type: ' suivi de chaque champ présent dont la valeur a le mauvais type, dans l'ordre du schéma, puis 'unexpected: ' suivi de chaque champ en trop, triés. Un int est accepté là où un float est attendu.",
+    tests: [
+      "un appel correct",
+      "un outil inventé",
+      "un champ manquant",
+      "un nombre envoyé comme texte",
+      "un nombre entier est un montant correct",
+      "un champ inventé par le modèle",
+      "tout faux à la fois",
+    ],
+  },
+  "approval-rules": {
+    prompt: "Écrivez needs_approval(call) : call est un dict avec 'tool' et 'args'. Renvoyez True quand une personne doit l'approuver : send_email vers une adresse hors de oasis.example (comparez le domaine en minuscules), refund avec un montant supérieur à 50, ou tout outil dont le nom commence par delete_. Renvoyez False sinon.",
+    tests: [
+      "lire ne demande aucune approbation",
+      "un courriel interne à l'entreprise",
+      "un courriel vers l'extérieur",
+      "le domaine en majuscules",
+      "un domaine ressemblant est extérieur",
+      "un petit remboursement",
+      "un gros remboursement",
+      "tout ce qui supprime",
+    ],
+  },
+  "loop-guard": {
+    prompt: "Écrivez loop_guard(replies, max_steps, max_tokens) : replies est la liste de ce que le modèle a renvoyé à chaque étape, des dicts avec 'tokens' et soit 'answer', soit 'tool' et 'args'. Parcourez-les dans l'ordre, en additionnant les tokens. Renvoyez (step, raison) pour le premier arrêt, où step compte à partir de 1 : 'answered' quand la réponse contient answer, 'token budget' quand le total cumulé dépasse max_tokens, 'repeating' quand le même outil avec les mêmes args apparaît pour la troisième fois de suite, et 'step limit' quand l'étape max_steps passe sans rien de tout cela. Si les réponses s'épuisent avant, renvoyez (len(replies), 'no reply'). Vérifiez dans cet ordre à chaque étape.",
+    tests: [
+      "une fin normale",
+      "le même appel trois fois",
+      "des arguments différents ne sont pas une répétition",
+      "une conversation coûteuse",
+      "trop d'étapes",
+      "le modèle cesse de répondre",
+    ],
+  },
+  "memory-recall": {
+    prompt: "Écrivez recall(memories, user, today, max_age) : memories est une liste de dicts avec 'user', 'text', 'saved' (une date 'YYYY-MM-DD') et 'source'. Renvoyez les paires (text, source) qui appartiennent à user et ont été enregistrées au plus max_age jours avant today, la plus récente en premier.",
+    tests: [
+      "les souvenirs récents de Sara",
+      "Omar ne voit que les siens",
+      "quelqu'un sans aucun souvenir",
+      "le dernier jour autorisé compte encore",
+      "un jour de plus, c'est parti",
+    ],
+  },
 };

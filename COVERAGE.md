@@ -407,7 +407,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 |---|---|---|---|---|
 | ●* | ● | Parameterised queries | 13 mentions in 6 docs, most in 0037-databases-and-sql, practice 10. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
 | ●* | ● | Output encoding | 7 mentions in 3 docs, most in h4-interviews, practice 5. *Lesson 47, 'XSS: encoding on output'.* |  |
-| ●* | ● | Input validation | 19 mentions in 9 docs, most in 0047-keeping-input-out-of-the-code, practice 21. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ●* | ● | Input validation | 20 mentions in 9 docs, most in 0047-keeping-input-out-of-the-code, practice 21. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 | ● | ● | OWASP ASVS | 11 mentions in 5 docs, most in 0068-threat-modeling-and-secure-sdlc. |  |
 | ●* | ● | SAST, DAST, IAST | 9 mentions in 2 docs, most in 0068-threat-modeling-and-secure-sdlc, practice 9. *Lesson 68, 'The pipeline of checks'.* |  |
 | ●* | ● | Semgrep (tool) | 22 mentions in 5 docs, most in P05, practice 1. *Walked through in project P05.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
