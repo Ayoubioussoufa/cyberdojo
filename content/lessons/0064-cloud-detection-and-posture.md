@@ -2,7 +2,7 @@
 title: Cloud detection and posture
 summary: Reading CloudTrail, responding to a leaked key, posture scanning with Prowler, protecting Entra and Microsoft 365, and what other clouds call the same things.
 month: 14
-minutes: 55
+minutes: 80
 builds: a key-compromise playbook, and a measured posture improvement
 source: Prowler documentation | https://docs.prowler.com/
 words: CloudTrail event, posture management, key rotation
@@ -36,12 +36,31 @@ Each event answers: **who** (`userIdentity`), **what** (`eventName`), **where fr
 
 There's one catch to learn now. **Management events**, such as creating a user, are recorded by default. **Data events**, such as reading a file from a bucket, are not, because there are so many of them. If you never turned them on, you can't prove what was read.
 
+A real event has more fields than that. These are the ones you'll use most:
+
+| Field | Tells you |
+|---|---|
+| `eventSource` | The service that was called, such as `iam.amazonaws.com` |
+| `awsRegion` | Where. Activity in a region you never use is a signal by itself |
+| `userIdentity.accessKeyId` | Which key signed the request |
+| `userAgent` | The tool that made the call: the console, the CLI or a script |
+| `errorCode` | Present only when the call failed, for example `AccessDenied` |
+| `readOnly` | `true` for calls that only look, `false` for calls that change something |
+
+Failures matter as much as successes. An identity doing its usual job rarely hits `AccessDenied`. A stolen key in the hands of someone exploring hits it again and again, as they try one API after another.
+
+@code denied-bursts
+
 | Worth a detection | Why |
 |---|---|
 | `StopLogging` on a trail | Someone's blinding you |
 | A new access key created for another user | Possible persistence |
 | Unusual `AssumeRole` | Possible movement |
 | A bucket policy opened to everyone | Data exposure |
+
+A watch list like that one can be written as code, which is the first step towards an alert.
+
+@code trail-watchlist
 
 @drill log-source
 
@@ -56,6 +75,16 @@ There's one catch to learn now. **Management events**, such as creating a user, 
 
 These missions use `jq`, a tool for querying JSON. It's the same filter-then-print thinking as `grep` and `awk`.
 
+CloudTrail delivers files whose top level is a list called `Records`. Three queries cover most first looks:
+
+```
+jq -r '.Records[] | [.eventTime, .userIdentity.userName, .eventName, .sourceIPAddress] | @tsv' trail.json
+jq '.Records[] | select(.errorCode == "AccessDenied")' trail.json
+jq -r '.Records[].eventName' trail.json | sort | uniq -c | sort -rn
+```
+
+The first prints a timeline, with one event on each line. The second keeps only the calls that failed. The third counts how often each API was called, and the rare names at the bottom of that list are often the interesting ones.
+
 @range trail
 
 ## A leaked key: the response
@@ -63,6 +92,17 @@ These missions use `jq`, a tool for querying JSON. It's the same filter-then-pri
 @flow Disable the key > Review CloudTrail > Scope what it could reach > Rotate dependents > Check for persistence > Fix the leak path > Prevent
 
 Do these in order. Disabling first stops the bleeding, while keeping the evidence. Checking for persistence matters because a smart attacker creates a second key straight away, so killing the first achieves little. Prevention means short-lived credentials, OIDC for pipelines, and secret scanning.
+
+The first two steps, as commands:
+
+```
+aws iam update-access-key --user-name ci-bot --access-key-id AKIAIOSFODNN7EXAMPLE --status Inactive
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE
+```
+
+The key is set to `Inactive` rather than deleted. It stops working at once, but it stays listed, so you can still tie events to it, and you can switch it back if you disabled the wrong one. `lookup-events` searches the last 90 days of management events. From its output you want four facts: when the key was first used, when it was last used, from which addresses, and which calls it made.
+
+@code key-scope
 
 ?? A key appears on public GitHub. What comes first?
 + Deactivate the key, then review its activity
@@ -80,6 +120,17 @@ Do these in order. Disabling first stops the bleeding, while keeping the evidenc
 | Public bucket with invoices | Yes | Yes | Now |
 | Public bucket with website images | Yes | No | Review, likely intended |
 | Unencrypted disk on an internal test box | No | No | Later |
+
+Running it takes one line, and a second one narrows the output:
+
+```
+prowler aws
+prowler aws --severity critical high
+```
+
+Each check comes back as `PASS` or `FAIL`, with a severity, the resource and a suggested fix. The severity is the tool's general opinion. It doesn't know which bucket holds the invoices, so your own ranking goes on top. One case sits between the rows above: something sensitive that isn't exposed, such as an internal database with no encryption, comes soon, after the exposed and sensitive ones.
+
+@code rank-findings
 
 ?? A scan reports 600 findings. What's the best first move?
 + Rank them by their exposure and data sensitivity
@@ -124,5 +175,38 @@ Learn the concept once, and only the name changes.
 - Windows Security logs from one domain controller here
 - GuardDuty findings, exported directly from your AWS account
 => Concepts transfer between clouds. Who called which API is recorded in every one of them.
+
+## Review a night's trail
+
+A colleague sends you five events from last night and asks whether to wake anyone.
+
+| Time (UTC) | Identity | Event | From | Error |
+|---|---|---|---|---|
+| 02:01:10 | `ci-bot` | `ListBuckets` | 203.0.113.7 | |
+| 02:01:14 | `ci-bot` | `ListUsers` | 203.0.113.7 | `AccessDenied` |
+| 02:01:19 | `ci-bot` | `DescribeInstances` | 203.0.113.7 | `AccessDenied` |
+| 02:04:40 | `ci-bot` | `CreateAccessKey`, for the user `admin-ana` | 203.0.113.7 | |
+| 02:06:02 | `ci-bot` | `StopLogging` | 203.0.113.7 | |
+
+?? What do the two `AccessDenied` lines suggest?
++ Someone is exploring what this key allows
+- The pipeline is running its normal job
+- AWS was having an outage that night
+- CloudTrail recorded those two events by mistake
+=> A build bot calls the same few APIs every day and doesn't ask for the user list. Trying unrelated calls and being refused is what looking around with a stolen key looks like.
+
+?? Which event gives the attacker a way back in after `ci-bot`'s key is disabled?
++ `CreateAccessKey`
+- `ListBuckets`
+- `StopLogging`
+- `DescribeInstances`
+=> The new key belongs to `admin-ana`, not to `ci-bot`. Disabling the leaked key leaves it working, which is why the playbook checks for persistence.
+
+?? After 02:06:02 the trail shows nothing more. What does that silence mean?
++ Logging was stopped, so nothing was recorded
+- The attacker gave up and went away
+- Every later call was denied by AWS
+- The key expired at exactly that time
+=> `StopLogging` is the last thing you see, not the last thing that happened. Yes, wake someone: everything after that moment has to be rebuilt from other sources.
 
 ?! List the first five things you'd do if an AWS key leaked at 2 a.m.
