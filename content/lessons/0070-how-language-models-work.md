@@ -2,7 +2,7 @@
 title: How language models work
 summary: From zero: what an LLM really does, tokens, training, context windows, embeddings, RAG, tool calling and agents, and why each one matters for security.
 month: 18
-minutes: 55
+minutes: 80
 builds: explain an LLM's moving parts, and compute similarity yourself
 source: OWASP GenAI Security Project | https://genai.owasp.org/
 words: token, embedding, hallucination
@@ -40,6 +40,12 @@ The **context window** is everything the model can see at once: your instruction
 
 Here's the crucial point. **The model keeps no memory between requests.** An app sends the whole conversation each time. So "memory" is really just text that an app chose to include, and anything that can put text there can influence the model.
 
+So every app has to decide what to keep when the conversation outgrows the window. A common choice keeps the instructions, then as many of the most recent messages as fit, and drops the oldest. Write it yourself, using the rough rule that a word costs four thirds of a token:
+
+@code fit-context
+
+Notice what that choice means. Whatever sits in the window is what the model works from, and an attacker who can fill the window with long text can push your earlier messages, or a safety reminder placed among them, out of it.
+
 ?? A chatbot "remembers" what you said earlier. How does that really work?
 + The app resends earlier text with each request
 - The model permanently learns from every single user
@@ -50,6 +56,10 @@ Here's the crucial point. **The model keeps no memory between requests.** An app
 ## Why the same question gets different answers
 
 At each step, a model has a range of likely next tokens. **Temperature** controls how adventurous its choice is: low stays close to the most likely word, and high takes more chances. Even at low settings, the results may differ from run to run. That's why one test proves little, and why Month 18's rule exists: a finding isn't a finding until it reproduces.
+
+Under the hood, the model gives each candidate token a score. **Softmax** turns scores into probabilities: raise *e* to the power of each score divided by the temperature, then divide each result by their total, so they add up to 1. Dividing by a small temperature stretches the gaps between scores, so the top token takes almost everything. A large temperature shrinks them, and the choice spreads out.
+
+@code softmax-temperature
 
 ?? An attack works once, and fails on the second try. What's the best explanation?
 + Model output varies, so it needs repeated measurement
@@ -79,6 +89,10 @@ print(round(cosine(refund, firewall), 2))     # 0.01
 
 Real embeddings have hundreds of numbers, but the idea is the same. A **vector database** stores them, and finds what's closest to a question.
 
+Search by meaning is then a sort: score every stored vector against the question, and keep the top few. Those few are the **top k**, and they're what gets pasted into the prompt.
+
+@code top-k
+
 ?? Two texts have a cosine similarity of 0.98. What does that suggest?
 + Their meanings are very close to each other
 - One of them was copied word for word
@@ -93,6 +107,10 @@ Models know nothing about your company. **RAG**, retrieval-augmented generation,
 @flow Question > Embed it > Find the closest documents > Paste them into the prompt > Model answers
 
 Read that flow as a defender. Step four **pastes outside text into the prompt**. If a stored document contains instructions, they arrive in the same stream as yours. That's how a poisoned wiki page or a ticket becomes an attack. And if retrieval ignores permissions, one user's question can pull in another user's documents.
+
+The fix for the second problem belongs in your code, not in the prompt. Filter the documents by what this user may read **before** ranking them, so a forbidden document can never be among the top k. "Only use documents this user may see", written in the prompt, is a request to a guesser, and it will sometimes be ignored.
+
+@code rag-permissions
 
 ?? Why is RAG a security concern as well as a feature?
 + Retrieved text enters the prompt as instructions might
@@ -132,6 +150,44 @@ You can run a small model on your own laptop with [Ollama](https://ollama.com/),
 | Retrieval | Does it respect each user's permissions? |
 | Tools | What's the worst thing it could do? |
 | Output | Is it treated as untrusted when it's shown or used? |
+
+?? Which question belongs to the tools row of that table?
++ What's the worst thing it could do?
+- Could the training data have been poisoned?
+- Who can put text in the window?
+- Does retrieval check each user's own rights?
+=> A tool turns words into actions, so its worst case is what you design for: which accounts, which data, which money it can touch.
+
+## Review a design
+
+A team describes its new customer-support assistant in three lines.
+
+```
+1. Memory: all chats are stored in one shared memory, so the bot gets smarter for everyone.
+2. Retrieval: searches every ticket; the prompt tells the model to use only the customer's own.
+3. Display: the model's answer is inserted into the page as HTML, so links work.
+```
+
+?? What can go wrong with line 1?
++ One customer's text reaches another customer's session
+- Shared memory makes every answer arrive slower
+- The model forgets everything after each chat
+- Customers cannot type more than one question
+=> Memory is text put back into the prompt. If it's shared, one person's words, including deliberate instructions, end up in someone else's conversation.
+
+?? Why isn't the instruction in line 2 enough?
++ A prompt is a request, not a rule
+- Tickets can never be turned into usable embeddings
+- The model can't even read the word customer
+- Retrieval only ever works on public documents anyway
+=> Permissions belong in the retrieval code, before ranking. A model asked politely to ignore other customers' tickets will sometimes use them.
+
+?? What's the risk in line 3?
++ An attacker's output can run in the page
+- HTML makes the model's answers far less accurate
+- Links stop working when inserted as plain HTML
+- The page loads too slowly for real customers
+=> Text in a retrieved ticket can make the model write a script tag or a malicious link. Treat the output as untrusted: escape it, and allow only the formatting you need.
 
 ?! Explain to a friend, in your own words, why a language model isn't a database of facts, and what that means for trusting its answers.
 

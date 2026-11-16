@@ -407,7 +407,7 @@ Basis: Brief 4, OWASP Top 10:2025, CWE Top 25, CyBOK Web & Mobile.
 |---|---|---|---|---|
 | ●* | ● | Parameterised queries | 13 mentions in 6 docs, most in 0037-databases-and-sql, practice 10. *Lesson 37 has a section, and lesson 47 reuses it.* |  |
 | ●* | ● | Output encoding | 7 mentions in 3 docs, most in h4-interviews, practice 5. *Lesson 47, 'XSS: encoding on output'.* |  |
-| ●* | ● | Input validation | 19 mentions in 9 docs, most in 0047-keeping-input-out-of-the-code, practice 21. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ●* | ● | Input validation | 20 mentions in 9 docs, most in 0047-keeping-input-out-of-the-code, practice 21. *Lesson 47, 'One root cause'.* | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 | ● | ● | OWASP ASVS | 11 mentions in 5 docs, most in 0068-threat-modeling-and-secure-sdlc. |  |
 | ●* | ● | SAST, DAST, IAST | 9 mentions in 2 docs, most in 0068-threat-modeling-and-secure-sdlc, practice 9. *Lesson 68, 'The pipeline of checks'.* |  |
 | ●* | ● | Semgrep (tool) | 22 mentions in 5 docs, most in P05, practice 1. *Walked through in project P05.* | [Injection beyond SQL](modules/04-web/03-injection-beyond-sql.md) |
@@ -818,7 +818,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ○ | ● | Quantitative risk: FAIR | 6 mentions in 1 docs, most in 0060-risk-assessment. | [Quantitative risk with FAIR](modules/12-grc/03-quantitative-risk.md) |
 | ● | ● | NIST CSF 2.0 | 32 mentions in 9 docs, most in 0061-frameworks, practice 7. |  |
 | ○ | ● | NIST RMF, SP 800-53 | 3 mentions in 3 docs, most in d1-ai-what-changed. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
-| ● | ● | ISO/IEC 27001 and 27002 | 24 mentions in 7 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
+| ● | ● | ISO/IEC 27001 and 27002 | 25 mentions in 8 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | CIS Controls and Benchmarks | 12 mentions in 4 docs, most in 0061-frameworks, practice 3. |  |
 | ● | ● | Security policies, standards, procedures | 36 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 11 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
@@ -898,7 +898,7 @@ Basis: Added: OWASP LLM Top 10 2025, MITRE ATLAS.
 | ◐* | ● | Evasion: adversarial examples | None. *Lesson 76, 'Attacks on models', is a short overview.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ◐* | ● | Data poisoning | 1 mentions in 1 docs, most in 0076-machine-learning-for-detection. *Section 'Poisoning and backdoors'.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ◐* | ● | Model extraction and membership inference | None. *Lesson 76, 'Attacks on models', is a short overview.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
-| ◐ | ◐ | MITRE ATLAS | 5 mentions in 3 docs, most in d2-llm-security-primer. *Named and linked, not taught.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
+| ◐ | ◐ | MITRE ATLAS | 6 mentions in 3 docs, most in 0071-securing-ai-applications. *Named and linked, not taught.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ●* | ● | Machine learning for detection | 6 mentions in 2 docs, most in 0076-machine-learning-for-detection, practice 1. *Lesson 76.* | [Adversarial machine learning](modules/14-ai-security/01-adversarial-ml.md) |
 | ●* | ● | AI-enabled offence: deepfakes, phishing at scale | 4 mentions in 4 docs, most in c1-the-jobs. *Lesson 75, 'What attackers do with it'.* |  |
 
