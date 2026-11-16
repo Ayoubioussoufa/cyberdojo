@@ -2,7 +2,7 @@
 title: Threat modeling and secure code
 summary: The four questions, data-flow diagrams and STRIDE, ASVS requirements, secure code review, and building security into development.
 month: 17
-minutes: 55
+minutes: 80
 builds: a threat model traced to ASVS requirements
 source: Threat Modeling Manifesto | https://www.threatmodelingmanifesto.org/
 words: threat model, trust boundary, STRIDE
@@ -60,7 +60,30 @@ A browser is controlled by the user, so nothing from it can be trusted. Now take
 | **D**enial of service | Password floods exhaust the server | Rate limiting |
 | **E**levation of privilege | A normal user reaches admin functions | Check the role on the server |
 
+Not every threat applies to every element. **STRIDE per element**, from Adam Shostack's work at Microsoft, says which letters to ask about for each kind of box or arrow on the diagram:
+
+| Element | Drawn as | Threats to ask about |
+|---|---|---|
+| External entity, such as a user or partner | A rectangle | S, R |
+| Process, such as the web app | A circle | S, T, R, I, D, E |
+| Data store, such as the database | Two parallel lines | T, I, D, and R when it stores logs |
+| Data flow | An arrow | T, I, D |
+
+A data store can't spoof anyone, and an arrow can't elevate its privileges, so skipping those questions isn't laziness. It leaves time for the ones that matter. A log store gets R because a log that can be altered can't settle an argument about who did what.
+
+@code stride-per-element
+
+The boundaries can be found mechanically too. Give each element a trust level, and every flow between two different levels crosses a boundary. Flows from a lower level into a higher one are where input must be checked.
+
+@code boundary-crossings
+
 @drill stride
+
+Write each threat as a sentence someone could act on: who, doing what, by what means, leading to which harm.
+
+> An attacker on the internet could log in as a customer by trying leaked passwords against the login form, leading to their orders and address being exposed.
+
+"Hackers could attack the login" can't be tested or fixed. The sentence above names the mitigation by itself: rate limiting, MFA and a check against known breached passwords. Then rank the threats with likelihood and impact, as in lesson 60, so the team fixes the worst first.
 
 ?? Where do you focus first on a data-flow diagram?
 + Where data crosses a trust boundary
@@ -101,6 +124,26 @@ cur.execute(f"SELECT * FROM items WHERE name = '{value}'")
 cur.execute("SELECT * FROM items WHERE name = %s", (value,))
 ```
 
+A scanner can find the first kind of flaw by its shape. A query built from an f-string, a `%` or a `+` looks the same in every file:
+
+@code sql-string-builds
+
+The second kind, authorisation, has no shape. Each route that takes an object's ID needs its own check that this user may see that object:
+
+```python
+@app.get("/invoices/<int:invoice_id>")
+@login_required
+def get_invoice(invoice_id):
+    invoice = Invoice.query.get_or_404(invoice_id)
+    if invoice.owner_id != current_user.id:
+        abort(404)
+    return render_invoice(invoice)
+```
+
+`@login_required` answers "who are you?". The `if` answers "is this invoice yours?". Without it, any logged-in customer can read every invoice by changing the number in the address. Returning 404 rather than 403 also avoids confirming that the invoice exists. A review lists every route and asks both questions of each.
+
+@code route-audit
+
 Turn repeated findings into [Semgrep rules](https://semgrep.dev/docs/writing-rules/overview), so that a person only has to find each kind once:
 
 ```yaml
@@ -111,6 +154,14 @@ rules:
     languages: [python]
     severity: ERROR
 ```
+
+Running the rule takes one command, and the same command goes in CI:
+
+```
+semgrep scan --config python-fstring-sql.yaml src/
+```
+
+It prints each match with its file and line, and exits with an error code when something matches, which is what lets a pipeline fail the pull request.
 
 @range appsec
 
@@ -141,5 +192,36 @@ No single tool is enough. The roadmap's [code-review duel](/guides/d3-using-ai-w
 - SAST, which only scans the production database
 - A code formatter, fixing the library's style
 => SCA is built for known-vulnerable components. SAST looks at your code, and DAST tests the running application.
+
+## Review a threat model
+
+A team sends you their threat model for a new invoice portal. Three lines stand out.
+
+```
+Scope:      the customer web app (the admin API is internal, so out of scope)
+Threat 4:   hackers could attack the portal
+Mitigation: an AI system will detect and block attacks
+```
+
+?? What's the problem with the scope?
++ Internal services are still reachable by attackers
+- Admin APIs are never worth threat modeling
+- The scope should list every developer's name
+- Threat models should cover a single page
+=> "Internal" isn't a trust level. An attacker who reaches any internal machine, or tricks the web app into calling the admin API, is on the inside. Draw it, with its boundary.
+
+?? How should threat 4 be rewritten?
++ Name the actor, the method and the harm
+- Make it shorter, so it fits one slide
+- Add the word critical, so it gets fixed
+- Remove it, since every system has hackers anyway
+=> "An attacker could read other customers' invoices by changing the invoice number in the address" can be tested, fixed and checked off. "Hackers could attack" can't.
+
+?? Why push back on the mitigation?
++ It can't be traced to a testable requirement
+- AI systems are banned from all security work
+- Detection is never really a part of security
+- Mitigations must always be written in actual code
+=> A mitigation answers one named threat and can be checked. Here, the object check on each route is the real fix, and detection is a backup.
 
 ?! Draw a login feature as a data flow. Mark one trust boundary, and give one STRIDE threat for it.

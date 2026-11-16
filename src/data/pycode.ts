@@ -1923,6 +1923,59 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import base64\n\ndef decode_command(line):\n    words = line.split()\n    for i, word in enumerate(words):\n        if word.lower() in ('-enc', '-encodedcommand') and i + 1 < len(words):\n            return base64.b64decode(words[i + 1]).decode('utf-16-le')\n    return None\n",
   },
+  {
+    id: "stride-per-element",
+    prompt: "Write threats(kind, holds_logs): kind is 'external entity', 'process', 'data store' or 'data flow'. Return the STRIDE letters to ask about, as a string in STRIDE order: SR for an external entity, STRIDE for a process, TID for a data flow, and TID for a data store, or TRID when holds_logs is True.",
+    starter: "def threats(kind, holds_logs=False):\n    # Your code here.\n    return ''\n",
+    tests: [
+      { name: "a user is an external entity", expr: "threats('external entity') == 'SR'" },
+      { name: "a process gets every letter", expr: "threats('process') == 'STRIDE'" },
+      { name: "an arrow", expr: "threats('data flow') == 'TID'" },
+      { name: "a database", expr: "threats('data store') == 'TID'" },
+      { name: "a log store adds repudiation, in its place", expr: "threats('data store', True) == 'TRID'" },
+      { name: "holds_logs changes nothing for a process", expr: "threats('process', True) == 'STRIDE'" },
+    ],
+    solution: "def threats(kind, holds_logs=False):\n    if kind == 'external entity':\n        return 'SR'\n    if kind == 'process':\n        return 'STRIDE'\n    if kind == 'data store' and holds_logs:\n        return 'TRID'\n    return 'TID'\n",
+  },
+  {
+    id: "boundary-crossings",
+    prompt: "Write crossings(levels, flows): levels maps each element of a data-flow diagram to its trust level, a whole number where higher means more trusted. flows is a list of (source, destination) pairs. Return, in flow order, a (source, destination, direction) tuple for each flow between two different levels: direction is 'inbound' when the destination is more trusted, and 'outbound' otherwise.",
+    starter: "def crossings(levels, flows):\n    found = []\n    for source, destination in flows:\n        # Compare levels[source] with levels[destination].\n        pass\n    return found\n",
+    tests: [
+      { name: "the login diagram", expr: "crossings({'browser': 0, 'web app': 1, 'database': 2, 'audit log': 2}, [('browser', 'web app'), ('web app', 'database'), ('database', 'web app'), ('web app', 'browser'), ('web app', 'audit log')]) == [('browser', 'web app', 'inbound'), ('web app', 'database', 'inbound'), ('database', 'web app', 'outbound'), ('web app', 'browser', 'outbound'), ('web app', 'audit log', 'inbound')]" },
+      { name: "two elements at the same level", expr: "crossings({'database': 2, 'audit log': 2}, [('database', 'audit log')]) == []" },
+      { name: "a jump over two levels", expr: "crossings({'partner': 0, 'database': 2}, [('partner', 'database')]) == [('partner', 'database', 'inbound')]" },
+      { name: "no flows", expr: "crossings({'browser': 0, 'web app': 1, 'database': 2, 'audit log': 2}, []) == []" },
+    ],
+    solution: "def crossings(levels, flows):\n    found = []\n    for source, destination in flows:\n        if levels[source] == levels[destination]:\n            continue\n        direction = 'inbound' if levels[destination] > levels[source] else 'outbound'\n        found.append((source, destination, direction))\n    return found\n",
+  },
+  {
+    id: "sql-string-builds",
+    prompt: "Write risky_queries(source): source is Python code as text. Return the line numbers, counting from 1, of lines that call execute( with a query built as an f-string (execute(f\" or execute(f'), or that contain execute( together with % or + after the opening quote of the query. Lines that pass values separately are fine.",
+    starter: "import re\n\ndef risky_queries(source):\n    found = []\n    for number, line in enumerate(source.splitlines(), start=1):\n        if 'execute(' not in line:\n            continue\n        # Your code here.\n    return found\n",
+    tests: [
+      { name: "the file from the lesson", expr: "risky_queries('import sqlite3\\nname = request.args[\"name\"]\\ncur.execute(f\"SELECT * FROM items WHERE name = \\'{name}\\'\")\\ncur.execute(\"SELECT * FROM items WHERE name = ?\", (name,))\\ncur.execute(\"SELECT * FROM users WHERE id = %s\" % user_id)\\ncur.execute(\"DELETE FROM carts WHERE id = \" + cart_id)\\nprint(f\"done {name}\")\\n') == [3, 5, 6]" },
+      { name: "a parameterised query is fine", expr: "risky_queries('cur.execute(\"SELECT * FROM t WHERE id = ?\", (i,))') == []" },
+      { name: "an f-string with single quotes", expr: "risky_queries(\"db.execute(f'SELECT name FROM t WHERE id = {i}')\") == [1]" },
+      { name: "an f-string outside execute is not a query", expr: "risky_queries('print(f\"user {name} logged in\")') == []" },
+      { name: "no code at all", expr: "risky_queries('') == []" },
+    ],
+    solution: "import re\n\ndef risky_queries(source):\n    found = []\n    for number, line in enumerate(source.splitlines(), start=1):\n        if 'execute(' not in line:\n            continue\n        after = line.split('execute(', 1)[1]\n        if re.match(r'\\s*f[\"\\']', after):\n            found.append(number)\n            continue\n        if re.search(r'[\"\\']\\s*[%+]', after):\n            found.append(number)\n    return found\n",
+  },
+  {
+    id: "route-audit",
+    prompt: "Write route_problems(routes, public): routes is a list of dicts with 'method', 'path', 'login_required' and 'owner_check' (True or False). public lists the paths meant to be open. Return a list of (method, path, problem) tuples in route order: 'no login' when login is not required and the path is not public, then 'no object check' when the path contains {id} and there is no owner check.",
+    starter: "def route_problems(routes, public):\n    found = []\n    for r in routes:\n        # Two questions for each route: who are you, and is this object yours?\n        pass\n    return found\n",
+    tests: [
+      { name: "a route with both checks", expr: "route_problems([{'method': 'GET', 'path': '/invoices/{id}', 'login_required': True, 'owner_check': True}], ['/health', '/login']) == []" },
+      { name: "the PDF route forgot the owner", expr: "route_problems([{'method': 'GET', 'path': '/invoices/{id}/pdf', 'login_required': True, 'owner_check': False}], ['/health', '/login']) == [('GET', '/invoices/{id}/pdf', 'no object check')]" },
+      { name: "creating an invoice needs no object check", expr: "route_problems([{'method': 'POST', 'path': '/invoices', 'login_required': True, 'owner_check': False}], ['/health', '/login']) == []" },
+      { name: "a delete with no checks at all", expr: "route_problems([{'method': 'DELETE', 'path': '/invoices/{id}', 'login_required': False, 'owner_check': False}], ['/health', '/login']) == [('DELETE', '/invoices/{id}', 'no login'), ('DELETE', '/invoices/{id}', 'no object check')]" },
+      { name: "a public health check is fine", expr: "route_problems([{'method': 'GET', 'path': '/health', 'login_required': False, 'owner_check': False}], ['/health', '/login']) == []" },
+      { name: "the whole app, in order", expr: "route_problems([{'method': 'GET', 'path': '/invoices/{id}', 'login_required': True, 'owner_check': True}, {'method': 'GET', 'path': '/invoices/{id}/pdf', 'login_required': True, 'owner_check': False}, {'method': 'POST', 'path': '/invoices', 'login_required': True, 'owner_check': False}, {'method': 'DELETE', 'path': '/invoices/{id}', 'login_required': False, 'owner_check': False}, {'method': 'GET', 'path': '/health', 'login_required': False, 'owner_check': False}], ['/health', '/login']) == [('GET', '/invoices/{id}/pdf', 'no object check'), ('DELETE', '/invoices/{id}', 'no login'), ('DELETE', '/invoices/{id}', 'no object check')]" },
+    ],
+    solution: "def route_problems(routes, public):\n    found = []\n    for r in routes:\n        if not r['login_required'] and r['path'] not in public:\n            found.append((r['method'], r['path'], 'no login'))\n        if '{id}' in r['path'] and not r['owner_check']:\n            found.append((r['method'], r['path'], 'no object check'))\n    return found\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);

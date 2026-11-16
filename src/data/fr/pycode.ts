@@ -1379,4 +1379,45 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "l'option sans rien après",
     ],
   },
+  "stride-per-element": {
+    prompt: "Écrivez threats(kind, holds_logs) : kind vaut 'external entity', 'process', 'data store' ou 'data flow'. Renvoyez les lettres STRIDE à examiner, sous forme de chaîne dans l'ordre de STRIDE : SR pour une entité externe, STRIDE pour un processus, TID pour un flux de données, et TID pour un stockage de données, ou TRID quand holds_logs vaut True.",
+    tests: [
+      "un utilisateur est une entité externe",
+      "un processus reçoit toutes les lettres",
+      "une flèche",
+      "une base de données",
+      "un stockage de journaux ajoute la répudiation, à sa place",
+      "holds_logs ne change rien pour un processus",
+    ],
+  },
+  "boundary-crossings": {
+    prompt: "Écrivez crossings(levels, flows) : levels associe chaque élément d'un diagramme de flux de données à son niveau de confiance, un entier où plus grand veut dire plus fiable. flows est une liste de paires (source, destination). Renvoyez, dans l'ordre des flux, un tuple (source, destination, direction) pour chaque flux entre deux niveaux différents : direction vaut 'inbound' quand la destination est plus fiable, et 'outbound' sinon.",
+    tests: [
+      "le diagramme de connexion",
+      "deux éléments au même niveau",
+      "un saut de deux niveaux",
+      "aucun flux",
+    ],
+  },
+  "sql-string-builds": {
+    prompt: "Écrivez risky_queries(source) : source est du code Python sous forme de texte. Renvoyez les numéros de ligne, en comptant depuis 1, des lignes qui appellent execute( avec une requête construite comme une f-string (execute(f\" ou execute(f'), ou qui contiennent execute( avec un % ou un + après les guillemets de la requête. Les lignes qui passent les valeurs séparément sont correctes.",
+    tests: [
+      "le fichier de la leçon",
+      "une requête paramétrée est correcte",
+      "une f-string entre apostrophes",
+      "une f-string hors d'execute n'est pas une requête",
+      "aucun code",
+    ],
+  },
+  "route-audit": {
+    prompt: "Écrivez route_problems(routes, public) : routes est une liste de dicts avec 'method', 'path', 'login_required' et 'owner_check' (True ou False). public liste les chemins censés être ouverts. Renvoyez une liste de tuples (method, path, problème) dans l'ordre des routes : 'no login' quand la connexion n'est pas exigée et que le chemin n'est pas public, puis 'no object check' quand le chemin contient {id} et qu'il n'y a pas de vérification du propriétaire.",
+    tests: [
+      "une route avec les deux vérifications",
+      "la route PDF a oublié le propriétaire",
+      "créer une facture ne demande pas de vérification d'objet",
+      "une suppression sans aucune vérification",
+      "un contrôle de santé public est correct",
+      "toute l'application, dans l'ordre",
+    ],
+  },
 };
