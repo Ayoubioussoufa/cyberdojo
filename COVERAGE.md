@@ -170,7 +170,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Processes, threads, handles, core system processes | 31 mentions in 4 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
-| ● | ● | The registry | 33 mentions in 13 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | The registry | 34 mentions in 13 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ● | ● | NTFS, $MFT, alternate data streams | 14 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ● | ● | Access tokens and SIDs | 23 mentions in 2 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 53 mentions in 15 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 54 mentions in 16 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 37 mentions in 4 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -422,7 +422,7 @@ Basis: Brief 5, CyBOK Software Security, CWE Top 25.
 |---|---|---|---|---|
 | ○ | ● | x86-64 assembly and registers | 1 mentions in 1 docs, most in P06. | [Reading x86-64 assembly](modules/05-binary/01-x86-64-assembly.md) |
 | ○ | ● | Calling conventions and the stack frame | None. | [Reading x86-64 assembly](modules/05-binary/01-x86-64-assembly.md) |
-| ◐ | ● | Compilation, linking, ELF and PE formats | 3 mentions in 1 docs, most in 0067-safe-malware-triage, practice 1. | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
+| ◐ | ● | Compilation, linking, ELF and PE formats | 4 mentions in 1 docs, most in 0067-safe-malware-triage, practice 1. | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
 | ◐ | ● | GOT and PLT | 3 mentions in 1 docs, most in P03. | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
 | ○ | ● | Process memory layout: text, heap, stack | None. | [Executables and linking](modules/05-binary/02-executables-and-linking.md) |
 
@@ -510,14 +510,14 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Safe lab design for malware | 64 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
-| ●* | ● | Static triage: hashes, strings, imports, entropy | 11 mentions in 3 docs, most in 0067-safe-malware-triage, practice 4. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
+| ● | ● | Safe lab design for malware | 66 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
+| ●* | ● | Static triage: hashes, strings, imports, entropy | 15 mentions in 3 docs, most in 0067-safe-malware-triage, practice 4. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ◐ | ● | Packers and unpacking | 11 mentions in 5 docs, most in 0067-safe-malware-triage. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
-| ● | ● | Dynamic analysis and sandboxes | 10 mentions in 5 docs, most in 0067-safe-malware-triage, practice 3. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
+| ● | ● | Dynamic analysis and sandboxes | 15 mentions in 5 docs, most in 0067-safe-malware-triage, practice 3. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ●* | ● | capa, FLOSS, PEStudio, Detect It Easy (tool) | 13 mentions in 3 docs, most in P13. *Walked through in project P13.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ● | ● | REMnux and FLARE-VM (tool) | 24 mentions in 2 docs, most in P13. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ○ | ● | Cuckoo, CAPE, ANY.RUN (tool) | 2 mentions in 2 docs, most in l1-after-24-months. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
-| ● | ● | Writing YARA rules | 13 mentions in 2 docs, most in P13. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
+| ● | ● | Writing YARA rules | 15 mentions in 2 docs, most in P13. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 
 ### Evasion concepts, seen from defence
 
@@ -823,7 +823,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ● | ● | Security policies, standards, procedures | 36 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 11 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
-| ◐ | ● | Security metrics and reporting to a board | 37 mentions in 20 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
+| ◐ | ● | Security metrics and reporting to a board | 38 mentions in 20 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
 | ● | ● | Audit and evidence | 7 mentions in 2 docs, most in 0061-frameworks, practice 3. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 
 ### Regulation

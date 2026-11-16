@@ -1868,6 +1868,61 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "from datetime import date\n\nLIFETIME = {'ip': 30, 'domain': 90, 'sha256': 365}\n\ndef still_active(indicators, today):\n    now = date.fromisoformat(today)\n    active = []\n    for i in indicators:\n        age = (now - date.fromisoformat(i['last_seen'])).days\n        if age <= LIFETIME[i['type']]:\n            active.append(i['value'])\n    return sorted(active)\n",
   },
+  {
+    id: "shannon-entropy",
+    prompt: "Write entropy(data): data is bytes. Return its Shannon entropy in bits per byte, rounded to 2 decimal places: for each byte value that appears, with p its share of the data, add -p times log2(p). Empty data has entropy 0.",
+    starter: "import math\nfrom collections import Counter\n\ndef entropy(data):\n    if not data:\n        return 0.0\n    counts = Counter(data)  # byte value -> how many times it appears\n    # Your code here.\n    return 0.0\n",
+    tests: [
+      { name: "one repeated byte", expr: "entropy(b'AAAA') == 0" },
+      { name: "two values, evenly mixed", expr: "entropy(b'AB' * 10) == 1.0" },
+      { name: "every byte value once", expr: "entropy(bytes(range(256))) == 8.0" },
+      { name: "ordinary text", expr: "entropy(b'hello world') == 2.85" },
+      { name: "empty data", expr: "entropy(b'') == 0" },
+      { name: "text scores far below random data", expr: "entropy(b'This is plain text in a program.') < 5 < entropy(bytes(range(256)) * 4)" },
+    ],
+    solution: "import math\nfrom collections import Counter\n\ndef entropy(data):\n    if not data:\n        return 0.0\n    counts = Counter(data)\n    n = len(data)\n    total = 0.0\n    for c in counts.values():\n        p = c / n\n        total -= p * math.log2(p)\n    return round(total, 2)\n",
+  },
+  {
+    id: "printable-strings",
+    prompt: "Write printable_strings(data, minimum): data is bytes. Return, in order, every run of at least minimum printable ASCII characters (byte values 32 to 126), as text. This is what the strings tool does.",
+    starter: "def printable_strings(data, minimum):\n    found = []\n    current = ''\n    for b in data:\n        # Grow current while bytes are printable; when a run ends, keep it if it is long enough.\n        pass\n    return found\n",
+    tests: [
+      { name: "a URL between binary bytes", expr: "printable_strings(b'\\x00\\x01http://192.0.2.44/c\\x00\\xff', 6) == ['http://192.0.2.44/c']" },
+      { name: "short runs are dropped", expr: "printable_strings(b'ab\\x00abcdef\\x00xyz', 4) == ['abcdef']" },
+      { name: "a run at the very end is kept", expr: "printable_strings(b'\\x90\\x90SOFTWARE\\\\Run', 4) == ['SOFTWARE\\\\Run']" },
+      { name: "several runs, in order", expr: "printable_strings(b'MZ\\x90\\x00This program\\x00\\x00kernel32.dll\\x00', 4) == ['This program', 'kernel32.dll']" },
+      { name: "exactly the minimum length counts", expr: "printable_strings(b'\\x00abcd\\x00', 4) == ['abcd']" },
+      { name: "nothing printable", expr: "printable_strings(bytes([0, 1, 2, 200, 255]), 4) == []" },
+    ],
+    solution: "def printable_strings(data, minimum):\n    found = []\n    current = ''\n    for b in data:\n        if 32 <= b <= 126:\n            current += chr(b)\n        else:\n            if len(current) >= minimum:\n                found.append(current)\n            current = ''\n    if len(current) >= minimum:\n        found.append(current)\n    return found\n",
+  },
+  {
+    id: "suspicious-imports",
+    prompt: "Write abilities(imports): imports is a list of Windows function names. Return the sorted list of abilities they suggest: 'injection' when all three of VirtualAllocEx, WriteProcessMemory and CreateRemoteThread are present, 'download' when any of URLDownloadToFileW, InternetOpenUrlA or WinHttpOpen is, 'persistence' when RegSetValueExW or CreateServiceW is, 'keylogging' when SetWindowsHookExW or GetAsyncKeyState is, and 'anti-analysis' when IsDebuggerPresent is.",
+    starter: "ANY_OF = {\n    'download': ['URLDownloadToFileW', 'InternetOpenUrlA', 'WinHttpOpen'],\n    'persistence': ['RegSetValueExW', 'CreateServiceW'],\n    'keylogging': ['SetWindowsHookExW', 'GetAsyncKeyState'],\n    'anti-analysis': ['IsDebuggerPresent'],\n}\nINJECTION = ['VirtualAllocEx', 'WriteProcessMemory', 'CreateRemoteThread']\n\ndef abilities(imports):\n    found = []\n    # Your code here.\n    return sorted(found)\n",
+    tests: [
+      { name: "a plain program", expr: "abilities(['CreateFileW', 'ReadFile', 'ExitProcess']) == []" },
+      { name: "all three injection functions", expr: "abilities(['VirtualAllocEx', 'WriteProcessMemory', 'CreateRemoteThread', 'ExitProcess']) == ['injection']" },
+      { name: "two of the three is not enough", expr: "abilities(['VirtualAllocEx', 'WriteProcessMemory']) == []" },
+      { name: "a downloader that survives reboots", expr: "abilities(['WinHttpOpen', 'RegSetValueExW', 'CreateFileW']) == ['download', 'persistence']" },
+      { name: "everything at once, sorted", expr: "abilities(['IsDebuggerPresent', 'GetAsyncKeyState', 'URLDownloadToFileW', 'CreateServiceW', 'VirtualAllocEx', 'WriteProcessMemory', 'CreateRemoteThread']) == ['anti-analysis', 'download', 'injection', 'keylogging', 'persistence']" },
+      { name: "no imports at all", expr: "abilities([]) == []" },
+    ],
+    solution: "ANY_OF = {\n    'download': ['URLDownloadToFileW', 'InternetOpenUrlA', 'WinHttpOpen'],\n    'persistence': ['RegSetValueExW', 'CreateServiceW'],\n    'keylogging': ['SetWindowsHookExW', 'GetAsyncKeyState'],\n    'anti-analysis': ['IsDebuggerPresent'],\n}\nINJECTION = ['VirtualAllocEx', 'WriteProcessMemory', 'CreateRemoteThread']\n\ndef abilities(imports):\n    found = []\n    if all(f in imports for f in INJECTION):\n        found.append('injection')\n    for ability, functions in ANY_OF.items():\n        if any(f in imports for f in functions):\n            found.append(ability)\n    return sorted(found)\n",
+  },
+  {
+    id: "enc-command-line",
+    prompt: "Write decode_command(line): line is a PowerShell command line that contains -EncodedCommand or -enc (in any case) followed by a base64 argument. Return the decoded command: base64-decode the argument, then read the bytes as UTF-16LE. Return None when the line has no encoded argument. The code only decodes text; nothing is run.",
+    starter: "import base64\n\ndef decode_command(line):\n    words = line.split()\n    for i, word in enumerate(words):\n        # When word is -enc or -encodedcommand, the next word is the base64.\n        pass\n    return None\n",
+    tests: [
+      { name: "the example from the lesson", expr: "decode_command('powershell -enc RwBlAHQALQBEAGEAdABlAA==') == 'Get-Date'" },
+      { name: "the long option name, in mixed case", expr: "decode_command(\"powershell.exe -NoProfile -EncodedCommand VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAnAGwAYQBiACAAdABlAHMAdAAnAA==\") == \"Write-Output 'lab test'\"" },
+      { name: "other options around it", expr: "decode_command('powershell -NoP -W Hidden -ENC RwBlAHQALQBQAHIAbwBjAGUAcwBzACAAfAAgAFMAbwByAHQALQBPAGIAagBlAGMAdAAgAEMAUABVAA== -NonInteractive') == 'Get-Process | Sort-Object CPU'" },
+      { name: "a plain command", expr: "decode_command('powershell -NoProfile Get-Date') is None" },
+      { name: "the option with nothing after it", expr: "decode_command('powershell -enc') is None" },
+    ],
+    solution: "import base64\n\ndef decode_command(line):\n    words = line.split()\n    for i, word in enumerate(words):\n        if word.lower() in ('-enc', '-encodedcommand') and i + 1 < len(words):\n            return base64.b64decode(words[i + 1]).decode('utf-16-le')\n    return None\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
