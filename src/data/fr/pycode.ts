@@ -1026,4 +1026,48 @@ export const PY_FR: Record<string, PyChallengeFr> = {
       "exactement à l'échéance",
     ],
   },
+  "risk-rating": {
+    prompt: "Écrivez rate(likelihood, impact) : les deux sont des entiers de 1 à 5. Renvoyez (score, band), où score vaut likelihood fois impact, et band vaut 'low' de 1 à 4, 'medium' de 5 à 9, 'high' de 10 à 16 et 'critical' de 17 à 25.",
+    tests: [
+      "le risque inhérent de rançongiciel",
+      "le même risque après les mesures",
+      "4 reste faible",
+      "5 est le premier moyen",
+      "10 est le premier élevé",
+      "16 reste élevé",
+      "le pire cas",
+    ],
+  },
+  "annual-loss": {
+    prompt: "Écrivez annual_loss(value, exposure, per_year) : value est ce que vaut l'actif, exposure est la part que détruit un événement (de 0 à 1), et per_year est le nombre de fois par an où l'on attend l'événement. Renvoyez la perte annuelle attendue, arrondie à 2 décimales.",
+    tests: [
+      "le système de la leçon",
+      "une fois tous les quatre ans",
+      "un portable chiffré",
+      "plusieurs fois par an",
+      "un événement qui n'arrive jamais ne coûte rien",
+    ],
+  },
+  "control-value": {
+    prompt: "Écrivez control_value(sle_before, aro_before, sle_after, aro_after, yearly_cost) : le coût d'un événement et sa fréquence annuelle, avant et après une mesure, et ce que la mesure coûte chaque année. Renvoyez ce que la mesure fait économiser chaque année une fois son propre coût payé, arrondi à 2 décimales. Un résultat négatif signifie qu'elle coûte plus qu'elle n'évite.",
+    tests: [
+      "le chiffrement de disque de la leçon",
+      "une mesure qui réduit la probabilité",
+      "une mesure qui coûte plus qu'elle ne rapporte",
+      "une mesure qui ne change rien",
+      "une mesure gratuite qui supprime la perte",
+    ],
+  },
+  "register-problems": {
+    prompt: "Écrivez register_problems(register, today) : register est une liste de dicts avec 'risk', 'owner' (un texte, parfois vide), 'inherent' et 'residual' (des scores), 'treatment' et 'review' (une date 'YYYY-MM-DD', ou None). Renvoyez une liste de paires (risk, problème) dans l'ordre du registre. Pour chaque entrée, vérifiez dans cet ordre : 'no owner', 'residual above inherent', 'accepted without review' (treatment vaut 'accept' et il n'y a pas de date de revue) et 'review overdue' (la date de revue est avant today).",
+    tests: [
+      "une entrée saine",
+      "pas de propriétaire",
+      "un résiduel au-dessus du score inhérent",
+      "accepté sans date de revue",
+      "une date de revue dépassée",
+      "une revue prévue aujourd'hui n'est pas en retard",
+      "plusieurs problèmes, dans l'ordre",
+    ],
+  },
 };

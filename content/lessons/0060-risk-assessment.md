@@ -2,7 +2,7 @@
 title: Running a risk assessment
 summary: Assets, likelihood and impact, inherent and residual risk, treatment options and a risk register, in the language of the business.
 month: 12
-minutes: 50
+minutes: 75
 builds: a risk register with owners and treatment decisions
 source: NIST SP 800-30 Rev. 1 | https://csrc.nist.gov/pubs/sp/800/30/r1/final
 words: risk register, residual risk, risk appetite
@@ -51,6 +51,19 @@ Define your scales **first**. "High" means nothing unless everyone agrees what i
 
 Those numbers are examples. Your organisation sets its own, and that's its **risk appetite** in practice: how much it will tolerate.
 
+The score is then sorted into bands, and each band says who must act and how fast. One common set:
+
+| Score | Band | What it triggers |
+|---|---|---|
+| 1 to 4 | Low | Accept it, and review once a year |
+| 5 to 9 | Medium | A plan from the owner within the quarter |
+| 10 to 16 | High | A plan within a month, reported to management |
+| 17 to 25 | Critical | Action now, reported to the board |
+
+A grid like this is **qualitative**: its numbers are ranks, not measurements. A 20 isn't twice as bad as a 10, and two different risks with the same score aren't equal. The grid is good for sorting and bad for arithmetic.
+
+@code risk-rating
+
 @drill risk-calc
 
 ?? Two analysts rate the same risk "high" and "medium". What's most likely missing?
@@ -77,6 +90,33 @@ Notice what happened. EDR lowered the likelihood. Backups lowered the impact. A 
 - A vendor brochure about its restore speed
 - The fact no incident has happened yet
 => A backup that's never been restored is a hope. Evidence turns a residual rating into a defensible number.
+
+## Putting a price on it
+
+When the decision is about money, a rank isn't enough. The **quantitative** method uses three numbers.
+
+| Number | Meaning | Example: a stolen laptop holding customer data |
+|---|---|---|
+| **SLE**, single loss expectancy | What it costs when it happens once | 20,000 € |
+| **ARO**, annual rate of occurrence | How many times a year you expect it | 0.5, so once every two years |
+| **ALE**, annual loss expectancy | SLE × ARO | 10,000 € a year |
+
+The SLE is often built from the asset's value and an **exposure factor**, the share of that value which one event destroys. A system worth 200,000 € that loses a tenth of its value in an outage has an SLE of 20,000 €.
+
+@code annual-loss
+
+The ALE lets you compare a control with its price. Disk encryption doesn't make laptops harder to steal, so the ARO stays at 0.5. But a stolen encrypted laptop costs only its hardware, say 1,500 €, so the ALE falls from 10,000 € to 750 €. If encryption costs 2,000 € a year to run, it saves 9,250 − 2,000 = 7,250 € a year. A finance director can approve that sentence. A control that costs more than the loss it prevents is a reason to choose a different treatment.
+
+@code control-value
+
+These figures are estimates, and you should say so. Give a range when you can, say where each number came from, and don't present 7,250 € as if it had been measured. [FAIR](https://www.fairinstitute.org/) is the best-known method for doing this with care.
+
+?? An event costs 40,000 € each time, and you expect it once every four years. What's its ALE?
++ `10,000 €`
+- `160,000 €`
+- `40,000 €`
+- `4,000 €`
+=> Once every four years is an ARO of 0.25, and 40,000 × 0.25 is 10,000 € a year. Multiplying by 4 instead is the usual slip.
 
 ## Four treatments
 
@@ -113,6 +153,12 @@ The **risk owner** is usually a business leader rather than someone in security,
 - Owners must always be the newest manager
 => Whoever owns the consequence should own the decision. Security supplies the analysis.
 
+A register goes wrong in a few predictable ways, and a program can check for each of them: an entry with no owner, a residual score above the inherent one, an accepted risk with no review date, and a review date that has already passed.
+
+@code register-problems
+
+The last use of a register is the simplest: compare each residual score with the appetite. If the board has said it tolerates nothing above 9, every residual of 10 or more needs either a plan or a signed acceptance, and that short list is what you bring to the meeting.
+
 ## Audit a register
 
 Registers are data, so you can check them with the tools you already know.
@@ -122,6 +168,37 @@ Registers are data, so you can check them with the tools you already know.
 ::: try Oasis Logistics
 The roadmap's fictional company has 180 staff, hybrid cloud, an e-commerce portal and three branches. Build a register of at least 15 risks. See [P09](/projects/P09/).
 :::
+
+## Review a register
+
+A colleague asks you to read three entries before they go to the risk committee.
+
+| Risk | L | I | Score | Owner | Treatment | Residual | Review |
+|---|---|---|---|---|---|---|---|
+| Phishing leads to a mailbox takeover | 4 | 3 | 12 | IT security | MFA | 4 | 2027-03 |
+| The old HR server is exploited | 3 | 4 | 12 | Head of HR | Accept | 12 | None |
+| A supplier outage stops deliveries | 2 | 5 | 10 | COO | Second supplier | 12 | 2027-01 |
+
+?? What would you change in the first entry?
++ Its owner should answer for the consequences
+- Its score should be seven, not twelve
+- MFA is a transfer, not a mitigation
+- A review date is never actually needed
+=> IT security advises, but a mailbox takeover hurts the business unit whose mail it is. The owner is whoever answers for that harm.
+
+?? What's missing from the second entry?
++ An accepted risk needs a review date
+- Accepted risks must have a zero residual
+- The Head of HR can't own risks
+- Old servers are assets, never real risks
+=> Accepting is allowed, and the residual stays at 12 because nothing was done. But an acceptance with no review date is a decision nobody will ever look at again.
+
+?? What can't be right in the third entry?
++ Its residual is higher than its inherent
+- A second supplier counts as avoiding it
+- The COO cannot own a supplier risk
+- An impact of five is never allowed
+=> A control doesn't add risk on paper. Either a number was mistyped, or the two scores were rated on different scales.
 
 ## Say it to a director
 

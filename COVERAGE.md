@@ -778,7 +778,7 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ●* | ● | MFA factors and strength | 58 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
+| ●* | ● | MFA factors and strength | 60 mentions in 22 docs, most in 0010-the-language-of-risk, practice 6. *Lesson 41, 'Authentication factors'.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ○ | ● | TOTP mechanics | None. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ● | ● | FIDO2, WebAuthn, passkeys | 13 mentions in 3 docs, most in 0041-identity-and-access. | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
 | ◐ | ● | Credential stuffing and spraying | 4 mentions in 3 docs, most in 0040-storing-passwords. *Section on guessing at scale.* | [Authentication mechanics](modules/11-identity/02-authentication-mechanics.md) |
@@ -815,7 +815,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 |---|---|---|---|---|
 | ●* | ● | Risk language: asset, threat, vulnerability, likelihood, impact | 10 mentions in 4 docs, most in 0010-the-language-of-risk, practice 8. *Lesson 10.* |  |
 | ●* | ● | Risk assessment methods | 18 mentions in 10 docs, most in P09, practice 4. *Lesson 60.* |  |
-| ○ | ● | Quantitative risk: FAIR | 1 mentions in 1 docs, most in 0060-risk-assessment. | [Quantitative risk with FAIR](modules/12-grc/03-quantitative-risk.md) |
+| ○ | ● | Quantitative risk: FAIR | 6 mentions in 1 docs, most in 0060-risk-assessment. | [Quantitative risk with FAIR](modules/12-grc/03-quantitative-risk.md) |
 | ● | ● | NIST CSF 2.0 | 23 mentions in 9 docs, most in 0061-frameworks, practice 7. |  |
 | ○ | ● | NIST RMF, SP 800-53 | 3 mentions in 3 docs, most in d1-ai-what-changed. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
 | ● | ● | ISO/IEC 27001 and 27002 | 20 mentions in 6 docs, most in 0061-frameworks, practice 3. | [NIST RMF and control catalogues](modules/12-grc/04-nist-rmf-and-controls.md) |
@@ -823,7 +823,7 @@ Basis: Brief 12, CyBOK Risk Management & Governance, Law & Regulation.
 | ● | ● | Security policies, standards, procedures | 31 mentions in 13 docs, most in P09, practice 29. | [AWS privilege paths and hardening](modules/10-cloud/01-aws-attack-paths.md) |
 | ● | ● | Business continuity and disaster recovery | 9 mentions in 1 docs, most in 0062-policy-privacy-and-the-midpoint, practice 4. |  |
 | ◐ | ● | Third-party and vendor risk | 3 mentions in 2 docs, most in 0062-policy-privacy-and-the-midpoint. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
-| ◐ | ● | Security metrics and reporting to a board | 34 mentions in 18 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
+| ◐ | ● | Security metrics and reporting to a board | 36 mentions in 19 docs, most in P06, practice 21. | [Security metrics and board reporting](modules/12-grc/07-metrics-and-reporting.md) |
 | ● | ● | Audit and evidence | 6 mentions in 2 docs, most in 0061-frameworks, practice 3. | [Sector compliance and vendor risk](modules/12-grc/06-sector-compliance.md) |
 
 ### Regulation
@@ -958,7 +958,7 @@ Basis: Added: CyBOK Human Factors, Privacy & Online Rights, Formal Methods, Dist
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ○ | ● | Social engineering principles | 1 mentions in 1 docs, most in 0069-supply-chain-and-pipelines. *Section 'why it works'. The word count credited the physical security module.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
-| ●* | ● | Phishing analysis | 37 mentions in 17 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
+| ●* | ● | Phishing analysis | 38 mentions in 18 docs, most in 0045-attacking-and-defending-identity, practice 10. *Lesson 54.* | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Pretexting, vishing, smishing | None. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ◐ | ● | Business email compromise | 3 mentions in 2 docs, most in 0054-phishing-analysis, practice 1. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
 | ○ | ● | Usable security | None. *The module's subject.* | [Usable security and culture](modules/16-human-privacy-research/02-usable-security.md) |

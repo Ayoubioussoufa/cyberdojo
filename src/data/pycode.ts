@@ -1474,6 +1474,62 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "from datetime import datetime, timedelta\n\ndef breach_clock(aware, now):\n    fmt = '%Y-%m-%d %H:%M'\n    deadline = datetime.strptime(aware, fmt) + timedelta(hours=72)\n    left = int((deadline - datetime.strptime(now, fmt)).total_seconds() // 60)\n    return deadline.strftime(fmt), left\n",
   },
+  {
+    id: "risk-rating",
+    prompt: "Write rate(likelihood, impact): both are whole numbers from 1 to 5. Return (score, band), where score is likelihood times impact, and band is 'low' for 1 to 4, 'medium' for 5 to 9, 'high' for 10 to 16 and 'critical' for 17 to 25.",
+    starter: "def rate(likelihood, impact):\n    score = likelihood * impact\n    # Your code here: choose the band.\n    return score, 'low'\n",
+    tests: [
+      { name: "the inherent ransomware risk", expr: "rate(4, 5) == (20, 'critical')" },
+      { name: "the same risk after controls", expr: "rate(2, 3) == (6, 'medium')" },
+      { name: "4 is still low", expr: "rate(1, 4) == (4, 'low')" },
+      { name: "5 is the first medium", expr: "rate(1, 5) == (5, 'medium')" },
+      { name: "10 is the first high", expr: "rate(2, 5) == (10, 'high')" },
+      { name: "16 is still high", expr: "rate(4, 4) == (16, 'high')" },
+      { name: "the worst case", expr: "rate(5, 5) == (25, 'critical')" },
+    ],
+    solution: "def rate(likelihood, impact):\n    score = likelihood * impact\n    if score <= 4:\n        band = 'low'\n    elif score <= 9:\n        band = 'medium'\n    elif score <= 16:\n        band = 'high'\n    else:\n        band = 'critical'\n    return score, band\n",
+  },
+  {
+    id: "annual-loss",
+    prompt: "Write annual_loss(value, exposure, per_year): value is what the asset is worth, exposure is the share of it one event destroys (from 0 to 1), and per_year is how many times a year the event is expected. Return the annual loss expectancy, rounded to 2 decimal places.",
+    starter: "def annual_loss(value, exposure, per_year):\n    # First the cost of one event, then the cost of a year.\n    return 0\n",
+    tests: [
+      { name: "the system from the lesson", expr: "annual_loss(200000, 0.1, 0.5) == 10000.0" },
+      { name: "once every four years", expr: "annual_loss(40000, 1, 0.25) == 10000.0" },
+      { name: "an encrypted laptop", expr: "annual_loss(1500, 1, 0.5) == 750.0" },
+      { name: "several times a year", expr: "annual_loss(1000, 0.2, 3) == 600.0" },
+      { name: "an event that never happens costs nothing", expr: "annual_loss(50000, 0.5, 0) == 0" },
+    ],
+    solution: "def annual_loss(value, exposure, per_year):\n    single = value * exposure\n    return round(single * per_year, 2)\n",
+  },
+  {
+    id: "control-value",
+    prompt: "Write control_value(sle_before, aro_before, sle_after, aro_after, yearly_cost): the cost of one event and its yearly rate, before and after a control, and what the control costs each year. Return what the control saves each year once its own cost is paid, rounded to 2 decimal places. A negative result means it costs more than it prevents.",
+    starter: "def control_value(sle_before, aro_before, sle_after, aro_after, yearly_cost):\n    # Compare the annual loss before with the annual loss after.\n    return 0\n",
+    tests: [
+      { name: "disk encryption from the lesson", expr: "control_value(20000, 0.5, 1500, 0.5, 2000) == 7250.0" },
+      { name: "a control that lowers the likelihood", expr: "control_value(40000, 0.25, 40000, 0.05, 3000) == 5000.0" },
+      { name: "a control that costs more than it saves", expr: "control_value(5000, 0.2, 5000, 0.1, 2000) == -1500.0" },
+      { name: "a control that changes nothing", expr: "control_value(1000, 1, 1000, 1, 100) == -100.0" },
+      { name: "a free control that removes the loss", expr: "control_value(1000, 1, 0, 1, 0) == 1000.0" },
+    ],
+    solution: "def control_value(sle_before, aro_before, sle_after, aro_after, yearly_cost):\n    before = sle_before * aro_before\n    after = sle_after * aro_after\n    return round(before - after - yearly_cost, 2)\n",
+  },
+  {
+    id: "register-problems",
+    prompt: "Write register_problems(register, today): register is a list of dicts with 'risk', 'owner' (text, maybe empty), 'inherent' and 'residual' (scores), 'treatment' and 'review' (a date as 'YYYY-MM-DD', or None). Return a list of (risk, problem) pairs in register order. For each entry check, in this order: 'no owner', 'residual above inherent', 'accepted without review' (treatment is 'accept' and there is no review date) and 'review overdue' (the review date is before today).",
+    starter: "def register_problems(register, today):\n    problems = []\n    for entry in register:\n        # Dates written as YYYY-MM-DD compare correctly as plain text.\n        pass\n    return problems\n",
+    tests: [
+      { name: "a healthy entry", expr: "register_problems([{'risk': 'Ransomware', 'owner': 'COO', 'inherent': 15, 'residual': 8, 'treatment': 'mitigate', 'review': '2027-03-01'}], '2026-11-16') == []" },
+      { name: "no owner", expr: "register_problems([{'risk': 'Phishing', 'owner': '', 'inherent': 12, 'residual': 4, 'treatment': 'mitigate', 'review': '2027-03-01'}], '2026-11-16') == [('Phishing', 'no owner')]" },
+      { name: "a residual above the inherent score", expr: "register_problems([{'risk': 'Supplier outage', 'owner': 'COO', 'inherent': 10, 'residual': 12, 'treatment': 'mitigate', 'review': '2027-01-15'}], '2026-11-16') == [('Supplier outage', 'residual above inherent')]" },
+      { name: "accepted with no review date", expr: "register_problems([{'risk': 'Old HR server', 'owner': 'Head of HR', 'inherent': 12, 'residual': 12, 'treatment': 'accept', 'review': None}], '2026-11-16') == [('Old HR server', 'accepted without review')]" },
+      { name: "a review date that has passed", expr: "register_problems([{'risk': 'Ransomware', 'owner': 'COO', 'inherent': 15, 'residual': 8, 'treatment': 'mitigate', 'review': '2026-09-30'}], '2026-11-16') == [('Ransomware', 'review overdue')]" },
+      { name: "a review due today is not overdue", expr: "register_problems([{'risk': 'Ransomware', 'owner': 'COO', 'inherent': 15, 'residual': 8, 'treatment': 'mitigate', 'review': '2026-11-16'}], '2026-11-16') == []" },
+      { name: "several problems, in order", expr: "register_problems([{'risk': 'Ransomware', 'owner': 'COO', 'inherent': 15, 'residual': 8, 'treatment': 'mitigate', 'review': '2027-03-01'}, {'risk': 'Lost laptop', 'owner': '', 'inherent': 6, 'residual': 9, 'treatment': 'accept', 'review': '2026-01-10'}], '2026-11-16') == [('Lost laptop', 'no owner'), ('Lost laptop', 'residual above inherent'), ('Lost laptop', 'review overdue')]" },
+    ],
+    solution: "def register_problems(register, today):\n    problems = []\n    for entry in register:\n        name = entry['risk']\n        if not entry['owner']:\n            problems.append((name, 'no owner'))\n        if entry['residual'] > entry['inherent']:\n            problems.append((name, 'residual above inherent'))\n        if entry['treatment'] == 'accept' and not entry['review']:\n            problems.append((name, 'accepted without review'))\n        if entry['review'] and entry['review'] < today:\n            problems.append((name, 'review overdue'))\n    return problems\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
