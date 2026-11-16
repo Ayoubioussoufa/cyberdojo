@@ -552,7 +552,7 @@ Basis: Brief 7, CyBOK Network Security.
 | ◐ | ● | iptables and nftables (tool) | 3 mentions in 1 docs, most in 0025-hardening-linux. | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
 | ● | ● | pfSense and OPNsense (tool) | 19 mentions in 3 docs, most in P01. |  |
 | ○ | ● | Next-generation firewalls | None. | [Sensors and TLS inspection](modules/07-network-security/03-sensors-and-tls-inspection.md) |
-| ◐ | ● | Egress filtering | 13 mentions in 7 docs, most in 0050-spotting-attacks-and-writing-findings, practice 5. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
+| ◐ | ● | Egress filtering | 15 mentions in 7 docs, most in 0050-spotting-attacks-and-writing-findings, practice 5. | [SSRF in depth](modules/04-web/07-ssrf-in-depth.md) |
 
 ### Detection on the network
 
@@ -981,4 +981,4 @@ Basis: Added: CyBOK Human Factors, Privacy & Online Rights, Formal Methods, Dist
 | ○ | ● | Distributed systems security: consensus, Byzantine faults | None. | [Distributed systems and blockchain security](modules/16-human-privacy-research/06-distributed-systems-and-blockchain.md) |
 | ○ | ● | Blockchain and smart contract security | None. | [Distributed systems and blockchain security](modules/16-human-privacy-research/06-distributed-systems-and-blockchain.md) |
 | ○ | ● | Reading a security paper | None. | [Reading and doing security research](modules/16-human-privacy-research/07-reading-and-doing-research.md) |
-| ●* | ● | Measuring security: base rates, ROC curves | 3 mentions in 2 docs, most in 0077-evaluating-ai-and-your-capstone, practice 1. *Lessons 76 and 77.* |  |
+| ●* | ● | Measuring security: base rates, ROC curves | 4 mentions in 2 docs, most in 0077-evaluating-ai-and-your-capstone, practice 1. *Lessons 76 and 77.* |  |

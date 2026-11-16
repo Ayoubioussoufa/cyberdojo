@@ -2416,6 +2416,55 @@ export const PY_CHALLENGES: PyChallenge[] = [
     ],
     solution: "import statistics\n\ndef unusual(baseline, today, threshold):\n    flagged = []\n    for user, count in today.items():\n        history = baseline.get(user)\n        if not history:\n            flagged.append(user)\n            continue\n        mean = statistics.mean(history)\n        spread = statistics.pstdev(history)\n        if spread == 0:\n            if count != mean:\n                flagged.append(user)\n        elif (count - mean) / spread > threshold:\n            flagged.append(user)\n    return sorted(flagged)\n",
   },
+  {
+    id: "label-agreement",
+    prompt: "Write kappa(first, second): two people's labels for the same items, as equal-length lists. Return Cohen's kappa rounded to 2 decimal places. po is the share of items where they agree. pe is the sum, over every label used, of (how many times the first person used it) times (how many times the second did), divided by the number of items squared. kappa is (po - pe) / (1 - pe), and 1.0 when pe is 1.",
+    starter: "from collections import Counter\n\ndef kappa(first, second):\n    n = len(first)\n    po = sum(1 for a, b in zip(first, second) if a == b) / n\n    # Your code here: pe, then kappa.\n    return round(po, 2)\n",
+    tests: [
+      { name: "two analysts on ten alerts", expr: "kappa(['malicious', 'malicious', 'benign', 'benign', 'benign', 'malicious', 'benign', 'benign', 'benign', 'benign'], ['malicious', 'benign', 'benign', 'benign', 'benign', 'malicious', 'benign', 'benign', 'malicious', 'benign']) == 0.52" },
+      { name: "perfect agreement", expr: "kappa(['malicious', 'malicious', 'benign', 'benign', 'benign', 'malicious', 'benign', 'benign', 'benign', 'benign'], ['malicious', 'malicious', 'benign', 'benign', 'benign', 'malicious', 'benign', 'benign', 'benign', 'benign']) == 1.0" },
+      { name: "opposite on every item", expr: "kappa(['malicious', 'benign'] * 5, ['benign', 'malicious'] * 5) == -1.0" },
+      { name: "90% agreement that means nothing", expr: "kappa(['benign'] * 9 + ['malicious'], ['benign'] * 10) == 0.0" },
+      { name: "one label used by both on everything", expr: "kappa(['benign'] * 4, ['benign'] * 4) == 1.0" },
+    ],
+    solution: "from collections import Counter\n\ndef kappa(first, second):\n    n = len(first)\n    po = sum(1 for a, b in zip(first, second) if a == b) / n\n    ca, cb = Counter(first), Counter(second)\n    pe = sum(ca[label] * cb[label] for label in set(first) | set(second)) / (n * n)\n    if pe == 1:\n        return 1.0\n    return round((po - pe) / (1 - pe), 2)\n",
+  },
+  {
+    id: "failure-taxonomy",
+    prompt: "Write top_failures(cases): cases is a list of dicts with 'id', 'correct' and 'failure' (a category name, or None when correct). Return a list of (failure, count) for the wrong cases, most frequent first, and alphabetical among equal counts.",
+    starter: "from collections import Counter\n\ndef top_failures(cases):\n    counts = Counter(c['failure'] for c in cases if not c['correct'])\n    # Sort by count, highest first, then by name.\n    return []\n",
+    tests: [
+      { name: "eight scored alerts", expr: "top_failures([{'id': 1, 'correct': True, 'failure': None}, {'id': 2, 'correct': False, 'failure': 'invented fact'}, {'id': 3, 'correct': False, 'failure': 'misread log'}, {'id': 4, 'correct': False, 'failure': 'invented fact'}, {'id': 5, 'correct': False, 'failure': 'wrong tool'}, {'id': 6, 'correct': False, 'failure': 'misread log'}, {'id': 7, 'correct': False, 'failure': 'invented fact'}, {'id': 8, 'correct': True, 'failure': None}]) == [('invented fact', 3), ('misread log', 2), ('wrong tool', 1)]" },
+      { name: "everything correct", expr: "top_failures([{'id': 1, 'correct': True, 'failure': None}]) == []" },
+      { name: "ties are alphabetical", expr: "top_failures([{'id': 1, 'correct': False, 'failure': 'wrong tool'}, {'id': 2, 'correct': False, 'failure': 'misread log'}]) == [('misread log', 1), ('wrong tool', 1)]" },
+      { name: "no cases", expr: "top_failures([]) == []" },
+    ],
+    solution: "from collections import Counter\n\ndef top_failures(cases):\n    counts = Counter(c['failure'] for c in cases if not c['correct'])\n    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))\n",
+  },
+  {
+    id: "regression-diff",
+    prompt: "Write diff_runs(before, after): both map item IDs to True (correct) or False. Return (fixed, broken): the sorted IDs that were wrong before and right after, and those that were right before and wrong after. Only IDs present in both runs count.",
+    starter: "def diff_runs(before, after):\n    fixed, broken = [], []\n    for item in before:\n        # Skip items missing from after.\n        pass\n    return sorted(fixed), sorted(broken)\n",
+    tests: [
+      { name: "three fixed, four broken", expr: "diff_runs({1: False, 2: False, 3: False, 4: True, 5: True, 6: True, 7: True, 8: True}, {1: True, 2: True, 3: True, 4: False, 5: False, 6: False, 7: False, 8: True}) == ([1, 2, 3], [4, 5, 6, 7])" },
+      { name: "nothing changed", expr: "diff_runs({1: True, 2: False}, {1: True, 2: False}) == ([], [])" },
+      { name: "a clean improvement", expr: "diff_runs({1: False, 2: True}, {1: True, 2: True}) == ([1], [])" },
+      { name: "items in only one run are ignored", expr: "diff_runs({1: False, 9: True}, {1: True, 10: False}) == ([1], [])" },
+    ],
+    solution: "def diff_runs(before, after):\n    fixed, broken = [], []\n    for item in before:\n        if item not in after:\n            continue\n        if not before[item] and after[item]:\n            fixed.append(item)\n        elif before[item] and not after[item]:\n            broken.append(item)\n    return sorted(fixed), sorted(broken)\n",
+  },
+  {
+    id: "cost-per-correct",
+    prompt: "Write value(runs, price_per_1k): runs is a list of dicts with 'correct', 'tokens' and 'seconds', one per test item. price_per_1k is the price of a thousand tokens. Return (accuracy, cost_per_correct, mean_seconds): accuracy rounded to 2 decimal places, the total cost divided by the number of correct answers rounded to 4 (or None when none were correct), and the mean time rounded to 1.",
+    starter: "def value(runs, price_per_1k):\n    n = len(runs)\n    correct = sum(1 for r in runs if r['correct'])\n    # Your code here.\n    return 0, None, 0\n",
+    tests: [
+      { name: "the small model", expr: "value([{'correct': True, 'tokens': 1200, 'seconds': 2.0}, {'correct': True, 'tokens': 800, 'seconds': 1.5}, {'correct': False, 'tokens': 1000, 'seconds': 2.5}, {'correct': True, 'tokens': 1000, 'seconds': 2.0}], 0.5) == (0.75, 0.6667, 2.0)" },
+      { name: "the large model", expr: "value([{'correct': True, 'tokens': 9000, 'seconds': 12.0}, {'correct': True, 'tokens': 11000, 'seconds': 10.0}, {'correct': True, 'tokens': 10000, 'seconds': 11.0}, {'correct': True, 'tokens': 10000, 'seconds': 11.0}], 0.5) == (1.0, 5.0, 11.0)" },
+      { name: "nothing correct", expr: "value([{'correct': False, 'tokens': 500, 'seconds': 1.0}], 0.5) == (0.0, None, 1.0)" },
+      { name: "a cheaper price", expr: "value([{'correct': True, 'tokens': 1200, 'seconds': 2.0}, {'correct': True, 'tokens': 800, 'seconds': 1.5}, {'correct': False, 'tokens': 1000, 'seconds': 2.5}, {'correct': True, 'tokens': 1000, 'seconds': 2.0}], 0.1)[1] == 0.1333" },
+    ],
+    solution: "def value(runs, price_per_1k):\n    n = len(runs)\n    correct = sum(1 for r in runs if r['correct'])\n    cost = sum(r['tokens'] for r in runs) / 1000 * price_per_1k\n    per_correct = round(cost / correct, 4) if correct else None\n    mean_seconds = round(sum(r['seconds'] for r in runs) / n, 1)\n    return round(correct / n, 2), per_correct, mean_seconds\n",
+  },
 ];
 
 export const pyChallenge = (id: string): PyChallenge | undefined => PY_CHALLENGES.find((c) => c.id === id);
