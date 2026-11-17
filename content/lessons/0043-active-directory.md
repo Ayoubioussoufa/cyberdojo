@@ -80,6 +80,37 @@ nltest /dsgetdc:corp.lab
 
 The first asks DNS for the record that lists the DCs. The second asks Windows to locate one and prints its name and address. If the first returns nothing, the client's DNS setting doesn't point at the DC, and no login will work until it does.
 
+### Workgroup or domain
+
+Without Active Directory, every Windows computer keeps its own list of accounts. Ana has one password on her laptop, another on the file server and a third on the printer server, and when she leaves, someone has to remember to remove her everywhere. That's a **workgroup**, and it's fine for a home. A company joins its computers to a **domain** instead: accounts live once, on the domain controllers, and every joined computer asks them. One password works everywhere, disabling one account locks it out of everything at once, and a single policy can set the screen lock on ten thousand laptops. That single point of control is the reason AD exists, and the reason it's the first thing an intruder looks for.
+
+### What happens when you log on to a domain computer
+
+Typing your password on a company laptop starts a short conversation you never see:
+
+1. The laptop asks DNS where the domain controllers are, using special SRV records such as `_ldap._tcp.dc._msdcs.corp.lab`.
+2. It contacts one and proves you know your password with **Kerberos**, without sending the password itself, and receives a ticket.
+3. The DC's answer includes every group you belong to, directly or through other groups. The laptop builds your access token from them, and that token decides which files and printers you may use.
+4. Group Policy applies: the GPOs linked to your computer's OU and to your user's OU are fetched and their settings enforced.
+
+When logons fail on a whole office, check these steps in order. Broken DNS at step 1 is the most common cause, which is why one of the questions below starts there. Kerberos and its ticket get a lesson of their own next.
+
+### The ports a domain controller listens on
+
+A scan of a domain controller shows a recognisable set of services, and knowing them tells you which firewall rules a domain needs:
+
+| Port | Service | Used for |
+|---|---|---|
+| 53 | DNS | Finding the DCs and other services |
+| 88 | Kerberos | Logons and tickets |
+| 135, and a high range | RPC | Management and replication |
+| 389, 636 | LDAP, LDAPS | Querying the directory; 636 is the encrypted form |
+| 445 | SMB | Group Policy files, the `SYSVOL` and `NETLOGON` shares |
+| 464 | Kerberos password change | Changing passwords |
+| 3268, 3269 | Global catalogue | Searching the whole forest |
+
+Workstations need to reach these on the DCs. Nothing on the Internet should.
+
 ?? Why is a domain controller such a high-value target?
 + It stores every single account's password material
 - It runs the company's public marketing website

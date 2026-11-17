@@ -78,6 +78,37 @@ nltest /dsgetdc:corp.lab
 
 La première demande au DNS l'enregistrement qui liste les DC. La seconde demande à Windows d'en localiser un et affiche son nom et son adresse. Si la première ne renvoie rien, le réglage DNS du client ne pointe pas vers le DC, et aucune ouverture de session ne fonctionnera tant que ce sera le cas.
 
+### Groupe de travail ou domaine
+
+Sans Active Directory, chaque ordinateur Windows garde sa propre liste de comptes. Ana a un mot de passe sur son portable, un autre sur le serveur de fichiers et un troisième sur le serveur d'impression, et quand elle part, quelqu'un doit penser à la supprimer partout. C'est un **groupe de travail** (*workgroup*), et cela suffit à la maison. Une entreprise rattache plutôt ses ordinateurs à un **domaine** : les comptes existent une seule fois, sur les contrôleurs de domaine, et chaque ordinateur rattaché les interroge. Un mot de passe marche partout, désactiver un compte le bloque partout d'un coup, et une seule stratégie peut régler le verrouillage d'écran de dix mille portables. Ce point de contrôle unique est la raison d'être d'AD, et la raison pour laquelle c'est la première chose que cherche un intrus.
+
+### Ce qui se passe quand vous ouvrez une session sur un ordinateur du domaine
+
+Taper votre mot de passe sur un portable d'entreprise lance une courte conversation que vous ne voyez jamais :
+
+1. Le portable demande au DNS où sont les contrôleurs de domaine, grâce à des enregistrements SRV spéciaux comme `_ldap._tcp.dc._msdcs.corp.lab`.
+2. Il en contacte un et prouve que vous connaissez votre mot de passe avec **Kerberos**, sans envoyer le mot de passe lui-même, et reçoit un ticket.
+3. La réponse du DC contient tous les groupes dont vous êtes membre, directement ou à travers d'autres groupes. Le portable en tire votre jeton d'accès, et c'est ce jeton qui décide des fichiers et des imprimantes auxquels vous avez droit.
+4. La stratégie de groupe s'applique : les GPO liées à l'OU de votre ordinateur et à celle de votre utilisateur sont récupérées, et leurs réglages imposés.
+
+Quand les connexions échouent dans tout un bureau, vérifiez ces étapes dans l'ordre. Un DNS en panne à l'étape 1 est la cause la plus fréquente, et c'est pourquoi l'une des questions ci-dessous commence par là. Kerberos et son ticket ont droit à une leçon à eux, juste après.
+
+### Les ports qu'écoute un contrôleur de domaine
+
+Le balayage d'un contrôleur de domaine montre un ensemble de services reconnaissable, et les connaître vous dit quelles règles de pare-feu un domaine demande :
+
+| Port | Service | Sert à |
+|---|---|---|
+| 53 | DNS | Trouver les DC et les autres services |
+| 88 | Kerberos | Ouvertures de session et tickets |
+| 135, et une plage haute | RPC | Administration et réplication |
+| 389, 636 | LDAP, LDAPS | Interroger l'annuaire ; 636 est la forme chiffrée |
+| 445 | SMB | Les fichiers de stratégie de groupe, les partages `SYSVOL` et `NETLOGON` |
+| 464 | Changement de mot de passe Kerberos | Changer les mots de passe |
+| 3268, 3269 | Catalogue global | Chercher dans toute la forêt |
+
+Les postes de travail doivent pouvoir joindre ces ports sur les DC. Rien sur Internet ne le devrait.
+
 ?? Pourquoi un contrôleur de domaine est-il une cible d'aussi grande valeur ?
 + Il stocke les secrets de chaque compte du domaine
 - Il héberge le site web public de toute l'entreprise
