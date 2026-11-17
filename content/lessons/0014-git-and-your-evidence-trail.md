@@ -24,6 +24,85 @@ Git takes **snapshots**. Each **commit** records the state of your files plus a 
 
 @flow Change files > git add: choose what to save > git commit: save a snapshot > git push: publish it
 
+### Why version control at all
+
+Without it, a project's history is a pile of files called `notes-final.txt`, `notes-final-2.txt` and `notes-final-REALLY.txt`, and nobody knows which one holds what, or why a line changed. Version control replaces that with one folder and a complete, dated list of every change, who made it and why. You can see any earlier state, compare two of them, and undo a mistake without losing the work since. Git is the version control system almost everyone uses, and GitHub is a website that stores Git repositories online. They're different things: Git runs on your computer, with or without GitHub.
+
+### The three places your files live
+
+Everything about Git makes sense once you see that each file can be in three places:
+
+| Place | What it is | How a file gets there |
+|---|---|---|
+| Working folder | The files you see and edit, like any folder | You edit them |
+| Staging area | A waiting room for the changes you'll save next | `git add` |
+| Repository | The saved history, kept in the hidden `.git` folder | `git commit` |
+
+The staging area is the part that surprises beginners. It lets you choose: you changed five files, but only two belong in this snapshot, so you `git add` those two and commit them with a message that fits. Delete the `.git` folder and the history is gone, while your files remain as a plain folder.
+
+### Your first repository, from zero
+
+Before GitHub, do it once on your own computer, in an empty folder. `git init` turns the folder into a repository:
+
+```
+git init -b main notes
+cd notes
+echo "# Lab notes" > README.md
+git status
+```
+
+```
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	README.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+```
+
+Read `git status` as Git talking to you. *Untracked* means Git sees the file but has never been asked to look after it, and the line in brackets even tells you the next command. Run `git add README.md` and `git status` again: the file moves under `Changes to be committed`, which is the staging area. Now save the snapshot:
+
+```
+git commit -m "Add README"
+```
+
+```
+[main (root-commit) 198c634] Add README
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+```
+
+`198c634` is the start of the commit's ID, a hash of its contents. Add a line to the file, then ask what changed with `git diff`:
+
+```
+@@ -1 +1,2 @@
+ # Lab notes
++Day 1: installed Ubuntu
+```
+
+Lines starting with `+` were added and lines with `-` removed. Commit again with `git commit -am "Note day 1"` (`-a` stages every file Git already tracks), and `git log --oneline` lists your history, newest first:
+
+```
+b47ac32 Note day 1
+198c634 Add README
+```
+
+### Undoing things
+
+Each kind of mistake has its own undo, and the safe ones never rewrite history:
+
+| You want to | Command |
+|---|---|
+| Throw away edits to a file you haven't staged | `git restore FILE` |
+| Take a file back out of the staging area | `git restore --staged FILE` |
+| Fix the message of the commit you just made, before pushing | `git commit --amend` |
+| Cancel a commit that's already pushed | `git revert HASH` |
+
+`git revert` doesn't delete anything: it adds a new commit that does the opposite, so the history stays honest and others' copies stay valid. Commands such as `git reset --hard` or `git push --force` do rewrite history; leave them until you know exactly what they'll throw away.
+
 ::: try Do this on your computer or in your Ubuntu VM
 ```
 git config --global user.name "Your Name"
@@ -38,6 +117,17 @@ git push
 ```
 First create the empty repository on [GitHub](https://github.com/new). For pushing, GitHub requires [an SSH key or a token](https://docs.github.com/en/get-started/git-basics/about-remote-repositories), not your password. You already know how to make a key.
 :::
+
+### Connecting your computer to GitHub
+
+GitHub stopped accepting account passwords for Git in 2021, so you prove who you are with an SSH key, the same kind you met in the SSH lesson. Create one if you don't have it, and copy the **public** half:
+
+```
+ssh-keygen -t ed25519 -C "you@example.com"
+cat ~/.ssh/id_ed25519.pub
+```
+
+Paste that line into GitHub under Settings, then SSH and GPG keys. Test it with `ssh -T git@github.com`: GitHub answers that you've successfully authenticated but that it doesn't provide shell access, which is the expected reply. Then use the repository's SSH address, the one that starts with `git@github.com:`. `git remote -v` shows which address your repository uses, under the name `origin`, the default name for the copy you cloned from.
 
 ?? What's the difference between `git commit` and `git push`?
 + Commit saves locally, and push publishes it
@@ -60,6 +150,57 @@ Then open a pull request on GitHub and merge it.
 
 Write commit messages that say **why**, in the imperative: "Add SSH hardening notes", not "stuff". The exit gate asks for at least 8 meaningful commits, and interviewers do read them.
 
+### What a branch really is
+
+A branch isn't a copy of your files. It's a label that points at one commit, and that moves forward each time you commit on it. `main` is just the first label. `git switch -c firewall` creates a new label where you stand and moves you onto it, so new commits go there and `main` stays where it was. `git log --oneline --graph --all` draws the result:
+
+```
+* 12b4bdf Note the firewall rule
+| * 8204eb7 Note the web port
+|/
+* b47ac32 Note day 1
+* 198c634 Add README
+```
+
+Two lines of work grew from `b47ac32`: the firewall note on one branch, the web port on `main`.
+
+### Merging, and your first conflict
+
+`git merge firewall`, run on `main`, brings that branch's commits in. When the two branches changed different lines, Git combines them by itself. When both changed the *same* line, Git can't guess which you want, and stops:
+
+```
+Auto-merging README.md
+CONFLICT (content): Merge conflict in README.md
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+Nothing is lost. Git writes both versions into the file between markers:
+
+```
+<<<<<<< HEAD
+Firewall: allow 22 and 443
+=======
+Firewall: allow 22 only
+>>>>>>> firewall
+```
+
+Above `=======` is your current branch (`HEAD`), below it is the branch you're merging. Edit the file to say what's actually true, delete the three marker lines, then `git add README.md` and `git commit`. If you'd rather think first, `git merge --abort` puts everything back as it was before the merge.
+
+### When Git refuses
+
+Git's error messages usually say what to do next, if you read them to the end:
+
+| You see | It means | Do this |
+|---|---|---|
+| `fatal: not a git repository` | You're in a folder that isn't a repository | `cd` into it, or run `git init` |
+| `Please tell me who you are.` | Git doesn't know your name for the commit | The two `git config --global` lines above |
+| `! [rejected] main -> main (fetch first)` | The remote has commits you don't have yet | `git pull`, deal with any conflict, then push again |
+| `Support for password authentication was removed` | GitHub refused your password | Use an SSH key and the `git@github.com:` address |
+| `CONFLICT (content): Merge conflict in FILE` | Both sides changed the same lines | Edit the file, remove the markers, `git add`, `git commit` |
+| `You are in 'detached HEAD' state` | You checked out a commit, not a branch | `git switch main`, or `git switch -c NEW` to keep work |
+
+The rejected push is the one you'll meet first, the day you work from two computers: the remote has a commit the other one pushed. Never "fix" it with `--force`, which deletes that commit from the remote.
+
 ?? Which commit message would you want an interviewer to read?
 + Add firewall rules with a reason for each
 - Update the files again after some small fixes
@@ -76,6 +217,23 @@ Deleting a password in a later commit doesn't remove it: it's still in the histo
 - Keep secrets out of your repo entirely. Add files like `.env` to `.gitignore`.
 - From Month 4, run [gitleaks](https://github.com/gitleaks/gitleaks) as a pre-commit hook.
 - Never publish Bandit passwords, other people's data, or anything from an employer.
+
+### `.gitignore`, in practice
+
+`.gitignore` is a plain text file at the top of the repository, with one pattern per line. Git acts as if matching files don't exist:
+
+```
+.env
+*.log
+```
+
+With that file in place, a `.env` holding `API_KEY=abc` no longer appears in `git status` at all, so `git add .` can't sweep it in. `git check-ignore -v .env` tells you which rule hides a file:
+
+```
+.gitignore:1:.env	.env
+```
+
+Two limits matter. `.gitignore` only works for files Git doesn't track yet: a file that's already committed stays tracked until you `git rm --cached` it. And it's a convenience, not a guarantee, which is why a scanner such as gitleaks runs before each commit too.
 
 ?? You committed an API key and pushed it. You delete it and commit again. Is it safe now?
 + No, it stays in history, so rotate it
