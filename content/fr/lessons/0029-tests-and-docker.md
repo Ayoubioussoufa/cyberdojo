@@ -156,6 +156,29 @@ Pensez à un conteneur maritime. Avant eux, les marchandises étaient chargées 
 
 Docker est l'outil qui construit et lance ces boîtes. Vous écrivez une courte recette, le **Dockerfile** ; Docker la transforme en **image**, une boîte figée en lecture seule ; et démarrer l'image vous donne un **conteneur**, une copie en cours d'exécution, isolée du reste de la machine.
 
+### Cinq mots à connaître d'abord
+
+Docker a son propre vocabulaire, et la suite de cette leçon l'emploie sans arrêt. Une cuisine aide : pensez à un plat préparé.
+
+- **Dockerfile** : la *recette*, un court fichier texte qui liste les étapes pour préparer le plat. C'est vous qui l'écrivez.
+- **Image** : le *plat préparé, au congélateur*. Docker suit la recette une fois et congèle le résultat : un ensemble complet de dossiers et de fichiers (un Python, les bibliothèques, votre code), plus une note qui dit quelle commande lancer. Une image ne change plus une fois construite.
+- **Conteneur** : *une portion, réchauffée et servie*. Démarrer une image donne une copie qui tourne. On peut servir autant de portions qu'on veut du même plat, et ce qui arrive à une portion ne touche pas au plat congelé.
+- **Registre** : le *supermarché*, une bibliothèque en ligne d'images toutes prêtes. Docker Hub est le registre par défaut, et c'est de là que vient `python:3.13-slim`.
+- **Tag** : *l'étiquette sur la boîte*, la partie après les deux-points qui choisit une version. `python:3.13-slim`, c'est Python 3.13, édition allégée. Sans tag, Docker suppose `latest`, qui change avec le temps : écrivez donc toujours le tag.
+
+### Ce qui se passe quand vous tapez `docker run`
+
+Une seule commande fait beaucoup de travail, et connaître les étapes rend chaque message d'erreur plus facile à lire :
+
+1. La commande `docker` que vous tapez n'est qu'une messagère. Elle transmet votre demande au **démon Docker**, `dockerd`, un service d'arrière-plan qui fait le vrai travail.
+2. Le démon cherche l'image sur votre machine. Si elle n'y est pas, il la télécharge depuis le registre, une couche après l'autre.
+3. Il crée un conteneur : une fine couche modifiable posée sur les couches de l'image, qui, elles, sont en lecture seule. Les fichiers que le conteneur modifie atterrissent dans cette fine couche, si bien que l'image elle-même n'est jamais modifiée.
+4. Il isole le conteneur : sa propre liste de processus, sa propre adresse réseau, son propre nom d'hôte, et les fichiers de l'image pour tout univers.
+5. Il lance la commande de l'image comme **processus principal** du conteneur.
+6. Quand ce processus se termine, le conteneur s'arrête. Il n'est pas supprimé, sauf si vous avez demandé `--rm` : il attend, arrêté, et `docker ps -a` le liste encore.
+
+Un fait de sécurité a sa place ici. Le démon tourne en root, donc quiconque peut lui donner des ordres peut lancer un conteneur qui monte tout le disque. Les membres du groupe `docker`, et tout programme qui peut atteindre le fichier `/var/run/docker.sock`, sont donc root sur cette machine, sauf de nom.
+
 ?? Que vous apporte le fait de mettre votre outil dans un conteneur ?
 + Il tourne à l'identique sur chaque machine
 - Il rend votre code Python plus rapide
@@ -189,6 +212,8 @@ Application | votre outil et ses bibliothèques |
 Moteur de conteneurs | Docker |
 Hôte | le matériel et le noyau partagé |
 
+Voici un Dockerfile pour l'outil d'analyse de journaux que vous avez écrit ce mois-ci. N'essayez pas encore de comprendre chaque ligne : la section suivante le démonte, ligne par ligne.
+
 ```dockerfile
 FROM python:3.13-slim
 WORKDIR /app
@@ -207,6 +232,32 @@ docker run --rm -v "$PWD/logs:/data:ro" toolkit /data/auth.log
 ```
 
 `-v` monte un dossier, et `:ro` le met en lecture seule. `--rm` nettoie ensuite. Suivez le [guide de prise en main de Docker](https://docs.docker.com/get-started/) (en anglais) pour apprendre compose, les volumes et le reste.
+
+### Comment fonctionne l'isolation
+
+Il n'y a pas de second système d'exploitation dans un conteneur. Le noyau Linux offre deux mécanismes, et Docker les combine :
+
+- Les **espaces de noms** (*namespaces*) décident de ce qu'un processus peut *voir*. Dans son propre espace de PID, le programme principal du conteneur est le processus numéro 1 et ne voit pas les autres processus de l'hôte. Dans son propre espace de montage, les fichiers de l'image sont tout son disque. Il reçoit sa propre interface réseau, sa propre adresse et son propre nom d'hôte.
+- Les **groupes de contrôle** (*cgroups*) décident de ce qu'il peut *consommer* : temps processeur, mémoire, nombre de processus.
+
+Docker retire aussi la plupart des pouvoirs spéciaux de root (les *capabilities* Linux) et filtre les appels système qu'un conteneur peut faire. Vous pouvez voir la première partie à l'œuvre :
+
+```
+docker run --rm alpine:3.22 sh -c 'ps; hostname'
+```
+
+```
+PID   USER     TIME  COMMAND
+    1 root      0:00 sh -c ps; hostname
+    7 root      0:00 ps
+487b0a2988a3
+```
+
+Vu de l'intérieur, il n'existe que deux processus, le shell est le processus 1, et le nom d'hôte est l'identifiant du conteneur. Depuis l'hôte, pourtant, `ps aux` montre ce même shell comme un processus ordinaire. C'est tout le principe : même noyau, vue plus étroite.
+
+### Sous Windows et macOS
+
+Les conteneurs ont besoin d'un noyau Linux, et Windows comme macOS n'en ont pas. **Docker Desktop** fait donc tourner une petite machine virtuelle Linux en arrière-plan (sous Windows, via WSL 2), et vos conteneurs vivent à l'intérieur. C'est pourquoi l'installateur demande d'activer la virtualisation, et pourquoi lire, depuis un conteneur, des fichiers rangés dans un dossier Windows est plus lent que depuis le côté Linux.
 
 ?? Pourquoi les conteneurs isolent-ils moins fortement que les machines virtuelles ?
 + Ils partagent tous le même noyau de l'hôte
@@ -227,6 +278,91 @@ Un Dockerfile se lit de haut en bas, chaque ligne ajoutant une couche à l'image
 - `ENTRYPOINT ["logparse"]` : la commande qui s'exécute quand le conteneur démarre. `RUN` construit l'image ; `ENTRYPOINT` est ce qui tourne réellement à chaque fois.
 
 L'ordre compte pour la vitesse : Docker met chaque ligne en cache, donc placez les parties qui changent rarement (la base, les dépendances) au-dessus de celles qui changent souvent (votre code source), et la plupart des reconstructions restent presque instantanées.
+
+### Lire un nom d'image
+
+`python:3.13-slim` est une forme abrégée. Écrit en entier, cela donne `docker.io/library/python:3.13-slim` :
+
+| Partie | Sens |
+|---|---|
+| `docker.io` | Le registre, ici Docker Hub, celui par défaut |
+| `library` | L'espace de noms : `library` regroupe les images officielles |
+| `python` | Le dépôt : toutes les versions de cette image |
+| `3.13-slim` | Le tag : Python 3.13 sur une Debian allégée |
+
+Les variantes comptent. `python:3.13` est plus grosse et contient des compilateurs. `python:3.13-slim` ne garde que ce qu'il faut pour exécuter Python. `python:3.13-alpine` est encore plus petite, mais Alpine utilise une autre bibliothèque C, et certains paquets Python ne s'y installent pas. Commencez par `slim`. Un tag peut aussi bouger : `3.13` est mis à jour à chaque correctif de sécurité. Pour figer une image exacte, ajoutez son empreinte, le long `@sha256:...` qu'affiche la construction.
+
+### Le point à la fin : le contexte de construction
+
+```
+docker build -t toolkit .
+```
+
+`-t toolkit` donne un nom à l'image (un *tag*), pour pouvoir la lancer sous le nom `toolkit`. Le `.` final est le **contexte de construction** : le dossier dont Docker transmet les fichiers au constructeur. Une ligne `COPY` ne voit que les fichiers de ce dossier. Demandez-lui un fichier absent et la construction s'arrête :
+
+```
+ERROR: failed to build: ... failed to calculate checksum of ref ...: "/app.py": not found
+```
+
+Lisez la fin de la ligne, `"/app.py": not found` : le fichier n'est pas dans le dossier d'où vous construisez. Soit vous avez lancé la commande dans le mauvais dossier, soit le fichier est exclu par `.dockerignore`.
+
+`.dockerignore` fonctionne comme `.gitignore` : il garde des fichiers hors du contexte. Mettez-y `.git`, `.venv`, `__pycache__` et `.env`. C'est une question de sécurité, pas seulement de rangement : avec un `COPY . .` négligent, vos secrets finissent cuits dans l'image, où quiconque la télécharge peut les lire. Les supprimer dans une ligne suivante n'y change rien, car chaque couche précédente est conservée.
+
+### `RUN`, `CMD` et `ENTRYPOINT`
+
+Ces trois-là se confondent facilement :
+
+- `RUN` s'exécute **pendant la construction**, une seule fois. Il installe des choses dans l'image.
+- `ENTRYPOINT` est le programme qui tourne **à chaque démarrage d'un conteneur**. Les mots tapés après le nom de l'image lui sont passés comme arguments.
+- `CMD` donne des arguments par défaut, ou une commande par défaut quand il n'y a pas d'`ENTRYPOINT`. Ce que vous tapez après le nom de l'image le remplace.
+
+Écrivez-les sous forme JSON, `["python", "hello.py"]`, comme plus haut. L'autre forme, une simple chaîne, passe par un shell, qui devient alors le processus principal et ne transmet pas le signal que Docker envoie pour arrêter le conteneur.
+
+### Votre première image, de zéro
+
+Faites-le une fois à la main avant d'empaqueter votre outil. Dans un dossier vide, créez `hello.py` :
+
+```python
+import platform
+import sys
+
+print(f"Hello from Python {platform.python_version()} on {platform.system()}")
+print("Arguments:", sys.argv[1:])
+```
+
+Et à côté, un fichier qui s'appelle exactement `Dockerfile`, sans extension :
+
+```dockerfile
+FROM python:3.13-slim
+WORKDIR /app
+COPY hello.py .
+USER nobody
+ENTRYPOINT ["python", "hello.py"]
+```
+
+Construisez-la avec `docker build -t hello .`. La sortie numérote chaque étape. Voici les lignes à lire :
+
+```
+#5 [1/3] FROM docker.io/library/python:3.13-slim@sha256:e48f59cd...
+#6 [2/3] WORKDIR /app
+#7 [3/3] COPY hello.py .
+#8 naming to docker.io/library/hello:latest done
+```
+
+`[1/3]` à `[3/3]` sont les trois lignes qui construisent des couches, l'image de base arrive avec son empreinte exacte, et la dernière ligne confirme le nom. Lancez-la maintenant, deux fois :
+
+```
+docker run --rm hello one two
+docker run --rm --entrypoint whoami hello
+```
+
+```
+Hello from Python 3.13.18 on Linux
+Arguments: ['one', 'two']
+nobody
+```
+
+Les mots tapés après le nom de l'image sont arrivés au programme comme arguments, et le programme a tourné en tant que `nobody`, pas root, comme le demandait le Dockerfile. Remarquez aussi qu'il annonce Python 3.13 et Linux, quel que soit le système de votre ordinateur : la boîte a apporté le sien. Modifiez une ligne de `hello.py` et reconstruisez : les étapes 1 et 2 affichent maintenant `CACHED`, et seul le `COPY` s'exécute à nouveau.
 
 ?? Pourquoi terminer un Dockerfile par `USER nobody` ?
 + Pour qu'une évasion démarre sans les droits root
@@ -250,6 +386,28 @@ services:
 `build: .` dit à compose de construire l'image à partir du Dockerfile présent ici. `ports` publie un port : `127.0.0.1:5000:5000` relie le port 5000 de localhost sur votre machine au port 5000 du conteneur, et *seulement* localhost, donc rien n'est exposé au réseau. `docker compose up --build` construit et démarre le tout ; `docker compose down` l'arrête et le supprime.
 
 Vous utiliserez exactement cela dans l'[Atelier](/workshop/), où un labo monte avec compose un petit service volontairement faible, lié à `127.0.0.1`, que vous attaquez puis durcissez, le tout sur votre propre machine.
+
+### Les ports : pourquoi on n'atteint pas le conteneur au début
+
+Un conteneur a sa propre adresse réseau, donc un serveur web qui écoute sur le port 5000 à l'intérieur reste invisible depuis votre machine tant que vous ne **publiez** pas le port : `ports:` dans compose, `-p` avec `docker run`. Le format est `adresse de l'hôte : port de l'hôte : port du conteneur`. Omettez l'adresse, et Docker publie sur toutes les interfaces réseau de votre machine. Sous Linux, il écrit aussi ses propres règles de pare-feu, qui s'appliquent avant celles de `ufw` : un port que vous croyiez bloqué est alors ouvert au réseau. Voilà pourquoi chaque exemple ici commence par `127.0.0.1:`.
+
+### Les volumes : des données qui survivent au conteneur
+
+Tout ce qu'un conteneur écrit va dans sa fine couche modifiable, et cette couche disparaît avec le conteneur. Pour des données qui doivent survivre, utilisez un **volume** :
+
+```yaml
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: change-me
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+volumes:
+  dbdata:
+```
+
+`dbdata` est un volume nommé que Docker conserve en dehors de tout conteneur, monté là où PostgreSQL range ses fichiers : après `docker compose down` puis `up`, on retrouve les mêmes données. L'autre sorte, le **montage de dossier** (*bind mount*), relie un dossier à vous, comme `-v "$PWD/logs:/data:ro"` plus haut. Dans un projet compose, les services se trouvent par leur nom : l'application joint la base à `db:5432`, sans adresse à chercher.
 
 ?? À quoi sert docker compose ?
 + Lancer plusieurs conteneurs ensemble à partir d'un fichier
@@ -283,6 +441,21 @@ Docker cherche l'image `hello-world` sur votre machine, ne la trouve pas, la té
 | `docker image rm IMAGE` | Supprime une image |
 
 `docker exec -it NOM sh` est la façon de regarder à l'intérieur de la boîte. Lancez-y `whoami` sur votre propre image et vous devriez voir `nobody`, c'est-à-dire `USER nobody` qui fait ses preuves.
+
+### Quand quelque chose ne va pas
+
+La même poignée d'erreurs attend tous ceux qui débutent avec Docker. Chacune nomme sa cause, si on lit la ligne jusqu'au bout :
+
+| Vous voyez | Cela veut dire | Faites ceci |
+|---|---|---|
+| `permission denied while trying to connect to the Docker daemon socket` | Votre utilisateur ne peut pas parler au démon | Utilisez `sudo`, ou entrez dans le groupe `docker`, en sachant qu'il équivaut à root |
+| `Bind for 0.0.0.0:5000 failed: port is already allocated` | Quelque chose utilise déjà ce port sur votre machine | Trouvez-le avec `docker ps`, ou publiez un autre port, `-p 127.0.0.1:5001:5000` |
+| `"/app.py": not found` pendant une construction | Le fichier n'est pas dans le contexte de construction | Construisez depuis le bon dossier, et vérifiez `.dockerignore` |
+| `Exited (0)` ou `Exited (1)` dans `docker ps -a` | Le processus principal a terminé, ou a planté | Lisez `docker logs NOM` |
+| `exec format error` | L'image a été construite pour un autre type de processeur | Prenez une image construite pour le vôtre, ou ajoutez `--platform` |
+| `no space left on device` | Les vieilles images et les vieux conteneurs se sont accumulés | Voyez-les avec `docker system df`, puis `docker system prune` |
+
+Un conteneur qui « s'arrête tout de suite » fonctionne en général comme prévu. Notre image `hello` affiche deux lignes et se termine, donc son conteneur indique `Exited (0)` : zéro veut dire succès. Un serveur ne reste allumé que parce que son processus principal ne se termine jamais.
 
 ?? `docker ps` ne montre rien, mais `docker ps -a` liste votre conteneur. Qu'est-ce que cela vous apprend ?
 + Le conteneur existe, mais il est arrêté
