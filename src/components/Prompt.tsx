@@ -8,6 +8,8 @@ import { sectionsFor, completions, isPath, knownPaths, listing, parse, rank, res
 import { fill, plural, useLang } from "@/i18n/LangProvider";
 import { localize, splitLang, type Lang } from "@/i18n/lang";
 import { say, type Dict } from "@/i18n/ui";
+import { HistoryButtons } from "@/components/HistoryButtons";
+import { DESKTOP } from "@/lib/desktop";
 
 interface Hit {
   title: string;
@@ -386,9 +388,10 @@ export function Prompt() {
             submit();
           }}
           onClick={(e) => {
-            if (!(e.target as HTMLElement).closest("a, input")) input.current?.focus();
+            if (!(e.target as HTMLElement).closest("a, input, button")) input.current?.focus();
           }}
         >
+          {DESKTOP && <HistoryButtons />}
           <nav className="prompt-where" aria-label={P.breadcrumb}>
             <span className="prompt-user" aria-hidden="true">{name}@cyberdojo</span>
             <span aria-hidden="true">:</span>

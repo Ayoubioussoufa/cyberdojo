@@ -17,8 +17,9 @@ export const frenchSpaces = (s: string) =>
 const TABLE = {
   common: {
     loading: ["Loading…", "Chargement…"],
-    back: ["Back", "Retour"],
-    backHome: ["Home", "Accueil"],
+    back: ["Back", "Précédent"],
+    forward: ["Forward", "Suivant"],
+    history: ["History", "Historique"],
     copy: ["copy", "copier"],
     copied: ["copied", "copié"],
     copiedCap: ["Copied", "Copié"],
