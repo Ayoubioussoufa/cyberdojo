@@ -7,7 +7,6 @@ import type { Lang } from "@/i18n/lang";
 import { say } from "@/i18n/ui";
 import { cancelSetup, deleteModel, lookupModel, saveSettings, startSetup, tutorReady, useTutorStatus } from "@/lib/tutor-client";
 import type { AdvisedModel, Fit, JobStep, SetupJob, TutorStatus } from "@/lib/tutor-types";
-import { BackButton } from "@/components/BackButton";
 
 const number = (lang: Lang, n: number, digits = 1) => new Intl.NumberFormat(lang, { maximumFractionDigits: digits }).format(n);
 
@@ -358,7 +357,6 @@ export function TutorSetup() {
   return (
     <div className="setup">
       <header className="page-head">
-        <BackButton className="above" />
         <h1>{t.tutor.setupTitle}</h1>
         <p className="lede">{t.tutor.setupLede}</p>
       </header>
