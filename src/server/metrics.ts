@@ -18,6 +18,10 @@ const SLACK = 5_000;
 const KEEP_DAYS = 400;
 const MAX_VISITS_A_DAY = 20_000;
 const MAX_PATHS_A_DAY = 2_500;
+/** Distinct pages kept per account: more than the whole site, so only forged paths are turned away. */
+const MAX_PATHS_A_USER = 3_000;
+/** Pages listed under each account on the admin page. */
+const TOP_PAGES = 15;
 const MAX_NEW_PER_IP = 60;
 const MAX_FEEDBACK_A_DAY = 5_000;
 const NOTE_MAX = 500;
@@ -131,6 +135,7 @@ export async function record(hit: Hit, user: User | null, ua: string, ip: string
     await many([
       ["DELETE FROM visits WHERE started_at < ?", now - KEEP_DAYS * DAY],
       ["DELETE FROM page_stats WHERE day < ?", dayOf(now - KEEP_DAYS * DAY)],
+      ["DELETE FROM user_pages WHERE last_at < ?", now - KEEP_DAYS * DAY],
     ]);
   }
   const { lang, path } = splitPath(hit.path);
@@ -160,8 +165,20 @@ export async function record(hit: Hit, user: User | null, ua: string, ip: string
     await many([visit]);
     return;
   }
+  // Signed in, the page's time is also kept under the account, so the admin can see where each learner spends it.
+  const own: Statement[] = uid
+    ? [
+        [
+          `INSERT INTO user_pages (user_id, path, views, active_ms, last_at)
+           SELECT ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM user_pages WHERE user_id = ? AND path = ?) OR (SELECT COUNT(*) FROM user_pages WHERE user_id = ?) < ?
+           ON CONFLICT (user_id, path) DO UPDATE SET views = views + excluded.views, active_ms = active_ms + excluded.active_ms, last_at = excluded.last_at`,
+          uid, path, view, credit, now, uid, path, uid, MAX_PATHS_A_USER,
+        ],
+      ]
+    : [];
   await many([
     visit,
+    ...own,
     [
       // A page already seen today always counts; new addresses stop at the cap.
       `INSERT INTO page_stats (day, path, views, active_ms)
@@ -184,7 +201,7 @@ export interface Report {
   referrers: { host: string; visits: number }[];
   devices: { name: string; visits: number }[];
   langs: { name: string; visits: number }[];
-  users: { username: string; createdAt: number; lastSeen: number | null; visits: number; days: number; totalMs: number; done: number }[];
+  users: { username: string; createdAt: number; lastSeen: number | null; visits: number; days: number; totalMs: number; rangeMs: number; done: number; pages: { path: string; views: number; ms: number; lastAt: number }[] }[];
   feedback: { path: string; up: number; down: number; notes: number }[];
   notes: { path: string; helpful: boolean; note: string; lang: string; at: number }[];
 }
@@ -229,10 +246,17 @@ export async function report(days: number, now = Date.now()): Promise<Report> {
     devices: ["SELECT device AS name, COUNT(*) AS visits FROM visits WHERE day >= ? GROUP BY device ORDER BY visits DESC", since],
     langs: ["SELECT lang AS name, COUNT(*) AS visits FROM visits WHERE day >= ? GROUP BY lang ORDER BY visits DESC", since],
     users: [
-      `SELECT u.username, u.created_at AS createdAt, MAX(v.last_at) AS lastSeen, COUNT(v.id) AS visits, COUNT(DISTINCT v.day) AS days,
-              COALESCE(SUM(v.active_ms), 0) AS totalMs, p.data AS data
+      `SELECT u.id, u.username, u.created_at AS createdAt, MAX(v.last_at) AS lastSeen, COUNT(v.id) AS visits, COUNT(DISTINCT v.day) AS days,
+              COALESCE(SUM(v.active_ms), 0) AS totalMs, COALESCE(SUM(CASE WHEN v.day >= ? THEN v.active_ms END), 0) AS rangeMs, p.data AS data
        FROM users u LEFT JOIN visits v ON v.user_id = u.id LEFT JOIN progress p ON p.user_id = u.id
        GROUP BY u.id ORDER BY lastSeen DESC NULLS LAST, u.created_at DESC LIMIT 500`,
+      since,
+    ],
+    userPages: [
+      `SELECT user_id AS userId, path, views, active_ms AS ms, last_at AS lastAt FROM (
+         SELECT *, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY active_ms DESC, views DESC) AS n FROM user_pages
+       ) WHERE n <= ?`,
+      TOP_PAGES,
     ],
     feedback: [
       `SELECT path, COALESCE(SUM(helpful), 0) AS up, COALESCE(SUM(1 - helpful), 0) AS down, COALESCE(SUM(note <> ''), 0) AS notes
@@ -265,6 +289,12 @@ export async function report(days: number, now = Date.now()): Promise<Report> {
     if (slot) slot.signups++;
   }
 
+  const pagesOf = new Map<string, Report["users"][number]["pages"]>();
+  for (const x of rows("userPages")) {
+    const list = pagesOf.get(String(x.userId)) ?? [];
+    list.push({ path: String(x.path), views: num(x.views), ms: num(x.ms), lastAt: num(x.lastAt) });
+    pagesOf.set(String(x.userId), list);
+  }
   const users = rows("users").map((u) => {
     let done = 0;
     try {
@@ -272,7 +302,17 @@ export async function report(days: number, now = Date.now()): Promise<Report> {
     } catch {
       // Unreadable progress counts as none.
     }
-    return { username: String(u.username), createdAt: num(u.createdAt), lastSeen: u.lastSeen === null ? null : num(u.lastSeen), visits: num(u.visits), days: num(u.days), totalMs: num(u.totalMs), done };
+    return {
+      username: String(u.username),
+      createdAt: num(u.createdAt),
+      lastSeen: u.lastSeen === null ? null : num(u.lastSeen),
+      visits: num(u.visits),
+      days: num(u.days),
+      totalMs: num(u.totalMs),
+      rangeMs: num(u.rangeMs),
+      done,
+      pages: (pagesOf.get(String(u.id)) ?? []).sort((a, b) => b.ms - a.ms || b.views - a.views),
+    };
   });
   const a = first("accounts");
   const act = first("active");

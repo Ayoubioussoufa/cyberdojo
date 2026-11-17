@@ -8,6 +8,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { countDownloads } from "../src/lib/release";
 import { isAdmin, readFeedback, readHit, type Report } from "../src/server/metrics";
 
 const PORT = 3103;
@@ -58,6 +59,17 @@ function unit() {
   ok(readFeedback({ v, p: "/fr/courses/x", helpful: false })?.path === "/courses/x/", "a vote's path is canonical, both languages as one");
   ok(readFeedback({ v, p: "/", helpful: true, note: "  a\n b  " })?.note === "a b", "a note is trimmed and its spaces collapsed");
   ok((readFeedback({ v, p: "/", helpful: true, note: "x".repeat(900) })?.note.length ?? 0) === 500, "a long note is cut to 500");
+
+  const asset = (name: string, n: number) => ({ name, size: 1, browser_download_url: `https://example.org/${name}`, download_count: n });
+  const rel = (tag: string, assets: ReturnType<typeof asset>[], draft = false) => ({ tag_name: tag, html_url: "", published_at: "2026-11-17T00:00:00Z", draft, prerelease: false, assets });
+  const dl = countDownloads([
+    rel("desktop-v0.3.0", [asset("CyberDojo-Setup-0.3.0.exe", 7), asset("CyberDojo-0.3.0.AppImage", 3), asset("CyberDojo-0.3.0.deb", 1), asset("latest.yml", 900), asset("SHA256SUMS.txt", 40), asset("CyberDojo-Setup-0.3.0.exe.blockmap", 50)]),
+    rel("desktop-v0.2.0", [asset("CyberDojo-0.2.0.dmg", 2)]),
+    rel("desktop-v0.4.0", [asset("CyberDojo-Setup-0.4.0.exe", 99)], true),
+    rel("v1.0.0", [asset("other.exe", 99)]),
+  ]);
+  ok(dl.total === 13 && dl.byOs.windows === 7 && dl.byOs.linux === 4 && dl.byOs.mac === 2, "downloads count installers only, per system", dl);
+  ok(dl.releases.map((r) => r.version).join() === "0.3.0,0.2.0" && dl.releases[0]?.total === 11, "drafts and other tags are left out; each release has its total", dl.releases);
 
   const before = process.env.CYBERDOJO_ADMINS;
   delete process.env.CYBERDOJO_ADMINS;
@@ -129,6 +141,10 @@ async function http() {
     const mine = raw.prepare("SELECT v.active_ms, v.device, u.username FROM visits v JOIN users u ON u.id = v.user_id WHERE v.visitor = ?").get(l) as Record<string, unknown> | undefined;
     ok(mine?.username === "lea" && mine.active_ms === 1_000 && mine.device === "phone", "a signed-in visit is tied to the account, with real time credited in full", mine);
 
+    const own = raw.prepare("SELECT p.views, p.active_ms FROM user_pages p JOIN users u ON u.id = p.user_id WHERE u.username = 'lea' AND p.path = '/roadmap/'").get() as { views: number; active_ms: number } | undefined;
+    ok(own?.views === 1 && own.active_ms === 1_000, "a signed-in learner's page time is also kept under the account", own);
+    ok(count("SELECT COUNT(*) AS n FROM user_pages") === 1, "a guest's pages aren't kept under any account");
+
     // The report.
     const res = await boss("GET", "/api/admin/stats/?days=7");
     const rep = res.json as unknown as Report;
@@ -141,6 +157,8 @@ async function http() {
     ok(today?.visitors === 2 && today.signups === 2, "today's row has today's figures", today);
     const row = rep.users.find((u) => u.username === "lea");
     ok(row?.visits === 1 && row.totalMs === 1_000 && rep.users.some((u) => u.username === "Boss" && u.visits === 0), "each account has its own line, visited or not", rep.users);
+    ok(row?.rangeMs === 1_000 && row.pages.length === 1 && row.pages[0]?.path === "/roadmap/" && row.pages[0].ms === 1_000 && row.pages[0].views === 1, "each account lists the pages it spent time on", row);
+    ok("downloads" in rep, "the report carries the download counts (null when GitHub can't be reached)");
     ok(rep.referrers[0]?.host === "www.example.org" && rep.pages.length === 3 && rep.langs.length === 1, "pages and sources are listed", { r: rep.referrers, p: rep.pages });
     ok(!JSON.stringify(rep).includes("password") && !JSON.stringify(rep).includes(g), "the report holds no hashes and no visitor numbers");
     ok((await boss("GET", "/api/admin/stats/?days=99999")).json.days === 30, "an odd period falls back to 30 days");
@@ -162,6 +180,7 @@ async function http() {
     // Leaving.
     ok((await lea("DELETE", "/api/account/", { password: pw })).status === 200, "the learner deletes the account");
     ok(count("SELECT COUNT(*) AS n FROM visits WHERE visitor = '" + l + "' AND user_id IS NULL") === 1, "their visits stay as anonymous counts, with no name attached");
+    ok(count("SELECT COUNT(*) AS n FROM user_pages") === 0, "their per-page times go with the account");
     raw.close();
   } finally {
     server.kill();

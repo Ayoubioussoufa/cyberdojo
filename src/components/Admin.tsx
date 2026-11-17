@@ -1,9 +1,16 @@
 /** Usage statistics for whoever runs the site. English only: it has one reader. */
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useAccount } from "@/lib/account";
+import type { Downloads } from "@/lib/release";
 import type { Report } from "@/server/metrics";
+
+/** The usage figures plus the app's download counts, which come from GitHub (null when it can't be reached). */
+type Stats = Report & { downloads: Downloads | null };
+type Account = Report["users"][number];
+
+const OS_NAMES = { windows: "Windows", mac: "macOS", linux: "Linux" } as const;
 
 const RANGES = [7, 30, 90] as const;
 
@@ -78,10 +85,32 @@ function Split({ title, rows, empty }: { title: string; rows: { name: string; vi
   );
 }
 
+function UserPages({ user, now }: { user: Account; now: number }) {
+  if (!user.pages.length) return <p className="muted">No page time counted for {user.username} yet, or they switched counting off.</p>;
+  return (
+    <table className="adm-pages">
+      <caption>Where {user.username} spent their time: the {user.pages.length} pages with the most, all time.</caption>
+      <thead><tr><th scope="col">Page</th><th scope="col">Views</th><th scope="col">Time</th><th scope="col">Per view</th><th scope="col">Last opened</th></tr></thead>
+      <tbody>
+        {user.pages.map((p) => (
+          <tr key={p.path}>
+            <th scope="row"><a href={p.path}>{p.path}</a></th>
+            <td>{p.views}</td>
+            <td>{p.ms ? time(p.ms) : "–"}</td>
+            <td>{p.views && p.ms ? time(p.ms / p.views) : "–"}</td>
+            <td>{ago(p.lastAt, now)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 export function Admin() {
   const { ready, admin } = useAccount();
   const [days, setDays] = useState<(typeof RANGES)[number]>(30);
-  const [data, setData] = useState<Report | null>(null);
+  const [data, setData] = useState<Stats | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
   const [state, setState] = useState<"loading" | "ok" | "denied" | "error">("loading");
 
   useEffect(() => {
@@ -92,7 +121,7 @@ export function Admin() {
         if (!live) return;
         if (res.status === 404) return setState("denied");
         if (!res.ok) return setState("error");
-        setData((await res.json()) as Report);
+        setData((await res.json()) as Stats);
         setState("ok");
       })
       .catch(() => live && setState("error"));
@@ -112,7 +141,7 @@ export function Admin() {
   }
   if (!data) return <p className="auth-error" role="alert">The server didn&apos;t answer. Reload to try again.</p>;
 
-  const { accounts, active, range: r, daily } = data;
+  const { accounts, active, range: r, daily, downloads } = data;
   return (
     <>
       <header className="page-head adm-head">
@@ -134,6 +163,7 @@ export function Admin() {
         <Tile value={time(r.avgVisitorMs)} label="average per visitor" note={`${time(r.avgAccountMs)} per signed-in account`} />
         <Tile value={active.now} label="on the site now" note="active in the last 5 minutes" />
         <Tile value={time(r.totalMs)} label="total time in use" note={`${r.visits} visits, ${r.views} page views`} />
+        <Tile value={downloads ? downloads.total : "–"} label="app downloads" note={downloads ? `all releases, ${downloads.releases[0] ? `${downloads.releases[0].total} of v${downloads.releases[0].version}` : "none yet"}` : "GitHub didn't answer"} />
       </div>
 
       <section className="adm-part">
@@ -177,27 +207,84 @@ export function Admin() {
 
       <section className="adm-part">
         <h2>Accounts</h2>
-        <p className="muted adm-note">Every account, most recently seen first. Time is counted only while the tab is open and in use.</p>
+        <p className="muted adm-note">
+          Every account, most recently seen first. Time counts only while the tab is visible and someone moved, typed or scrolled in the last two minutes.
+          Open an account to see the pages it spent that time on.
+        </p>
         <div className="table-wrap">
-          <table>
-            <thead><tr><th scope="col">Username</th><th scope="col">Joined</th><th scope="col">Last seen</th><th scope="col">Visits</th><th scope="col">Days</th><th scope="col">Total time</th><th scope="col">Per visit</th><th scope="col">Lessons done</th></tr></thead>
+          <table className="adm-users">
+            <thead><tr><th scope="col">Username</th><th scope="col">Joined</th><th scope="col">Last seen</th><th scope="col">Visits</th><th scope="col">Days</th><th scope="col">Time in {days} days</th><th scope="col">Total time</th><th scope="col">Per visit</th><th scope="col">Lessons done</th></tr></thead>
             <tbody>
               {data.users.map((u) => (
-                <tr key={u.username}>
-                  <th scope="row">{u.username}</th>
-                  <td>{date(u.createdAt)}</td>
-                  <td>{ago(u.lastSeen, data.generatedAt)}</td>
-                  <td>{u.visits}</td>
-                  <td>{u.days}</td>
-                  <td>{time(u.totalMs)}</td>
-                  <td>{u.visits ? time(u.totalMs / u.visits) : "–"}</td>
-                  <td>{u.done}</td>
-                </tr>
+                <Fragment key={u.username}>
+                  <tr>
+                    <th scope="row">
+                      <button type="button" className="adm-user" aria-expanded={open === u.username} onClick={() => setOpen(open === u.username ? null : u.username)}>
+                        <span aria-hidden="true">{open === u.username ? "▾" : "▸"}</span> {u.username}
+                      </button>
+                    </th>
+                    <td>{date(u.createdAt)}</td>
+                    <td>{ago(u.lastSeen, data.generatedAt)}</td>
+                    <td>{u.visits}</td>
+                    <td>{u.days}</td>
+                    <td>{u.rangeMs ? time(u.rangeMs) : "–"}</td>
+                    <td>{u.totalMs ? time(u.totalMs) : "–"}</td>
+                    <td>{u.visits ? time(u.totalMs / u.visits) : "–"}</td>
+                    <td>{u.done}</td>
+                  </tr>
+                  {open === u.username && (
+                    <tr className="adm-sub">
+                      <td colSpan={9}>
+                        <UserPages user={u} now={data.generatedAt} />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
-              {data.users.length === 0 && <tr><td colSpan={8}>No accounts yet.</td></tr>}
+              {data.users.length === 0 && <tr><td colSpan={9}>No accounts yet.</td></tr>}
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="adm-part">
+        <h2>App downloads</h2>
+        {!downloads ? (
+          <p className="muted adm-note">GitHub didn&apos;t answer, so the counts can&apos;t be shown right now. Reload in a few minutes.</p>
+        ) : (
+          <>
+            <p className="muted adm-note">
+              Installer downloads from the GitHub releases, as GitHub counts them. An installed app that updates itself downloads the new installer, so updates are included.
+              {" "}Windows {downloads.byOs.windows}, macOS {downloads.byOs.mac}, Linux {downloads.byOs.linux}.
+            </p>
+            <div className="table-wrap">
+              <table>
+                <thead><tr><th scope="col">Version</th><th scope="col">Published</th><th scope="col">Windows</th><th scope="col">macOS</th><th scope="col">Linux</th><th scope="col">Total</th></tr></thead>
+                <tbody>
+                  {downloads.releases.map((rel) => {
+                    const of = (os: keyof typeof OS_NAMES) => rel.files.filter((f) => f.os === os);
+                    const cell = (os: keyof typeof OS_NAMES) => {
+                      const files = of(os);
+                      const n = files.reduce((a, f) => a + f.count, 0);
+                      return <td title={files.map((f) => `${f.kind}: ${f.count}`).join(", ") || undefined}>{files.length ? n : "–"}</td>;
+                    };
+                    return (
+                      <tr key={rel.version}>
+                        <th scope="row">v{rel.version}</th>
+                        <td>{date(Date.parse(rel.publishedAt))}</td>
+                        {cell("windows")}
+                        {cell("mac")}
+                        {cell("linux")}
+                        <td><b>{rel.total}</b></td>
+                      </tr>
+                    );
+                  })}
+                  {downloads.releases.length === 0 && <tr><td colSpan={6}>No release yet.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="adm-part">
@@ -207,7 +294,7 @@ export function Admin() {
             <thead><tr><th scope="col">Page</th><th scope="col">Views</th><th scope="col">Time</th><th scope="col">Per view</th></tr></thead>
             <tbody>
               {data.pages.map((p) => (
-                <tr key={p.path}><th scope="row"><a href={p.path}>{p.path}</a></th><td>{p.views}</td><td>{time(p.ms)}</td><td>{p.views ? time(p.ms / p.views) : "–"}</td></tr>
+                <tr key={p.path}><th scope="row"><a href={p.path}>{p.path}</a></th><td>{p.views}</td><td>{p.ms ? time(p.ms) : "–"}</td><td>{p.views && p.ms ? time(p.ms / p.views) : "–"}</td></tr>
               ))}
               {data.pages.length === 0 && <tr><td colSpan={4}>No page views in this period.</td></tr>}
             </tbody>
