@@ -40,6 +40,26 @@ The next line is a safety net, and you should use it in every script:
 | `-u` | Stop on an unset variable, which is usually a typo |
 | `-o pipefail` | A pipeline fails if any stage fails, not just the last |
 
+### Terminal, shell and Bash
+
+Three words get mixed up, so pin them down once. The **terminal** is the window you type into; it only shows text. The **shell** is the program inside it that reads what you type and runs it. **Bash** is one particular shell, the usual one on Linux. `sh` is an older, smaller shell language that Bash understands, but `sh` on Debian and Ubuntu is a different program, `dash`, which doesn't know Bash's extras such as `[[ ]]`. That's why a Bash script starts with a Bash shebang and is run as `./audit.sh` or `bash audit.sh`, never `sh audit.sh`. `echo "$SHELL"` shows your login shell.
+
+### What happens when you press Enter
+
+The shell does the same steps for every line, in order, and knowing them explains most surprises:
+
+1. It replaces what it can: `$name` by the variable's value, `$(command)` by that command's output, and patterns such as `*.log` by the matching file names.
+2. It splits the result into words on spaces, except inside quotes. This is the step that breaks `rm $file` when the name contains a space.
+3. It looks up the first word. A **builtin** such as `cd` or `echo` is part of the shell itself; anything else is searched for in each folder of `$PATH`, in order. `type` tells you which you'll get:
+
+```
+$ type cd ls
+cd is a shell builtin
+ls is /usr/bin/ls
+```
+
+4. It runs the command, waits, and keeps its exit code in `$?`. A first word that is neither a builtin nor in `$PATH` gives `lsit: command not found`, which nearly always means a typo or a missing package.
+
 ?? What does `set -e` do?
 + It stops the script on failure
 - It encrypts the script on disk
@@ -122,6 +142,21 @@ grep -q "^ana:" /etc/passwd || echo "no account called ana"
 
 Note that `[[ … ]]` is itself a command. It prints nothing and returns 0 when the test is true, which is the only reason `if` can use it.
 
+### When a script won't run
+
+These are the messages everyone meets in their first week of scripting, exactly as Bash prints them:
+
+| You see | It means | Do this |
+|---|---|---|
+| `./audit.sh: Permission denied` | The file isn't executable | `chmod u+x audit.sh` |
+| `lsit: command not found` | No builtin and nothing in `$PATH` by that name | Check the spelling, or install the tool |
+| `/bin/bash^M: bad interpreter: No such file or directory` | The file has Windows line endings, so the shebang ends with an invisible `\r` | Convert it with `sed -i 's/\r$//' audit.sh`, or save as LF in your editor |
+| `nmae: unbound variable` | `set -u` caught a variable that was never set, here a typo | Fix the name, or give a default with `${name:-...}` |
+| `syntax error: unexpected end of file from 'if' command on line 2` | A block was opened and never closed: here an `if` without `fi` | Close every `if` with `fi`, `do` with `done`, `case` with `esac` |
+| `[[: not found` | The script was run by `sh`, which isn't Bash | Run it as `./audit.sh` or `bash audit.sh` |
+
+Older versions of Bash say only `unexpected end of file`, without naming the `if`: the cause is the same.
+
 ?? Which exit code means success?
 + Zero, and anything else means failure
 - One, and zero means the opposite
@@ -157,6 +192,42 @@ Read the `for` loop as a sentence: "for each value in the list `21 23 3306`, put
 The `while` loop reads a file one line at a time. A line of `/etc/passwd` looks like `root:x:0:0:root:/root:/bin/bash`, with seven fields separated by colons. `read -r user _ uid _` puts the first field in `user`, throws the second away into `_`, puts the third in `uid`, and puts everything left into the last `_`. The `< /etc/passwd` after `done` is what feeds the file into the loop.
 
 When a script does something you don't expect, run it with `bash -x audit.sh`. Bash then prints each command, with its variables already filled in, just before running it. Most bugs become obvious the moment you see the real command.
+
+### What `bash -x` shows you
+
+Here is a three-line script and its trace:
+
+```bash
+#!/usr/bin/env bash
+file="my notes.txt"
+count=$(wc -l < /etc/hostname)
+echo "$file has $count lines"
+```
+
+```
++ file='my notes.txt'
+++ wc -l
++ count=1
++ echo 'my notes.txt has 1 lines'
+my notes.txt has 1 lines
+```
+
+Each `+` line is a command just before it runs, with the variables already replaced, and `++` marks a command run inside `$(...)`. The quotes Bash adds show you exactly where each argument starts and ends, which is how a quoting bug gives itself away.
+
+### ShellCheck, a second pair of eyes
+
+ShellCheck reads a script without running it and points at the lines that will bite. Give it a script containing `rm $file`:
+
+```
+In audit.sh line 3:
+rm $file
+   ^---^ SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+rm "$file"
+```
+
+Every warning has a code such as `SC2086`, and each code has a page on the ShellCheck wiki that explains the problem with examples. Install it with `sudo apt install shellcheck`, run it on every script you write, and treat a warning you don't understand as a lesson, not noise.
 
 ?? `grep -q root file` prints nothing. How does a script know whether it matched?
 + It checks the exit code, 0 meaning match
