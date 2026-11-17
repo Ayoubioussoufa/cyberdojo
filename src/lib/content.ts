@@ -50,6 +50,7 @@ import { TRAIN, type TrainLink } from "@/data/train";
 import type { Lang } from "@/i18n/lang";
 import { UI } from "@/i18n/ui";
 import type { Check, Doc, DocBrief, DocLink, DocMeta, HelpLevel, Question, Segment, StepSegment, Term, TocEntry, ToolUse, Written } from "./types";
+import { highlight } from "./highlight";
 
 const ROOT = path.join(process.cwd(), "content");
 const MODULES = path.join(process.cwd(), "modules");
@@ -89,6 +90,11 @@ function makeMarked(toc: TocEntry[]) {
   const m = new Marked({ gfm: true });
   m.use({
     renderer: {
+      // Coloured when the language is known or the block is clearly commands; false keeps marked's plain block.
+      code({ text, lang }) {
+        const coloured = highlight(text, lang);
+        return coloured ? `${coloured}\n` : false;
+      },
       heading({ tokens, depth }) {
         const inner = this.parser.parseInline(tokens);
         if (depth !== 2) return `<h${depth}>${inner}</h${depth}>\n`;
