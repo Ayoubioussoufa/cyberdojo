@@ -44,7 +44,7 @@ interface GitHubRelease {
   published_at: string;
   draft: boolean;
   prerelease: boolean;
-  assets: { name: string; size: number; browser_download_url: string }[];
+  assets: { name: string; size: number; browser_download_url: string; download_count?: number }[];
 }
 
 /** Picks the newest published desktop release from GitHub's list. */
@@ -65,18 +65,58 @@ export function pickRelease(list: GitHubRelease[]): Release | null {
   };
 }
 
-/** Null when there's no release yet or GitHub can't be reached: the page then points to the releases page. */
-export async function latestRelease(): Promise<Release | null> {
+/** GitHub's list of releases, newest first, or null when it can't be reached. */
+async function releases(perPage: number, revalidate: number): Promise<GitHubRelease[] | null> {
   const api = REPO.replace("https://github.com/", "https://api.github.com/repos/");
   if (!api.startsWith("https://api.github.com/repos/")) return null;
   try {
-    const res = await fetch(`${api}/releases?per_page=10`, {
+    const res = await fetch(`${api}/releases?per_page=${perPage}`, {
       headers: { Accept: "application/vnd.github+json", "User-Agent": "CyberDojo-site", ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) },
-      next: { revalidate: 600 },
+      next: { revalidate },
       signal: AbortSignal.timeout(8000),
     });
-    return res.ok ? pickRelease((await res.json()) as GitHubRelease[]) : null;
+    return res.ok ? ((await res.json()) as GitHubRelease[]) : null;
   } catch {
     return null;
   }
+}
+
+/** Null when there's no release yet or GitHub can't be reached: the page then points to the releases page. */
+export async function latestRelease(): Promise<Release | null> {
+  const list = await releases(10, 600);
+  return list ? pickRelease(list) : null;
+}
+
+export interface Downloads {
+  total: number;
+  byOs: Record<Os, number>;
+  releases: { version: string; publishedAt: string; total: number; files: { name: string; os: Os; kind: string; count: number }[] }[];
+}
+
+/**
+ * How many times each installer was downloaded, as GitHub counts it. Only the
+ * installers count: the checksums and the update manifests are fetched by the
+ * app itself. An installed app that updates itself downloads the new installer
+ * too, so updates are part of these figures.
+ */
+export function countDownloads(list: GitHubRelease[]): Downloads {
+  const out: Downloads = { total: 0, byOs: { windows: 0, mac: 0, linux: 0 }, releases: [] };
+  for (const r of list) {
+    if (r.draft || !/^desktop-v\d+\.\d+\.\d+$/.test(r.tag_name)) continue;
+    const files = r.assets.flatMap((a) => {
+      const kind = classify(a.name);
+      return kind ? [{ name: a.name, ...kind, count: a.download_count ?? 0 }] : [];
+    });
+    const total = files.reduce((n, f) => n + f.count, 0);
+    for (const f of files) out.byOs[f.os] += f.count;
+    out.total += total;
+    out.releases.push({ version: r.tag_name.replace(/^desktop-v/, ""), publishedAt: r.published_at, total, files });
+  }
+  return out;
+}
+
+/** Null when GitHub can't be reached. Kept for five minutes, so the admin page doesn't spend GitHub's hourly allowance. */
+export async function downloadCounts(): Promise<Downloads | null> {
+  const list = await releases(100, 300);
+  return list ? countDownloads(list) : null;
 }

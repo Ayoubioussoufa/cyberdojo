@@ -14,6 +14,8 @@ const OFF = "cyberdojo-stats-off";
 const TICK = 5_000;
 const SEND_EVERY = 30_000;
 const IDLE_AFTER = 120_000;
+/** The server closes a visit after 30 minutes without a report; past this, a return opens a fresh one first. */
+const REOPEN_AFTER = 25 * 60_000;
 
 const read = (k: string) => {
   try {
@@ -64,17 +66,40 @@ let spent = 0;
 let lastTick = 0;
 let lastInput = 0;
 let lastSent = 0;
+/** When the server last heard from this tab, whatever the report was. */
+let lastPost = 0;
 let started = false;
+/**
+ * Reports go one after another. The server credits time against the moment it
+ * last heard from this browser, so a page view that overtook the time report for
+ * the page before it would shrink that time to a few seconds. Moving between
+ * pages sends both at once, so without this queue most of the time was lost.
+ */
+let queue: Promise<unknown> = Promise.resolve();
 /** The tab's state before the event being handled: when it hides, the seconds up to that moment still count. */
 let showing = true;
 
-function post(body: { p: string; view: boolean; ms: number; r?: string }) {
+/** `now` skips the queue: when the page is going away, a queued request would never start. */
+function post(body: { p: string; view: boolean; ms: number; r?: string }, now = false) {
   if (!counted()) return;
   const v = visitor();
   if (!v) return;
-  void fetch("/api/track/", { method: "POST", keepalive: true, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ v, ...body }) }).catch(() => {
-    // Offline: these seconds go uncounted.
-  });
+  lastPost = Date.now();
+  const send = () =>
+    fetch("/api/track/", { method: "POST", keepalive: true, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ v, ...body }) }).catch(() => {
+      // Offline: these seconds go uncounted.
+    });
+  if (now) void send();
+  else queue = queue.then(send);
+}
+
+/**
+ * Someone came back after a long break on the same page. The server has closed
+ * the visit by now, and a time report can't open one with credit (it has nothing
+ * to measure against), so the return counts as opening the page again.
+ */
+function reopen() {
+  if (path && Date.now() - lastPost > REOPEN_AFTER) post({ p: path, view: true, ms: 0 });
 }
 
 function tick() {
@@ -85,10 +110,10 @@ function tick() {
   if (showing && now - lastInput < IDLE_AFTER && gap < 3 * TICK) spent += gap;
 }
 
-function flush() {
+function flush(leaving = false) {
   tick();
   if (spent < 1_000 || !path) return;
-  post({ p: path, view: false, ms: Math.round(spent) });
+  post({ p: path, view: false, ms: Math.round(spent) }, leaving);
   spent = 0;
   lastSent = Date.now();
 }
@@ -98,7 +123,9 @@ function start() {
   showing = document.visibilityState === "visible";
   lastTick = lastInput = lastSent = Date.now();
   const touched = () => {
-    lastInput = Date.now();
+    const now = Date.now();
+    if (now - lastInput >= IDLE_AFTER) reopen();
+    lastInput = now;
   };
   for (const name of ["pointerdown", "pointermove", "keydown", "scroll", "wheel", "touchstart"]) window.addEventListener(name, touched, { passive: true, capture: true });
   setInterval(() => {
@@ -107,14 +134,15 @@ function start() {
   }, TICK);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
-      flush();
+      flush(true);
       showing = false;
     } else {
       showing = true;
       lastTick = lastInput = Date.now();
+      reopen();
     }
   });
-  window.addEventListener("pagehide", flush);
+  window.addEventListener("pagehide", () => flush(true));
 }
 
 /**
