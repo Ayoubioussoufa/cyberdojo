@@ -689,7 +689,7 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 | ◐* | ● | MISP, OpenCTI (tool) | 9 mentions in 2 docs, most in 0066-threat-intelligence. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ● | ● | Traffic Light Protocol | 19 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ◐ | ● | Attribution and its limits | 5 mentions in 2 docs, most in 0066-threat-intelligence. | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
-| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 32 mentions in 10 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
+| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 33 mentions in 11 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ○ | ● | The underground economy: IABs, RaaS | None. *Section 'Crime as a supply chain'.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 
 ### OSINT and recon (ATT&CK Reconnaissance)

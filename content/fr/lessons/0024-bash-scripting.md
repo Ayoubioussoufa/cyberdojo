@@ -38,6 +38,26 @@ La ligne suivante est un filet de sécurité, et vous devriez l'utiliser dans ch
 | `-u` | S'arrêter sur une variable non définie, ce qui est en général une faute de frappe |
 | `-o pipefail` | Un pipeline échoue si l'une de ses étapes échoue, pas seulement la dernière |
 
+### Terminal, shell et Bash
+
+Trois mots se mélangent, alors fixons-les une fois pour toutes. Le **terminal** est la fenêtre dans laquelle vous tapez ; il ne fait qu'afficher du texte. Le **shell** est le programme, à l'intérieur, qui lit ce que vous tapez et l'exécute. **Bash** est un shell particulier, le plus courant sous Linux. `sh` est un langage de shell plus ancien et plus petit, que Bash comprend ; mais sous Debian et Ubuntu, `sh` est un autre programme, `dash`, qui ne connaît pas les ajouts de Bash comme `[[ ]]`. Voilà pourquoi un script Bash commence par un shebang Bash et se lance avec `./audit.sh` ou `bash audit.sh`, jamais `sh audit.sh`. `echo "$SHELL"` affiche votre shell de connexion.
+
+### Ce qui se passe quand vous appuyez sur Entrée
+
+Le shell fait les mêmes étapes pour chaque ligne, dans l'ordre, et les connaître explique la plupart des surprises :
+
+1. Il remplace ce qu'il peut : `$name` par la valeur de la variable, `$(commande)` par ce qu'affiche la commande, et des motifs comme `*.log` par les noms de fichiers qui correspondent.
+2. Il découpe le résultat en mots aux espaces, sauf entre guillemets. C'est cette étape qui casse `rm $file` quand le nom contient une espace.
+3. Il cherche le premier mot. Une **commande interne** (*builtin*) comme `cd` ou `echo` fait partie du shell lui-même ; tout le reste est cherché dans chaque dossier de `$PATH`, dans l'ordre. `type` vous dit ce que vous obtiendrez :
+
+```
+$ type cd ls
+cd is a shell builtin
+ls is /usr/bin/ls
+```
+
+4. Il lance la commande, attend, et garde son code de sortie dans `$?`. Un premier mot qui n'est ni une commande interne ni dans `$PATH` donne `lsit: command not found`, ce qui veut presque toujours dire une faute de frappe ou un paquet manquant.
+
 ?? Que fait `set -e` ?
 + Il arrête le script en cas d'échec
 - Il chiffre le script sur le disque
@@ -120,6 +140,21 @@ grep -q "^ana:" /etc/passwd || echo "no account called ana"
 
 Notez que `[[ … ]]` est lui-même une commande. Il n'affiche rien et renvoie 0 quand le test est vrai, et c'est la seule raison pour laquelle `if` peut l'utiliser.
 
+### Quand un script refuse de tourner
+
+Voici les messages que tout le monde rencontre la première semaine, tels que Bash les affiche :
+
+| Vous voyez | Cela veut dire | Faites ceci |
+|---|---|---|
+| `./audit.sh: Permission denied` | Le fichier n'est pas exécutable | `chmod u+x audit.sh` |
+| `lsit: command not found` | Aucune commande interne et rien dans `$PATH` de ce nom | Vérifiez l'orthographe, ou installez l'outil |
+| `/bin/bash^M: bad interpreter: No such file or directory` | Le fichier a des fins de ligne Windows : le shebang se termine par un `\r` invisible | Convertissez-le avec `sed -i 's/\r$//' audit.sh`, ou enregistrez en LF dans votre éditeur |
+| `nmae: unbound variable` | `set -u` a attrapé une variable jamais définie, ici une faute de frappe | Corrigez le nom, ou donnez une valeur par défaut avec `${name:-...}` |
+| `syntax error: unexpected end of file from 'if' command on line 2` | Un bloc ouvert n'a jamais été fermé : ici un `if` sans `fi` | Fermez chaque `if` par `fi`, `do` par `done`, `case` par `esac` |
+| `[[: not found` | Le script a été lancé par `sh`, qui n'est pas Bash | Lancez-le avec `./audit.sh` ou `bash audit.sh` |
+
+Les versions plus anciennes de Bash disent seulement `unexpected end of file`, sans nommer le `if` : la cause est la même.
+
 ?? Quel code de sortie signifie succès ?
 + Zéro, et toute autre valeur signale un échec
 - Un, et zéro signifie alors tout le contraire
@@ -155,6 +190,42 @@ Lisez la boucle `for` comme une phrase : « pour chaque valeur de la liste `21 2
 La boucle `while` lit un fichier ligne par ligne. Une ligne de `/etc/passwd` ressemble à `root:x:0:0:root:/root:/bin/bash`, avec sept champs séparés par des deux-points. `read -r user _ uid _` met le premier champ dans `user`, jette le deuxième dans `_`, met le troisième dans `uid`, et met tout ce qui reste dans le dernier `_`. Le `< /etc/passwd` après `done` est ce qui envoie le fichier dans la boucle.
 
 Quand un script fait quelque chose d'inattendu, lancez-le avec `bash -x audit.sh`. Bash affiche alors chaque commande, avec ses variables déjà remplacées, juste avant de l'exécuter. La plupart des bugs deviennent évidents dès que vous voyez la vraie commande.
+
+### Ce que montre `bash -x`
+
+Voici un script de trois lignes et sa trace :
+
+```bash
+#!/usr/bin/env bash
+file="my notes.txt"
+count=$(wc -l < /etc/hostname)
+echo "$file has $count lines"
+```
+
+```
++ file='my notes.txt'
+++ wc -l
++ count=1
++ echo 'my notes.txt has 1 lines'
+my notes.txt has 1 lines
+```
+
+Chaque ligne `+` est une commande juste avant son exécution, avec les variables déjà remplacées, et `++` marque une commande lancée à l'intérieur de `$(...)`. Les guillemets que Bash ajoute montrent exactement où commence et finit chaque argument : c'est ainsi qu'un problème de guillemets se trahit.
+
+### ShellCheck, un second regard
+
+ShellCheck lit un script sans l'exécuter et montre les lignes qui vont mordre. Donnez-lui un script qui contient `rm $file` :
+
+```
+In audit.sh line 3:
+rm $file
+   ^---^ SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+rm "$file"
+```
+
+Chaque avertissement porte un code comme `SC2086`, et chaque code a une page sur le wiki de ShellCheck qui explique le problème avec des exemples. Installez-le avec `sudo apt install shellcheck`, passez-le sur chaque script que vous écrivez, et traitez un avertissement que vous ne comprenez pas comme une leçon, pas comme du bruit.
 
 ?? `grep -q root file` n'affiche rien. Comment un script sait-il s'il y a eu une correspondance ?
 + Il vérifie le code de sortie, 0 pour trouvé
