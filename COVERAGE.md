@@ -19,7 +19,7 @@ Basis: Brief 1, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | OSI and TCP/IP layering, encapsulation | 11 mentions in 3 docs, most in 0017-ethernet-arp-layers, practice 1. *Lesson 17, 'Layers: envelopes inside envelopes'.* |  |
-| ● | ● | Ethernet frames and switching | 26 mentions in 5 docs, most in 0017-ethernet-arp-layers, practice 3. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
+| ● | ● | Ethernet frames and switching | 27 mentions in 5 docs, most in 0017-ethernet-arp-layers, practice 3. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ● | ● | ARP mechanics | 19 mentions in 4 docs, most in 0017-ethernet-arp-layers, practice 2. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ● | ● | ARP spoofing and on-path attacks | 7 mentions in 3 docs, most in 0017-ethernet-arp-layers. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ◐* | ● | VLANs and 802.1Q trunking | 3 mentions in 1 docs, most in 0017-ethernet-arp-layers. *Lesson 17 has a VLANs section, with no tagging or trunk mechanics.* | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
@@ -42,7 +42,7 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | TCP handshake and connection states | 14 mentions in 5 docs, most in 0018-tcp-udp-and-ports, practice 1. |  |
+| ● | ● | TCP handshake and connection states | 15 mentions in 5 docs, most in 0022-scanning-with-nmap, practice 1. |  |
 | ◐ | ● | TCP internals: sequence numbers, windows, retransmission, congestion | 2 mentions in 1 docs, most in 0018-tcp-udp-and-ports, practice 1. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ○ | ● | TCP attacks: SYN flood, SYN cookies, RST injection, hijacking | None. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | UDP amplification and reflection | 6 mentions in 3 docs, most in 0018-tcp-udp-and-ports. | [Denial of service](modules/01-networking/13-denial-of-service.md) |
@@ -84,7 +84,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 43 mentions in 16 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ● | ● | curl (tool) | 46 mentions in 16 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 3 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 9 mentions in 6 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 5 mentions in 3 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -94,11 +94,11 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | tcpdump (tool) | 11 mentions in 4 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ○ | ● | BPF capture filters | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ● | ● | Wireshark (tool) | 37 mentions in 8 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ●* | ● | Display filters and following streams | 11 mentions in 3 docs, most in 0020-reading-packets. *Lesson 20, 'Reading Wireshark'.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ○ | ● | tshark (tool) | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ◐ | ● | tcpdump (tool) | 17 mentions in 4 docs, most in 0020-reading-packets. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ○ | ● | BPF capture filters | 6 mentions in 1 docs, most in 0020-reading-packets. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ● | ● | Wireshark (tool) | 44 mentions in 8 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ●* | ● | Display filters and following streams | 17 mentions in 3 docs, most in 0020-reading-packets. *Lesson 20, 'Reading Wireshark'.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ○ | ● | tshark (tool) | 1 mentions in 1 docs, most in 0020-reading-packets. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | Decrypting TLS in a capture | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | Encrypted traffic analysis, JA3/JA4 | 1 mentions in 1 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | NetFlow and connection metadata | None. *Flow records section, and retention design.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
@@ -107,9 +107,9 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Nmap (tool) | 71 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 3 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ○ | ● | Scan timing, rate and how each looks to a defender | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ● | ● | Nmap (tool) | 76 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 8 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ○ | ● | Scan timing, rate and how each looks to a defender | 4 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Nmap Scripting Engine | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | masscan, RustScan, ZMap (tool) | None. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ◐ | ● | Service and OS fingerprinting | 10 mentions in 6 docs, most in 0038-hashes-and-symmetric-crypto, practice 3. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
@@ -267,7 +267,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ◐* | ● | RSA | 2 mentions in 1 docs, most in 0039-public-keys-and-tls. *A glossary line and 'Two keys' in lesson 39. The mathematics isn't taught.* | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ○ | ● | RSA padding and attacks: OAEP, Bleichenbacher | None. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ●* | ● | Diffie-Hellman and forward secrecy | 4 mentions in 1 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Key exchange'.* | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
-| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 8 mentions in 4 docs, most in 0025-hardening-linux, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
+| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 10 mentions in 5 docs, most in 0025-hardening-linux, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
 | ○ | ● | Nonce misuse | 1 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
 | ●* | ● | Digital signatures | 5 mentions in 3 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Digital signatures'.* |  |
 
@@ -284,7 +284,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | TLS 1.3 handshake | 11 mentions in 3 docs, most in 0039-public-keys-and-tls. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
+| ● | ● | TLS 1.3 handshake | 12 mentions in 4 docs, most in 0039-public-keys-and-tls. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Key schedule and HKDF | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | History of TLS attacks | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Downgrade attacks | 1 mentions in 1 docs, most in 0056-how-a-pentest-works. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
@@ -305,7 +305,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ○ | ● | End-to-end encryption, Signal protocol | None. | [The crypto frontier](modules/03-cryptography/12-modern-crypto-frontier.md) |
 | ○ | ● | Zero knowledge, MPC, homomorphic encryption | None. | [The crypto frontier](modules/03-cryptography/12-modern-crypto-frontier.md) |
 | ○ | ● | openssl (tool) | 11 mentions in 1 docs, most in 0039-public-keys-and-tls. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
-| ◐ | ● | GnuPG, age (tool) | 11 mentions in 2 docs, most in P06. | [Key management](modules/03-cryptography/11-key-management.md) |
+| ◐ | ● | GnuPG, age (tool) | 12 mentions in 3 docs, most in P06. | [Key management](modules/03-cryptography/11-key-management.md) |
 | ◐ | ◐ | CyberChef (tool) | 12 mentions in 5 docs, most in P02. |  |
 
 ## 04 Web security
@@ -510,7 +510,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Safe lab design for malware | 66 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
+| ● | ● | Safe lab design for malware | 68 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ●* | ● | Static triage: hashes, strings, imports, entropy | 15 mentions in 3 docs, most in 0067-safe-malware-triage, practice 4. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ◐ | ● | Packers and unpacking | 11 mentions in 5 docs, most in 0067-safe-malware-triage. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
 | ● | ● | Dynamic analysis and sandboxes | 15 mentions in 5 docs, most in 0067-safe-malware-triage, practice 3. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
@@ -689,7 +689,7 @@ Basis: Brief 9, CyBOK Adversarial Behaviours, ATT&CK v20.
 | ◐* | ● | MISP, OpenCTI (tool) | 9 mentions in 2 docs, most in 0066-threat-intelligence. *MISP is used in P12. OpenCTI is absent.* | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ● | ● | Traffic Light Protocol | 19 mentions in 2 docs, most in 0066-threat-intelligence, practice 18. | [Sharing threat intelligence](modules/09-threat-intel/04-cti-sharing.md) |
 | ◐ | ● | Attribution and its limits | 5 mentions in 2 docs, most in 0066-threat-intelligence. | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
-| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 32 mentions in 10 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
+| ◐ | ● | Threat actors: APTs, criminals, hacktivists, insiders | 33 mentions in 11 docs, most in P06. *Its opening section.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 | ○ | ● | The underground economy: IABs, RaaS | None. *Section 'Crime as a supply chain'.* | [Threat actors and attribution](modules/09-threat-intel/03-threat-actors.md) |
 
 ### OSINT and recon (ATT&CK Reconnaissance)
@@ -874,7 +874,7 @@ Basis: Added: CyBOK Secure Software Lifecycle, OWASP A03:2025.
 | ● | ● | Signing: Sigstore, cosign | 20 mentions in 2 docs, most in P14. | [SLSA, SSDF and maturity models](modules/13-supply-chain/03-slsa-and-maturity.md) |
 | ●* | ● | Syft, OSV-Scanner, dependabot (tool) | 7 mentions in 2 docs, most in P14. *Syft is walked through in P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ◐ | ● | CI/CD attacks: poisoned pipelines, runner abuse | 7 mentions in 5 docs, most in 0069-supply-chain-and-pipelines. | [CI/CD pipeline security](modules/13-supply-chain/02-cicd-attacks.md) |
-| ●* | ● | Secrets scanning | 26 mentions in 8 docs, most in P03, practice 4. *Walked through in project P03.* | [Key management](modules/03-cryptography/11-key-management.md) |
+| ●* | ● | Secrets scanning | 27 mentions in 8 docs, most in P03, practice 4. *Walked through in project P03.* | [Key management](modules/03-cryptography/11-key-management.md) |
 | ◐ | ● | Case studies: SolarWinds, xz, log4j | 5 mentions in 2 docs, most in 0069-supply-chain-and-pipelines. | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 
 ## 14 AI and machine-learning security

@@ -2,7 +2,7 @@
 
 <!-- Written by scripts/tools/index.ts. Edit the tool pages, then run pnpm audit:tools. -->
 
-169 tool guides, plus an A to Z of 907 names at [/tools/all/](../src/app/[lang]/tools/all/page.tsx).
+191 tool guides, plus an A to Z of 923 names at [/tools/all/](../src/app/[lang]/tools/all/page.tsx).
 
 Every guide says what the tool is for and how it works, then what defenders see. How much it shows depends on its `use` field:
 
@@ -17,12 +17,12 @@ Every guide says what the tool is for and how it works, then what defenders see.
 | List | Size | With a guide here |
 |---|---|---|
 | Kali top 10 | 10 | 10 |
-| ATT&CK tools seen with 2 or more groups or campaigns | 57 | 16 |
+| ATT&CK tools seen with 2 or more groups or campaigns | 57 | 17 |
 | Kali 802-11 | 19 | 4 |
 | Kali bluetooth | 10 | 0 |
 | Kali database | 10 | 1 |
 | Kali exploitation | 9 | 4 |
-| Kali forensics | 102 | 16 |
+| Kali forensics | 102 | 18 |
 | Kali hardware | 11 | 2 |
 | Kali identify | 15 | 6 |
 | Kali information-gathering | 49 | 15 |
@@ -45,6 +45,7 @@ What the Internet already says about a target, usually your own.
 - [Censys](01-recon-osint/censys.md) (own): Searches Internet-wide scan data on hosts and certificates.
 - [crt.sh](01-recon-osint/crtsh.md) (own): Searches public Certificate Transparency logs by domain.
 - [dig](01-recon-osint/dig.md) (open): Asks DNS servers direct questions and shows their full answers.
+- [dnslookup](01-recon-osint/dnslookup.md) (open): Sends DNS queries over plain DNS or over encrypted DNS (HTTPS, TLS, QUIC) and shows the answer.
 - [dnsrecon](01-recon-osint/dnsrecon.md) (own): Enumerates a domain's DNS records and checks for common misconfigurations.
 - [ExifTool](01-recon-osint/exiftool.md) (open): Reads and removes metadata from images, documents and other files.
 - [fierce](01-recon-osint/fierce.md) (own): Finds non-contiguous IP space and hostnames for a domain through DNS.
@@ -183,33 +184,44 @@ Normal system programs, and how to spot misuse.
 - [net, ipconfig and the net recon family](10-built-in/netutils.md) (know): Everyday Windows commands attackers run first to understand where they've landed.
 - [PowerShell](10-built-in/powershell.md) (know): Windows' scripting engine, and a favourite of attackers for the same reasons admins love it.
 - [rundll32, regsvr32 and mshta](10-built-in/rundll32.md) (know): Signed Windows programs that run code, which attackers use to launch payloads under a trusted name.
+- [schtasks](10-built-in/schtasks.md) (know): Windows' command for scheduled tasks, a common way for intruders to stay on a machine.
 - [WMIC and WMI](10-built-in/wmic.md) (know): A Windows management interface used to run commands and gather information, locally and remotely.
 
 ## Host hardening and audit
 
 Checking and locking down Linux and Windows.
 
+- [AppArmor](11-hardening/apparmor.md) (open): Confines Linux programs to the files and capabilities that their profile allows.
 - [auditd](11-hardening/auditd.md) (open): Records security-relevant events in the Linux kernel.
+- [chmod](11-hardening/chmod.md) (open): Sets who may read, write and run a file on Linux and macOS.
 - [CIS-CAT](11-hardening/cis-cat.md) (open): Assesses systems against CIS Benchmarks.
 - [Fail2ban](11-hardening/fail2ban.md) (open): Blocks addresses that show signs of attack in log files.
 - [firewalld](11-hardening/firewalld.md) (open): Manages a Linux host firewall through zones.
+- [icacls](11-hardening/icacls.md) (open): Shows and changes who may read, write or run files and folders on Windows.
 - [Lynis](11-hardening/lynis.md) (open): Audits a Linux or Unix system and scores its hardening.
 - [nftables](11-hardening/nftables.md) (open): The Linux kernel's firewall, set up with the nft command; the successor to iptables.
 - [OpenSCAP](11-hardening/openscap.md) (open): Checks a system against formal security policies, such as CIS or STIG.
+- [SELinux](11-hardening/selinux.md) (open): Labels every file and process on Linux, and allows only what its policy permits between labels.
 - [ssh](11-hardening/ssh.md) (open): Logs in to and runs commands on remote machines over an encrypted channel.
+- [sudo](11-hardening/sudo.md) (open): Runs one command as another user, usually root, and logs who did it.
 - [Sysmon](11-hardening/sysmon.md) (open): Records detailed activity on Windows, far beyond the default logs.
+- [systemctl](11-hardening/systemctl.md) (open): Starts, stops and inspects the services that systemd runs on a Linux machine.
 - [ufw](11-hardening/ufw.md) (open): A simple front end to the Linux firewall, common on Ubuntu.
 
 ## Detection and monitoring
 
 IDS, SIEM, EDR and log tooling.
 
+- [awk](12-detection/awk.md) (open): Splits lines into fields, and prints, counts or adds up the ones you choose.
+- [Chainsaw](12-detection/chainsaw.md) (open): Hunts through Windows event logs quickly, with Sigma rules and keyword searches.
 - [Elastic Stack](12-detection/elastic-stack.md) (open): Stores and searches huge volumes of logs, with dashboards.
 - [Get-WinEvent](12-detection/get-winevent.md) (open): Queries Windows event logs from PowerShell, the scriptable way into Event Viewer.
 - [grep](12-detection/grep.md) (open): Finds the lines that match a pattern in files or in a command's output.
 - [journalctl](12-detection/journalctl.md) (open): Reads and filters the systemd journal, where most Linux logs now live.
+- [jq](12-detection/jq.md) (open): Filters, reshapes and pulls fields out of JSON on the command line.
 - [osquery](12-detection/osquery.md) (open): Lets you query a computer's state as if it were a database.
 - [Security Onion](12-detection/security-onion.md) (open): A ready-made Linux distribution for network security monitoring.
+- [sed](12-detection/sed.md) (open): Edits text as it streams past: replaces, deletes or picks out lines.
 - [Sigma](12-detection/sigma.md) (open): A shared, tool-independent format for writing detection rules.
 - [Snort](12-detection/snort.md) (open): The original open-source intrusion detection system.
 - [Suricata](12-detection/suricata.md) (open): Inspects network traffic for known threats and logs rich metadata.
@@ -225,13 +237,16 @@ Collecting and reading evidence.
 - [Autoruns](13-forensics/autoruns.md) (open): Lists everything set to start automatically on a Windows machine, in one place.
 - [binwalk](13-forensics/binwalk.md) (open): Finds and extracts files hidden inside other files, especially firmware.
 - [ClamAV](13-forensics/clamav.md) (open): An open-source antivirus engine, often used on mail and file servers.
+- [crontab](13-forensics/crontab.md) (open): Schedules commands to run at set times on Linux, and lists what is scheduled.
 - [dd](13-forensics/dd.md) (open): Copies data byte for byte, the classic way to image a disk.
 - [foremost](13-forensics/foremost.md) (open): Recovers files from a disk image by their content, not the file system.
 - [FTK Imager](13-forensics/ftk-imager.md) (open): Creates forensic disk and memory images, preserving the evidence.
 - [last](13-forensics/last.md) (open): Shows who logged in to a Linux machine, from where and for how long.
 - [lsof](13-forensics/lsof.md) (open): Lists the files, sockets and devices each process has open.
 - [Plaso](13-forensics/plaso.md) (open): Builds a single timeline from many sources of evidence.
+- [Process Explorer](13-forensics/process-explorer.md) (open): Shows Windows processes as a tree, with their files, connections, signature and parent.
 - [ps](13-forensics/ps.md) (open): Lists running processes with their owner, parent, start time and command line.
+- [rkhunter](13-forensics/rkhunter.md) (open): Checks a Linux system for known rootkits, changed system files and risky settings.
 - [The Sleuth Kit](13-forensics/sleuthkit.md) (open): Command-line tools for file system forensics.
 - [Volatility](13-forensics/volatility.md) (open): Analyses the contents of a captured memory image.
 - [YARA](13-forensics/yara.md) (open): Matches files and memory against patterns you define.
@@ -255,9 +270,11 @@ Taking programs apart safely.
 Auditing cloud accounts, images and clusters.
 
 - [Checkov](15-cloud/checkov.md) (open): Scans infrastructure-as-code for misconfigurations before deployment.
+- [docker](15-cloud/docker.md) (open): Builds, runs and inspects containers from the command line.
 - [Falco](15-cloud/falco.md) (open): Detects suspicious behaviour in containers and on hosts at runtime.
 - [Grype](15-cloud/grype.md) (open): Finds known vulnerabilities in container images and file systems.
 - [kube-bench](15-cloud/kube-bench.md) (open): Checks a Kubernetes cluster against the CIS Benchmark.
+- [kubectl](15-cloud/kubectl.md) (open): Controls a Kubernetes cluster: lists, inspects and changes what runs on it.
 - [Prowler](15-cloud/prowler.md) (own): Audits a live cloud account against security best practices.
 - [ScoutSuite](15-cloud/scoutsuite.md) (own): Reviews a cloud account's security and shows it in one report.
 - [Trivy](15-cloud/trivy.md) (open): Scans images, file systems and code for vulnerabilities and misconfigurations.
@@ -268,6 +285,7 @@ Finding flaws and secrets in what you build.
 
 - [Bandit](16-appsec/bandit.md) (open): Finds common security issues in Python code.
 - [CodeQL](16-appsec/codeql.md) (open): Treats code as a database you can query for security flaws.
+- [git](16-appsec/git.md) (open): Tracks every change to a project's files, and who made it.
 - [Gitleaks](16-appsec/gitleaks.md) (open): Finds secrets such as keys and tokens in code and git history.
 - [Semgrep](16-appsec/semgrep.md) (open): Finds bugs and risky patterns in source code using simple rules.
 - [TruffleHog](16-appsec/trufflehog.md) (open): Finds secrets and checks whether they still work.
@@ -277,11 +295,14 @@ Finding flaws and secrets in what you build.
 Everyday tools for keys, TLS and encoding.
 
 - [age](17-crypto/age.md) (open): A simple, modern tool for encrypting files.
+- [base64](17-crypto/base64.md) (open): Encodes binary data as plain text, and decodes it back.
 - [CFSSL](17-crypto/cfssl.md) (open): Cloudflare's toolkit for running your own certificate authority.
+- [CyberChef](17-crypto/cyberchef.md) (open): A browser toolbox of hundreds of operations to decode, decrypt and analyse data.
 - [GnuPG](17-crypto/gpg.md) (open): Encrypts and signs files and email with public-key cryptography.
 - [hashID](17-crypto/hashid.md) (open): Identifies the type of a hash from its format.
 - [OpenSSL](17-crypto/openssl.md) (open): The standard toolkit for TLS, certificates and everyday cryptography.
 - [sha256sum](17-crypto/sha256sum.md) (open): Computes and checks SHA-256 hashes, to prove a file hasn't changed.
+- [WireGuard](17-crypto/wireguard.md) (open): A small, fast VPN built on modern cryptography, set up with the wg command.
 
 ## Threat intelligence and deception
 
@@ -291,6 +312,7 @@ Sharing what you know, and setting traps.
 - [CALDERA](18-intel/caldera.md) (own): Runs automated, ATT&CK-based adversary emulation for defenders.
 - [MISP](18-intel/misp.md) (open): An open-source platform for storing and sharing threat intelligence.
 - [OpenCTI](18-intel/opencti.md) (open): Organises threat intelligence into a connected knowledge base.
+- [VirusTotal](18-intel/virustotal.md) (open): Checks a file, hash, URL, domain or IP against dozens of antivirus engines and threat data.
 
 ## Mobile, firmware and hardware
 

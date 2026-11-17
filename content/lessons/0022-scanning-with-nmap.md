@@ -31,6 +31,24 @@ It's the TCP handshake from lesson 18, used as a question.
 
 The default scan as root, `-sS`, is a **SYN scan**: on SYN-ACK, Nmap sends RST instead of finishing the handshake. It's fast. It's also still visible to any decent monitoring.
 
+### With root, and without
+
+A SYN scan builds its packets by hand and never finishes the handshake, and only root may send hand-made packets. Ask for one as an ordinary user and Nmap stops at once:
+
+```
+You requested a scan type which requires root privileges.
+QUITTING!
+```
+
+Run without root and without naming a scan type, Nmap quietly uses a **connect scan**, `-sT`, instead: it asks the operating system to open a normal connection to each port, completing the handshake, then closes it. The states mean the same thing, and `--reason` shows the evidence:
+
+```
+PORT   STATE SERVICE REASON
+80/tcp open  http    syn-ack
+```
+
+The difference matters to a defender: a completed connection reaches the service, so the service's own log may record it, while a SYN scan's half-open probes usually don't get that far.
+
 ?? In a SYN scan, what does a closed port send back?
 + RST, which means that nothing's listening there
 - SYN-ACK, which means that a service answered
@@ -105,6 +123,26 @@ Three more options are worth knowing from the start:
 By default Nmap tests the top 1,000 ports. A service on port 8443 or 31337 may be missed. Always use `-p-` on hosts that matter.
 :::
 
+### A lab you can rebuild anywhere
+
+If your VMs aren't ready yet, Docker gives you a target in seconds, on your own machine only. Start a web server published on localhost, scan it, and remove it:
+
+```
+docker run -d --rm --name lab-web -p 127.0.0.1:8080:80 nginx:1.27-alpine
+nmap -sV -sC -p 8080 127.0.0.1
+docker stop lab-web
+```
+
+```
+PORT     STATE SERVICE VERSION
+8080/tcp open  http    nginx 1.27.5
+|_http-title: Welcome to nginx!
+|_http-server-header: nginx/1.27.5
+|_http-open-proxy: Proxy might be redirecting requests
+```
+
+The version came from the service itself, and the scripts read the default page. The last line is worth a pause: nginx isn't an open proxy here, the script just saw an answer it couldn't rule out, and says "might". Script output is a lead to check, never a finding on its own.
+
 ?? A scan shows port 22 `filtered`. What's the best reading?
 + Something, probably a firewall, is dropping the probes
 - SSH is running with its original default password
@@ -157,6 +195,17 @@ Write each open port up the same way, so that a reader can act on it:
 | 22 | OpenSSH 9.6p1 | Yes, for administration | Limit the source to the admin machine |
 | 80 | nginx 1.24.0, default page | No, nothing is published | Remove nginx or close the port |
 | 3306 | MySQL 8.0.36 | Not from the network | Bind to localhost |
+
+### When the scan surprises you
+
+| You see | Likely reason | Try this |
+|---|---|---|
+| `requires root privileges. QUITTING!` | You asked for a SYN or UDP scan as an ordinary user | `sudo nmap`, or `-sT` for TCP without root |
+| `Host seems down` | Discovery probes were dropped, though the host may be up | `-Pn` to scan anyway |
+| Every port `filtered` | A firewall drops everything you send | Check you're scanning the right address, then accept it: that firewall is doing its job |
+| `Failed to resolve` | A typo in the name, or DNS can't find it | Check the name, or scan the address |
+| Two scans disagree | The service restarted, or the target limits how fast it answers | Scan again more slowly, with `-T3` or less |
+| A UDP scan takes forever | Silent UDP ports make Nmap wait | Scan fewer ports, `--top-ports 20` |
 
 ?? Nmap prints `80/tcp open http` on a scan with no options. How sure is the word `http`?
 + It's a guess based on the port number
