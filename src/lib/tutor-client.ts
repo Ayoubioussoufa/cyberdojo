@@ -92,6 +92,7 @@ export const deleteModel = async (name: string) => {
 };
 /** Any model by name: its size and how it would run here, or a TutorError saying why not. */
 export const lookupModel = async (name: string, signal?: AbortSignal) => json<AdvisedModel>(await send("GET", `/api/tutor/lookup/?name=${encodeURIComponent(name)}`, undefined, signal));
+export const clearAllChats = async () => json<{ ok: boolean }>(await send("DELETE", "/api/tutor/threads/"));
 export const getThreads = async (lang: Lang) => json<{ threads: Thread[]; pages: Thread[] }>(await send("GET", `/api/tutor/threads/?lang=${lang}`));
 
 /**

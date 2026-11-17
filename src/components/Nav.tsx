@@ -91,6 +91,11 @@ export function Nav() {
               <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1.5v8.2M4.6 6.6 8 10l3.4-3.4M2.5 13.5h11" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
           )}
+          {DESKTOP && (
+            <Link href="/account/#appear-h" className={`icon-btn${path.startsWith("/account/") ? " on" : ""}`} aria-label={t.nav.appearance} title={t.nav.appearance}>
+              <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1.8a6.2 6.2 0 1 0 0 12.4c.9 0 1.3-.6 1.3-1.2 0-.8-.6-1-.6-1.7 0-.6.5-1 1.1-1h1.4a3 3 0 0 0 3-3C14.2 4.3 11.4 1.8 8 1.8Z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /><circle cx="5" cy="7" r="1" fill="currentColor" /><circle cx="7.6" cy="4.8" r="1" fill="currentColor" /><circle cx="10.6" cy="5.6" r="1" fill="currentColor" /></svg>
+            </Link>
+          )}
           <button type="button" className="icon-btn" onClick={toggle} aria-label={dark ? t.nav.light : t.nav.dark}>
             {dark ? "☀" : "☾"}
           </button>

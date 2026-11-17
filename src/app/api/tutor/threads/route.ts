@@ -3,7 +3,7 @@ import { isLang } from "@/i18n/lang";
 import type { Thread } from "@/lib/tutor-types";
 import { refuse } from "@/server/tutor/guard";
 import { pageChunks } from "@/server/tutor/corpus";
-import { chats, isThread } from "@/server/tutor/store";
+import { chats, clearAllHistory, isThread } from "@/server/tutor/store";
 
 const TITLE = 70;
 const title = (text: string | null) => {
@@ -28,4 +28,12 @@ export async function GET(req: Request) {
     return title ? [{ href: r.page, title, updatedAt: r.updatedAt, count: r.count }] : [];
   });
   return NextResponse.json({ threads, pages });
+}
+
+/** Clears every chat. The guard keeps it to the app's own window, and to requests from the app's own pages. */
+export async function DELETE(req: Request) {
+  const no = await refuse(req);
+  if (no) return no;
+  await clearAllHistory();
+  return NextResponse.json({ ok: true });
 }

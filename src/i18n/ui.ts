@@ -71,6 +71,7 @@ const TABLE = {
     menu: ["Menu", "Menu"],
     otherLang: ["FR", "EN"],
     otherLangLabel: ["Lire en français", "Read in English"],
+    appearance: ["Appearance: fonts and colours", "Apparence : polices et couleurs"],
   },
   subnav: {
     practice: ["Practice", "Pratique"],
@@ -1131,6 +1132,10 @@ const TABLE = {
     clear: ["Clear this chat", "Effacer cet échange"],
     setupLink: ["Models and settings", "Modèles et réglages"],
     howToAsk: ["How to ask the tutor", "Comment interroger le tuteur"],
+    deleteThis: ["Delete this chat", "Supprimer cette conversation"],
+    deleteConfirm: ["Delete this chat? It can't be brought back.", "Supprimer cette conversation ? Elle ne pourra pas être récupérée."],
+    clearAll: ["Clear all chats", "Effacer toutes les conversations"],
+    clearAllConfirm: ["Delete every chat with the tutor on this computer? They can't be brought back.", "Supprimer toutes les conversations avec le tuteur sur cet ordinateur ? Elles ne pourront pas être récupérées."],
     offOllama: ["Ollama isn't running, so the tutor can't answer yet.", "Ollama n'est pas lancé : le tuteur ne peut pas encore répondre."],
     offModel: ["The tutor has no model yet.", "Le tuteur n'a pas encore de modèle."],
     openSetup: ["Set up the tutor", "Configurer le tuteur"],
