@@ -46,7 +46,7 @@ Basis: Brief 1, CyBOK Network Security.
 | ◐ | ● | TCP internals: sequence numbers, windows, retransmission, congestion | 2 mentions in 1 docs, most in 0018-tcp-udp-and-ports, practice 1. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ○ | ● | TCP attacks: SYN flood, SYN cookies, RST injection, hijacking | None. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | UDP amplification and reflection | 6 mentions in 3 docs, most in 0018-tcp-udp-and-ports. | [Denial of service](modules/01-networking/13-denial-of-service.md) |
-| ○ | ● | Sockets: how programs use the network | 2 mentions in 2 docs, most in 0018-tcp-udp-and-ports. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ○ | ● | Sockets: how programs use the network | 3 mentions in 2 docs, most in 0029-tests-and-docker. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | QUIC and HTTP/3 | 2 mentions in 2 docs, most in 0018-tcp-udp-and-ports. | [QUIC and HTTP/3](modules/01-networking/14-quic-and-http3.md) |
 
 ### Name and configuration services
@@ -135,7 +135,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Kernel and user mode, system calls | 19 mentions in 1 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
+| ● | ● | Kernel and user mode, system calls | 20 mentions in 2 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
 | ○ | ● | Processes, fork and exec | 2 mentions in 2 docs, most in 0030-how-operating-systems-work. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
 | ● | ● | Virtual memory and page tables | 9 mentions in 1 docs, most in 0030-how-operating-systems-work. |  |
 | ○ | ● | The /proc filesystem | 4 mentions in 2 docs, most in 0009-processes-and-signals. | [Linux processes and /proc](modules/02-operating-systems/01-linux-processes-and-proc.md) |
@@ -147,7 +147,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ○ | ● | POSIX ACLs | None. *Section on discretionary access.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | Linux capabilities | None. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | SELinux and AppArmor | Practice only (1). | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ○* | ● | seccomp, namespaces, cgroups | 24 mentions in 3 docs, most in P14, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
+| ○* | ● | seccomp, namespaces, cgroups | 29 mentions in 4 docs, most in P14, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ● | ● | auditd (tool) | 11 mentions in 3 docs, most in P06. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | eBPF for security | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | Kernel modules | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
@@ -170,7 +170,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Processes, threads, handles, core system processes | 31 mentions in 4 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
-| ● | ● | The registry | 39 mentions in 14 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | The registry | 42 mentions in 15 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ● | ● | NTFS, $MFT, alternate data streams | 14 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ● | ● | Access tokens and SIDs | 23 mentions in 2 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
@@ -256,7 +256,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ●* | ● | Hash properties: preimage, collision | 2 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. *Lesson 38, 'Hashes'.* | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Merkle-Damgård and length extension | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ○ | ● | Birthday bound | None. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
-| ◐ | ● | SHA-2 and SHA-3 | 57 mentions in 18 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
+| ◐ | ● | SHA-2 and SHA-3 | 59 mentions in 19 docs, most in 0038-hashes-and-symmetric-crypto, practice 27. | [Hash function internals](modules/03-cryptography/04-hash-function-internals.md) |
 | ● | ● | Password hashing: bcrypt, scrypt, Argon2 | 37 mentions in 4 docs, most in 0040-storing-passwords, practice 2. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 | ◐* | ● | Password cracking: hashcat, John, rainbow tables (tool) | 2 mentions in 1 docs, most in 0040-storing-passwords. *Lesson 40 explains rainbow tables. No cracking tool or method appears.* | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |
 
@@ -548,7 +548,7 @@ Basis: Brief 7, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Stateful firewalls and rule logic | 17 mentions in 4 docs, most in 0021-firewalls-and-segmentation. | [IPv6 security](modules/01-networking/11-ipv6-security.md) |
-| ●* | ● | ufw (tool) | 23 mentions in 3 docs, most in 0025-hardening-linux. *Lesson 25, 'The host firewall'.* | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
+| ●* | ● | ufw (tool) | 24 mentions in 4 docs, most in 0025-hardening-linux. *Lesson 25, 'The host firewall'.* | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
 | ◐ | ● | iptables and nftables (tool) | 3 mentions in 1 docs, most in 0025-hardening-linux. | [iptables and nftables](modules/07-network-security/01-iptables-and-nftables.md) |
 | ● | ● | pfSense and OPNsense (tool) | 19 mentions in 3 docs, most in P01. |  |
 | ○ | ● | Next-generation firewalls | None. | [Sensors and TLS inspection](modules/07-network-security/03-sensors-and-tls-inspection.md) |
@@ -731,9 +731,9 @@ Basis: Brief 10.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | How containers isolate | 9 mentions in 2 docs, most in 0029-tests-and-docker, practice 1. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ●* | ● | Dockerfile and image hardening | 27 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
-| ◐ | ● | Container escape classes | 3 mentions in 2 docs, most in P14, practice 2. *Causes and defences, deliberately not techniques.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
+| ◐ | ● | How containers isolate | 11 mentions in 2 docs, most in 0029-tests-and-docker, practice 1. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
+| ●* | ● | Dockerfile and image hardening | 32 mentions in 4 docs, most in 0029-tests-and-docker, practice 1. *Lesson 69, 'Hardened containers'.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
+| ◐ | ● | Container escape classes | 4 mentions in 3 docs, most in P14, practice 2. *Causes and defences, deliberately not techniques.* | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 | ●* | ● | Trivy, Grype (tool) | 11 mentions in 3 docs, most in 0069-supply-chain-and-pipelines. *Walked through in project P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ○ | ● | Container runtime security | None. | [Container isolation and runtime security](modules/10-cloud/05-container-escape-and-runtime.md) |
 
