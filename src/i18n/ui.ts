@@ -579,6 +579,7 @@ const TABLE = {
     calLabel: ["{n} active days in the last {weeks} weeks", "{n} jours actifs sur les {weeks} dernières semaines"],
     things: ["{n} thing done|{n} things done", "{n} chose faite|{n} choses faites"],
     calLegend: ["{n} active days in {weeks} weeks", "{n} jours actifs en {weeks} semaines"],
+    inYear: ["{things} in the last year", "{things} au cours de la dernière année"],
     less: ["Less", "Moins"],
     more: ["More", "Plus"],
     guest: ["This progress is saved in this browser only.", "Cette progression n'est enregistrée que dans ce navigateur."],
