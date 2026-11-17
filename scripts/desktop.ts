@@ -103,7 +103,7 @@ async function smoke() {
       if (child.exitCode !== null || Date.now() > deadline) throw new Error(`the staged server didn't start:\n${output.slice(-2000)}`);
       await new Promise((r) => setTimeout(r, 300));
     }
-    for (const p of ["/courses/", "/tutor/setup/", "/courses/0050-spotting-attacks-and-writing-findings/", "/api/tutor/status/"]) {
+    for (const p of ["/courses/", "/tutor/setup/", "/courses/0050-spotting-attacks-and-writing-findings/", "/api/tutor/status/", "/textures.css"]) {
       const status = await ask(p);
       if (status !== 200) throw new Error(`the staged server answered ${status} to ${p}:\n${output.slice(-2000)}`);
     }
@@ -134,6 +134,8 @@ async function stage() {
   const placed = flattenModules(standalone, path.join(SERVER, "node_modules"));
   copyResolvingLinks(path.join(standalone, DIST_DIR), path.join(SERVER, DIST_DIR), placed);
   fs.cpSync(path.join(ROOT, DIST_DIR, "static"), path.join(SERVER, DIST_DIR, "static"), { recursive: true });
+  // Files served as they are, such as the background textures (public/textures.css). Standalone output doesn't copy them.
+  if (fs.existsSync(path.join(ROOT, "public"))) fs.cpSync(path.join(ROOT, "public"), path.join(SERVER, "public"), { recursive: true });
   fs.copyFileSync(path.join(ROOT, ".tutor", "index.json"), path.join(SERVER, "tutor-index.json"));
   const left = links(SERVER);
   if (left.length) throw new Error(`the staged server still has links, which installers break:\n${left.slice(0, 10).join("\n")}`);

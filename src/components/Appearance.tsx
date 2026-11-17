@@ -12,6 +12,10 @@ import {
   DEFAULT_PREFS,
   FONTS,
   isDefault,
+  loadTextures,
+  TEXTURES,
+  PALETTES,
+  randomPalette,
   readLocal,
   THEME_DEFAULTS,
   unreadable,
@@ -39,6 +43,14 @@ async function saveRemote(prefs: Prefs): Promise<string | null> {
 export function AppearanceSync() {
   const { ready, user } = useAccount();
   const done = useRef<string | null>(null);
+  useEffect(() => {
+    // A copy saved by an earlier version has no CSS variables for the pre-paint script: rewrite it once.
+    const local = readLocal();
+    if (local) {
+      applyPrefs(local);
+      writeLocal(local);
+    }
+  }, []);
   useEffect(() => {
     if (!ready || !user || done.current === user.id) return;
     done.current = user.id;
@@ -76,11 +88,14 @@ export function AppearanceSettings() {
   const [theme, setTheme] = useState<Theme>("dark");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [problem, setProblem] = useState("");
+  const [blend, setBlend] = useState("");
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     setPrefs(readLocal() ?? DEFAULT_PREFS);
     setTheme(themeNow());
+    // The previews below are drawn by the texture stylesheet, so it loads with this section.
+    loadTextures();
     // The app's View > Appearance menu opens /account/#appear-h; this section draws after the page loads, so scroll here once it exists.
     if (window.location.hash === "#appear-h") requestAnimationFrame(() => document.getElementById("appear-h")?.scrollIntoView({ block: "start" }));
     // The theme button changes data-theme: follow it, so the pickers edit the theme on screen.
@@ -112,9 +127,9 @@ export function AppearanceSettings() {
     }, 600);
   };
 
-  const pickColour = (key: "bg" | "surface", value: string) => {
+  const pickColour = (key: "bg" | "surface" | "accent", value: string) => {
     const v = value.toLowerCase();
-    const bad = unreadable(theme, v);
+    const bad = unreadable(theme, { ...prefs[theme], [key]: v });
     if (bad) {
       setProblem(A.tooLow);
       return;
@@ -122,7 +137,15 @@ export function AppearanceSettings() {
     update({ ...prefs, [theme]: { ...prefs[theme], [key]: v } });
   };
 
-  const colourField = (key: "bg" | "surface", label: string) => (
+  // Random only on a click, never while drawing, so the server and browser render the same page.
+  const surprise = () => {
+    const { harmony, ...colours } = randomPalette(theme);
+    update({ ...prefs, [theme]: colours });
+    const said: Record<string, string> = { analogous: A.blendAnalogous, complementary: A.blendComplementary, triadic: A.blendTriadic, split: A.blendSplit };
+    setBlend(said[harmony] ?? "");
+  };
+
+  const colourField = (key: "bg" | "surface" | "accent", label: string) => (
     <label className="appear-colour">
       <input type="color" value={prefs[theme][key] ?? THEME_DEFAULTS[theme][key]} onChange={(e) => pickColour(key, e.target.value)} />
       <span>{label}</span>
@@ -160,14 +183,40 @@ export function AppearanceSettings() {
       </fieldset>
 
       <fieldset className="appear-group">
+        <legend>{A.texture}</legend>
+        <p className="muted appear-hint">{A.textureHint}</p>
+        <div className="tex-grid">
+          {TEXTURES.map((tex) => (
+            <button key={tex.id} type="button" className="tex-option" aria-pressed={prefs.texture === tex.id} onClick={() => update({ ...prefs, texture: tex.id })}>
+              <span className="tex-swatch" data-tex={tex.id} aria-hidden="true" />
+              <span>{tex.name[lang === "fr" ? 1 : 0]}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="appear-group">
         <legend>{theme === "dark" ? A.coloursDark : A.coloursLight}</legend>
         <p className="muted appear-hint">{A.coloursHint}</p>
         <div className="appear-colours">
           {colourField("bg", A.pageBg)}
           {colourField("surface", A.sectionBg)}
+          {colourField("accent", A.accent)}
         </div>
+        <div className="appear-palettes" role="group" aria-label={A.palettes}>
+          <button type="button" className="btn sm primary" onClick={surprise}>{A.surprise}</button>
+          {PALETTES.map((pal) => (
+            <button key={pal.id} type="button" className="appear-palette" onClick={() => { update({ ...prefs, [theme]: pal[theme] }); setBlend(""); }}>
+              <span className="appear-swatch" aria-hidden="true" style={{ background: pal[theme].bg ?? undefined, borderColor: pal[theme].surface ?? undefined }}>
+                <i style={{ background: pal[theme].accent ?? undefined }} />
+              </span>
+              {pal.name[lang === "fr" ? 1 : 0]}
+            </button>
+          ))}
+        </div>
+        {blend && <p className="muted appear-hint" aria-live="polite">{blend}</p>}
         <div className="acct-row">
-          <button type="button" className="btn sm" onClick={() => update({ ...prefs, [theme]: { bg: null, surface: null } })}>{A.resetColours}</button>
+          <button type="button" className="btn sm" onClick={() => { update({ ...prefs, [theme]: { bg: null, surface: null, accent: null } }); setBlend(""); }}>{A.resetColours}</button>
           <button type="button" className="btn sm" onClick={() => update(DEFAULT_PREFS)}>{A.resetAll}</button>
         </div>
       </fieldset>

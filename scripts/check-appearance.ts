@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { APPEARANCE_SCRIPT, cleanPrefs, contrast, DEFAULT_PREFS, THEME_DEFAULTS, THEME_TEXT, unreadable } from "../src/lib/appearance";
+import { APPEARANCE_SCRIPT, cleanPrefs, contrast, cssVars, DEFAULT_PREFS, inkOn, PALETTES, randomPalette, TEXTURE_CSS, TEXTURES, THEME_DEFAULTS, THEME_TEXT, unreadable, type Prefs } from "../src/lib/appearance";
 
 const PORT = 3104;
 const BASE = `http://localhost:${PORT}`;
@@ -27,8 +27,10 @@ function unit() {
   const blocks = { dark: block(':root, :root[data-theme="dark"] {'), light: block(':root[data-theme="light"] {') };
   for (const theme of ["dark", "light"] as const) {
     for (const t of THEME_TEXT[theme]) ok(blocks[theme].includes(`--${t.name}: ${t.colour};`), `${theme} --${t.name} in globals.css is ${t.colour}`);
-    ok(blocks[theme].includes(`var(--u-bg-${theme}, ${THEME_DEFAULTS[theme].bg})`) && blocks[theme].includes(`var(--u-surface-${theme}, ${THEME_DEFAULTS[theme].surface})`), `${theme} backgrounds in globals.css fall back to the theme's own`);
-    ok(!unreadable(theme, THEME_DEFAULTS[theme].bg) && !unreadable(theme, THEME_DEFAULTS[theme].surface), `the ${theme} theme's own backgrounds pass the readability check`);
+    const d = THEME_DEFAULTS[theme];
+    const fallbacks = [`--bg: var(--u-bg-${theme}, ${d.bg})`, `--surface: var(--u-surface-${theme}, ${d.surface})`, `--accent: var(--u-accent-${theme}, ${d.accent})`, `--accent-ink: var(--u-accent-ink-${theme}, ${d.accentInk})`, `--accent-soft: var(--u-accent-soft-${theme}, ${d.accentSoft})`];
+    ok(fallbacks.every((f) => blocks[theme].includes(f)), `${theme} colours in globals.css fall back to the theme's own`, fallbacks.filter((f) => !blocks[theme].includes(f)));
+    ok(unreadable(theme, { bg: null, surface: null, accent: null }) === null, `the ${theme} theme's own colours pass the readability check`, unreadable(theme, { bg: null, surface: null, accent: null }));
   }
   ok(Math.abs(contrast("#000000", "#ffffff") - 21) < 1e-9 && Math.abs(contrast("#777777", "#777777") - 1) < 1e-9, "contrast is 21 for black on white and 1 for a colour on itself");
 
@@ -42,12 +44,38 @@ function unit() {
   ok(why({ dark: { bg: "red; background: url(https://evil.example/x)" } }) === "colour", "CSS text in a colour is refused");
   ok(why({ dark: { bg: "#fff" } }) === "colour" && why({ dark: { bg: "rgb(0,0,0)" } }) === "colour" && why({ dark: { bg: 123 } }) === "colour", "only #rrggbb is accepted");
   ok(why({ dark: { bg: "#ffffff" } }) === "contrast" && why({ light: { surface: "#000000" } }) === "contrast", "a background that makes text unreadable is refused");
+  // The accent: any colour that stands out and keeps its button text readable.
+  const green = cleanPrefs({ dark: { accent: "#3FB950" }, light: { accent: "#1a7f37" } });
+  ok("prefs" in green && green.prefs.dark.accent === "#3fb950" && green.prefs.light.accent === "#1a7f37", "a green accent is accepted in both themes", green);
+  ok(why({ dark: { accent: "#1a2a1f" } }) === "contrast", "a dark-theme accent too close to the page is refused");
+  ok(why({ light: { accent: "#f4f0e0" } }) === "contrast", "a light-theme accent too close to the page is refused");
+  ok(inkOn("#3fb950") === "#111111" && inkOn("#0b3d91") === "#ffffff", "button text turns black on light accents and white on dark ones");
+  const vars = cssVars((green as { prefs: Prefs }).prefs);
+  ok(vars["--u-accent-dark"] === "#3fb950" && vars["--u-accent-ink-dark"] === "#111111" && /^#[0-9a-f]{6}$/.test(vars["--u-accent-soft-dark"] ?? "") && contrast(vars["--u-accent-dark"] as string, vars["--u-accent-soft-dark"] as string) >= 3, "an accent sets its own ink and soft tint, all checked hex", vars);
+  ok(Object.keys(cssVars(DEFAULT_PREFS)).length === 0, "the defaults set no variables");
+  ok(why({ dark: { bg: "#3a4a2a", accent: "#3fb950" } }) === "contrast", "colours are judged together: a background that makes the accent vanish is refused");
+  // Textures: chosen by id from the list, drawn only by the site's own stylesheet.
+  ok(why({ texture: "blueprint-grid" }) === "accepted" && why({ texture: "url(https://evil.example)" }) === "bad" && why({ texture: 3 }) === "bad", "a texture is accepted only from the list");
+  const tex = fs.readFileSync(`public${TEXTURE_CSS}`, "utf8");
+  ok(TEXTURES.filter((t) => t.id !== "none").every((t) => tex.includes(`:root[data-texture="${t.id}"] body::before`) && tex.includes(`.tex-swatch[data-tex="${t.id}"]::before`)), "every texture has its rules in the stylesheet");
+  // CSS-level url() calls only; url(%23n) inside an inline SVG points at that SVG's own filter.
+  const urls = [...tex.matchAll(/url\((?!%23)([^)]{0,30})/g)].map((m) => m[1] as string);
+  ok(urls.length > 0 && urls.every((u) => u.startsWith('"data:image/svg+xml,')), "the texture stylesheet loads nothing from elsewhere: every url() is an inline SVG", urls.filter((u) => !u.startsWith('"data:')));
+  ok(!/https?:\/\/(?!www\.w3\.org\/2000\/svg)/.test(tex) && !/@import|expression\(|javascript:/i.test(tex), "no outside address, import or script in the texture stylesheet");
+  ok(tex.length < 80_000, `the texture stylesheet stays small (${(tex.length / 1024).toFixed(1)} KB)`);
+  ok(APPEARANCE_SCRIPT.includes(JSON.stringify(TEXTURE_CSS)) && APPEARANCE_SCRIPT.includes('"thermal-gradient"'), "the pre-paint script knows the texture list and its stylesheet");
+
+  // Palettes: the fixed ones and the random blends must all pass the same checks.
+  ok(PALETTES.every((p) => !unreadable("dark", p.dark) && !unreadable("light", p.light) && "prefs" in cleanPrefs({ dark: p.dark, light: p.light })), "every fixed palette passes the checks in both themes", PALETTES.filter((p) => unreadable("dark", p.dark) || unreadable("light", p.light)).map((p) => p.id));
+  const blends = (["dark", "light"] as const).flatMap((t) => Array.from({ length: 300 }, () => ({ t, c: randomPalette(t) })));
+  ok(blends.every(({ t, c }) => c.harmony !== "none" && !unreadable(t, c) && "prefs" in cleanPrefs({ [t]: { bg: c.bg, surface: c.surface, accent: c.accent } })), "600 random blends all pass the checks, with no fallback");
+  ok(new Set(blends.map(({ c }) => `${c.bg}${c.accent}`)).size > 590 && new Set(blends.map(({ c }) => c.harmony)).size === 4, "random blends differ every time and use all four harmony rules");
   const up = cleanPrefs({ dark: { bg: "#0A0F14" } });
   ok("prefs" in up && up.prefs.dark.bg === "#0a0f14", "colours are stored in lower case", up);
   ok(why("x") === "bad" && why(null) === "bad" && why([1]) === "bad" && why({ dark: "x" }) === "bad", "anything but an object is refused");
   const extra = cleanPrefs({ font: "inter", evil: "<script>", dark: { bg: null, surface: "#0b1016", x: 1 } });
   ok("prefs" in extra && !JSON.stringify(extra.prefs).includes("evil") && !JSON.stringify(extra.prefs).includes("\"x\""), "unknown keys are dropped, not stored", extra);
-  ok(APPEARANCE_SCRIPT.includes("^#[0-9a-f]{6}$") && !APPEARANCE_SCRIPT.includes("innerHTML") && !APPEARANCE_SCRIPT.includes("eval"), "the pre-paint script re-checks colours and builds no HTML");
+  ok(APPEARANCE_SCRIPT.includes("^#[0-9a-f]{6}$") && APPEARANCE_SCRIPT.includes("--u-(bg|surface|accent|accent-ink|accent-soft)-(dark|light)") && !APPEARANCE_SCRIPT.includes("innerHTML") && !APPEARANCE_SCRIPT.includes("eval"), "the pre-paint script only sets allowed variables to checked colours, and builds no HTML");
 }
 
 async function http() {
@@ -75,7 +103,7 @@ async function http() {
     }
     ok(up, "server starts");
     if (!up) return;
-    const prefs = { font: "lexend", code: "jetbrains", dark: { bg: "#0b1016", surface: null }, light: { bg: null, surface: "#ffffff" } };
+    const prefs = { font: "lexend", code: "jetbrains", texture: "blueprint-grid", dark: { bg: "#0b1016", surface: null, accent: "#3fb950" }, light: { bg: null, surface: "#ffffff", accent: null } };
     ok((await call("GET", "/api/prefs/")).status === 401, "a stranger can't read settings");
     ok((await call("PUT", "/api/prefs/", { prefs })).status === 401, "a stranger can't save settings");
     const pw = "river tiger lamp 42";
@@ -85,6 +113,7 @@ async function http() {
     ok((await call("PUT", "/api/prefs/", { prefs }, { origin: "https://evil.example" })).status === 403, "another site can't change the settings");
     ok((await call("PUT", "/api/prefs/", { prefs: { ...prefs, font: "Comic Sans" } })).status === 400, "an unknown font is refused by the server");
     ok((await call("PUT", "/api/prefs/", { prefs: { ...prefs, dark: { bg: "red;}body{display:none", surface: null } } })).status === 400, "CSS text in a colour is refused by the server");
+    ok((await call("PUT", "/api/prefs/", { prefs: { ...prefs, dark: { bg: null, surface: null, accent: "#141c25" } } })).status === 400, "an accent that vanishes into the page is refused by the server");
     ok((await call("PUT", "/api/prefs/", { prefs: { ...prefs, dark: { bg: "#f0f0f0", surface: null } } })).status === 400, "an unreadable background is refused by the server");
     const saved = await call("PUT", "/api/prefs/", { prefs });
     ok(saved.status === 200, "valid settings are saved", saved.json);
