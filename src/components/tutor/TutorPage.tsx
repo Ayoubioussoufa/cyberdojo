@@ -8,7 +8,6 @@ import { clearChat, getThreads, tutorReady, useTutorStatus } from "@/lib/tutor-c
 import type { Mode, Thread } from "@/lib/tutor-types";
 import { ChatLog, Composer, useChat } from "./chat";
 import { TutorOff } from "./TutorOff";
-import { BackButton } from "@/components/BackButton";
 
 const PREFIX = "/tutor/chat/";
 const newId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
@@ -112,7 +111,6 @@ export function TutorPage() {
 
       <section className="chat-main" aria-label={t.tutor.chatTitle}>
         <header className="chat-head">
-          <BackButton />
           <h1>{t.tutor.chatTitle}</h1>
           {ready && <Link href="/tutor/setup/" className="tutor-model" title={t.tutor.setupLink}>{status?.settings.chatModel}</Link>}
           {saved && <button type="button" className="link-btn" onClick={() => void remove()}>{t.tutor.deleteChat}</button>}
