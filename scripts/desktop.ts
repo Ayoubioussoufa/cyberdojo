@@ -67,10 +67,18 @@ function freePort(): Promise<number> {
  * the native database module). A server that only works where it was built,
  * because something in it points back into the repository, fails here.
  */
+/** Every file below `root`, as paths relative to it. */
+function filesUnder(root: string): string[] {
+  return (fs.readdirSync(root, { recursive: true, withFileTypes: true }) as fs.Dirent[])
+    .filter((e) => !e.isDirectory())
+    .map((e) => path.relative(root, path.join(e.parentPath, e.name)));
+}
+
 async function smoke() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cyberdojo-smoke-"));
   const copy = path.join(dir, "server");
   fs.cpSync(SERVER, copy, { recursive: true, verbatimSymlinks: true });
+  const shipped = new Set(filesUnder(copy));
   const port = await freePort();
   const token = "smoke-test-token";
   const child = spawn(process.execPath, [path.join(copy, "server.js")], {
@@ -95,11 +103,16 @@ async function smoke() {
       if (child.exitCode !== null || Date.now() > deadline) throw new Error(`the staged server didn't start:\n${output.slice(-2000)}`);
       await new Promise((r) => setTimeout(r, 300));
     }
-    for (const p of ["/courses/", "/tutor/setup/", "/api/tutor/status/"]) {
+    for (const p of ["/courses/", "/tutor/setup/", "/courses/0050-spotting-attacks-and-writing-findings/", "/api/tutor/status/"]) {
       const status = await ask(p);
       if (status !== 200) throw new Error(`the staged server answered ${status} to ${p}:\n${output.slice(-2000)}`);
     }
-    console.log("smoke: the staged server runs from another folder");
+    // Installed, this folder is the app's install folder. Anything the server writes there blocks the
+    // Windows installer: its paths can pass 260 characters, which the old version's uninstaller can't remove,
+    // and the update then stops with "CyberDojo cannot be closed". Data belongs in CYBERDOJO_DATA.
+    const written = filesUnder(copy).filter((f) => !shipped.has(f));
+    if (written.length) throw new Error(`the staged server wrote into its own folder:\n${written.slice(0, 10).join("\n")}`);
+    console.log("smoke: the staged server runs from another folder and writes nothing into it");
   } finally {
     child.kill();
     await new Promise((r) => setTimeout(r, 500));
@@ -146,7 +159,8 @@ const config: Configuration = {
   // Names without the version, so a link to releases/latest/download/<name> keeps working from one release to the next.
   artifactName: "CyberDojo-${os}-${arch}.${ext}",
   win: { target: "nsis" },
-  nsis: { oneClick: false, allowToChangeInstallationDirectory: true, artifactName: "CyberDojo-Setup-${arch}.${ext}" },
+  // installer.nsh removes the page cache that versions up to 0.3.0 left in the install folder.
+  nsis: { oneClick: false, allowToChangeInstallationDirectory: true, artifactName: "CyberDojo-Setup-${arch}.${ext}", include: path.join(ROOT, "desktop", "installer.nsh") },
   // No Apple certificate yet. Apple silicon refuses to run unsigned code at all, so the app is signed ad hoc ("-"):
   // macOS then asks the learner once (Privacy & Security, Open Anyway) instead of calling the app damaged.
   // The hardened runtime would reject Electron's own frameworks under an ad-hoc signature, so it is off.
