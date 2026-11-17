@@ -872,6 +872,7 @@ const TABLE = {
     thanks: ["Thanks — this helps.", "Merci — cela aide."],
   },
   pyrun: {
+    keys: ["Tab indents. Esc, then Tab, leaves the editor. Ctrl+Enter (Cmd+Enter on a Mac) runs your code.", "Tab indente. Échap, puis Tab, sort de l'éditeur. Ctrl+Entrée (Cmd+Entrée sur Mac) lance votre code."],
     title: ["Code challenge", "Défi de code"],
     run: ["Run", "Lancer"],
     running: ["Running…", "Exécution…"],
