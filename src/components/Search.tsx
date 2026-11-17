@@ -79,10 +79,7 @@ export function Search() {
 
   return (
     <>
-      <button type="button" className="search-open" onClick={open} aria-label={t.search.open}>
-        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" /><path d="m20 20-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-        <kbd>Ctrl K</kbd>
-      </button>
+      {/* No button in the top bar any more (removed at the owner's request): Ctrl+K or Cmd+K opens this, and the command line's "find" searches too. */}
       <dialog ref={box} className="palette" aria-label={t.search.open} onClick={(e) => e.target === box.current && close()}>
         <input
           ref={input}
