@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { CodeEditor } from "@/components/CodeEditor";
 import { DESKTOP } from "@/lib/desktop";
 import { fill, plural, useLang } from "@/i18n/LangProvider";
 import { pyChallenge } from "@/data/pycode";
@@ -59,7 +60,6 @@ export function PyRunner({ id }: { id: string }) {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
   const [loadError, setLoadError] = useState(false);
-  const area = useRef<HTMLTextAreaElement>(null);
 
   if (!challenge) return null;
   // French shows its own prompt and test names; the code and the tests themselves are shared.
@@ -83,31 +83,13 @@ export function PyRunner({ id }: { id: string }) {
     setBusy(false);
   };
 
-  const onTab = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key !== "Tab") return;
-    e.preventDefault();
-    const el = e.currentTarget;
-    const { selectionStart: a, selectionEnd: b } = el;
-    const next = `${code.slice(0, a)}    ${code.slice(b)}`;
-    setCode(next);
-    requestAnimationFrame(() => el.setSelectionRange(a + 4, a + 4));
-  };
-
   const allPassed = result && !result.userError && result.total > 0 && result.passed === result.total;
 
   return (
     <section className="pyrun" aria-label={P.title}>
       <p className="pyrun-prompt">{prompt}</p>
-      <textarea
-        ref={area}
-        className="pyrun-code"
-        value={code}
-        spellCheck={false}
-        rows={Math.max(6, code.split("\n").length + 1)}
-        onChange={(e) => setCode(e.target.value)}
-        onKeyDown={onTab}
-        aria-label={P.title}
-      />
+      <CodeEditor value={code} onChange={setCode} onRun={() => void run()} label={P.title} />
+      <p className="pyrun-keys">{P.keys}</p>
       <div className="pyrun-actions">
         <button type="button" className="btn primary sm" onClick={() => void run()} disabled={busy}>{busy ? P.running : P.run}</button>
         <button type="button" className="btn sm ghost" onClick={() => { setCode(challenge.starter); setResult(null); setLoadError(false); }}>{P.reset}</button>
