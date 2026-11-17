@@ -16,6 +16,9 @@ export async function addMessage(page: string, role: TutorMessage["role"], mode:
 
 export const clearHistory = (page: string) => run("DELETE FROM tutor_messages WHERE page = ?", page);
 
+/** Every chat, on the tutor's page and beside lessons. Grades of written answers are kept: they aren't chats. */
+export const clearAllHistory = () => run("DELETE FROM tutor_messages");
+
 interface GradeRow extends Omit<Grade, "right" | "missing" | "feedback"> {
   feedback: string;
 }

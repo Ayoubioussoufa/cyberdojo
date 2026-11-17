@@ -4,7 +4,7 @@ import Link from "@/components/HoverLink";
 import { useCallback, useEffect, useState } from "react";
 import { useLang } from "@/i18n/LangProvider";
 import { localize } from "@/i18n/lang";
-import { clearChat, getThreads, tutorReady, useTutorStatus } from "@/lib/tutor-client";
+import { clearAllChats, clearChat, getThreads, tutorReady, useTutorStatus } from "@/lib/tutor-client";
 import type { Mode, Thread } from "@/lib/tutor-types";
 import { ChatLog, Composer, useChat } from "./chat";
 import { TutorOff } from "./TutorOff";
@@ -77,6 +77,23 @@ export function TutorPage() {
     void ask(text, m, reveal);
   };
 
+  /** Deletes one chat from the list, after asking. The open chat starts afresh if it was the one deleted. */
+  const removeOne = async (href: string) => {
+    if (!window.confirm(t.tutor.deleteConfirm)) return;
+    await clearChat(href).catch(() => undefined);
+    if (href === page) open(null);
+    load();
+  };
+  /** Deletes every chat on this computer, after asking. */
+  const removeAll = async () => {
+    if (!window.confirm(t.tutor.clearAllConfirm)) return;
+    stop();
+    await clearAllChats().catch(() => undefined);
+    open(null);
+    load();
+  };
+  const bin = <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+
   const starters = [t.tutor.starter1, t.tutor.starter2, t.tutor.starter3, t.tutor.starter4];
 
   return (
@@ -87,8 +104,9 @@ export function TutorPage() {
         {threads.length === 0 ? <p className="muted">{t.tutor.noChats}</p> : (
           <ul>
             {threads.map((th) => (
-              <li key={th.href}>
+              <li key={th.href} className="chat-item">
                 <button type="button" className={th.href === page ? "on" : ""} aria-current={th.href === page ? "true" : undefined} onClick={() => open(idOf(th.href))}>{th.title}</button>
+                <button type="button" className="chat-del" onClick={() => void removeOne(th.href)} aria-label={`${t.tutor.deleteThis}: ${th.title}`} title={t.tutor.deleteThis}>{bin}</button>
               </li>
             ))}
           </ul>
@@ -98,11 +116,15 @@ export function TutorPage() {
             <h2>{t.tutor.pageChats}</h2>
             <ul>
               {pages.map((p) => (
-                <li key={p.href}><Link href={`${localize(p.href, lang)}#tutor`}>{p.title}</Link></li>
+                <li key={p.href} className="chat-item">
+                  <Link href={`${localize(p.href, lang)}#tutor`}>{p.title}</Link>
+                  <button type="button" className="chat-del" onClick={() => void removeOne(p.href)} aria-label={`${t.tutor.deleteThis}: ${p.title}`} title={t.tutor.deleteThis}>{bin}</button>
+                </li>
               ))}
             </ul>
           </>
         )}
+        {(threads.length > 0 || pages.length > 0) && <button type="button" className="link-btn chat-clear" onClick={() => void removeAll()}>{t.tutor.clearAll}</button>}
         <nav className="chat-foot" aria-label={t.tutor.setupLink}>
           <Link href="/guides/s5-working-with-your-tutor/">{t.tutor.howToAsk}</Link>
           <Link href="/tutor/setup/">{t.tutor.setupLink}</Link>
