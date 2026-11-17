@@ -29,6 +29,24 @@ C'est la poignée de main TCP de la leçon 18, utilisée comme une question.
 
 Le balayage par défaut en root, `-sS`, est un **balayage SYN** : sur un SYN-ACK, Nmap envoie RST au lieu de terminer la poignée de main. C'est rapide. Cela reste visible pour toute surveillance correcte.
 
+### Avec root, et sans
+
+Un balayage SYN fabrique ses paquets à la main et ne termine jamais la poignée de main, et seul root peut envoyer des paquets fabriqués à la main. Demandez-en un en tant qu'utilisateur ordinaire et Nmap s'arrête aussitôt :
+
+```
+You requested a scan type which requires root privileges.
+QUITTING!
+```
+
+Lancé sans root et sans préciser de type de balayage, Nmap utilise discrètement un **balayage par connexion**, `-sT` : il demande au système d'ouvrir une connexion normale vers chaque port, en terminant la poignée de main, puis la ferme. Les états veulent dire la même chose, et `--reason` montre la preuve :
+
+```
+PORT   STATE SERVICE REASON
+80/tcp open  http    syn-ack
+```
+
+La différence compte pour un défenseur : une connexion terminée atteint le service, dont le propre journal peut donc l'enregistrer, alors que les sondes à moitié ouvertes d'un balayage SYN n'arrivent en général pas jusque-là.
+
 ?? Dans un balayage SYN, que renvoie un port fermé ?
 + RST, ce qui signifie que rien n'écoute là
 - SYN-ACK, ce qui signifie qu'un service a répondu
@@ -103,6 +121,26 @@ Trois autres options valent d'être connues dès le début :
 Par défaut, Nmap teste les 1 000 ports les plus courants. Un service sur le port 8443 ou 31337 peut lui échapper. Utilisez toujours `-p-` sur les hôtes qui comptent.
 :::
 
+### Un lab à reconstruire n'importe où
+
+Si vos VM ne sont pas encore prêtes, Docker vous donne une cible en quelques secondes, sur votre seule machine. Démarrez un serveur web publié sur localhost, balayez-le, puis supprimez-le :
+
+```
+docker run -d --rm --name lab-web -p 127.0.0.1:8080:80 nginx:1.27-alpine
+nmap -sV -sC -p 8080 127.0.0.1
+docker stop lab-web
+```
+
+```
+PORT     STATE SERVICE VERSION
+8080/tcp open  http    nginx 1.27.5
+|_http-title: Welcome to nginx!
+|_http-server-header: nginx/1.27.5
+|_http-open-proxy: Proxy might be redirecting requests
+```
+
+La version vient du service lui-même, et les scripts ont lu la page par défaut. La dernière ligne mérite qu'on s'y arrête : nginx n'est pas un proxy ouvert ici, le script a juste vu une réponse qu'il ne pouvait pas écarter, et il dit « might » (« peut-être »). La sortie d'un script est une piste à vérifier, jamais un constat à elle seule.
+
 ?? Un balayage montre le port 22 `filtered`. Quelle est la meilleure lecture ?
 + Quelque chose, sans doute un pare-feu, jette les sondes
 - SSH tourne avec son mot de passe par défaut
@@ -155,6 +193,17 @@ Rédigez chaque port ouvert de la même façon, pour qu'un lecteur puisse agir :
 | 22 | OpenSSH 9.6p1 | Oui, pour l'administration | Limiter la source à la machine d'administration |
 | 80 | nginx 1.24.0, page par défaut | Non, rien n'est publié | Supprimer nginx ou fermer le port |
 | 3306 | MySQL 8.0.36 | Pas depuis le réseau | Lier à localhost |
+
+### Quand le balayage vous surprend
+
+| Vous voyez | Raison probable | Essayez ceci |
+|---|---|---|
+| `requires root privileges. QUITTING!` | Vous avez demandé un balayage SYN ou UDP en tant qu'utilisateur ordinaire | `sudo nmap`, ou `-sT` pour du TCP sans root |
+| `Host seems down` | Les sondes de découverte ont été jetées, alors que l'hôte est peut-être allumé | `-Pn` pour balayer quand même |
+| Tous les ports `filtered` | Un pare-feu jette tout ce que vous envoyez | Vérifiez que c'est la bonne adresse, puis acceptez-le : ce pare-feu fait son travail |
+| `Failed to resolve` | Une faute dans le nom, ou le DNS ne le trouve pas | Vérifiez le nom, ou balayez l'adresse |
+| Deux balayages ne disent pas la même chose | Le service a redémarré, ou la cible limite sa vitesse de réponse | Recommencez plus lentement, avec `-T3` ou moins |
+| Un balayage UDP n'en finit pas | Les ports UDP muets font attendre Nmap | Balayez moins de ports, `--top-ports 20` |
 
 ?? Nmap affiche `80/tcp open http` lors d'un balayage sans option. Quelle confiance accorder au mot `http` ?
 + C'est une supposition tirée du numéro de port
