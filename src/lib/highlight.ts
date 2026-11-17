@@ -3,6 +3,8 @@
  * browser gets plain HTML with colours, and downloads no highlighter. Shiki uses
  * the same grammars as VS Code. Each token carries a colour for the dark theme and
  * one for the light theme as CSS variables, and globals.css picks one per theme.
+ * Each block can take keyboard focus, so a reader who can't use a mouse can still
+ * scroll a long line sideways.
  *
  * A block that names its language (```python) is coloured in that language. A
  * block that names none is coloured as shell only when its first word is a real
@@ -30,6 +32,13 @@ import dark from "shiki/themes/github-dark-default.mjs";
 import light from "shiki/themes/github-light-default.mjs";
 
 const THEMES = { dark: "github-dark-default", light: "github-light-default" } as const;
+
+/**
+ * GitHub's light theme is made for a white page; on the course's grey code
+ * background three of its colours fall below WCAG AA (4.5:1). These darker
+ * versions of the same hues pass (scripts/check-css.ts checks them).
+ */
+export const LIGHT_FIXES: Record<string, string> = { "#6e7781": "#4f5964", "#8250df": "#6639ba", "#cf222e": "#a40e26" };
 
 /** Other names writers use for the same languages. */
 const ALIASES: Record<string, string> = {
@@ -78,7 +87,8 @@ export function highlight(code: string, lang: string | undefined): string | null
   try {
     return h
       .codeToHtml(code, { lang: name, themes: THEMES, defaultColor: false })
-      .replace(/^<pre class="shiki[^"]*"[^>]*>/, `<pre class="shiki" data-lang="${name}">`)
+      .replace(/^<pre class="shiki[^"]*"[^>]*>/, `<pre class="shiki" data-lang="${name}" tabindex="0">`)
+      .replace(/--shiki-light:(#[0-9a-fA-F]{6})/g, (all, hex: string) => `--shiki-light:${LIGHT_FIXES[hex.toLowerCase()] ?? hex}`)
       .replace("<code>", `<code class="language-${name}">`);
   } catch {
     return null;

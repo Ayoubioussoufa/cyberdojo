@@ -53,7 +53,7 @@ export default async function Page({ params }: Props) {
       {doc.meta.tested && <p className="tested"><strong>{P.checked}</strong> <span lang={lang === "en" ? undefined : "en"}>{doc.meta.tested}</span></p>}
       <h2>{P.toolsH2}</h2>
       <p className="muted">{P.toolsText}</p>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0}>
         <table>
           <thead><tr><th>{t.kind.Tool}</th><th>{P.what}</th><th>{P.help}</th></tr></thead>
           <tbody>

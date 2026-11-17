@@ -168,7 +168,7 @@ export function Admin() {
 
       <section className="adm-part">
         <h2>Active people</h2>
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0}>
           <table>
             <thead><tr><th scope="col"></th><th scope="col">Today</th><th scope="col">7 days</th><th scope="col">30 days</th></tr></thead>
             <tbody>
@@ -192,7 +192,7 @@ export function Admin() {
         </div>
         <details className="adm-details">
           <summary>The same figures as a table</summary>
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0}>
             <table>
               <thead><tr><th scope="col">Day</th><th scope="col">Visitors</th><th scope="col">Accounts</th><th scope="col">Visits</th><th scope="col">Page views</th><th scope="col">Time</th><th scope="col">New accounts</th></tr></thead>
               <tbody>
@@ -211,7 +211,7 @@ export function Admin() {
           Every account, most recently seen first. Time counts only while the tab is visible and someone moved, typed or scrolled in the last two minutes.
           Open an account to see the pages it spent that time on.
         </p>
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0}>
           <table className="adm-users">
             <thead><tr><th scope="col">Username</th><th scope="col">Joined</th><th scope="col">Last seen</th><th scope="col">Visits</th><th scope="col">Days</th><th scope="col">Time in {days} days</th><th scope="col">Total time</th><th scope="col">Per visit</th><th scope="col">Lessons done</th></tr></thead>
             <tbody>
@@ -257,7 +257,7 @@ export function Admin() {
               Installer downloads from the GitHub releases, as GitHub counts them. An installed app that updates itself downloads the new installer, so updates are included.
               {" "}Windows {downloads.byOs.windows}, macOS {downloads.byOs.mac}, Linux {downloads.byOs.linux}.
             </p>
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0}>
               <table>
                 <thead><tr><th scope="col">Version</th><th scope="col">Published</th><th scope="col">Windows</th><th scope="col">macOS</th><th scope="col">Linux</th><th scope="col">Total</th></tr></thead>
                 <tbody>
@@ -289,7 +289,7 @@ export function Admin() {
 
       <section className="adm-part">
         <h2>Pages</h2>
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0}>
           <table>
             <thead><tr><th scope="col">Page</th><th scope="col">Views</th><th scope="col">Time</th><th scope="col">Per view</th></tr></thead>
             <tbody>
@@ -304,7 +304,7 @@ export function Admin() {
 
       <section className="adm-part">
         <h2>Lesson feedback</h2>
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0}>
           <table>
             <thead><tr><th scope="col">Page</th><th scope="col">Clear</th><th scope="col">Not clear</th><th scope="col">Notes</th></tr></thead>
             <tbody>

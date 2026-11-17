@@ -78,13 +78,13 @@ export default async function Page({ params }: LangParams) {
             <ol><li>{t.download.mac1}</li><li>{t.download.mac2}</li><li>{t.download.mac3}</li></ol>
             <p className="dl-note">{t.download.macOld}</p>
             <p className="dl-note">{t.download.macDamaged}</p>
-            <pre><code>xattr -dr com.apple.quarantine /Applications/CyberDojo.app</code></pre>
+            <pre tabIndex={0}><code>xattr -dr com.apple.quarantine /Applications/CyberDojo.app</code></pre>
           </div>
           <div>
             <h3>Linux</h3>
             <ol>
-              <li>{t.download.linux1}<pre><code>chmod +x {appImage}{"\n"}./{appImage}</code></pre></li>
-              <li>{t.download.linux2}<pre><code>sudo apt install ./{deb}</code></pre></li>
+              <li>{t.download.linux1}<pre tabIndex={0}><code>chmod +x {appImage}{"\n"}./{appImage}</code></pre></li>
+              <li>{t.download.linux2}<pre tabIndex={0}><code>sudo apt install ./{deb}</code></pre></li>
             </ol>
           </div>
         </div>

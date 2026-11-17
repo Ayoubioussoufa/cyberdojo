@@ -61,7 +61,7 @@ export default async function Page({ params }: LangParams) {
         <span><i className="fade-cell recall">R</i> {p.recall}</span>
         <span><i className="fade-cell solo" /> {p.solo}</span>
       </p>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0}>
         <table className="fade-table">
           <thead>
             <tr><th>{t.kind.Tool}</th>{PROJECTS.map((x) => <th key={x.id}>{x.id.slice(1)}</th>)}</tr>

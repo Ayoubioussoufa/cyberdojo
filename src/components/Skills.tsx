@@ -11,7 +11,7 @@ export function SkillMatrix() {
   const { lang, t } = useLang();
   const levels = t.skills.levels.split("|");
   return (
-    <div className="table-wrap">
+    <div className="table-wrap" tabIndex={0}>
       <table className="skills">
         <thead>
           <tr><th>{t.skills.skill}</th><th>{t.skills.you}</th><th>M3</th><th>M6</th><th>M12</th><th>M18</th><th>M24</th></tr>
