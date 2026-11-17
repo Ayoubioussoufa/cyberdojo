@@ -147,7 +147,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ○ | ● | POSIX ACLs | None. *Section on discretionary access.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | Linux capabilities | None. | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ○ | ● | SELinux and AppArmor | Practice only (1). | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
-| ○* | ● | seccomp, namespaces, cgroups | 29 mentions in 4 docs, most in P14, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
+| ○* | ● | seccomp, namespaces, cgroups | 32 mentions in 4 docs, most in 0074-kubernetes-and-zero-trust, practice 1. *Every hit is a Kubernetes namespace, or one seccompProfile line in a manifest. Linux namespaces and cgroups are never explained.* | [Linux confinement](modules/02-operating-systems/03-linux-confinement.md) |
 | ● | ● | auditd (tool) | 11 mentions in 3 docs, most in P06. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | eBPF for security | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
 | ○ | ● | Kernel modules | None. | [Linux persistence and audit](modules/02-operating-systems/05-linux-persistence-and-audit.md) |
@@ -170,7 +170,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Processes, threads, handles, core system processes | 31 mentions in 4 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
-| ● | ● | The registry | 43 mentions in 15 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | The registry | 44 mentions in 15 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ● | ● | NTFS, $MFT, alternate data streams | 14 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ● | ● | Access tokens and SIDs | 24 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
@@ -741,7 +741,7 @@ Basis: Brief 10.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Kubernetes architecture | 23 mentions in 8 docs, most in 0074-kubernetes-and-zero-trust, practice 6. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
+| ● | ● | Kubernetes architecture | 27 mentions in 8 docs, most in 0074-kubernetes-and-zero-trust, practice 6. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
 | ○ | ● | Kubernetes RBAC | Practice only (3). | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
 | ● | ● | Pod Security Standards and admission control | 27 mentions in 3 docs, most in P14, practice 3. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
 | ◐ | ● | NetworkPolicy | 8 mentions in 2 docs, most in 0074-kubernetes-and-zero-trust, practice 3. | [Kubernetes security in depth](modules/10-cloud/06-kubernetes-attack-paths.md) |
@@ -767,9 +767,9 @@ Basis: Brief 11, CyBOK Authentication, Authorisation & Accountability.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | Authentication versus authorisation | 3 mentions in 3 docs, most in 0048-access-control-that-holds. *Lesson 41.* |  |
-| ● | ● | Access control models: RBAC, ABAC, ReBAC | 16 mentions in 5 docs, most in 0041-identity-and-access, practice 4. | [Azure security](modules/10-cloud/02-azure-security.md) |
+| ● | ● | Access control models: RBAC, ABAC, ReBAC | 17 mentions in 5 docs, most in 0041-identity-and-access, practice 4. | [Azure security](modules/10-cloud/02-azure-security.md) |
 | ○ | ● | Formal models: Bell-LaPadula, Biba, Clark-Wilson | Practice only (2). | [Formal access control models](modules/11-identity/01-formal-access-models.md) |
-| ●* | ● | Least privilege, separation of duties | 15 mentions in 10 docs, most in 0007-users-and-permissions, practice 3. *Lesson 7, 'Least privilege', and lesson 41.* |  |
+| ●* | ● | Least privilege, separation of duties | 16 mentions in 10 docs, most in 0007-users-and-permissions, practice 3. *Lesson 7, 'Least privilege', and lesson 41.* |  |
 | ●* | ● | Privileged access management, just-in-time | 4 mentions in 1 docs, most in 0041-identity-and-access. *Lesson 41, 'Reducing standing privilege'.* |  |
 | ●* | ● | Identity governance: joiner-mover-leaver, SCIM | 3 mentions in 1 docs, most in 0041-identity-and-access. *Lesson 41, 'The identity lifecycle'.* |  |
 | ○ | ● | NIST SP 800-63 password guidance | 6 mentions in 1 docs, most in 0040-storing-passwords. | [Password storage under attack](modules/03-cryptography/10-password-cracking.md) |

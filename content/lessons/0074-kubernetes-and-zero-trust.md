@@ -30,6 +30,70 @@ You write a **manifest** that says what you want, such as "three copies of this 
 
 The **API server** is the front door, **etcd** stores the state, and each **node** runs a **kubelet**. Almost everything goes through the API server, so who can call it, and with what rights, is the central question. It's the same lesson as cloud IAM.
 
+### Why Kubernetes exists
+
+Docker runs containers on one machine, and someone has to start them, restart them when they crash, and move them when the machine dies. With three containers you can do that by hand. With three hundred, spread over twenty servers, you can't. Kubernetes turns the job around: instead of giving orders ("start this, now that"), you describe the result you want ("two copies of this web server, always"), and Kubernetes works continuously to keep reality matching your description. That idea, **desired state**, explains almost everything it does.
+
+### The words, in one picture
+
+| Word | What it is | Everyday picture |
+|---|---|---|
+| Cluster | All the machines Kubernetes manages, as one | The whole port |
+| Node | One machine in the cluster | One quay |
+| Pod | One or more containers that always run together | One shipping container on the quay |
+| Deployment | "Keep N copies of this pod running" | The standing order for the port |
+| Service | A stable name and address in front of changing pods | The port's fixed phone number |
+| Namespace | A named area that separates teams or apps | Fenced zones of the port |
+
+You rarely create pods by hand. You create a deployment, and it creates and replaces the pods for you.
+
+### Your first cluster, from zero
+
+A cluster for learning runs inside Docker on your own machine: [kind](https://kind.sigs.k8s.io/) creates one with `kind create cluster`, and `kubectl` talks to it. Ask for two copies of a web server:
+
+```
+kubectl create deployment web --image=nginx:1.27-alpine --replicas=2
+kubectl get deployments
+kubectl get pods
+```
+
+```
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+web    2/2     2            2           25s
+
+NAME                   READY   STATUS    RESTARTS   AGE
+web-79ffc79c64-s7bgt   1/1     Running   0          26s
+web-79ffc79c64-t2x9v   1/1     Running   0          26s
+```
+
+`2/2` means both copies are ready. Now delete one pod, as if its machine had died, and look again:
+
+```
+kubectl delete pod web-79ffc79c64-s7bgt
+kubectl get pods
+```
+
+```
+NAME                   READY   STATUS    RESTARTS   AGE
+web-79ffc79c64-bbnmd   1/1     Running   0          9s
+web-79ffc79c64-t2x9v   1/1     Running   0          35s
+```
+
+You never asked for it, but a new pod (`bbnmd`, 9 seconds old) replaced the one you deleted: the deployment saw one copy instead of two and fixed it. That's desired state at work. Finally, `kubectl expose deployment web --port=80` creates a service, a fixed internal address (here `10.43.190.74`) that keeps working whichever pods come and go. `kind delete cluster` removes everything.
+
+### When kubectl complains
+
+| You see | It means | Do this |
+|---|---|---|
+| `The connection to the server localhost:8080 was refused` | `kubectl` has no cluster configured, or it's stopped | Start the cluster; check `kubectl config current-context` |
+| `Error from server (NotFound): pods "nosuch" not found` | No object by that name in this namespace | `kubectl get pods -A` to search every namespace |
+| `ImagePullBackOff` in the status | The image name or tag doesn't exist, or the registry refused | `kubectl describe pod NAME` and read the Events at the bottom |
+| `Error` or `CrashLoopBackOff`, with restarts climbing | The container starts, then its program exits | `kubectl logs NAME` shows what it printed before dying |
+| `Pending` for a long time | No node can take the pod, often for lack of memory or CPU | `kubectl describe pod NAME`, again the Events |
+| `Error from server (Forbidden): ... cannot list resource "pods"` | RBAC refused: this identity isn't allowed | Expected for least privilege; `kubectl auth can-i --list` shows what's allowed |
+
+The last row is security working. A pod's default service account can't list pods, and a hardened cluster keeps it that way; the hardening table below is about not undoing it.
+
 ?? Why is unauthenticated access to etcd so serious?
 + It holds the cluster's state and its secrets
 - It runs the web pages that users visit
