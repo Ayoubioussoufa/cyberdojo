@@ -70,7 +70,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ●* | ● | Email transport: SMTP, IMAP, POP3 | 6 mentions in 2 docs, most in ports, practice 3. *Lesson 54, 'How email really travels'.* |  |
 | ● | ● | SPF, DKIM, DMARC | 39 mentions in 3 docs, most in 0054-phishing-analysis, practice 7. | [Social engineering](modules/16-human-privacy-research/01-social-engineering.md) |
-| ◐ | ● | SMB and file shares | 3 mentions in 3 docs, most in s2-memorising-what-must-be-instant, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
+| ◐ | ● | SMB and file shares | 4 mentions in 4 docs, most in s2-memorising-what-must-be-instant, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ◐ | ● | Cleartext legacy: FTP, Telnet | 3 mentions in 2 docs, most in ports, practice 2. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ◐ | ● | SNMP | 1 mentions in 1 docs, most in ports, practice 1. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
 | ○ | ● | NFS | 1 mentions in 1 docs, most in ports. | [LAN and legacy protocols](modules/01-networking/08-lan-and-legacy-protocols.md) |
@@ -107,7 +107,7 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Nmap (tool) | 76 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ● | ● | Nmap (tool) | 77 mentions in 13 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 8 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Scan timing, rate and how each looks to a defender | 4 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Nmap Scripting Engine | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
@@ -172,7 +172,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | ● | ● | Processes, threads, handles, core system processes | 31 mentions in 4 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
 | ● | ● | The registry | 43 mentions in 15 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ● | ● | NTFS, $MFT, alternate data streams | 14 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
-| ● | ● | Access tokens and SIDs | 23 mentions in 2 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
+| ● | ● | Access tokens and SIDs | 24 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ○ | ● | Windows privileges: SeDebug, SeImpersonate | None. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ●* | ● | Services and the Service Control Manager | 8 mentions in 2 docs, most in 0031-windows-objects. *Lesson 31, 'Services and scheduled tasks'.* |  |
@@ -200,9 +200,9 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Domains, forests, OUs, trusts | 65 mentions in 9 docs, most in 0043-active-directory, practice 3. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
-| ● | ● | Group Policy | 38 mentions in 5 docs, most in 0043-active-directory. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
-| ◐ | ◐ | LDAP | 7 mentions in 3 docs, most in ports, practice 12. |  |
+| ● | ● | Domains, forests, OUs, trusts | 72 mentions in 9 docs, most in 0043-active-directory, practice 3. | [Windows credential stores](modules/02-operating-systems/07-windows-credential-stores.md) |
+| ● | ● | Group Policy | 41 mentions in 5 docs, most in 0043-active-directory. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ◐ | ◐ | LDAP | 8 mentions in 3 docs, most in 0043-active-directory, practice 12. |  |
 | ● | ● | BloodHound and attack paths | 35 mentions in 8 docs, most in 0045-attacking-and-defending-identity, practice 1. |  |
 | ◐ | ◐ | Kerberoasting | 20 mentions in 7 docs, most in 0044-kerberos-and-ntlm, practice 3. |  |
 | ◐ | ◐ | AS-REP roasting | 6 mentions in 4 docs, most in 0044-kerberos-and-ntlm. |  |

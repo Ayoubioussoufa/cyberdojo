@@ -29,6 +29,17 @@ Trois commandes vous apprennent toutes les autres, donc apprenez-les avant tout 
 
 Vous croiserez des noms courts dans les scripts des autres. Ce sont des **alias** : `ls` et `dir` signifient tous deux `Get-ChildItem`, `?` signifie `Where-Object` et `%` signifie `ForEach-Object`. `Get-Alias ls` vous dit ce qu'un alias représente. Les attaquants utilisent les alias pour rendre les commandes plus courtes et plus difficiles à rechercher, donc apprenez à les développer de tête.
 
+### Deux PowerShell
+
+Vous rencontrerez deux programmes du même nom. **Windows PowerShell 5.1** est intégré à toutes les machines Windows et se lance avec `powershell.exe`. **PowerShell 7** est la version plus récente et open source, installée à part, qui se lance avec `pwsh` et tourne aussi sous Linux et macOS. Ils partagent presque tout le langage, donc ce que vous apprenez ici marche dans les deux. Demandez à celui dans lequel vous êtes :
+
+```powershell
+$PSVersionTable.PSVersion
+$PSVersionTable.PSEdition
+```
+
+PowerShell 7 répond par une version comme `7.5.0` et l'édition `Core` ; Windows PowerShell répond `5.1` et `Desktop`. Cela compte pour la défense : les attaquants préfèrent `powershell.exe`, toujours présent, et la journalisation doit couvrir toutes les éditions présentes sur vos machines. Les anciennes versions de Windows livraient aussi PowerShell 2.0, qui n'enregistre presque rien : le lancer était une façon classique d'échapper à la journalisation, alors supprimez-le partout où il existe encore.
+
 ?? Vous n'avez jamais vu `Restart-Service`. Que pouvez-vous dire d'après son seul nom ?
 + Il redémarre un service, verbe puis nom
 - Il lit un journal sur les services
@@ -86,6 +97,36 @@ Get-Command *event*
 Get-Process | Get-Member       # quelles propriétés a-t-il ?
 ```
 
+### À quoi ressemble un objet
+
+« Objet » paraît abstrait tant qu'on n'en tient pas un. Mettez un processus dans une variable et interrogez-le :
+
+```powershell
+$p = Get-Process -Id $PID
+$p.Name
+$p.Id
+$p | Get-Member -MemberType Property
+```
+
+`$PID` est l'identifiant de votre propre PowerShell, donc `$p` est le shell dans lequel vous tapez. `$p.Name` affiche `pwsh` (ou `powershell`), une simple valeur que l'on peut comparer ou trier. `Get-Member` liste tout ce que contient l'objet :
+
+```
+   TypeName: System.Diagnostics.Process
+
+Name                MemberType Definition
+----                ---------- ----------
+BasePriority        Property   int BasePriority {get;}
+ExitCode            Property   int ExitCode {get;}
+HandleCount         Property   int HandleCount {get;}
+HasExited           Property   bool HasExited {get;}
+```
+
+Chaque ligne est une propriété, avec son type : `int` est un nombre entier, `bool` vrai ou faux, `datetime` une date. Comme `CPU` est stocké sous forme de nombre, `Where-Object CPU -gt 100` compare des nombres, pas du texte, et c'est ce qui rend les pipelines PowerShell si fiables.
+
+### Pourquoi l'affichage semble coupé
+
+À la fin d'un pipeline, PowerShell choisit quelques colonnes qui tiennent dans votre fenêtre et affiche celles-là. Les autres propriétés ne sont pas perdues, seulement cachées. Ajoutez `| Format-List *` pour voir toutes les propriétés de chaque objet, ou `| Select-Object Name, Id, Path` pour choisir vos colonnes. Quand une valeur se termine par `...`, la colonne était trop étroite : `Format-List` l'affiche en entier.
+
 ?? Pourquoi n'avez-vous pas besoin d'`awk` pour choisir une colonne dans PowerShell ?
 + Le pipeline transmet des objets aux propriétés nommées
 - La sortie PowerShell tient toujours en une colonne
@@ -98,6 +139,21 @@ Get-Process | Get-Member       # quelles propriétés a-t-il ?
 PowerShell a une stratégie d'exécution qui limite le lancement des scripts. Microsoft est explicite : [la stratégie d'exécution n'est pas une frontière de sécurité, c'est de la défense en profondeur](https://learn.microsoft.com/fr-fr/powershell/module/microsoft.powershell.core/about/about_execution_policies). Un utilisateur peut la contourner avec `-ExecutionPolicy Bypass`, ou en collant le contenu du script.
 
 Ne vous y fiez donc pas. Les contrôles qui comptent sont la journalisation, et le [contrôle des applications](https://learn.microsoft.com/fr-fr/windows/security/application-security/application-control/app-control-for-business/appcontrol).
+
+### Quand PowerShell refuse
+
+Les erreurs de PowerShell sont longues, mais la première ligne porte le sens :
+
+| Vous voyez | Cela veut dire | Faites ceci |
+|---|---|---|
+| `The term 'Get-Proces' is not recognized as a name of a cmdlet, function, script file, or executable program.` | Aucune commande de ce nom, en général une faute de frappe | `Get-Command *proces*` pour trouver le bon nom |
+| `A parameter cannot be found that matches parameter name 'Nme'.` | La commande existe, l'option non | `Get-Help Get-Process` liste ses paramètres |
+| `The command triage.ps1 was not found, but does exist in the current location.` | PowerShell ne lance pas un script du dossier courant par son seul nom | Tapez `.\triage.ps1`, comme `./` sous Bash |
+| `... cannot be loaded because running scripts is disabled on this system.` | La stratégie d'exécution bloque les scripts | Pour vos propres scripts, `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` |
+| `Access is denied` ou `Requested registry access is not allowed.` | La commande demande des droits d'administrateur | Ouvrez PowerShell avec Exécuter en tant qu'administrateur |
+| `No events were found that match the specified selection criteria.` | `Get-WinEvent` a bien tourné et n'a rien trouvé | Élargissez la période ou vérifiez l'identifiant d'événement |
+
+La quatrième ligne, c'est la stratégie d'exécution qui fait son travail : vous empêcher de lancer un script par accident. Comme l'explique le paragraphe ci-dessus, elle ne peut pas arrêter quelqu'un qui le veut vraiment.
 
 ?? Pourquoi la stratégie d'exécution n'est-elle pas un vrai contrôle ?
 + Un utilisateur peut simplement la contourner
