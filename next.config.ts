@@ -30,7 +30,17 @@ const production = process.env.NODE_ENV === "production";
 
 // Pages are still pre-rendered at build time. The server exists for /api: accounts and saved progress.
 const nextConfig: NextConfig = {
-  ...(desktop ? { output: "standalone" as const, distDir: ".next-desktop" } : {}),
+  ...(desktop
+    ? {
+        output: "standalone" as const,
+        distDir: ".next-desktop",
+        // Installed, the server's folder is the app's install folder. By default Next saves every page it
+        // renders there (.next-desktop/server/route-cache/...), with paths past Windows' 260 characters:
+        // the uninstaller can't remove them, so updates stopped with "CyberDojo cannot be closed".
+        // The page cache stays in memory instead. scripts/desktop.ts's smoke test checks nothing is written.
+        experimental: { isrFlushToDisk: false },
+      }
+    : {}),
   trailingSlash: true,
   images: { unoptimized: true },
   turbopack: { root: __dirname },
