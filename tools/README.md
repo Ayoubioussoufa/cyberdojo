@@ -2,7 +2,7 @@
 
 <!-- Written by scripts/tools/index.ts. Edit the tool pages, then run pnpm audit:tools. -->
 
-148 tool guides, plus an A to Z of 895 names at [/tools/all/](../src/app/[lang]/tools/all/page.tsx).
+169 tool guides, plus an A to Z of 907 names at [/tools/all/](../src/app/[lang]/tools/all/page.tsx).
 
 Every guide says what the tool is for and how it works, then what defenders see. How much it shows depends on its `use` field:
 
@@ -17,12 +17,12 @@ Every guide says what the tool is for and how it works, then what defenders see.
 | List | Size | With a guide here |
 |---|---|---|
 | Kali top 10 | 10 | 10 |
-| ATT&CK tools seen with 2 or more groups or campaigns | 57 | 14 |
+| ATT&CK tools seen with 2 or more groups or campaigns | 57 | 16 |
 | Kali 802-11 | 19 | 4 |
 | Kali bluetooth | 10 | 0 |
 | Kali database | 10 | 1 |
 | Kali exploitation | 9 | 4 |
-| Kali forensics | 102 | 14 |
+| Kali forensics | 102 | 16 |
 | Kali hardware | 11 | 2 |
 | Kali identify | 15 | 6 |
 | Kali information-gathering | 49 | 15 |
@@ -49,8 +49,10 @@ What the Internet already says about a target, usually your own.
 - [ExifTool](01-recon-osint/exiftool.md) (open): Reads and removes metadata from images, documents and other files.
 - [fierce](01-recon-osint/fierce.md) (own): Finds non-contiguous IP space and hostnames for a domain through DNS.
 - [Google dorks](01-recon-osint/google-dorks.md) (own): Uses advanced search operators to find exposed files and pages.
+- [host](01-recon-osint/host.md) (open): Gives a short, readable answer to a DNS question, handy in scripts.
 - [httpx](01-recon-osint/httpx.md) (own): Probes a list of hosts and reports which ones run a web server, and what it runs.
 - [Maltego](01-recon-osint/maltego.md) (own): Draws links between people, domains and infrastructure on a graph.
+- [nslookup](01-recon-osint/nslookup.md) (open): Looks up DNS records from the command line, on Windows, macOS and Linux alike.
 - [recon-ng](01-recon-osint/recon-ng.md) (own): A modular recon framework with a console and a database of findings.
 - [Sherlock](01-recon-osint/sherlock.md) (own): Checks which websites have an account with a given username.
 - [Shodan](01-recon-osint/shodan.md) (own): A search engine for Internet-connected devices and the banners they expose.
@@ -67,12 +69,14 @@ Finding hosts, ports and services.
 - [enum4linux-ng](02-scanning/enum4linux-ng.md) (own): Gathers information from Windows and Samba hosts over SMB.
 - [fping](02-scanning/fping.md) (own): Pings many hosts at once and reports which ones answer.
 - [hping3](02-scanning/hping3.md) (own): Sends custom TCP, UDP and ICMP packets, for testing firewalls.
+- [ip](02-scanning/ip.md) (open): Shows and changes a Linux host's addresses, routes and neighbours.
 - [masscan](02-scanning/masscan.md) (own): Scans very large address ranges at high speed.
 - [naabu](02-scanning/naabu.md) (own): A simple, fast port scanner built for pipelines.
 - [nbtscan](02-scanning/nbtscan.md) (own): Lists Windows hosts on a network through NetBIOS names.
 - [Netcat](02-scanning/netcat.md) (open): Reads and writes raw data over network connections.
 - [netdiscover](02-scanning/netdiscover.md) (own): Finds hosts on a local network, actively or just by listening.
 - [Nmap](02-scanning/nmap.md) (own): Finds live hosts, open ports, services and versions.
+- [ping](02-scanning/ping.md) (open): Checks whether a host answers and how long a round trip takes.
 - [RustScan](02-scanning/rustscan.md) (own): Finds open ports fast, then passes them to Nmap.
 - [smbclient](02-scanning/smbclient.md) (own): Lists and accesses Windows file shares from Linux.
 - [snmpwalk](02-scanning/snmpwalk.md) (own): Reads a device's settings over SNMP.
@@ -116,6 +120,7 @@ Proxies, discovery and scanners for web apps.
 - [sqlmap](04-web/sqlmap.md) (know): Automates finding and exploiting SQL injection.
 - [wafw00f](04-web/wafw00f.md) (own): Detects whether a web application firewall protects a site.
 - [wfuzz](04-web/wfuzz.md) (own): Web fuzzer that can target any part of a request.
+- [wget](04-web/wget.md) (open): Downloads files and whole sites over HTTP, HTTPS and FTP, without a browser.
 - [WhatWeb](04-web/whatweb.md) (own): Identifies the technology behind a website.
 - [WPScan](04-web/wpscan.md) (own): Audits WordPress sites for vulnerable plugins and weak settings.
 - [XSStrike](04-web/xsstrike.md) (know): Scans for cross-site scripting flaws.
@@ -131,6 +136,7 @@ Finding known flaws and weak settings.
 - [Nuclei](05-vulnerability/nuclei.md) (own): Scans for known flaws using community-written YAML templates.
 - [OpenVAS](05-vulnerability/openvas.md) (own): An open-source vulnerability scanner, from Greenbone.
 - [SearchSploit](05-vulnerability/searchsploit.md) (own): Searches a local copy of the Exploit Database.
+- [testssl.sh](05-vulnerability/testssl.md) (own): Checks a server's TLS set-up: protocols, ciphers, certificate and known flaws.
 
 ## Passwords and credentials
 
@@ -188,7 +194,9 @@ Checking and locking down Linux and Windows.
 - [Fail2ban](11-hardening/fail2ban.md) (open): Blocks addresses that show signs of attack in log files.
 - [firewalld](11-hardening/firewalld.md) (open): Manages a Linux host firewall through zones.
 - [Lynis](11-hardening/lynis.md) (open): Audits a Linux or Unix system and scores its hardening.
+- [nftables](11-hardening/nftables.md) (open): The Linux kernel's firewall, set up with the nft command; the successor to iptables.
 - [OpenSCAP](11-hardening/openscap.md) (open): Checks a system against formal security policies, such as CIS or STIG.
+- [ssh](11-hardening/ssh.md) (open): Logs in to and runs commands on remote machines over an encrypted channel.
 - [Sysmon](11-hardening/sysmon.md) (open): Records detailed activity on Windows, far beyond the default logs.
 - [ufw](11-hardening/ufw.md) (open): A simple front end to the Linux firewall, common on Ubuntu.
 
@@ -197,6 +205,9 @@ Checking and locking down Linux and Windows.
 IDS, SIEM, EDR and log tooling.
 
 - [Elastic Stack](12-detection/elastic-stack.md) (open): Stores and searches huge volumes of logs, with dashboards.
+- [Get-WinEvent](12-detection/get-winevent.md) (open): Queries Windows event logs from PowerShell, the scriptable way into Event Viewer.
+- [grep](12-detection/grep.md) (open): Finds the lines that match a pattern in files or in a command's output.
+- [journalctl](12-detection/journalctl.md) (open): Reads and filters the systemd journal, where most Linux logs now live.
 - [osquery](12-detection/osquery.md) (open): Lets you query a computer's state as if it were a database.
 - [Security Onion](12-detection/security-onion.md) (open): A ready-made Linux distribution for network security monitoring.
 - [Sigma](12-detection/sigma.md) (open): A shared, tool-independent format for writing detection rules.
@@ -211,11 +222,16 @@ IDS, SIEM, EDR and log tooling.
 Collecting and reading evidence.
 
 - [Autopsy](13-forensics/autopsy.md) (open): A graphical workbench for examining disk images.
+- [Autoruns](13-forensics/autoruns.md) (open): Lists everything set to start automatically on a Windows machine, in one place.
 - [binwalk](13-forensics/binwalk.md) (open): Finds and extracts files hidden inside other files, especially firmware.
 - [ClamAV](13-forensics/clamav.md) (open): An open-source antivirus engine, often used on mail and file servers.
+- [dd](13-forensics/dd.md) (open): Copies data byte for byte, the classic way to image a disk.
 - [foremost](13-forensics/foremost.md) (open): Recovers files from a disk image by their content, not the file system.
 - [FTK Imager](13-forensics/ftk-imager.md) (open): Creates forensic disk and memory images, preserving the evidence.
+- [last](13-forensics/last.md) (open): Shows who logged in to a Linux machine, from where and for how long.
+- [lsof](13-forensics/lsof.md) (open): Lists the files, sockets and devices each process has open.
 - [Plaso](13-forensics/plaso.md) (open): Builds a single timeline from many sources of evidence.
+- [ps](13-forensics/ps.md) (open): Lists running processes with their owner, parent, start time and command line.
 - [The Sleuth Kit](13-forensics/sleuthkit.md) (open): Command-line tools for file system forensics.
 - [Volatility](13-forensics/volatility.md) (open): Analyses the contents of a captured memory image.
 - [YARA](13-forensics/yara.md) (open): Matches files and memory against patterns you define.
@@ -224,11 +240,15 @@ Collecting and reading evidence.
 
 Taking programs apart safely.
 
+- [file](14-reversing/file.md) (open): Identifies what a file really is from its content, not from its name.
 - [gdb](14-reversing/gdb.md) (own): The GNU debugger: runs a program under your control to see what it does.
 - [Ghidra](14-reversing/ghidra.md) (own): A free reverse-engineering suite with an excellent decompiler.
+- [Process Monitor](14-reversing/procmon.md) (open): Records every file, registry, process and network action on Windows, live.
 - [pwndbg](14-reversing/pwndbg.md) (own): A gdb plug-in for exploitation research and binary analysis.
 - [radare2](14-reversing/radare2.md) (own): A scriptable command-line reverse-engineering framework.
+- [strace](14-reversing/strace.md) (open): Shows every system call a Linux program makes, and what the kernel answered.
 - [strings](14-reversing/strings.md) (open): Prints the readable text inside a binary file.
+- [xxd](14-reversing/xxd.md) (open): Shows any file as hexadecimal and text side by side, and turns hex back into bytes.
 
 ## Cloud and containers
 
@@ -261,6 +281,7 @@ Everyday tools for keys, TLS and encoding.
 - [GnuPG](17-crypto/gpg.md) (open): Encrypts and signs files and email with public-key cryptography.
 - [hashID](17-crypto/hashid.md) (open): Identifies the type of a hash from its format.
 - [OpenSSL](17-crypto/openssl.md) (open): The standard toolkit for TLS, certificates and everyday cryptography.
+- [sha256sum](17-crypto/sha256sum.md) (open): Computes and checks SHA-256 hashes, to prove a file hasn't changed.
 
 ## Threat intelligence and deception
 
