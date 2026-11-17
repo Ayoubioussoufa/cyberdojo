@@ -12,6 +12,8 @@ import {
   DEFAULT_PREFS,
   FONTS,
   isDefault,
+  PALETTES,
+  randomPalette,
   readLocal,
   THEME_DEFAULTS,
   unreadable,
@@ -39,6 +41,14 @@ async function saveRemote(prefs: Prefs): Promise<string | null> {
 export function AppearanceSync() {
   const { ready, user } = useAccount();
   const done = useRef<string | null>(null);
+  useEffect(() => {
+    // A copy saved by an earlier version has no CSS variables for the pre-paint script: rewrite it once.
+    const local = readLocal();
+    if (local) {
+      applyPrefs(local);
+      writeLocal(local);
+    }
+  }, []);
   useEffect(() => {
     if (!ready || !user || done.current === user.id) return;
     done.current = user.id;
@@ -76,6 +86,7 @@ export function AppearanceSettings() {
   const [theme, setTheme] = useState<Theme>("dark");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [problem, setProblem] = useState("");
+  const [blend, setBlend] = useState("");
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
@@ -112,9 +123,9 @@ export function AppearanceSettings() {
     }, 600);
   };
 
-  const pickColour = (key: "bg" | "surface", value: string) => {
+  const pickColour = (key: "bg" | "surface" | "accent", value: string) => {
     const v = value.toLowerCase();
-    const bad = unreadable(theme, v);
+    const bad = unreadable(theme, { ...prefs[theme], [key]: v });
     if (bad) {
       setProblem(A.tooLow);
       return;
@@ -122,7 +133,15 @@ export function AppearanceSettings() {
     update({ ...prefs, [theme]: { ...prefs[theme], [key]: v } });
   };
 
-  const colourField = (key: "bg" | "surface", label: string) => (
+  // Random only on a click, never while drawing, so the server and browser render the same page.
+  const surprise = () => {
+    const { harmony, ...colours } = randomPalette(theme);
+    update({ ...prefs, [theme]: colours });
+    const said: Record<string, string> = { analogous: A.blendAnalogous, complementary: A.blendComplementary, triadic: A.blendTriadic, split: A.blendSplit };
+    setBlend(said[harmony] ?? "");
+  };
+
+  const colourField = (key: "bg" | "surface" | "accent", label: string) => (
     <label className="appear-colour">
       <input type="color" value={prefs[theme][key] ?? THEME_DEFAULTS[theme][key]} onChange={(e) => pickColour(key, e.target.value)} />
       <span>{label}</span>
@@ -165,9 +184,22 @@ export function AppearanceSettings() {
         <div className="appear-colours">
           {colourField("bg", A.pageBg)}
           {colourField("surface", A.sectionBg)}
+          {colourField("accent", A.accent)}
         </div>
+        <div className="appear-palettes" role="group" aria-label={A.palettes}>
+          <button type="button" className="btn sm primary" onClick={surprise}>{A.surprise}</button>
+          {PALETTES.map((pal) => (
+            <button key={pal.id} type="button" className="appear-palette" onClick={() => { update({ ...prefs, [theme]: pal[theme] }); setBlend(""); }}>
+              <span className="appear-swatch" aria-hidden="true" style={{ background: pal[theme].bg ?? undefined, borderColor: pal[theme].surface ?? undefined }}>
+                <i style={{ background: pal[theme].accent ?? undefined }} />
+              </span>
+              {pal.name[lang === "fr" ? 1 : 0]}
+            </button>
+          ))}
+        </div>
+        {blend && <p className="muted appear-hint" aria-live="polite">{blend}</p>}
         <div className="acct-row">
-          <button type="button" className="btn sm" onClick={() => update({ ...prefs, [theme]: { bg: null, surface: null } })}>{A.resetColours}</button>
+          <button type="button" className="btn sm" onClick={() => { update({ ...prefs, [theme]: { bg: null, surface: null, accent: null } }); setBlend(""); }}>{A.resetColours}</button>
           <button type="button" className="btn sm" onClick={() => update(DEFAULT_PREFS)}>{A.resetAll}</button>
         </div>
       </fieldset>
