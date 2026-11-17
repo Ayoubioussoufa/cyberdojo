@@ -158,6 +158,29 @@ Think of a shipping container. Before them, cargo was loaded loose, and every sh
 
 Docker is the tool that builds and runs those boxes. You write a short recipe, the **Dockerfile**; Docker turns it into an **image**, a frozen read-only box; and starting the image gives you a **container**, a running copy isolated from the rest of the machine.
 
+### Five words to know first
+
+Docker comes with its own vocabulary, and the rest of this lesson uses it constantly. A kitchen helps: think of a ready meal.
+
+- **Dockerfile**: the *recipe*, a short text file listing the steps to prepare the meal. You write it.
+- **Image**: the *ready meal in the freezer*. Docker follows the recipe once and freezes the result: a complete set of folders and files (a Python, the libraries, your code) plus a note saying which command to start. An image never changes after it's built.
+- **Container**: *one portion, heated and served*. Starting an image gives a running copy of it. You can serve many portions from the same meal, and whatever happens to one portion leaves the frozen meal untouched.
+- **Registry**: the *supermarket*, an online library of ready-made images. Docker Hub is the default one, and it's where `python:3.13-slim` comes from.
+- **Tag**: the *label on the box*, the part after the colon that picks a version. `python:3.13-slim` is Python 3.13, slim edition. With no tag, Docker assumes `latest`, which changes over time, so always write the tag.
+
+### What happens when you type `docker run`
+
+One command does a lot of work, and knowing the steps makes every error message easier to read:
+
+1. The `docker` command you type is only a messenger. It sends your request to the **Docker daemon**, `dockerd`, a background service that does the real work.
+2. The daemon looks for the image on your machine. If it isn't there, it downloads it from the registry, one layer at a time.
+3. It creates a container: a thin, writable layer laid on top of the image's read-only layers. Files the container changes land in that thin layer, so the image itself is never modified.
+4. It isolates the container: its own list of processes, its own network address, its own host name, and the image's files as its whole world.
+5. It starts the image's command as the container's **main process**.
+6. When that process ends, the container stops. It isn't deleted, unless you asked for `--rm`: it waits, stopped, and `docker ps -a` still lists it.
+
+One security fact belongs here. The daemon runs as root, so anyone who can give it orders can start a container that mounts the whole disk. Members of the `docker` group, and any program that can reach the file `/var/run/docker.sock`, are therefore root on that machine in all but name.
+
 ?? What does putting your tool in a container give you?
 + It runs the same on every machine
 - It makes your Python code run faster
@@ -191,6 +214,8 @@ App | your tool and its libraries |
 Container runtime | Docker |
 Host | hardware and the shared kernel |
 
+Here is a Dockerfile for the log tool you wrote this month. Don't try to understand every line yet: the next section takes it apart, line by line.
+
 ```dockerfile
 FROM python:3.13-slim
 WORKDIR /app
@@ -209,6 +234,32 @@ docker run --rm -v "$PWD/logs:/data:ro" toolkit /data/auth.log
 ```
 
 `-v` mounts a folder, and `:ro` makes it read-only. `--rm` cleans up afterwards. Follow [Docker's getting-started guide](https://docs.docker.com/get-started/) to learn compose, volumes and the rest.
+
+### How the isolation works
+
+There is no second operating system inside a container. The Linux kernel offers two features, and Docker combines them:
+
+- **Namespaces** decide what a process can *see*. In its own PID namespace, the container's main program is process number 1 and can't see the host's other processes. In its own mount namespace, the image's files are its whole disk. It gets its own network interface and address, and its own host name.
+- **Control groups** (cgroups) decide how much it can *use*: CPU time, memory, the number of processes.
+
+Docker also removes most of root's special powers (Linux *capabilities*) and filters the system calls a container may make. You can watch the first part work:
+
+```
+docker run --rm alpine:3.22 sh -c 'ps; hostname'
+```
+
+```
+PID   USER     TIME  COMMAND
+    1 root      0:00 sh -c ps; hostname
+    7 root      0:00 ps
+487b0a2988a3
+```
+
+Only two processes exist from inside, the shell is process 1, and the host name is the container's ID. From the host, though, `ps aux` shows that same shell as an ordinary process. That's the whole point: same kernel, narrower view.
+
+### On Windows and macOS
+
+Containers need a Linux kernel, and Windows and macOS don't have one. **Docker Desktop** therefore runs a small Linux virtual machine in the background (on Windows, through WSL 2) and your containers live inside it. That's why the installer asks for virtualisation to be enabled, and why reading files from a Windows folder inside a container is slower than from the Linux side.
 
 ?? Why do containers isolate less strongly than virtual machines?
 + They all share the same host kernel
@@ -229,6 +280,91 @@ A Dockerfile is read top to bottom, each line adding a layer to the image. Here 
 - `ENTRYPOINT ["logparse"]` — the command that runs when the container starts. `RUN` builds the image; `ENTRYPOINT` is what actually runs each time.
 
 Order matters for speed: Docker caches each line, so put the parts that rarely change (the base, the dependencies) above the parts that change often (your source), and most rebuilds stay almost instant.
+
+### Reading an image name
+
+`python:3.13-slim` is a short form. Written out in full, it's `docker.io/library/python:3.13-slim`:
+
+| Part | Meaning |
+|---|---|
+| `docker.io` | The registry, here Docker Hub, the default |
+| `library` | The namespace: `library` holds the official images |
+| `python` | The repository: every version of this one image |
+| `3.13-slim` | The tag: Python 3.13 on a trimmed-down Debian |
+
+The variants matter. `python:3.13` is bigger and includes compilers. `python:3.13-slim` keeps only what running Python needs. `python:3.13-alpine` is smaller still, but Alpine uses a different C library, so some Python packages won't install on it. Start with `slim`. A tag can also move: `3.13` is updated with each security fix. To freeze an exact image, add its digest, the long `@sha256:...` that the build output prints.
+
+### The dot at the end: the build context
+
+```
+docker build -t toolkit .
+```
+
+`-t toolkit` gives the image a name (a *tag*), so you can run it as `toolkit`. The final `.` is the **build context**: the folder whose files Docker hands to the builder. A `COPY` line can only see files inside that folder. Ask it for a file that isn't there and the build stops:
+
+```
+ERROR: failed to build: ... failed to calculate checksum of ref ...: "/app.py": not found
+```
+
+Read the end of the line, `"/app.py": not found`: the file isn't in the folder you built from. Either you ran the command in the wrong folder, or the file is excluded by `.dockerignore`.
+
+`.dockerignore` works like `.gitignore`: it keeps files out of the context. Put `.git`, `.venv`, `__pycache__` and `.env` in it. This is security, not just tidiness: with a careless `COPY . .`, your secrets end up baked into the image, where anyone who downloads it can read them. Deleting them in a later line doesn't help, because every earlier layer is kept.
+
+### `RUN`, `CMD` and `ENTRYPOINT`
+
+These three are easy to mix up:
+
+- `RUN` happens **while building**, once. It installs things into the image.
+- `ENTRYPOINT` is the program that runs **each time a container starts**. Words you type after the image name are passed to it as arguments.
+- `CMD` gives default arguments, or a default command when there's no `ENTRYPOINT`. Anything you type after the image name replaces it.
+
+Write them in the JSON form, `["python", "hello.py"]`, as above. The other form, a plain string, is run through a shell, which then becomes the main process and doesn't pass on the signal Docker sends to stop the container.
+
+### Your first image, from zero
+
+Do this once by hand before packaging your tool. In an empty folder, create `hello.py`:
+
+```python
+import platform
+import sys
+
+print(f"Hello from Python {platform.python_version()} on {platform.system()}")
+print("Arguments:", sys.argv[1:])
+```
+
+And beside it, a file called exactly `Dockerfile`, with no extension:
+
+```dockerfile
+FROM python:3.13-slim
+WORKDIR /app
+COPY hello.py .
+USER nobody
+ENTRYPOINT ["python", "hello.py"]
+```
+
+Build it with `docker build -t hello .`. The output numbers each step. These are the lines to read:
+
+```
+#5 [1/3] FROM docker.io/library/python:3.13-slim@sha256:e48f59cd...
+#6 [2/3] WORKDIR /app
+#7 [3/3] COPY hello.py .
+#8 naming to docker.io/library/hello:latest done
+```
+
+`[1/3]` to `[3/3]` are the three lines that build layers, the base image arrives with its exact digest, and the last line confirms the name. Now run it, twice:
+
+```
+docker run --rm hello one two
+docker run --rm --entrypoint whoami hello
+```
+
+```
+Hello from Python 3.13.18 on Linux
+Arguments: ['one', 'two']
+nobody
+```
+
+The words after the image name reached the program as arguments, and the program ran as `nobody`, not root, as the Dockerfile asked. Notice too that it says Python 3.13 and Linux, whatever your own computer runs: the box brought its own. Change one line of `hello.py` and build again: steps 1 and 2 now say `CACHED`, and only the `COPY` runs again.
 
 ?? Why end a Dockerfile with `USER nobody`?
 + So a breakout starts without root power
@@ -252,6 +388,28 @@ services:
 `build: .` tells compose to build the image from the Dockerfile here. `ports` publishes a port: `127.0.0.1:5000:5000` maps your machine's localhost port 5000 to the container's 5000, and *only* localhost, so nothing is exposed to the network. `docker compose up --build` builds and starts it; `docker compose down` stops and removes it.
 
 You will use exactly this in the [Workshop](/workshop/), where a lab stands up a small, deliberately weak service with compose, bound to `127.0.0.1`, for you to attack and then harden — all on your own machine.
+
+### Ports: why you can't reach the container at first
+
+A container has its own network address, so a web server listening on port 5000 inside it is invisible from your machine until you **publish** the port: `ports:` in compose, `-p` with `docker run`. The format is `host address : host port : container port`. Leave out the address and Docker publishes on every network interface of your machine. On Linux it also writes its own firewall rules, which take effect before `ufw`'s, so a port you thought you had blocked is open to the network. That's why every example here starts with `127.0.0.1:`.
+
+### Volumes: data that outlives the container
+
+Whatever a container writes goes into its thin writable layer, and that layer is deleted with the container. For data that must survive, use a **volume**:
+
+```yaml
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: change-me
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+volumes:
+  dbdata:
+```
+
+`dbdata` is a named volume that Docker keeps outside every container, mounted where PostgreSQL stores its files, so `docker compose down` and `up` again find the same data. The other kind, a **bind mount**, maps a folder of your own, as `-v "$PWD/logs:/data:ro"` did earlier. Inside a compose project, services find each other by name: the app reaches the database at `db:5432`, with no address to look up.
 
 ?? What is docker compose for?
 + Running several containers together from one file
@@ -285,6 +443,21 @@ Docker looks for the `hello-world` image on your machine, doesn't find it, downl
 | `docker image rm IMAGE` | Deletes an image |
 
 `docker exec -it NAME sh` is how you look around inside the box. Run `whoami` there on your own image and you should see `nobody`, which is `USER nobody` proving itself.
+
+### When something goes wrong
+
+The same handful of errors meets everyone who starts with Docker. Each one names its cause if you read to the end of the line:
+
+| You see | It means | Do this |
+|---|---|---|
+| `permission denied while trying to connect to the Docker daemon socket` | Your user can't talk to the daemon | Use `sudo`, or join the `docker` group, knowing it's equal to root |
+| `Bind for 0.0.0.0:5000 failed: port is already allocated` | Something already uses that port on your machine | Find it with `docker ps`, or publish another port, `-p 127.0.0.1:5001:5000` |
+| `"/app.py": not found` during a build | The file isn't in the build context | Build from the right folder, and check `.dockerignore` |
+| `Exited (0)` or `Exited (1)` in `docker ps -a` | The main process finished, or crashed | Read `docker logs NAME` |
+| `exec format error` | The image was built for another kind of processor | Use an image built for yours, or add `--platform` |
+| `no space left on device` | Old images and containers have piled up | See them with `docker system df`, then `docker system prune` |
+
+A container that "exits straight away" is usually working as designed. Our `hello` image prints two lines and ends, so its container shows `Exited (0)`: zero means success. A server stays up only because its main process never finishes.
 
 ?? `docker ps` shows nothing, but `docker ps -a` lists your container. What does that tell you?
 + The container exists, but it has stopped
