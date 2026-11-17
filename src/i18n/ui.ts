@@ -885,6 +885,8 @@ const TABLE = {
     themeDefault: ["theme default", "par défaut"],
     resetColours: ["Reset these colours", "Rétablir ces couleurs"],
     palettes: ["Palettes", "Palettes"],
+    texture: ["Background texture", "Texture de fond"],
+    textureHint: ["Drawn behind the page, never behind text boxes, and in your theme's colours. If one makes reading harder, pick None.", "Dessinée derrière la page, jamais derrière les blocs de texte, et dans les couleurs de votre thème. Si l'une d'elles gêne la lecture, choisissez Aucune."],
     surprise: ["Surprise me", "Surprenez-moi"],
     blendAnalogous: ["A new blend: neighbouring hues, calm and close.", "Un nouveau mélange : des teintes voisines, calmes et proches."],
     blendComplementary: ["A new blend: opposite hues, for the strongest contrast.", "Un nouveau mélange : des teintes opposées, pour le contraste le plus fort."],

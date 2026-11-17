@@ -27,11 +27,13 @@
     "test:coverage": "tsx scripts/coverage/audit.ts --check",
     "audit:tools": "tsx scripts/tools/index.ts",
     "test:tools": "tsx scripts/tools/index.ts --check",
-    "test": "pnpm test:shell && pnpm test:sim && pnpm test:missions && pnpm test:drills && pnpm test:prompt && pnpm test:workshop && pnpm test:pycode && pnpm tutor:index && pnpm test:tutor && pnpm test:content && pnpm test:i18n && pnpm test:coverage && pnpm test:tools && pnpm build && pnpm test:auth && pnpm test:metrics && pnpm test:appearance",
+    "test": "pnpm test:shell && pnpm test:sim && pnpm test:missions && pnpm test:drills && pnpm test:prompt && pnpm test:workshop && pnpm test:pycode && pnpm tutor:index && pnpm test:tutor && pnpm test:content && pnpm test:i18n && pnpm test:coverage && pnpm test:tools && pnpm test:textures && pnpm build && pnpm test:auth && pnpm test:metrics && pnpm test:appearance",
     "user:reset": "tsx scripts/reset-password.ts",
     "test:auth": "tsx scripts/check-auth.ts",
     "test:metrics": "tsx scripts/check-metrics.ts",
-    "test:appearance": "tsx scripts/check-appearance.ts"
+    "test:appearance": "tsx scripts/check-appearance.ts",
+    "textures": "tsx scripts/textures.ts",
+    "test:textures": "tsx scripts/textures.ts --check"
   },
   "dependencies": {
     "@codemirror/autocomplete": "6.20.4",
