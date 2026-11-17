@@ -58,6 +58,15 @@ CREATE TABLE IF NOT EXISTS page_stats (
   active_ms INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, path)
 ) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS user_pages (
+  user_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  path      TEXT NOT NULL,
+  views     INTEGER NOT NULL DEFAULT 0,
+  active_ms INTEGER NOT NULL DEFAULT 0,
+  last_at   INTEGER NOT NULL,
+  PRIMARY KEY (user_id, path)
+) WITHOUT ROWID;
+CREATE INDEX IF NOT EXISTS user_pages_recent ON user_pages(last_at);
 CREATE TABLE IF NOT EXISTS feedback (
   path       TEXT NOT NULL,
   visitor    TEXT NOT NULL,
