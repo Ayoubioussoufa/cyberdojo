@@ -31,6 +31,17 @@ Three commands teach you all the others, so learn these before anything else:
 
 You'll meet short names in other people's scripts. They're **aliases**: `ls` and `dir` both mean `Get-ChildItem`, `?` means `Where-Object` and `%` means `ForEach-Object`. `Get-Alias ls` tells you what one stands for. Attackers use aliases to make commands shorter and harder to search for, so learn to expand them in your head.
 
+### Two PowerShells
+
+You'll meet two programs with the same name. **Windows PowerShell 5.1** is built into every Windows machine and starts as `powershell.exe`. **PowerShell 7** is the newer, open-source version, installed separately, which starts as `pwsh` and also runs on Linux and macOS. They share almost all of the language, so what you learn here works in both. Ask the one you're in:
+
+```powershell
+$PSVersionTable.PSVersion
+$PSVersionTable.PSEdition
+```
+
+PowerShell 7 answers with a version such as `7.5.0` and the edition `Core`; Windows PowerShell answers `5.1` and `Desktop`. It matters for defence: attackers favour `powershell.exe` because it's always there, and logging settings must cover whichever editions your machines have. Older Windows versions also shipped PowerShell 2.0, which records almost nothing, and starting it was a classic way to slip past logging, so remove it wherever it still exists.
+
 ?? You've never seen `Restart-Service`. What can you tell from its name alone?
 + It restarts a service: verb, then noun
 - It reads a log file about services
@@ -88,6 +99,36 @@ Get-Command *event*
 Get-Process | Get-Member       # what properties does it have?
 ```
 
+### What an object looks like
+
+"Object" sounds abstract until you hold one. Put a process in a variable and ask it things:
+
+```powershell
+$p = Get-Process -Id $PID
+$p.Name
+$p.Id
+$p | Get-Member -MemberType Property
+```
+
+`$PID` is the ID of your own PowerShell, so `$p` is the shell you're typing in. `$p.Name` prints `pwsh` (or `powershell`), a plain value you can compare or sort. `Get-Member` lists everything the object holds:
+
+```
+   TypeName: System.Diagnostics.Process
+
+Name                MemberType Definition
+----                ---------- ----------
+BasePriority        Property   int BasePriority {get;}
+ExitCode            Property   int ExitCode {get;}
+HandleCount         Property   int HandleCount {get;}
+HasExited           Property   bool HasExited {get;}
+```
+
+Each line is one property, with its type: `int` is a whole number, `bool` true or false, `datetime` a date. Because `CPU` is stored as a number, `Where-Object CPU -gt 100` compares numbers, not text, which is what makes PowerShell pipelines so reliable.
+
+### Why output looks cut off
+
+When a pipeline ends, PowerShell picks a few columns that fit your window and shows those. The other properties aren't gone, only hidden. Add `| Format-List *` to see every property of each object, or `| Select-Object Name, Id, Path` to pick your own columns. When a value ends in `...`, the column was too narrow: `Format-List` shows it whole.
+
 ?? Why don't you need `awk` to pick a column in PowerShell?
 + The pipeline passes objects with named properties
 - PowerShell output is always a single column
@@ -100,6 +141,21 @@ Get-Process | Get-Member       # what properties does it have?
 PowerShell has an execution policy that limits running scripts. Microsoft is explicit: ["The execution policy isn't a security boundary, it's defense in depth."](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies) A user can bypass it with `-ExecutionPolicy Bypass`, or by pasting the script's contents.
 
 So don't rely on it. The controls that matter are logging, and [application control](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol).
+
+### When PowerShell says no
+
+PowerShell's errors are long, but the first line carries the meaning:
+
+| You see | It means | Do this |
+|---|---|---|
+| `The term 'Get-Proces' is not recognized as a name of a cmdlet, function, script file, or executable program.` | No command by that name, usually a typo | `Get-Command *proces*` to find the right name |
+| `A parameter cannot be found that matches parameter name 'Nme'.` | The command exists, the option doesn't | `Get-Help Get-Process` lists its parameters |
+| `The command triage.ps1 was not found, but does exist in the current location.` | PowerShell doesn't run scripts from the current folder by name alone | Type `.\triage.ps1`, as `./` in Bash |
+| `... cannot be loaded because running scripts is disabled on this system.` | The execution policy blocks scripts | For your own scripts, `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` |
+| `Access is denied` or `Requested registry access is not allowed.` | The command needs administrator rights | Open PowerShell with Run as administrator |
+| `No events were found that match the specified selection criteria.` | `Get-WinEvent` ran fine and found nothing | Widen the time range or check the event ID |
+
+The fourth line is the execution policy doing what it's for: stopping you from running a script by accident. As the paragraph above explains, it can't stop someone who means to.
 
 ?? Why isn't execution policy a real control?
 + Users can simply bypass it
