@@ -42,7 +42,7 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | TCP handshake and connection states | 14 mentions in 5 docs, most in 0018-tcp-udp-and-ports, practice 1. |  |
+| ● | ● | TCP handshake and connection states | 15 mentions in 5 docs, most in 0022-scanning-with-nmap, practice 1. |  |
 | ◐ | ● | TCP internals: sequence numbers, windows, retransmission, congestion | 2 mentions in 1 docs, most in 0018-tcp-udp-and-ports, practice 1. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ○ | ● | TCP attacks: SYN flood, SYN cookies, RST injection, hijacking | None. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | UDP amplification and reflection | 6 mentions in 3 docs, most in 0018-tcp-udp-and-ports. | [Denial of service](modules/01-networking/13-denial-of-service.md) |
@@ -107,9 +107,9 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Nmap (tool) | 71 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 3 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
-| ○ | ● | Scan timing, rate and how each looks to a defender | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ● | ● | Nmap (tool) | 76 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 8 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ○ | ● | Scan timing, rate and how each looks to a defender | 4 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Nmap Scripting Engine | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | masscan, RustScan, ZMap (tool) | None. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ◐ | ● | Service and OS fingerprinting | 10 mentions in 6 docs, most in 0038-hashes-and-symmetric-crypto, practice 3. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
