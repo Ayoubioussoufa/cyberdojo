@@ -135,6 +135,12 @@ small { font-size: 0.8em; }
 .prompt-input:focus-visible { outline: none; }
 .prompt-in { position: relative; max-width: 76rem; margin: 0 auto; padding: 0 20px; font-family: var(--mono); font-size: 13px; line-height: 1.4; color: var(--muted); }
 .prompt-line { display: flex; align-items: center; padding: 9px 0; cursor: text; }
+.hist { display: inline-flex; flex: none; gap: 2px; margin-right: 10px; }
+.hist-btn { display: inline-grid; place-items: center; width: 26px; height: 24px; padding: 0; border: 1px solid transparent; border-radius: var(--radius); background: none; color: var(--ink); cursor: pointer; }
+.hist-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hist-btn:hover:not(:disabled) { background: var(--surface); border-color: var(--rule); }
+.hist-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.hist-btn:disabled { color: var(--rule-strong); cursor: default; }
 .prompt-where { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .prompt-user { color: var(--ok); }
 .prompt-path a { color: var(--link); text-decoration: none; }
@@ -626,14 +632,23 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .stat-tiles .card { padding: 12px 14px; }
 .stat-tiles strong { display: block; font: 600 24px var(--body); }
 .stat-tiles span { font-family: var(--body); font-size: 13px; color: var(--muted); }
-.cal { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 13px); grid-auto-columns: 13px; gap: 3px; overflow-x: auto; padding-bottom: 4px; }
-.cal span, .cal-key i { display: inline-block; width: 13px; height: 13px; border-radius: 2px; }
+.cal-wrap { max-width: 100%; }
+.cal-total { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 10px; }
+.cal-total strong { font-weight: 600; }
+.cal-scroll { overflow-x: auto; padding: 10px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+/* Square cells that stretch to fill the width, down to 10px; below that the year scrolls sideways. */
+.cal-grid { display: grid; grid-template-columns: auto repeat(var(--weeks), minmax(10px, 1fr)); gap: 2px; min-width: calc(var(--weeks) * 12px + 28px); font-family: var(--body); }
+.cal-month { grid-row: 1; width: 0; overflow: visible; font-size: 12px; color: var(--muted); white-space: nowrap; line-height: 1; padding-bottom: 4px; }
+.cal-day { grid-column: 1; align-self: center; font-size: 11px; line-height: 1; color: var(--muted); padding-right: 6px; }
+.cal-cell { display: block; aspect-ratio: 1; border-radius: 2px; }
+.cal-key i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; }
+.cal-cell:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
 .cal-0 { background: var(--sunk); box-shadow: inset 0 0 0 1px var(--rule); }
 .cal-1 { background: color-mix(in srgb, var(--accent) 30%, var(--bg)); }
 .cal-2 { background: color-mix(in srgb, var(--accent) 55%, var(--bg)); }
 .cal-3 { background: color-mix(in srgb, var(--accent) 78%, var(--bg)); }
 .cal-4 { background: var(--accent); }
-.cal-legend { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.cal-legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 8px; }
 .cal-key { display: inline-flex; align-items: center; gap: 3px; }
 .cando-list { list-style: none; margin: 0; padding: 0; columns: 2 17rem; column-gap: 28px; font-size: 16px; }
 .cando-list li { break-inside: avoid; padding: 4px 0 4px 24px; position: relative; }
@@ -1052,10 +1067,14 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 
 /* ── home: the terminal is the hero; status reads like `systemctl status` ── */
 .hero-console { margin-bottom: 40px; }
-.hero-pane { border: 1px solid var(--rule-strong); border-radius: var(--radius); background: var(--term-bg); color: var(--term-ink); padding: 26px 28px 22px; margin-bottom: 22px; }
-.hero-pane h1 { font-size: clamp(26px, 4.4vw, 48px); font-stretch: 75%; line-height: 1.1; letter-spacing: -0.03em; color: #f1f4f7; margin: 0 0 22px; max-width: 22ch; }
-.hero-hash { color: var(--term-dim); }
-.hero-console .hero-term { padding: 16px 0 0; border-top: 1px dashed rgb(255 255 255 / 12%); border-radius: 0; background: none; font-size: 13.5px; }
+/* The home page's welcome pane: a terminal in the dark theme, a light sheet in the light one. */
+.hero-pane { --pane-bg: var(--term-bg); --pane-ink: var(--term-ink); --pane-title: #f1f4f7; --pane-dim: var(--term-dim); --pane-accent: var(--term-accent); --pane-rule: rgb(255 255 255 / 12%); border: 1px solid var(--rule-strong); border-radius: var(--radius); background: var(--pane-bg); color: var(--pane-ink); padding: 26px 28px 22px; margin-bottom: 22px; }
+:root[data-theme="light"] .hero-pane { --pane-bg: var(--surface); --pane-ink: var(--ink); --pane-title: var(--ink); --pane-dim: var(--muted); --pane-accent: var(--ok); --pane-rule: var(--rule-strong); }
+.hero-pane h1 { font-size: clamp(26px, 4.4vw, 48px); font-stretch: 75%; line-height: 1.1; letter-spacing: -0.03em; color: var(--pane-title); margin: 0 0 22px; max-width: 22ch; }
+.hero-hash { color: var(--pane-dim); }
+.hero-console .hero-term { padding: 16px 0 0; border-top: 1px dashed var(--pane-rule); border-radius: 0; background: none; color: var(--pane-ink); box-shadow: none; font-size: 13.5px; }
+.hero-console .hero-term .p { color: var(--pane-dim); }
+.hero-console .hero-term .g { color: var(--pane-accent); }
 .hero-console .lede { max-width: 40rem; }
 .status { border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; background: var(--surface); padding: 6px 20px 18px; }
 .status-h { font-size: 15px; font-stretch: 90%; margin: 12px 0 6px; color: var(--muted); font-weight: 600; }
@@ -1292,7 +1311,8 @@ code, kbd, pre, .term, .hero-term, .case-evidence, .build-line, .build-out, .spo
 .chat-list li button:hover, .chat-list li a:hover { background: var(--surface); }
 .chat-list li button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 .chat-list .muted { font-size: 14px; margin: 0; }
-.chat-settings { margin-top: auto; padding-top: 12px; font-size: 14px; }
+/* Help and settings sit together at the foot of the chat list, help first. */
+.chat-foot { display: grid; gap: 6px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 14px; }
 .chat-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .chat-head { display: flex; align-items: center; gap: 16px; padding: 10px 24px; border-bottom: 1px solid var(--rule); }
 .chat-head h1 { font-size: 18px; margin: 0 auto 0 0; }

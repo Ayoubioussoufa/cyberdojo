@@ -14,6 +14,7 @@ const WORDS = {
     reload: "Reload", find: "Search the course",
     updates: "Check for updates…", logs: "Open the logs folder", issue: "Report a problem", source: "Source code", about: "About CyberDojo",
     cut: "Cut", copy: "Copy", paste: "Paste", selectAll: "Select all", copyLink: "Copy link address", openLink: "Open link in your browser", askAbout: "Ask the tutor about this",
+    newWindow: "New window", closeWindow: "Close window", openInWindow: "Open in a new window",
   },
   fr: {
     file: "Fichier", go: "Aller", help: "Aide", view: "Affichage",
@@ -22,6 +23,7 @@ const WORDS = {
     reload: "Recharger", find: "Chercher dans le cours",
     updates: "Rechercher des mises à jour…", logs: "Ouvrir le dossier des journaux", issue: "Signaler un problème", source: "Code source", about: "À propos de CyberDojo",
     cut: "Couper", copy: "Copier", paste: "Coller", selectAll: "Tout sélectionner", copyLink: "Copier l'adresse du lien", openLink: "Ouvrir le lien dans votre navigateur", askAbout: "Demander au tuteur",
+    newWindow: "Nouvelle fenêtre", closeWindow: "Fermer la fenêtre", openInWindow: "Ouvrir dans une nouvelle fenêtre",
   },
 } as const;
 
@@ -32,6 +34,8 @@ export interface MenuActions {
   go: (path: string) => void;
   back: () => void;
   forward: () => void;
+  /** Another window, on the page of the one in front. */
+  newWindow: () => void;
   openData: () => void;
   openLogs: () => void;
   checkUpdates: () => void;
@@ -49,6 +53,9 @@ export function appMenu(lang: Lang, a: MenuActions): Menu {
     {
       label: w.file,
       submenu: [
+        { label: w.newWindow, accelerator: "CmdOrCtrl+N", click: a.newWindow },
+        { role: "close", label: w.closeWindow, accelerator: "CmdOrCtrl+W" },
+        { type: "separator" },
         { label: w.tutor, accelerator: "CmdOrCtrl+T", click: () => a.go("/tutor/") },
         { label: w.setup, click: () => a.go("/tutor/setup/") },
         { type: "separator" },
@@ -104,8 +111,15 @@ export function appMenu(lang: Lang, a: MenuActions): Menu {
   return Menu.buildFromTemplate(template);
 }
 
+export interface ContextActions {
+  ask: (text: string) => void;
+  /** Opens one of the course's own links in another app window. */
+  openInWindow: (url: string) => void;
+  newWindow: () => void;
+}
+
 /** What a right-click offers: edit actions in a text box, copy for a selection, link actions, and asking the tutor. */
-export function contextMenu(win: BrowserWindow, p: ContextMenuParams, lang: Lang, ask: (text: string) => void): Menu | null {
+export function contextMenu(win: BrowserWindow, p: ContextMenuParams, lang: Lang, a: ContextActions): Menu | null {
   const w = words(lang);
   const items: MenuItemConstructorOptions[] = [];
   const selection = p.selectionText.trim();
@@ -113,16 +127,24 @@ export function contextMenu(win: BrowserWindow, p: ContextMenuParams, lang: Lang
     items.push({ role: "cut", label: w.cut, enabled: p.editFlags.canCut }, { role: "copy", label: w.copy, enabled: p.editFlags.canCopy }, { role: "paste", label: w.paste, enabled: p.editFlags.canPaste }, { type: "separator" }, { role: "selectAll", label: w.selectAll });
   } else if (selection) {
     items.push({ role: "copy", label: w.copy });
-    items.push({ label: w.askAbout, click: () => ask(selection.slice(0, 2000)) });
+    items.push({ label: w.askAbout, click: () => a.ask(selection.slice(0, 2000)) });
   }
   if (p.linkURL && /^https?:/i.test(p.linkURL)) {
     if (items.length) items.push({ type: "separator" });
+    const own = p.linkURL.startsWith(`${new URL(win.webContents.getURL()).origin}/`);
+    if (own) items.push({ label: w.openInWindow, click: () => a.openInWindow(p.linkURL) });
     items.push({ label: w.copyLink, click: () => clipboard.writeText(p.linkURL) });
-    if (!p.linkURL.startsWith(new URL(win.webContents.getURL()).origin)) items.push({ label: w.openLink, click: () => void shell.openExternal(p.linkURL) });
+    if (!own) items.push({ label: w.openLink, click: () => void shell.openExternal(p.linkURL) });
   }
   if (!items.length) {
     const nav = win.webContents.navigationHistory;
-    items.push({ label: w.back, enabled: nav.canGoBack(), click: () => nav.goBack() }, { label: w.forward, enabled: nav.canGoForward(), click: () => nav.goForward() }, { type: "separator" }, { role: "reload", label: w.reload });
+    items.push(
+      { label: w.back, enabled: nav.canGoBack(), click: () => nav.goBack() },
+      { label: w.forward, enabled: nav.canGoForward(), click: () => nav.goForward() },
+      { type: "separator" },
+      { label: w.newWindow, click: a.newWindow },
+      { role: "reload", label: w.reload },
+    );
   }
   return Menu.buildFromTemplate(items);
 }

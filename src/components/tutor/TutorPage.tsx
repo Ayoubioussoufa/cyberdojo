@@ -103,8 +103,10 @@ export function TutorPage() {
             </ul>
           </>
         )}
-        <Link href="/guides/s5-working-with-your-tutor/" className="chat-settings">{t.tutor.howToAsk}</Link>
-        <Link href="/tutor/setup/" className="chat-settings">{t.tutor.setupLink}</Link>
+        <nav className="chat-foot" aria-label={t.tutor.setupLink}>
+          <Link href="/guides/s5-working-with-your-tutor/">{t.tutor.howToAsk}</Link>
+          <Link href="/tutor/setup/">{t.tutor.setupLink}</Link>
+        </nav>
       </aside>
 
       <section className="chat-main" aria-label={t.tutor.chatTitle}>
