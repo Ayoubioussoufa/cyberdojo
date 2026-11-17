@@ -886,6 +886,8 @@ const TABLE = {
     resetAll: ["Reset everything", "Tout rétablir"],
     saving: ["Saving…", "Enregistrement…"],
     saved: ["Saved to your account.", "Enregistré dans votre compte."],
+    savedApp: ["Saved on this computer.", "Enregistré sur cet ordinateur."],
+    textApp: ["Choose the fonts and the background colours you read best with. Changes apply at once and are kept on this computer.", "Choisissez les polices et les couleurs de fond avec lesquelles vous lisez le mieux. Les changements s'appliquent tout de suite et sont gardés sur cet ordinateur."],
     offline: ["Not saved: you seem to be offline. This browser keeps your choice for now.", "Non enregistré : vous semblez hors ligne. Ce navigateur garde votre choix pour l'instant."],
     tooLow: ["Text wouldn't be readable on that colour, so it wasn't applied. Pick a darker or lighter one.", "Le texte ne serait pas lisible sur cette couleur : elle n'a pas été appliquée. Choisissez-en une plus sombre ou plus claire."],
     guest: ["Sign in to keep these choices on every device.", "Connectez-vous pour garder ces choix sur tous vos appareils."],
@@ -901,7 +903,6 @@ const TABLE = {
     allPassed: ["All {n} test passes — nicely done!|All {n} tests pass — nicely done!", "Le {n} test passe — bien joué !|Les {n} tests passent — bien joué !"],
     yourError: ["Your code didn't run:", "Votre code ne s'est pas exécuté :"],
     loadError: ["Couldn't load the Python runner. Check your connection and try again.", "Impossible de charger l'exécuteur Python. Vérifiez votre connexion et réessayez."],
-    desktopNote: ["Code challenges run in the browser version for now — open this page on the website to try it.", "Les défis de code s'exécutent dans la version web pour l'instant — ouvrez cette page sur le site pour l'essayer."],
   },
   doc: {
     defineHolder: ["One sentence, no looking", "Une phrase, sans regarder"],

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/i18n/LangProvider";
 import { say } from "@/i18n/ui";
 import { useAccount } from "@/lib/account";
+import { DESKTOP } from "@/lib/desktop";
 import {
   applyPrefs,
   CODE_FONTS,
@@ -80,6 +81,8 @@ export function AppearanceSettings() {
   useEffect(() => {
     setPrefs(readLocal() ?? DEFAULT_PREFS);
     setTheme(themeNow());
+    // The app's View > Appearance menu opens /account/#appear-h; this section draws after the page loads, so scroll here once it exists.
+    if (window.location.hash === "#appear-h") requestAnimationFrame(() => document.getElementById("appear-h")?.scrollIntoView({ block: "start" }));
     // The theme button changes data-theme: follow it, so the pickers edit the theme on screen.
     const watch = new MutationObserver(() => setTheme(themeNow()));
     watch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -130,7 +133,7 @@ export function AppearanceSettings() {
   return (
     <section className="acct-part" aria-labelledby="appear-h">
       <h2 id="appear-h">{A.title}</h2>
-      <p className="muted">{A.text}</p>
+      <p className="muted">{DESKTOP ? A.textApp : A.text}</p>
 
       <fieldset className="appear-group">
         <legend>{A.font}</legend>
@@ -170,7 +173,7 @@ export function AppearanceSettings() {
       </fieldset>
 
       {problem && <p className="auth-error" role="alert">{problem}</p>}
-      {user && status !== "idle" && !problem && <p className="acct-sync" data-state={status === "saving" ? "saving" : "saved"}>{status === "saving" ? A.saving : A.saved}</p>}
+      {user && status !== "idle" && !problem && <p className="acct-sync" data-state={status === "saving" ? "saving" : "saved"}>{status === "saving" ? A.saving : DESKTOP ? A.savedApp : A.saved}</p>}
       {!user && <p className="muted">{A.guest}</p>}
     </section>
   );
