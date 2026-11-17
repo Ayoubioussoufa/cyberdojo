@@ -115,7 +115,7 @@ export default async function Page({ params }: LangParams) {
       </div>
 
       <h2 className="section-title">{L.platforms}</h2>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0}>
         <table className="labs-platforms">
           <thead><tr><th>{L.platform}</th><th>{L.what}</th><th>{L.cost}</th><th>{L.count}</th></tr></thead>
           <tbody>

@@ -88,7 +88,7 @@ function Calendar({ days }: { days: Record<string, number> }) {
   return (
     <div className="cal-wrap">
       <p className="cal-total"><strong>{fill(P.inYear, { things: plural(lang, P.things, total) })}</strong> <span className="meta">{fill(P.calLegend, { n: active, weeks })}</span></p>
-      <div className="cal-scroll" ref={scroller}>
+      <div className="cal-scroll" ref={scroller} tabIndex={0}>
         <div className="cal-grid" style={{ "--weeks": weeks } as React.CSSProperties} role="img" aria-label={fill(P.calLabel, { n: active, weeks })}>
           {labels.map((l) => <span key={l.col} className="cal-month" style={{ gridColumn: l.col + 2 }} aria-hidden="true">{l.name}</span>)}
           {[0, 2, 4].map((d) => <span key={d} className="cal-day" style={{ gridRow: d + 2 }} aria-hidden="true">{dayName(d)}</span>)}

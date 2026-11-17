@@ -88,6 +88,8 @@ function shuffled<T>(items: T[], seed: number): T[] {
 function makeMarked(toc: TocEntry[]) {
   const seen = new Map<string, number>();
   const m = new Marked({ gfm: true });
+  // Plain code blocks can take keyboard focus too, like the coloured ones, so a long line can be scrolled without a mouse.
+  m.use({ hooks: { postprocess: (html: string) => html.replace(/<pre>/g, '<pre tabindex="0">') } });
   m.use({
     renderer: {
       // Coloured when the language is known or the block is clearly commands; false keeps marked's plain block.
@@ -117,7 +119,7 @@ function makeMarked(toc: TocEntry[]) {
         const cell = (c: (typeof token.header)[number], tag: string) => `<${tag}>${this.parser.parseInline(c.tokens)}</${tag}>`;
         const head = token.header.map((c) => cell(c, "th")).join("");
         const body = token.rows.map((r) => `<tr>${r.map((c) => cell(c, "td")).join("")}</tr>`).join("");
-        return `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>\n`;
+        return `<div class="table-wrap" tabindex="0"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>\n`;
       },
     },
   });

@@ -28,7 +28,7 @@ export default async function Page({ params }: LangParams) {
 
       <section>
         <h2><span className="tour-n">2</span> What each part is for</h2>
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0}>
           <table>
             <thead><tr><th>Part</th><th>What it is</th><th>When you use it</th></tr></thead>
             <tbody>
@@ -108,7 +108,7 @@ function French() {
 
       <section>
         <h2><span className="tour-n">2</span> À quoi sert chaque partie</h2>
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0}>
           <table>
             <thead><tr><th>Partie</th><th>Ce que c&apos;est</th><th>Quand l&apos;utiliser</th></tr></thead>
             <tbody>

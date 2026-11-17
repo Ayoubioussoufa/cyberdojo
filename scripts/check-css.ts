@@ -47,5 +47,17 @@ for (const file of FILES) {
     bad++;
   }
 }
-console.log(bad ? `${bad} stylesheet problem(s)` : `✓ css: ${FILES.length} stylesheets parse, every block closed`);
+// The type scale: every fixed font size in the site's stylesheet is one of these steps
+// (clamp(), em and rem sizes are relative, so they're free). Nothing below 12 px.
+const SCALE = [12, 13, 14, 15, 16, 17, 19, 22, 24, 26, 30, 34, 40];
+const site = fs.readFileSync("src/app/globals.css", "utf8");
+for (const m of site.matchAll(/(?:font-size:\s*|font:\s*(?:[1-9]00\s+)?)([\d.]+)px/g)) {
+  const px = Number(m[1]);
+  if (!SCALE.includes(px)) {
+    const line = site.slice(0, m.index).split("\n").length;
+    console.log(`✗ src/app/globals.css:${line}: font size ${px}px is off the type scale (${SCALE.join(", ")})`);
+    bad++;
+  }
+}
+console.log(bad ? `${bad} stylesheet problem(s)` : `✓ css: ${FILES.length} stylesheets parse, every block closed, every font size on the scale`);
 process.exit(bad ? 1 : 0);
