@@ -124,7 +124,7 @@ function grass() {
 
 function impressionist() {
   const r = rng(9);
-  const hues = ["%e07a5f", "%f2cc8f", "%81b29a", "%3d85c6", "%9c89b8", "%f4a261", "%2a9d8f", "%e9c46a"].map((h) => h.replace("%", "#"));
+  const hues = ["#e07a5f", "#f2cc8f", "#81b29a", "#3d85c6", "#9c89b8", "#f4a261", "#2a9d8f", "#e9c46a"];
   const groups = new Map<string, string>();
   for (let i = 0; i < 220; i++) {
     const x = r() * 500, y = r() * 500, len = 10 + r() * 22, a = r() * Math.PI;
