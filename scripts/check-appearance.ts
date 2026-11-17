@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { APPEARANCE_SCRIPT, cleanPrefs, contrast, cssVars, DEFAULT_PREFS, inkOn, PALETTES, randomPalette, THEME_DEFAULTS, THEME_TEXT, unreadable, type Prefs } from "../src/lib/appearance";
+import { APPEARANCE_SCRIPT, cleanPrefs, contrast, cssVars, DEFAULT_PREFS, inkOn, PALETTES, randomPalette, TEXTURE_CSS, TEXTURES, THEME_DEFAULTS, THEME_TEXT, unreadable, type Prefs } from "../src/lib/appearance";
 
 const PORT = 3104;
 const BASE = `http://localhost:${PORT}`;
@@ -54,6 +54,17 @@ function unit() {
   ok(vars["--u-accent-dark"] === "#3fb950" && vars["--u-accent-ink-dark"] === "#111111" && /^#[0-9a-f]{6}$/.test(vars["--u-accent-soft-dark"] ?? "") && contrast(vars["--u-accent-dark"] as string, vars["--u-accent-soft-dark"] as string) >= 3, "an accent sets its own ink and soft tint, all checked hex", vars);
   ok(Object.keys(cssVars(DEFAULT_PREFS)).length === 0, "the defaults set no variables");
   ok(why({ dark: { bg: "#3a4a2a", accent: "#3fb950" } }) === "contrast", "colours are judged together: a background that makes the accent vanish is refused");
+  // Textures: chosen by id from the list, drawn only by the site's own stylesheet.
+  ok(why({ texture: "blueprint-grid" }) === "accepted" && why({ texture: "url(https://evil.example)" }) === "bad" && why({ texture: 3 }) === "bad", "a texture is accepted only from the list");
+  const tex = fs.readFileSync(`public${TEXTURE_CSS}`, "utf8");
+  ok(TEXTURES.filter((t) => t.id !== "none").every((t) => tex.includes(`:root[data-texture="${t.id}"] body::before`) && tex.includes(`.tex-swatch[data-tex="${t.id}"]::before`)), "every texture has its rules in the stylesheet");
+  // CSS-level url() calls only; url(%23n) inside an inline SVG points at that SVG's own filter.
+  const urls = [...tex.matchAll(/url\((?!%23)([^)]{0,30})/g)].map((m) => m[1] as string);
+  ok(urls.length > 0 && urls.every((u) => u.startsWith('"data:image/svg+xml,')), "the texture stylesheet loads nothing from elsewhere: every url() is an inline SVG", urls.filter((u) => !u.startsWith('"data:')));
+  ok(!/https?:\/\/(?!www\.w3\.org\/2000\/svg)/.test(tex) && !/@import|expression\(|javascript:/i.test(tex), "no outside address, import or script in the texture stylesheet");
+  ok(tex.length < 80_000, `the texture stylesheet stays small (${(tex.length / 1024).toFixed(1)} KB)`);
+  ok(APPEARANCE_SCRIPT.includes(JSON.stringify(TEXTURE_CSS)) && APPEARANCE_SCRIPT.includes('"thermal-gradient"'), "the pre-paint script knows the texture list and its stylesheet");
+
   // Palettes: the fixed ones and the random blends must all pass the same checks.
   ok(PALETTES.every((p) => !unreadable("dark", p.dark) && !unreadable("light", p.light) && "prefs" in cleanPrefs({ dark: p.dark, light: p.light })), "every fixed palette passes the checks in both themes", PALETTES.filter((p) => unreadable("dark", p.dark) || unreadable("light", p.light)).map((p) => p.id));
   const blends = (["dark", "light"] as const).flatMap((t) => Array.from({ length: 300 }, () => ({ t, c: randomPalette(t) })));
@@ -92,7 +103,7 @@ async function http() {
     }
     ok(up, "server starts");
     if (!up) return;
-    const prefs = { font: "lexend", code: "jetbrains", dark: { bg: "#0b1016", surface: null, accent: "#3fb950" }, light: { bg: null, surface: "#ffffff", accent: null } };
+    const prefs = { font: "lexend", code: "jetbrains", texture: "blueprint-grid", dark: { bg: "#0b1016", surface: null, accent: "#3fb950" }, light: { bg: null, surface: "#ffffff", accent: null } };
     ok((await call("GET", "/api/prefs/")).status === 401, "a stranger can't read settings");
     ok((await call("PUT", "/api/prefs/", { prefs })).status === 401, "a stranger can't save settings");
     const pw = "river tiger lamp 42";

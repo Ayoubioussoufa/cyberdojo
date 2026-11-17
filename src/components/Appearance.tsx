@@ -12,6 +12,8 @@ import {
   DEFAULT_PREFS,
   FONTS,
   isDefault,
+  loadTextures,
+  TEXTURES,
   PALETTES,
   randomPalette,
   readLocal,
@@ -92,6 +94,8 @@ export function AppearanceSettings() {
   useEffect(() => {
     setPrefs(readLocal() ?? DEFAULT_PREFS);
     setTheme(themeNow());
+    // The previews below are drawn by the texture stylesheet, so it loads with this section.
+    loadTextures();
     // The app's View > Appearance menu opens /account/#appear-h; this section draws after the page loads, so scroll here once it exists.
     if (window.location.hash === "#appear-h") requestAnimationFrame(() => document.getElementById("appear-h")?.scrollIntoView({ block: "start" }));
     // The theme button changes data-theme: follow it, so the pickers edit the theme on screen.
@@ -174,6 +178,19 @@ export function AppearanceSettings() {
               <input type="radio" name="appear-code" checked={prefs.code === f.id} onChange={() => update({ ...prefs, code: f.id })} />
               <span style={{ fontFamily: f.stack }}>{f.label}</span>
             </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="appear-group">
+        <legend>{A.texture}</legend>
+        <p className="muted appear-hint">{A.textureHint}</p>
+        <div className="tex-grid">
+          {TEXTURES.map((tex) => (
+            <button key={tex.id} type="button" className="tex-option" aria-pressed={prefs.texture === tex.id} onClick={() => update({ ...prefs, texture: tex.id })}>
+              <span className="tex-swatch" data-tex={tex.id} aria-hidden="true" />
+              <span>{tex.name[lang === "fr" ? 1 : 0]}</span>
+            </button>
           ))}
         </div>
       </fieldset>
