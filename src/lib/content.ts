@@ -703,7 +703,7 @@ export function moduleContext(doc: Doc, lang: Lang = "en"): Segment {
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /** Tools named after ordinary words, which would link from every page that says "dig deeper". */
-const PLAIN_WORDS = new Set(["dig", "strings", "ping", "curl", "whois", "ssh", "sudo", "find", "age", "pass", "volatility", "autopsy", "responder", "sigma", "empire", "sliver", "tor", "reg", "net"]);
+const PLAIN_WORDS = new Set(["dig", "host", "ip", "last", "file", "dd", "strings", "ping", "curl", "whois", "ssh", "sudo", "find", "age", "pass", "volatility", "autopsy", "responder", "sigma", "empire", "sliver", "tor", "reg", "net"]);
 const toolRe = new Map<string, RegExp | null>();
 /** Finds a tool's names in text, exact case. Only letters and digits count as a word edge, so `nc` won't match `sync`. */
 function toolPattern(d: Doc): RegExp | null {
