@@ -56,7 +56,8 @@ const MODULES = path.join(process.cwd(), "modules");
 const TOOL_PAGES = path.join(process.cwd(), "tools");
 const FRENCH = path.join(process.cwd(), "content", "fr");
 
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+/** Safe in text and inside a quoted attribute: several callers put the result in href="…" or aria-label="…". */
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
 /** Marked escapes headings; the table of contents needs plain text. */
 const decode = (s: string) =>
