@@ -267,7 +267,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ◐* | ● | RSA | 2 mentions in 1 docs, most in 0039-public-keys-and-tls. *A glossary line and 'Two keys' in lesson 39. The mathematics isn't taught.* | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ○ | ● | RSA padding and attacks: OAEP, Bleichenbacher | None. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
 | ●* | ● | Diffie-Hellman and forward secrecy | 4 mentions in 1 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Key exchange'.* | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
-| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 8 mentions in 4 docs, most in 0025-hardening-linux, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
+| ◐ | ● | Elliptic curves: ECDH, ECDSA, Ed25519 | 10 mentions in 5 docs, most in 0025-hardening-linux, practice 2. | [Diffie-Hellman and elliptic curves](modules/03-cryptography/06-diffie-hellman-and-elliptic-curves.md) |
 | ○ | ● | Nonce misuse | 1 mentions in 1 docs, most in 0038-hashes-and-symmetric-crypto. | [Block ciphers and modes](modules/03-cryptography/03-block-ciphers-and-modes.md) |
 | ●* | ● | Digital signatures | 5 mentions in 3 docs, most in 0039-public-keys-and-tls. *Lesson 39, 'Digital signatures'.* |  |
 
@@ -305,7 +305,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 | ○ | ● | End-to-end encryption, Signal protocol | None. | [The crypto frontier](modules/03-cryptography/12-modern-crypto-frontier.md) |
 | ○ | ● | Zero knowledge, MPC, homomorphic encryption | None. | [The crypto frontier](modules/03-cryptography/12-modern-crypto-frontier.md) |
 | ○ | ● | openssl (tool) | 11 mentions in 1 docs, most in 0039-public-keys-and-tls. | [RSA in depth](modules/03-cryptography/05-rsa-in-depth.md) |
-| ◐ | ● | GnuPG, age (tool) | 11 mentions in 2 docs, most in P06. | [Key management](modules/03-cryptography/11-key-management.md) |
+| ◐ | ● | GnuPG, age (tool) | 12 mentions in 3 docs, most in P06. | [Key management](modules/03-cryptography/11-key-management.md) |
 | ◐ | ◐ | CyberChef (tool) | 12 mentions in 5 docs, most in P02. |  |
 
 ## 04 Web security
@@ -510,7 +510,7 @@ Basis: Brief 6, CyBOK Malware & Attack Technologies, ATT&CK Stealth and Defense 
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Safe lab design for malware | 66 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
+| ● | ● | Safe lab design for malware | 68 mentions in 23 docs, most in 0012-build-your-lab, practice 1. | [Network and cloud forensics](modules/08-blue-team/08-network-and-cloud-forensics.md) |
 | ●* | ● | Static triage: hashes, strings, imports, entropy | 15 mentions in 3 docs, most in 0067-safe-malware-triage, practice 4. *Lesson 67, 'Static triage'.* | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
 | ◐ | ● | Packers and unpacking | 11 mentions in 5 docs, most in 0067-safe-malware-triage. | [Static reverse engineering](modules/05-binary/07-static-reverse-engineering.md) |
 | ● | ● | Dynamic analysis and sandboxes | 15 mentions in 5 docs, most in 0067-safe-malware-triage, practice 3. | [Malware analysis in depth](modules/06-malware-edr/04-malware-analysis-in-depth.md) |
@@ -874,7 +874,7 @@ Basis: Added: CyBOK Secure Software Lifecycle, OWASP A03:2025.
 | ● | ● | Signing: Sigstore, cosign | 20 mentions in 2 docs, most in P14. | [SLSA, SSDF and maturity models](modules/13-supply-chain/03-slsa-and-maturity.md) |
 | ●* | ● | Syft, OSV-Scanner, dependabot (tool) | 7 mentions in 2 docs, most in P14. *Syft is walked through in P14.* | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 | ◐ | ● | CI/CD attacks: poisoned pipelines, runner abuse | 7 mentions in 5 docs, most in 0069-supply-chain-and-pipelines. | [CI/CD pipeline security](modules/13-supply-chain/02-cicd-attacks.md) |
-| ●* | ● | Secrets scanning | 26 mentions in 8 docs, most in P03, practice 4. *Walked through in project P03.* | [Key management](modules/03-cryptography/11-key-management.md) |
+| ●* | ● | Secrets scanning | 27 mentions in 8 docs, most in P03, practice 4. *Walked through in project P03.* | [Key management](modules/03-cryptography/11-key-management.md) |
 | ◐ | ● | Case studies: SolarWinds, xz, log4j | 5 mentions in 2 docs, most in 0069-supply-chain-and-pipelines. | [Dependency risk](modules/13-supply-chain/01-dependency-attacks.md) |
 
 ## 14 AI and machine-learning security
