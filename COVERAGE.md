@@ -19,7 +19,7 @@ Basis: Brief 1, CyBOK Network Security.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ●* | ● | OSI and TCP/IP layering, encapsulation | 11 mentions in 3 docs, most in 0017-ethernet-arp-layers, practice 1. *Lesson 17, 'Layers: envelopes inside envelopes'.* |  |
-| ● | ● | Ethernet frames and switching | 26 mentions in 5 docs, most in 0017-ethernet-arp-layers, practice 3. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
+| ● | ● | Ethernet frames and switching | 27 mentions in 5 docs, most in 0017-ethernet-arp-layers, practice 3. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ● | ● | ARP mechanics | 19 mentions in 4 docs, most in 0017-ethernet-arp-layers, practice 2. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ● | ● | ARP spoofing and on-path attacks | 7 mentions in 3 docs, most in 0017-ethernet-arp-layers. | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
 | ◐* | ● | VLANs and 802.1Q trunking | 3 mentions in 1 docs, most in 0017-ethernet-arp-layers. *Lesson 17 has a VLANs section, with no tagging or trunk mechanics.* | [Layer 2 attacks and switch defences](modules/01-networking/04-layer-2-attacks.md) |
@@ -84,7 +84,7 @@ Basis: Brief 1, CyBOK Network Security.
 |---|---|---|---|---|
 | ○ | ● | netcat (nc, ncat) (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ● | socat (tool) | None. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
-| ● | ● | curl (tool) | 43 mentions in 16 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
+| ● | ● | curl (tool) | 46 mentions in 16 docs, most in 0035-how-the-web-works, practice 168. | [Netcat and socat](modules/01-networking/01-netcat-and-socat.md) |
 | ○ | ◐ | openssl s_client (tool) | 3 mentions in 1 docs, most in 0039-public-keys-and-tls. *Used in tools and exercises, not taught as a tool.* | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ◐ | ● | ss, netstat, lsof (tool) | 9 mentions in 6 docs, most in 0018-tcp-udp-and-ports. | [TCP internals and attacks](modules/01-networking/03-tcp-internals.md) |
 | ◐ | ● | ip, ifconfig, route tables (tool) | 5 mentions in 3 docs, most in 0012-build-your-lab. | [The IP layer and ICMP](modules/01-networking/02-ip-layer-and-icmp.md) |
@@ -94,11 +94,11 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ◐ | ● | tcpdump (tool) | 11 mentions in 4 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ○ | ● | BPF capture filters | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ● | ● | Wireshark (tool) | 37 mentions in 8 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ●* | ● | Display filters and following streams | 11 mentions in 3 docs, most in 0020-reading-packets. *Lesson 20, 'Reading Wireshark'.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
-| ○ | ● | tshark (tool) | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ◐ | ● | tcpdump (tool) | 17 mentions in 4 docs, most in 0020-reading-packets. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ○ | ● | BPF capture filters | 6 mentions in 1 docs, most in 0020-reading-packets. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ● | ● | Wireshark (tool) | 44 mentions in 8 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ●* | ● | Display filters and following streams | 17 mentions in 3 docs, most in 0020-reading-packets. *Lesson 20, 'Reading Wireshark'.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
+| ○ | ● | tshark (tool) | 1 mentions in 1 docs, most in 0020-reading-packets. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | Decrypting TLS in a capture | None. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | Encrypted traffic analysis, JA3/JA4 | 1 mentions in 1 docs, most in P02. | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
 | ○ | ● | NetFlow and connection metadata | None. *Flow records section, and retention design.* | [Packet analysis in depth](modules/01-networking/06-packet-analysis-in-depth.md) |
@@ -284,7 +284,7 @@ Basis: Brief 3, CyBOK Cryptography and Applied Cryptography.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | TLS 1.3 handshake | 11 mentions in 3 docs, most in 0039-public-keys-and-tls. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
+| ● | ● | TLS 1.3 handshake | 12 mentions in 4 docs, most in 0039-public-keys-and-tls. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Key schedule and HKDF | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | History of TLS attacks | None. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
 | ○ | ● | Downgrade attacks | 1 mentions in 1 docs, most in 0056-how-a-pentest-works. | [TLS internals](modules/03-cryptography/08-tls-internals.md) |
