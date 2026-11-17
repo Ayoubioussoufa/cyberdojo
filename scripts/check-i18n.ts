@@ -74,6 +74,8 @@ for (const f of MESSAGE_FILES) {
     ...src.matchAll(/\?\? "([A-Z][^"]+[.?])"/g),
     ...src.matchAll(/const WRONG = "([^"]+)"/g),
     ...src.matchAll(/new (?:Runtime|Ollama|Tutor)Error\("([^"]+)"\)/g),
+    // A route's table of refusal messages, such as PROBLEMS in /api/prefs.
+    ...[...src.matchAll(/const PROBLEMS[^=]*= \{([\s\S]*?)\n\};/g)].flatMap((b) => [...(b[1] as string).matchAll(/: "([^"]+)"/g)]),
   ].map((m) => m[1] as string);
   for (const m of found) {
     messages++;

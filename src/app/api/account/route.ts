@@ -4,7 +4,7 @@ import { fail, limited, note, sameOrigin, smallJson, text } from "@/server/http"
 import { verifyPassword } from "@/server/password";
 import { currentUser, endSession } from "@/server/session";
 
-/** Deletes the account with its sessions, progress and per-page times. Its visits stay as anonymous counts. */
+/** Deletes the account with its sessions, progress, settings and per-page times. Its visits stay as anonymous counts. */
 export async function DELETE(req: Request) {
   if (!sameOrigin(req)) return fail(403, "This request came from another site.");
   const user = await currentUser();
@@ -25,6 +25,7 @@ export async function DELETE(req: Request) {
     ["DELETE FROM progress WHERE user_id = ?", user.id],
     ["UPDATE visits SET user_id = NULL WHERE user_id = ?", user.id],
     ["DELETE FROM user_pages WHERE user_id = ?", user.id],
+    ["DELETE FROM user_prefs WHERE user_id = ?", user.id],
     ["UPDATE feedback SET user_id = NULL WHERE user_id = ?", user.id],
     ["DELETE FROM users WHERE id = ?", user.id],
   ]);

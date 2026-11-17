@@ -5,8 +5,9 @@
    text face for long reading. One signature: the shell prompt under the header,
    which is also the breadcrumb. Flat panels, small radii, no decorative shadows. */
 :root, :root[data-theme="dark"] {
-  --bg: #10171f;
-  --surface: #151e28;
+  /* --u-*: backgrounds a learner chose on the account page (src/lib/appearance.ts), set only as checked #rrggbb. */
+  --bg: var(--u-bg-dark, #10171f);
+  --surface: var(--u-surface-dark, #151e28);
   --sunk: #0c1218;
   --ink: #e3e8ee;
   --muted: #97a4b3;
@@ -45,8 +46,8 @@
   color-scheme: dark;
 }
 :root[data-theme="light"] {
-  --bg: #eef1f4;
-  --surface: #fbfcfd;
+  --bg: var(--u-bg-light, #eef1f4);
+  --surface: var(--u-surface-light, #fbfcfd);
   --sunk: #e2e7ec;
   --ink: #121a23;
   --muted: #4b5968;
@@ -71,6 +72,16 @@
   --overlay: 0 18px 48px -18px rgb(18 26 35 / 40%);
   color-scheme: light;
 }
+
+/* Reading and code fonts chosen on the account page: fixed stacks keyed by an id, never a typed name. */
+:root[data-font="inter"] { --body: "Inter Variable", "Segoe UI", system-ui, sans-serif; }
+:root[data-font="lexend"] { --body: "Lexend Variable", "Segoe UI", system-ui, sans-serif; }
+:root[data-font="opendyslexic"] { --body: "OpenDyslexic", "Segoe UI", system-ui, sans-serif; }
+:root[data-font="serif"] { --body: "Source Serif 4 Variable", Georgia, "Times New Roman", serif; }
+:root[data-font="system"] { --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+:root[data-code-font="jetbrains"] { --mono: "JetBrains Mono Variable", ui-monospace, Menlo, Consolas, monospace; }
+:root[data-code-font="fira"] { --mono: "Fira Code Variable", ui-monospace, Menlo, Consolas, monospace; }
+:root[data-code-font="system"] { --mono: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; }
 
 *, *::before, *::after { box-sizing: border-box; }
 /* --stick: how much of the top the sticky bars cover. The nav alone is 52px; on a computer the prompt sticks under it. */
@@ -873,6 +884,17 @@ div.term { height: 320px; overflow-y: auto; padding: 12px 14px; font-family: var
 .acct-part .auth-form { max-width: 24rem; }
 .acct-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .acct-sync { font-size: 15px; margin: 0 0 12px; }
+.appear-group { border: 0; padding: 0; margin: 18px 0 0; min-width: 0; }
+.appear-group legend { font-weight: 650; font-size: 16px; margin-bottom: 8px; padding: 0; }
+.appear-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.appear-choice { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); cursor: pointer; font-size: 16px; }
+.appear-choice:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.appear-choice input { accent-color: var(--accent); margin: 0; }
+.appear-hint { font-size: 14.5px; margin: 0 0 10px; max-width: var(--read); }
+.appear-colours { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+.appear-colour { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; }
+.appear-colour input[type="color"] { width: 44px; height: 32px; padding: 2px; border: 1px solid var(--rule-strong); border-radius: var(--radius); background: var(--surface); cursor: pointer; }
+.appear-colour code { font-size: 13px; color: var(--muted); }
 .acct-sync::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--ok); }
 .acct-sync[data-state="saving"]::before { background: var(--warn); }
 .acct-sync[data-state="offline"]::before { background: var(--bad); }
