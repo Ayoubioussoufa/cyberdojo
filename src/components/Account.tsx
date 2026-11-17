@@ -8,6 +8,7 @@ import { fill, plural, useLang } from "@/i18n/LangProvider";
 import { DESKTOP } from "@/lib/desktop";
 import { exportStore } from "@/lib/progress";
 import { browserRefuses, countingOff, setCounting } from "@/lib/track";
+import { AppearanceSettings } from "@/components/Appearance";
 
 import { say } from "@/i18n/ui";
 
@@ -145,6 +146,7 @@ export function Account() {
         </div>
         {error && <p className="auth-error" role="alert">{error}</p>}
       </section>
+      <AppearanceSettings />
       {DESKTOP ? <p className="muted">{t.tutor.localProfile}</p> : (
         <>
           <Password />

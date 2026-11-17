@@ -2,8 +2,18 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import "@fontsource-variable/atkinson-hyperlegible-next/wght.css";
 import "@fontsource-variable/martian-mono/wdth.css";
+// The other fonts on offer in the appearance settings. Only declared here: a browser downloads one only when it's chosen.
+import "@fontsource-variable/inter/wght.css";
+import "@fontsource-variable/lexend/wght.css";
+import "@fontsource/opendyslexic/400.css";
+import "@fontsource/opendyslexic/700.css";
+import "@fontsource-variable/source-serif-4/wght.css";
+import "@fontsource-variable/jetbrains-mono/wght.css";
+import "@fontsource-variable/fira-code/wght.css";
 import "../globals.css";
 import { AccountStart } from "@/components/AccountStart";
+import { AppearanceSync } from "@/components/Appearance";
+import { APPEARANCE_SCRIPT } from "@/lib/appearance";
 import { Nav } from "@/components/Nav";
 import { Prompt } from "@/components/Prompt";
 import { Track } from "@/components/Track";
@@ -41,12 +51,13 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME + APPEARANCE_SCRIPT }} />
       </head>
       <body>
         <LangProvider lang={lang} t={t}>
           <a className="skip" href="#main">{t.common.skip}</a>
           <AccountStart />
+          <AppearanceSync />
           {!DESKTOP && <Track />}
           <Nav />
           <Prompt />

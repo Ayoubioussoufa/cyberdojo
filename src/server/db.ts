@@ -67,6 +67,11 @@ CREATE TABLE IF NOT EXISTS user_pages (
   PRIMARY KEY (user_id, path)
 ) WITHOUT ROWID;
 CREATE INDEX IF NOT EXISTS user_pages_recent ON user_pages(last_at);
+CREATE TABLE IF NOT EXISTS user_prefs (
+  user_id    TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  data       TEXT NOT NULL,
+  updated_at INTEGER NOT NULL
+) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS feedback (
   path       TEXT NOT NULL,
   visitor    TEXT NOT NULL,

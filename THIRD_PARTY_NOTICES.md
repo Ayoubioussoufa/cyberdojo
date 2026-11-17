@@ -41,3 +41,16 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## Fonts
+
+The site serves these fonts itself, from the Fontsource packages, under the
+[SIL Open Font License 1.1](https://openfontlicense.org/): Atkinson Hyperlegible Next (Braille
+Institute), Martian Mono (Evil Martians), Inter (Rasmus Andersson), Lexend (The Lexend Project),
+OpenDyslexic (Abbie Gonzalez), Source Serif 4 (Adobe), JetBrains Mono (JetBrains) and Fira Code
+(Nikita Prokopov). The last six are choices on the account page's appearance settings.
+
+## Code editor
+
+The Python challenges' editor is [CodeMirror 6](https://codemirror.net/) (MIT licence, Marijn
+Haverbeke and others). Lesson code is coloured with [Shiki](https://shiki.style/) (MIT licence).
