@@ -7,6 +7,7 @@ import { AccountStart } from "@/components/AccountStart";
 import { Nav } from "@/components/Nav";
 import { Prompt } from "@/components/Prompt";
 import { Track } from "@/components/Track";
+import { PageMemory } from "@/components/PageMemory";
 import { TutorDock } from "@/components/tutor/TutorDock";
 import { LangProvider } from "@/i18n/LangProvider";
 import { LANGS, isLang } from "@/i18n/lang";
@@ -48,6 +49,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           <a className="skip" href="#main">{t.common.skip}</a>
           <AccountStart />
           {!DESKTOP && <Track />}
+          <PageMemory />
           <Nav />
           <Prompt />
           <main id="main">{children}</main>
