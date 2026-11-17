@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { CodeEditor } from "@/components/CodeEditor";
-import { DESKTOP } from "@/lib/desktop";
 import { fill, plural, useLang } from "@/i18n/LangProvider";
 import { pyChallenge } from "@/data/pycode";
 import { PY_FR } from "@/data/fr/pycode";
 import { interpretResult, PY_HARNESS, type RunResult, testsJson } from "@/lib/pycode";
 
 // Pyodide (Python compiled to WebAssembly) runs the learner's code in their own
-// browser; nothing is sent anywhere. v1 loads it from the official CDN, so it
-// needs a connection — the desktop app shows a note instead until it is bundled.
+// browser, or in the desktop app's window; nothing is sent anywhere. It loads from
+// the official CDN, so the first run needs a connection; offline, the challenge
+// says so (loadError) and the editor still works.
 const PYODIDE_VERSION = "0.27.7";
 const PYODIDE_BASE = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
 
@@ -65,7 +65,6 @@ export function PyRunner({ id }: { id: string }) {
   // French shows its own prompt and test names; the code and the tests themselves are shared.
   const fr = lang === "fr" ? PY_FR[id] : undefined;
   const prompt = fr?.prompt ?? challenge.prompt;
-  if (DESKTOP) return <section className="pyrun"><p className="pyrun-prompt">{prompt}</p><p className="pyrun-note">{P.desktopNote}</p></section>;
 
   const run = async () => {
     setBusy(true);
