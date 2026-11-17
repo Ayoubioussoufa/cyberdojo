@@ -6,6 +6,7 @@ import Link from "@/components/HoverLink";
 import { useAccount } from "@/lib/account";
 import { BELTS } from "@/data/path";
 import { useLang } from "@/i18n/LangProvider";
+import { useEffect, useRef } from "react";
 import { currentBelt, isDone, skillBars, streak, type PathStep } from "@/lib/pathState";
 import { today, useStore } from "@/lib/progress";
 
@@ -31,27 +32,81 @@ export function BeltChip({ belt }: { belt: (typeof BELTS)[number] }) {
   );
 }
 
+/** A day as the store keys it: the learner's own calendar date, not UTC. */
+const isoOf = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+/**
+ * A year of practice, drawn like GitHub's contribution graph: one square per
+ * day, one column per week (Monday at the top), the newest week on the right.
+ * On a narrow screen the grid scrolls sideways and opens on the latest weeks.
+ */
 function Calendar({ days }: { days: Record<string, number> }) {
-  const weeks = 18;
-  const end = new Date(`${today()}T12:00:00`);
-  const start = new Date(end);
-  start.setDate(end.getDate() - (weeks * 7 - 1) - ((end.getDay() + 6) % 7) + 6);
-  const cells: { iso: string; n: number }[] = [];
-  const p = (n: number) => String(n).padStart(2, "0");
-  for (const d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const iso = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-    cells.push({ iso, n: days[iso] ?? 0 });
-  }
-  const level = (n: number) => (n === 0 ? 0 : n < 3 ? 1 : n < 8 ? 2 : n < 15 ? 3 : 4);
-  const active = cells.filter((c) => c.n).length;
   const { lang, t } = useLang();
   const P = t.progress;
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, []);
+
+  const weeks = 53;
+  const end = new Date(`${today()}T12:00:00`);
+  const monday = new Date(end);
+  monday.setDate(end.getDate() - ((end.getDay() + 6) % 7));
+  const first = new Date(monday);
+  first.setDate(monday.getDate() - 7 * (weeks - 1));
+
+  const locale = lang === "fr" ? "fr-FR" : "en-GB";
+  const long = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const month = new Intl.DateTimeFormat(locale, { month: "short" });
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: "short" });
+
+  const columns: { iso: string; n: number; date: Date; future: boolean }[][] = [];
+  const labels: { col: number; name: string }[] = [];
+  let total = 0;
+  let active = 0;
+  for (let w = 0; w < weeks; w++) {
+    const col = [];
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(first);
+      date.setDate(first.getDate() + w * 7 + d);
+      const iso = isoOf(date);
+      const future = date > end;
+      const n = future ? 0 : (days[iso] ?? 0);
+      total += n;
+      if (n) active++;
+      col.push({ iso, n, date, future });
+    }
+    columns.push(col);
+    // A month's name sits over the week that holds its 1st day, as on GitHub.
+    const firstOfMonth = col.find((c) => c.date.getDate() === 1);
+    if (firstOfMonth) labels.push({ col: w, name: month.format(firstOfMonth.date).replace(".", "") });
+  }
+  const level = (n: number) => (n === 0 ? 0 : n < 3 ? 1 : n < 8 ? 2 : n < 15 ? 3 : 4);
+  const dayName = (d: number) => weekday.format(new Date(2024, 0, 1 + d)).replace(".", "");
+
   return (
-    <div>
-      <div className="cal" role="img" aria-label={fill(P.calLabel, { n: active, weeks })}>
-        {cells.map((c) => <span key={c.iso} className={`cal-${level(c.n)}`} title={`${c.iso}: ${plural(lang, P.things, c.n)}`} />)}
+    <div className="cal-wrap">
+      <p className="cal-total"><strong>{fill(P.inYear, { things: plural(lang, P.things, total) })}</strong> <span className="meta">{fill(P.calLegend, { n: active, weeks })}</span></p>
+      <div className="cal-scroll" ref={scroller}>
+        <div className="cal-grid" style={{ "--weeks": weeks } as React.CSSProperties} role="img" aria-label={fill(P.calLabel, { n: active, weeks })}>
+          {labels.map((l) => <span key={l.col} className="cal-month" style={{ gridColumn: l.col + 2 }} aria-hidden="true">{l.name}</span>)}
+          {[0, 2, 4].map((d) => <span key={d} className="cal-day" style={{ gridRow: d + 2 }} aria-hidden="true">{dayName(d)}</span>)}
+          {columns.flatMap((col, w) =>
+            col.map((c, d) =>
+              c.future ? null : (
+                <span
+                  key={c.iso}
+                  className={`cal-cell cal-${level(c.n)}`}
+                  style={{ gridColumn: w + 2, gridRow: d + 2 }}
+                  title={`${plural(lang, P.things, c.n)} · ${long.format(c.date)}`}
+                />
+              ),
+            ),
+          )}
+        </div>
       </div>
-      <p className="meta cal-legend"><span>{fill(P.calLegend, { n: active, weeks })}</span><span className="cal-key">{P.less} <i className="cal-0" /><i className="cal-1" /><i className="cal-2" /><i className="cal-3" /><i className="cal-4" /> {P.more}</span></p>
+      <p className="meta cal-legend"><span className="cal-key">{P.less} <i className="cal-0" /><i className="cal-1" /><i className="cal-2" /><i className="cal-3" /><i className="cal-4" /> {P.more}</span></p>
     </div>
   );
 }
