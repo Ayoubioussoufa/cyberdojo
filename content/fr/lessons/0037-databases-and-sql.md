@@ -59,6 +59,21 @@ INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);
 
 Lancez `SELECT * FROM users;` et vous devriez voir les trois lignes ci-dessus. Gardez cette fenêtre ouverte pour le reste de la leçon et essayez chaque requête au moment où vous la rencontrez.
 
+### Pourquoi une base de données, et pas un fichier ?
+
+Vous pourriez garder les utilisateurs dans un tableur ou un fichier CSV, et pour une seule personne, cela marche. Une base de données devient utile dès que plusieurs programmes se servent des données en même temps. Elle laisse de nombreux lecteurs et rédacteurs travailler ensemble sans rien corrompre, elle impose des règles à chaque ligne (cette colonne est un nombre, cet identifiant est unique), elle répond aux questions dans un seul langage sans que vous écriviez la boucle de recherche, et elle peut regrouper des modifications pour qu'elles aient toutes lieu, ou aucune. C'est pourquoi presque toutes les applications que vous évaluerez rangent leurs données dans une base.
+
+### SQLite, et les serveurs de bases de données
+
+SQLite est une base de données dans un seul fichier, ouverte directement par le programme qui l'utilise : pas de serveur, pas de mot de passe, rien qui écoute sur le réseau. Les bases qui tournent derrière la plupart des sites fonctionnent autrement. **MySQL** (et sa cousine MariaDB) et **PostgreSQL** tournent comme des serveurs, à l'écoute sur les ports 3306 et 5432, et les programmes s'y connectent par le réseau avec un nom d'utilisateur et un mot de passe :
+
+```
+mysql -h db.lab -u app -p shop
+psql -h db.lab -U app shop
+```
+
+Le SQL que vous tapez est presque le même partout ; les différences tiennent à la connexion et aux extras de chaque produit. Pour un défenseur, le modèle serveur amène ses propres questions : qui peut joindre ce port, quel compte l'application utilise, et ce que ce compte a le droit de faire. Le constat « MySQL joignable depuis le réseau du personnel » de la leçon sur Nmap, c'est exactement cela.
+
 ?? Qu'est-ce qu'une clé étrangère ?
 + Une colonne qui pointe vers une autre table
 - Un mot de passe venu d'un serveur étranger
@@ -129,6 +144,38 @@ Sur l'exemple, l'étape 3 forme deux groupes : l'utilisateur 1 avec une commande
 
 @code big-spenders
 
+### NULL, la valeur qui n'est pas là
+
+Une valeur manquante en SQL s'appelle `NULL`, ce qui veut dire « inconnu », ni zéro ni chaîne vide, et elle se comporte bizarrement. Ne donnez aucun rôle à `tom` et demandez :
+
+```sql
+SELECT name FROM users WHERE role = NULL;      -- ne renvoie rien du tout
+SELECT name FROM users WHERE role IS NULL;     -- tom
+SELECT name, role FROM users WHERE role != 'admin';
+```
+
+```
+name  role
+----  ----
+sam   user
+```
+
+Toute comparaison avec `NULL` n'est ni vraie ni fausse, mais inconnue, et `WHERE` ne garde que les lignes où le test est vrai. Donc `= NULL` ne correspond jamais, `IS NULL` est la bonne façon de demander, et la dernière requête laisse discrètement `tom` de côté : il n'est pas admin, mais « inconnu n'est pas admin » n'est pas vrai non plus. Des contrôles d'accès écrits ainsi peuvent oublier des comptes.
+
+### Quand SQLite proteste
+
+Voici de vrais messages de `sqlite3`, et chacun dit où chercher :
+
+| Vous voyez | Cela veut dire |
+|---|---|
+| `no such table: user` | Le nom de table est faux ; `.tables` liste les vrais |
+| `no such column: nmae` | Un nom de colonne est mal écrit ; `.schema users` les montre |
+| `near "SELEC": syntax error` | SQLite s'est arrêté sur le mot qu'il n'a pas compris ; l'erreur est là ou juste avant |
+| `UNIQUE constraint failed: users.id` | Cette clé primaire existe déjà, donc la ligne est refusée |
+| L'invite devient `...>` | Vous n'avez pas encore tapé le `;` final, donc SQLite attend la suite |
+
+Les versions récentes de `sqlite3` montrent même l'endroit exact, avec `^--- error here` sous la ligne.
+
 ?? Vous voulez le nombre d'échecs de chaque IP, seulement pour les IP qui en ont plus de 10. Quelle clause filtre sur le compte ?
 + `HAVING`, car il filtre après le regroupement
 - `WHERE`, car il filtre après le regroupement
@@ -141,6 +188,27 @@ Sur l'exemple, l'étape 3 forme deux groupes : l'utilisateur 1 avec une commande
 Un **index** ressemble à l'index d'un livre : il rend les recherches rapides. Sans lui, la base parcourt toute la table.
 
 Une **transaction** regroupe des changements pour qu'ils aient tous lieu ou qu'aucun n'ait lieu : déplacer de l'argent de A vers B, sans jamais le perdre en route.
+
+### Modifier des données, sans risque
+
+`UPDATE` et `DELETE` modifient des lignes, et la clause `WHERE` décide lesquelles. Oubliez-la, et la modification touche toutes les lignes. Essayez dans une transaction, que l'on peut annuler :
+
+```sql
+BEGIN;
+UPDATE users SET role = 'admin';
+SELECT name, role FROM users;
+ROLLBACK;
+```
+
+```
+name  role
+----  -----
+ana   admin
+sam   admin
+tom   admin
+```
+
+Tout le monde est devenu admin, parce que le `WHERE id = 2` a été oublié. `ROLLBACK` annule toute la transaction, et un `SELECT` ensuite montre à nouveau les rôles d'origine ; `COMMIT` aurait rendu la modification définitive. Le vrai travail sur une base suit la même habitude : lancez d'abord le `SELECT` avec le même `WHERE`, vérifiez qu'il ne renvoie que les lignes voulues, puis transformez-le en `UPDATE`.
 
 ?? Que garantit une transaction ?
 + Tous les changements ont lieu, ou aucun

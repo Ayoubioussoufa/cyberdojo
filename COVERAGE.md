@@ -107,7 +107,7 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Nmap (tool) | 76 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ● | ● | Nmap (tool) | 77 mentions in 13 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 8 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Scan timing, rate and how each looks to a defender | 4 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Nmap Scripting Engine | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
@@ -170,7 +170,7 @@ Basis: Brief 2, CyBOK Operating Systems & Virtualisation.
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
 | ● | ● | Processes, threads, handles, core system processes | 31 mentions in 4 docs, most in 0031-windows-objects, practice 7. | [Memory forensics](modules/08-blue-team/06-memory-forensics.md) |
-| ● | ● | The registry | 42 mentions in 15 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
+| ● | ● | The registry | 43 mentions in 15 docs, most in 0031-windows-objects, practice 7. | [Windows privilege escalation](modules/02-operating-systems/08-windows-privilege-escalation.md) |
 | ● | ● | NTFS, $MFT, alternate data streams | 14 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Disk forensics](modules/08-blue-team/05-disk-forensics.md) |
 | ● | ● | Access tokens and SIDs | 24 mentions in 3 docs, most in 0031-windows-objects, practice 1. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
 | ● | ● | Integrity levels and UAC | 6 mentions in 1 docs, most in 0031-windows-objects. | [Windows tokens and privileges](modules/02-operating-systems/06-windows-tokens-and-privileges.md) |
