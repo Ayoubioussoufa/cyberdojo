@@ -61,6 +61,21 @@ INSERT INTO orders VALUES (10, 1, 40), (11, 2, 15), (12, 2, 70);
 
 Run `SELECT * FROM users;` and you should see the three rows above. Keep this window open for the rest of the lesson and try every query as you meet it.
 
+### Why a database, and not a file?
+
+You could keep users in a spreadsheet or a CSV file, and for one person that works. A database earns its place as soon as several programs use the data at once. It lets many readers and writers work at the same time without corrupting anything, it enforces rules on every row (this column is a number, this ID is unique), it answers questions in one language without you writing the search loop, and it can group changes so that they all happen or none do. That's why almost every application you'll assess keeps its data in one.
+
+### SQLite, and the database servers
+
+SQLite is a database in a single file, opened directly by the program that uses it: no server, no password, nothing listening on the network. The databases behind most websites work differently. **MySQL** (and its sibling MariaDB) and **PostgreSQL** run as servers, listening on ports 3306 and 5432, and programs connect to them over the network with a username and password:
+
+```
+mysql -h db.lab -u app -p shop
+psql -h db.lab -U app shop
+```
+
+The SQL you type is almost the same everywhere; the differences are in the connection and in each product's extras. For a defender, the server model brings its own questions: who can reach that port, which account the application uses, and what that account is allowed to do. The Nmap lesson's "MySQL reachable from the staff network" finding is exactly this.
+
 ?? What's a foreign key?
 + A column pointing at another table
 - A password from another country's server
@@ -131,6 +146,38 @@ On the example, step 3 makes two groups: user 1 with one order of 40, and user 2
 
 @code big-spenders
 
+### NULL, the value that isn't there
+
+A missing value in SQL is `NULL`, which means "unknown", not zero or an empty string, and it behaves oddly. Give `tom` no role and ask:
+
+```sql
+SELECT name FROM users WHERE role = NULL;      -- returns nothing at all
+SELECT name FROM users WHERE role IS NULL;     -- tom
+SELECT name, role FROM users WHERE role != 'admin';
+```
+
+```
+name  role
+----  ----
+sam   user
+```
+
+Any comparison with `NULL` is neither true nor false but unknown, and `WHERE` keeps only rows where the test is true. So `= NULL` never matches, `IS NULL` is the way to ask, and the last query quietly leaves `tom` out: he isn't an admin, but "unknown is not admin" isn't true either. Access checks written like that can miss accounts.
+
+### When SQLite complains
+
+These are real messages from `sqlite3`, and each says where to look:
+
+| You see | It means |
+|---|---|
+| `no such table: user` | The table name is wrong; `.tables` lists the real ones |
+| `no such column: nmae` | A column name is misspelt; `.schema users` shows them |
+| `near "SELEC": syntax error` | SQLite stopped at the word it couldn't parse; the mistake is there or just before |
+| `UNIQUE constraint failed: users.id` | That primary key already exists, so the row was refused |
+| The prompt changes to `...>` | You haven't typed the closing `;` yet, so SQLite is waiting for more |
+
+The newer `sqlite3` versions even point at the exact spot with `^--- error here` under the line.
+
 ?? You want each IP's failure count, only for IPs with more than 10. Which clause filters on the count?
 + `HAVING`, because it filters after any grouping
 - `WHERE`, because it filters after any grouping
@@ -143,6 +190,27 @@ On the example, step 3 makes two groups: user 1 with one order of 40, and user 2
 An **index** is like a book's index: it makes lookups fast. Without one, the database scans the whole table.
 
 A **transaction** groups changes so that they all happen or none do: move money from A to B, and never lose it halfway.
+
+### Changing data, safely
+
+`UPDATE` and `DELETE` change rows, and the `WHERE` clause decides which. Leave it out and the change hits every row. Try it inside a transaction, which you can take back:
+
+```sql
+BEGIN;
+UPDATE users SET role = 'admin';
+SELECT name, role FROM users;
+ROLLBACK;
+```
+
+```
+name  role
+----  -----
+ana   admin
+sam   admin
+tom   admin
+```
+
+Everyone became an admin, because the `WHERE id = 2` was forgotten. `ROLLBACK` cancels the whole transaction, and a `SELECT` afterwards shows the original roles again; `COMMIT` would have made the change permanent. Real database work follows the same habit: run the `SELECT` with the same `WHERE` first, check that it returns only the rows you mean, then turn it into the `UPDATE`.
 
 ?? What does a transaction guarantee?
 + All the changes happen, or none

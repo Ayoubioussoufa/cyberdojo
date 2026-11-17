@@ -107,7 +107,7 @@ Basis: Brief 1, CyBOK Network Security.
 
 | Before | Now | Topic | Evidence in the course | Taught in module |
 |---|---|---|---|---|
-| ● | ● | Nmap (tool) | 71 mentions in 12 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
+| ● | ● | Nmap (tool) | 72 mentions in 13 docs, most in 0022-scanning-with-nmap, practice 13. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ◐ | ● | Scan types: SYN, connect, UDP, FIN/NULL/Xmas, idle | 3 mentions in 1 docs, most in 0022-scanning-with-nmap, practice 1. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Scan timing, rate and how each looks to a defender | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
 | ○ | ● | Nmap Scripting Engine | 3 mentions in 1 docs, most in 0022-scanning-with-nmap. | [Scanning in depth](modules/01-networking/07-scanning-in-depth.md) |
