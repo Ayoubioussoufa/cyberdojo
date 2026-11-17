@@ -39,7 +39,8 @@
     "marked": "15.0.12",
     "next": "16.4.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "shiki": "4.6.0"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",

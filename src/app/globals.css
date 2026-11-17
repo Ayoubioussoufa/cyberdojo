@@ -317,6 +317,11 @@ code, kbd { font-family: var(--mono); font-size: 0.8em; }
 kbd { border: 1px solid var(--rule-strong); border-bottom-width: 2px; border-radius: var(--radius); padding: 0 0.35em; }
 pre { position: relative; margin: 0 0 1.2em; padding: 13px 16px; background: var(--code-bg); border-left: 2px solid var(--rule-strong); border-radius: var(--radius); overflow-x: auto; font-size: 14px; line-height: 1.5; tab-size: 4; }
 pre code { font-size: 1em; background: none; padding: 0; }
+/* Coloured code (src/lib/highlight.ts): each token holds a dark and a light colour; the theme picks one. */
+pre.shiki, pre.shiki span { color: var(--shiki-dark); }
+:root[data-theme="light"] pre.shiki, :root[data-theme="light"] pre.shiki span { color: var(--shiki-light); }
+pre.shiki[data-lang]::before { content: attr(data-lang); position: absolute; top: 4px; right: 10px; font: 600 10.5px/1 var(--body); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); pointer-events: none; }
+pre.shiki:hover[data-lang]::before { opacity: 0; }
 .pre-copy { position: absolute; top: 6px; right: 6px; padding: 2px 8px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); color: var(--muted); font-family: var(--body); font-size: 11.5px; opacity: 0; transition: opacity 0.12s; }
 pre:hover .pre-copy, .pre-copy:focus-visible { opacity: 1; }
 @media (hover: none) { .pre-copy { opacity: 1; } }
