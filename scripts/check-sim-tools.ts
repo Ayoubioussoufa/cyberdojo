@@ -252,7 +252,7 @@ curl --nonsense ${b}/
 const clean = (s: string) =>
   s.replace(/\r/g, "").replace(/^(Date|Connection|Keep-Alive): .*\n/gim, "").replace(/curl\/[0-9.]+/g, "curl/x");
 /** Real curl wraps some errors in advice that isn't the point of the comparison. */
-const firstErr = (s: string) => /curl: .*/.exec(s)?.[0].replace(/^curl: \((\d+)\).*/, "curl: ($1)").replace(/'/g, "").replace(/ is unknown$/, " is unknown") ?? "";
+const firstErr = (s: string) => /curl: .*/.exec(s)?.[0].replace(/^curl: \((\d+)\).*/, "curl: ($1)").replace(/'/g, "") ?? "";
 
 server.listen(0, "127.0.0.1", () => {
   const { port } = server.address() as { port: number };
